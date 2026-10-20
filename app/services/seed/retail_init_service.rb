@@ -458,6 +458,20 @@ class Seed::RetailInitService
         visible_columns: %w[name code workflow_status needed_by]
       }
     },
+    tickets: {
+      "General Issue" => {
+        properties: { property_string_1: "Issue Type", property_string_2: "Reported By" },
+        visible_columns: %w[name priority workflow_status assigned_employee_id]
+      },
+      "Bug Report" => {
+        properties: { property_string_1: "Severity", property_string_2: "Repro Steps" },
+        visible_columns: %w[name priority workflow_status assigned_employee_id]
+      },
+      "Feature Request" => {
+        properties: { property_string_1: "Requested By", property_decimal_1: "Estimated Effort" },
+        visible_columns: %w[name priority workflow_status assigned_employee_id]
+      }
+    },
     purchase_items: {
       "Stationery" => {
         properties: { property_string_1: "Brand Preference", property_integer_1: "Pack Size" },
@@ -588,6 +602,25 @@ class Seed::RetailInitService
         Seed::WorkflowStepService.create(company: @company, workflow: workflow, **attrs)
       end
     end
+
+    @company.categories.where(resource_name: "tickets").find_each do |category|
+      workflow = Seed::WorkflowService.create(
+        company: @company,
+        category: category,
+        name: "#{category.name} Ticket Process",
+        description: "Default ticket workflow: to do, in progress, review, done.",
+        process_type: :ticket_process
+      )
+
+      [
+        { name: "To Do", position: 1, text_color: WORKFLOW_STEP_TEXT_COLORS[0], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[0] },
+        { name: "In Progress", position: 2, text_color: WORKFLOW_STEP_TEXT_COLORS[1], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[1] },
+        { name: "Review", position: 3, text_color: WORKFLOW_STEP_TEXT_COLORS[3], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[3] },
+        { name: "Done", position: 4, text_color: WORKFLOW_STEP_TEXT_COLORS[2], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[2] }
+      ].each do |attrs|
+        Seed::WorkflowStepService.create(company: @company, workflow: workflow, **attrs)
+      end
+    end
   end
 
   def configure_retail_permissions
@@ -697,6 +730,9 @@ class Seed::RetailInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
+        "Ticket" => { create: true, read: true, update: true, delete: true },
+        "TicketComment" => { create: true, read: true, update: true, delete: true },
+        "TicketLog" => { create: true, read: true, update: true, delete: true },
         "Document" => { create: true, read: true, update: true, delete: true },
         "CompanySetting" => { create: true, read: true, update: false, delete: true }, # owner-only update (see CompanySettingsPolicy)
 
@@ -763,6 +799,9 @@ class Seed::RetailInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
+        "Ticket" => { create: true, read: true, update: true, delete: true },
+        "TicketComment" => { create: true, read: true, update: true, delete: true },
+        "TicketLog" => { create: true, read: true, update: true, delete: true },
         "Document" => { create: true, read: true, update: true, delete: true },
         "CompanySetting" => { create: true, read: true, update: false, delete: true }, # owner-only update (see CompanySettingsPolicy)
         "Student" => { create: true, read: true, update: true, delete: true }
@@ -773,6 +812,9 @@ class Seed::RetailInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
         "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
         "CompanyTicketLog" => { read: true },
+        "Ticket" => { create: true, read: true, update: true, delete: false },
+        "TicketComment" => { create: true, read: true, update: false, delete: false },
+        "TicketLog" => { read: true },
         "Order" => { create: true, read: true, update: true, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: true, read: true, update: false, delete: false },
@@ -788,6 +830,9 @@ class Seed::RetailInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
         "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
         "CompanyTicketLog" => { read: true },
+        "Ticket" => { create: true, read: true, update: true, delete: false },
+        "TicketComment" => { create: true, read: true, update: false, delete: false },
+        "TicketLog" => { read: true },
         "Order" => { create: true, read: true, update: false, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: false, read: true, update: false, delete: false },
@@ -803,6 +848,9 @@ class Seed::RetailInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
         "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
         "CompanyTicketLog" => { read: true },
+        "Ticket" => { create: true, read: true, update: true, delete: false },
+        "TicketComment" => { create: true, read: true, update: false, delete: false },
+        "TicketLog" => { read: true },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Order" => { create: false, read: true, update: false, delete: false }
       },
@@ -812,6 +860,9 @@ class Seed::RetailInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
         "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
         "CompanyTicketLog" => { read: true },
+        "Ticket" => { create: true, read: true, update: true, delete: false },
+        "TicketComment" => { create: true, read: true, update: false, delete: false },
+        "TicketLog" => { read: true },
         "Order" => { read: true, update: true },
         "Service" => { read: true },
         "Brand" => { create: false, read: true, update: false, delete: false },
@@ -824,6 +875,9 @@ class Seed::RetailInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
         "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
         "CompanyTicketLog" => { read: true },
+        "Ticket" => { create: true, read: true, update: true, delete: false },
+        "TicketComment" => { create: true, read: true, update: false, delete: false },
+        "TicketLog" => { read: true },
         "Order" => { read: true },
         "Facility" => { create: false, read: true, update: false, delete: false }
       },
@@ -833,6 +887,9 @@ class Seed::RetailInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
         "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
         "CompanyTicketLog" => { read: true },
+        "Ticket" => { create: true, read: true, update: true, delete: false },
+        "TicketComment" => { create: true, read: true, update: false, delete: false },
+        "TicketLog" => { read: true },
         "Customer" => { create: true, read: true, update: true },
         "Order" => { create: true, read: true },
         "Brand" => { create: false, read: true, update: false, delete: false },

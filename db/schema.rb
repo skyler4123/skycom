@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_20_060326) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_20_070004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -8315,6 +8315,152 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_060326) do
     t.index ["company_id"], name: "index_tax_configs_on_company_id", unique: true
   end
 
+  create_table "ticket_comments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "ticket_id", null: false
+    t.uuid "employee_id", null: false
+    t.text "message", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_ticket_comments_on_business_type"
+    t.index ["company_id", "ticket_id"], name: "index_ticket_comments_on_company_id_and_ticket_id"
+    t.index ["company_id"], name: "index_ticket_comments_on_company_id"
+    t.index ["discarded_at"], name: "index_ticket_comments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_ticket_comments_on_lifecycle_status"
+    t.index ["ticket_id"], name: "index_ticket_comments_on_ticket_id"
+    t.index ["workflow_status"], name: "index_ticket_comments_on_workflow_status"
+  end
+
+  create_table "ticket_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "ticket_id", null: false
+    t.string "actor_type"
+    t.uuid "actor_id"
+    t.integer "action", default: 0, null: false
+    t.string "from_status"
+    t.string "to_status"
+    t.text "note"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_ticket_logs_on_business_type"
+    t.index ["company_id", "ticket_id"], name: "index_ticket_logs_on_company_id_and_ticket_id"
+    t.index ["company_id"], name: "index_ticket_logs_on_company_id"
+    t.index ["discarded_at"], name: "index_ticket_logs_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_ticket_logs_on_lifecycle_status"
+    t.index ["ticket_id"], name: "index_ticket_logs_on_ticket_id"
+    t.index ["workflow_status"], name: "index_ticket_logs_on_workflow_status"
+  end
+
+  create_table "tickets", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "assigned_employee_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id"
+    t.uuid "workflow_step_id"
+    t.string "name", null: false
+    t.text "description"
+    t.integer "priority", default: 1, null: false
+    t.string "external_id"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assigned_employee_id"], name: "index_tickets_on_assigned_employee_id"
+    t.index ["business_type"], name: "index_tickets_on_business_type"
+    t.index ["category_id"], name: "index_tickets_on_category_id"
+    t.index ["company_id", "assigned_employee_id"], name: "index_tickets_on_company_id_and_assigned_employee_id"
+    t.index ["company_id", "updated_at"], name: "index_tickets_on_company_id_and_updated_at"
+    t.index ["company_id", "workflow_status"], name: "index_tickets_on_company_id_and_workflow_status"
+    t.index ["company_id"], name: "index_tickets_on_company_id"
+    t.index ["discarded_at"], name: "index_tickets_on_discarded_at"
+    t.index ["employee_id"], name: "index_tickets_on_employee_id"
+    t.index ["external_id"], name: "index_tickets_on_external_id"
+    t.index ["lifecycle_status"], name: "index_tickets_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_tickets_on_property_mapping_id"
+    t.index ["workflow_status"], name: "index_tickets_on_workflow_status"
+    t.index ["workflow_step_id"], name: "index_tickets_on_workflow_step_id"
+  end
+
   create_table "transactions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -9280,6 +9426,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_060326) do
   add_foreign_key "tasks", "property_mappings"
   add_foreign_key "tasks", "task_groups"
   add_foreign_key "tax_configs", "companies"
+  add_foreign_key "ticket_comments", "companies"
+  add_foreign_key "ticket_comments", "employees"
+  add_foreign_key "ticket_comments", "tickets"
+  add_foreign_key "ticket_logs", "companies"
+  add_foreign_key "ticket_logs", "tickets"
+  add_foreign_key "tickets", "categories"
+  add_foreign_key "tickets", "companies"
+  add_foreign_key "tickets", "employees"
+  add_foreign_key "tickets", "employees", column: "assigned_employee_id"
+  add_foreign_key "tickets", "property_mappings"
+  add_foreign_key "tickets", "workflow_steps"
   add_foreign_key "transactions", "branches"
   add_foreign_key "transactions", "categories"
   add_foreign_key "transactions", "companies"

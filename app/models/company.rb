@@ -29,6 +29,8 @@ class Company < ApplicationRecord
     Event EventGroup EventConfig
     Notification NotificationTag
     CompanyTicket CompanyTicketComment CompanyTicketLog
+    Ticket TicketComment TicketLog
+    Ticket TicketComment TicketLog
     Document CompanySetting Folder StoredFile
   ].freeze
   # Delay before the welcome notification job runs. Single-file: only used
@@ -159,6 +161,9 @@ class Company < ApplicationRecord
   has_many :company_tickets, dependent: :destroy
   has_many :company_ticket_comments, dependent: :destroy
   has_many :company_ticket_logs, dependent: :destroy
+  has_many :tickets, dependent: :destroy
+  has_many :ticket_comments, dependent: :destroy
+  has_many :ticket_logs, dependent: :destroy
   has_many :documents, dependent: :destroy
   has_many :folders, dependent: :destroy
   has_many :stored_files, dependent: :destroy

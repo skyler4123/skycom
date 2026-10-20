@@ -143,6 +143,16 @@ class Seed::HotelInitService
         visible_columns: %w[name code workflow_status needed_by]
       }
     },
+    tickets: {
+      "Guest Issue" => {
+        properties: { property_string_1: "Room", property_string_2: "Reported By" },
+        visible_columns: %w[name priority workflow_status assigned_employee_id]
+      },
+      "Maintenance" => {
+        properties: { property_string_1: "Location", property_string_2: "Urgency" },
+        visible_columns: %w[name priority workflow_status assigned_employee_id]
+      }
+    },
     purchase_items: {
       "Perishable Items" => {
         properties: { property_string_1: "Brand Preference", property_integer_1: "Pack Size" },

@@ -140,6 +140,15 @@ Rails.application.routes.draw do
       end
       resources :company_ticket_comments, only: [ :create ]
       resources :company_ticket_logs, only: [ :index, :show ]
+
+      resources :tickets do
+        member do
+          post :advance
+          post :assign
+        end
+      end
+      resources :ticket_comments, only: [ :create ]
+      resources :ticket_logs, only: [ :index, :show ]
       resources :notifications, only: [ :index, :show ] do
         member do
           post :mark_read
