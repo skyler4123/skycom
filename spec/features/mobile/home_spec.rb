@@ -18,6 +18,20 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
     expect(page).to have_link("Employee Info", href: mobile_employee_path)
   end
 
+  scenario "has attendance month link" do
+    sign_in(user)
+    visit mobile_home_path
+
+    expect(page).to have_link("Attendance Month", href: mobile_attendance_month_path)
+  end
+
+  scenario "has payroll link" do
+    sign_in(user)
+    visit mobile_home_path
+
+    expect(page).to have_link("Payroll", href: mobile_payroll_path)
+  end
+
   scenario "has check in button" do
     sign_in(user)
     visit mobile_home_path

@@ -657,6 +657,7 @@ export const dictionary = () => {
     "Check In": { vi: "Giờ vào" },
     "Check Out": { vi: "Giờ ra" },
     "Date": { vi: "Ngày" },
+    "My Profile": { vi: "Hồ sơ của tôi" },
     "Employee": { vi: "Nhân viên" },
     "Back": { vi: "Quay lại" },
     "Onsite Miss": { vi: "Lỡ chấm công tại chỗ" },

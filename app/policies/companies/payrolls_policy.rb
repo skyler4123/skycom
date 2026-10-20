@@ -9,6 +9,10 @@ class Companies::PayrollsPolicy < ApplicationPolicy
     record.can?(:read, Payroll)
   end
 
+  def my?
+    record.can?(:read, Payroll)
+  end
+
   def summary?
     record.can?(:read, Payroll)
   end

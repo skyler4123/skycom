@@ -1,7 +1,7 @@
 # app/controllers/companies/attendance_months_controller.rb
 #
 # Attendance month dashboard API (Shell-First).
-# Serves Stimulus: Companies_AttendanceMonths_IndexController, Companies_AttendanceMonths_ShowController
+# Serves Stimulus: Companies_AttendanceMonths_IndexController, Companies_AttendanceMonths_ShowController, Companies_AttendanceMonths_MyController
 # Endpoints: GET /companies/:company_id/attendance_months(.json?employee_name&from&to&min_absent_days&min_deficit_minutes), GET /companies/:company_id/attendance_months/:id(.json with attendance_days), POST /companies/:company_id/attendance_months/collect
 # Docs: docs/HR.md
 class Companies::AttendanceMonthsController < Companies::ApplicationController
@@ -41,7 +41,33 @@ class Companies::AttendanceMonthsController < Companies::ApplicationController
     end
   end
 
+  def my
+    employee = current_employee
+    month = parse_month(params[:month]) || Date.current.beginning_of_month
+    m = employee ? current_company.attendance_months.includes(:employee).find_by(employee: employee, month: month.beginning_of_month) : nil
+    months = employee ? current_company.attendance_months.where(employee: employee).order(month: :desc) : []
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json do
+        render json: {
+          employee: employee&.as_json(only: %i[id name]),
+          month: month.to_s,
+          attendance_month: m ? format_month(m) : nil,
+          attendance_days: m ? month_days(m).map { |d| format_day(d) } : [],
+          months: months.map { |x| { id: x.id, month: x.month } }
+        }
+      end
+    end
+  end
+
   private
+
+  def parse_month(value)
+    return nil if value.blank?
+    Date.parse("#{value}-01")
+  rescue ArgumentError, TypeError, Date::Error
+    nil
+  end
 
   def parse_filter_date(value)
     Date.parse(value.to_s)
