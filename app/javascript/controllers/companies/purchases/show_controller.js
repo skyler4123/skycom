@@ -150,8 +150,8 @@ export default class Companies_Purchases_ShowController extends Companies_Layout
         <div class="flex flex-wrap gap-2">
           ${(p.workflow_steps || []).map(s => `
             <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium border cursor-default ${s.id === currentId
-              ? "border-blue-300 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700"
-              : "border-slate-200 bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"}">
+               ? (s.background_color || "bg-blue-50 dark:bg-blue-900/30") + " " + (s.text_color || "text-blue-700 dark:text-blue-300") + " border-blue-300 dark:border-blue-700"
+               : (s.background_color || "bg-slate-50 dark:bg-slate-800") + " " + (s.text_color || "text-slate-500 dark:text-slate-400") + " border-slate-200 dark:border-slate-700"}">
               ${s.position}. ${s.name}
             </span>`).join('')}
         </div>

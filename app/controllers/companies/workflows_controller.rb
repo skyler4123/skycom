@@ -52,6 +52,7 @@ class Companies::WorkflowsController < Companies::ApplicationController
     normalize_steps_company(workflow)
 
     if workflow.save
+      current_company.invalidate_client_cache!
       redirect_to company_workflow_path(current_company, workflow), notice: "Workflow created successfully"
     else
       redirect_to new_company_workflow_path(current_company), alert: workflow.errors.full_messages.to_sentence
@@ -64,6 +65,7 @@ class Companies::WorkflowsController < Companies::ApplicationController
     normalize_steps_company(workflow)
 
     if workflow.save
+      current_company.invalidate_client_cache!
       redirect_to company_workflow_path(current_company, workflow), notice: "Workflow updated successfully."
     else
       redirect_to edit_company_workflow_path(current_company, workflow), alert: workflow.errors.full_messages.to_sentence
@@ -73,6 +75,7 @@ class Companies::WorkflowsController < Companies::ApplicationController
   def destroy
     workflow = current_company.workflows.find(params[:id])
     workflow.destroy!
+    current_company.invalidate_client_cache!
     redirect_to company_workflows_path(current_company), notice: "Workflow deleted."
   end
 
@@ -81,7 +84,7 @@ class Companies::WorkflowsController < Companies::ApplicationController
   def workflow_params
     params.require(:workflow).permit(
       :name, :description, :process_type, :category_id,
-      workflow_steps_attributes: [ :id, :name, :position ]
+      workflow_steps_attributes: [ :id, :name, :position, :text_color, :background_color ]
     )
   end
 
@@ -98,7 +101,7 @@ class Companies::WorkflowsController < Companies::ApplicationController
     ]).merge(
       category: workflow.category&.as_json(only: [ :id, :name ]),
       steps: workflow.workflow_steps.sort_by(&:position)
-        .map { |step| step.as_json(only: [ :id, :name, :position ]) }
+        .map { |step| step.as_json(only: [ :id, :name, :position, :text_color, :background_color ]) }
     )
   end
 end

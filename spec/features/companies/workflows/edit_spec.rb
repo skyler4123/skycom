@@ -59,4 +59,19 @@ RSpec.feature "Companies::Workflows Edit", type: :feature, js: true do
     expect(workflow.reload.name).to eq('Custom Purchase Process v2')
     expect(workflow.workflow_steps.order(:position).map(&:name)).to eq([ 'Submit Request', 'Approve' ])
   end
+
+  scenario "changes a step color and persists it" do
+    visit edit_company_workflow_path(company, workflow)
+    expect(page).to have_selector('input[name="workflow[workflow_steps_attributes][0][name]"]', wait: 10)
+
+    color_select = first('select[data-step-color]')
+    color_select.find('option', text: 'Emerald').select_option
+
+    click_button "Save Changes"
+
+    expect(page).to have_current_path(company_workflow_path(company, workflow), wait: 10)
+    step = workflow.reload.workflow_steps.order(:position).first
+    expect(step.text_color).to eq("text-emerald-700 dark:text-emerald-300")
+    expect(step.background_color).to eq("bg-emerald-100 dark:bg-emerald-900/30")
+  end
 end

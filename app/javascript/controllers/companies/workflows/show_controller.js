@@ -79,8 +79,8 @@ export default class Companies_Workflows_ShowController extends Companies_Layout
             <div>
               ${(w.steps || []).map(s => `
                 <div class="flex items-center gap-3 py-2 border-b border-slate-100 dark:border-slate-800">
-                  <span class="flex size-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-sm font-bold cursor-default">${s.position}</span>
-                  <span class="text-sm font-semibold text-slate-900 dark:text-white">${s.name}</span>
+                   <span class="flex size-8 items-center justify-center rounded-lg ${s.background_color || 'bg-blue-100 dark:bg-blue-900/30'} ${s.text_color || 'text-blue-600 dark:text-blue-400'} text-sm font-bold cursor-default">${s.position}</span>
+                   <span class="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-semibold ${s.text_color || 'text-slate-900 dark:text-white'} ${s.background_color || ''}">${s.name}</span>
                 </div>`).join('')}
             </div>
           </div>

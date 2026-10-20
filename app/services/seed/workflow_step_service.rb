@@ -6,6 +6,8 @@ class Seed::WorkflowStepService
     description: nil,
     code: nil,
     position:,
+    text_color: nil,
+    background_color: nil,
     lifecycle_status: :active,
     discarded_at: nil
   )
@@ -18,6 +20,8 @@ class Seed::WorkflowStepService
       description: description,
       code: code || "WF-STP-#{SecureRandom.hex(4).upcase}",
       position: position,
+      text_color: text_color,
+      background_color: background_color,
       lifecycle_status: lifecycle_status,
       discarded_at: discarded_at
     )

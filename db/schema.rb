@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_19_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_20_060326) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -8614,6 +8614,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_19_000003) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "text_color"
+    t.string "background_color"
     t.index ["business_type"], name: "index_workflow_steps_on_business_type"
     t.index ["code"], name: "index_workflow_steps_on_code", unique: true
     t.index ["company_id"], name: "index_workflow_steps_on_company_id"
