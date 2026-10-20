@@ -2,6 +2,11 @@
 
 ## Overview
 
+**Scope note:** A `Ticket` is an **internal service of a Company** — employees use it to track
+internal work (issues, requests, procurement) *inside* the company. It is **not** an external
+support ticket to Skycom; that is `CompanyTicket` (Help Center). `CompanyTicket` and `Ticket`
+share workflow machinery but serve different audiences.
+
 A `Ticket` is an internal issue tracker for employees. It combines:
 - **Purchase-style workflow binding**: a Ticket belongs to a `Category`; the category owns a `Workflow` (default 4 steps: *To Do → In Progress → Review → Done*). Transitions go through `Workflows::AdvanceService` with ABAC `can?(:update, Ticket)` (Jira-style, no per-step roles).
 - **Real-time collaboration**: assignee (Employee), comments (`TicketComment`), and a dedicated `TicketLog` for ticket lifecycle events.
@@ -27,6 +32,13 @@ WebSocket events: `ticket_created`, `ticket_commented`, `ticket_workflow_step_ch
 ## Seeding
 
 Init services create `tickets` categories and a 4-step workflow per category. Role grants mirror CompanyTicket (Admin/Manager full CRUD; employees create/read/update Ticket).
+
+## Seeding
+
+Enriched companies seed ~6 internal `Ticket` rows (round-robin across the `tickets`
+categories) plus `TicketComment` threads, with workflow states spread across phases
+(completed / rejected / reworked / pending), mirroring
+`Seed::CompanyTicketService.create_sample_thread`.
 
 ## File reference
 
