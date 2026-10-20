@@ -4,8 +4,7 @@ class CreateTicketComments < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :ticket, null: false, foreign_key: true, type: :uuid
 
-      t.string :author_type, null: false
-      t.uuid :author_id, null: false
+      t.uuid :employee_id, null: false
       t.text :message, null: false
 
       # --- System Fields ---
@@ -21,6 +20,6 @@ class CreateTicketComments < ActiveRecord::Migration[8.0]
     end
 
     add_index :ticket_comments, [ :company_id, :ticket_id ]
-    add_index :ticket_comments, [ :author_type, :author_id ]
+    add_foreign_key :ticket_comments, :employees, column: :employee_id
   end
 end
