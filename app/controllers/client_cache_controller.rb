@@ -20,7 +20,8 @@ class ClientCacheController < ApplicationController
               categories:        {},
               property_mappings: {},
               table_configs:     {},
-              company_settings: {}
+              company_settings: {},
+              workflows: { include: { workflow_steps: {} } }
             },
             methods: [ :resource_names ]
           ),

@@ -110,6 +110,10 @@ export const currentCategories = () => {
   return currentCompany()?.categories || []
 }
 
+export const currentWorkflows = () => {
+  return currentCompany()?.workflows || []
+}
+
 export const currentPropertyMappings = () => {
   return currentCompany()?.property_mappings || []
 }

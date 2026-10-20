@@ -186,7 +186,7 @@ class Companies::PurchasesController < Companies::ApplicationController
     ]).merge(
       total_price: appointments.sum { |a| a.total_price.to_f },
       workflow: workflow&.as_json(only: [ :id, :name ]),
-      current_workflow_step: purchase.workflow_step&.as_json(only: [ :id, :name, :position ]),
+      current_workflow_step: purchase.workflow_step&.as_json(only: [ :id, :name, :position, :text_color, :background_color ]),
       supplier: purchase.supplier&.as_json(only: [ :id, :name ]),
       branch: purchase.branch&.as_json(only: [ :id, :name ]),
       category: purchase.category&.as_json(only: [ :id, :name ]),
@@ -199,7 +199,7 @@ class Companies::PurchasesController < Companies::ApplicationController
     return payload unless with_workflow_detail
 
     payload.merge(
-      workflow_steps: workflow&.workflow_steps&.sort_by(&:position)&.map { |s| s.as_json(only: [ :id, :name, :position ]) },
+      workflow_steps: workflow&.workflow_steps&.sort_by(&:position)&.map { |s| s.as_json(only: [ :id, :name, :position, :text_color, :background_color ]) },
       workflow_step_logs: purchase.workflow_step_logs.order(:created_at).map { |log|
         log.as_json(only: [ :id, :outcome, :note, :created_at ])
           .merge(step_name: log.workflow_step&.name, employee_name: log.employee&.name)

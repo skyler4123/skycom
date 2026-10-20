@@ -580,10 +580,10 @@ class Seed::RetailInitService
       )
 
       [
-        { name: "Submit", position: 1 },
-        { name: "Manager Approval", position: 2 },
-        { name: "Buy", position: 3 },
-        { name: "Complete", position: 4 }
+        { name: "Submit", position: 1, text_color: WORKFLOW_STEP_TEXT_COLORS[0], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[0] },
+        { name: "Manager Approval", position: 2, text_color: WORKFLOW_STEP_TEXT_COLORS[3], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[3] },
+        { name: "Buy", position: 3, text_color: WORKFLOW_STEP_TEXT_COLORS[1], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[1] },
+        { name: "Complete", position: 4, text_color: WORKFLOW_STEP_TEXT_COLORS[2], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[2] }
       ].each do |attrs|
         Seed::WorkflowStepService.create(company: @company, workflow: workflow, **attrs)
       end

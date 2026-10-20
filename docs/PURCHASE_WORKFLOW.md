@@ -104,7 +104,7 @@ Purchase ──► supplier (optional), branch (optional)
 | `PurchaseItem` | `name`, `description`, `code`, `unit` ("piece"/"box"), `estimated_unit_price` (**reference only**), 60 `property_*` slots |
 | `PurchasePurchaseItemAppointment` | `purchase_id` + `purchase_item_id` (concrete FKs) + `quantity` / `unit_price` / `total_price` |
 | `Workflow` | `category_id` (**unique — one workflow per category**), `name`, `process_type: { purchase_process: 0, leave_process: 1 }` — no `is_default` column |
-| `WorkflowStep` | `name`, `position` (unique per workflow) — **no permission columns** |
+| `WorkflowStep` | `name`, `position` (unique per workflow) — **no permission columns**; `text_color`, `background_color` (Tailwind classes for rendering) |
 | `WorkflowStepLog` | `subject` (polymorphic), `employee_id` (actor), `outcome: { submitted: 0, approved: 1, rejected: 2, rework: 3 }`, `note`, `metadata` (`from_step_id`, `target_step_id`) |
 
 ## 5. State Machine — `Workflows::AdvanceService`

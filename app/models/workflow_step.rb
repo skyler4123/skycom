@@ -15,6 +15,8 @@ class WorkflowStep < ApplicationRecord
   validates :name, presence: true, length: { maximum: 255 }
   validates :position, numericality: { only_integer: true, greater_than_or_equal_to: 1 },
     uniqueness: { scope: :workflow_id }
+  validates :text_color, inclusion: { in: WORKFLOW_STEP_TEXT_COLORS }, allow_blank: true
+  validates :background_color, inclusion: { in: WORKFLOW_STEP_BACKGROUND_COLORS }, allow_blank: true
 
   # --- Methods ---
   def next_step

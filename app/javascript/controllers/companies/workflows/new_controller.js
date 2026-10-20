@@ -46,18 +46,44 @@ export default class Companies_Workflows_NewController extends Companies_LayoutC
       const index = Number(input.name.match(/workflow_steps_attributes\]\[(\d+)\]\[name\]/)?.[1])
       if (this.steps[index]) this.steps[index].name = input.value
     })
+    this.stepRowsTarget.querySelectorAll('select[data-step-color]').forEach((select) => {
+      const index = Number(select.dataset.index)
+      if (this.steps[index]) this.steps[index].colorKey = select.value
+    })
+  }
+
+  syncColor(event) {
+    const select = event.target
+    const opt = WORKFLOW_STEP_COLOR_OPTIONS.find(o => o.key === select.value)
+    if (!opt) return
+    const row = select.closest('tr')
+    const textInput = row.querySelector('input[name$="[text_color]"]')
+    const bgInput = row.querySelector('input[name$="[background_color]"]')
+    if (textInput) textInput.value = opt.text
+    if (bgInput) bgInput.value = opt.background
   }
 
   stepRowHTML(step, index) {
     const baseClass = 'flex-1 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm'
+    const opt = findWorkflowColorOption(step.text_color, step.background_color)
+    const colorKey = step.colorKey || opt.key
+    const colorSelect = WORKFLOW_STEP_COLOR_OPTIONS.map(o =>
+      `<option value="${o.key}" ${o.key === colorKey ? 'selected' : ''}>${o.label}</option>`
+    ).join('')
     return `
       <tr>
         <td class="py-2 px-2">
           <div class="flex items-center gap-2">
             <span class="text-xs text-slate-400 font-bold w-5">${index + 1}.</span>
             <input type="hidden" name="workflow[workflow_steps_attributes][${index}][position]" value="${index + 1}">
+            <input type="hidden" name="workflow[workflow_steps_attributes][${index}][text_color]" value="${step.text_color || opt.text}">
+            <input type="hidden" name="workflow[workflow_steps_attributes][${index}][background_color]" value="${step.background_color || opt.background}">
             <input type="text" name="workflow[workflow_steps_attributes][${index}][name]" required
               value="${step.name || ''}" placeholder="${translate("e.g. Manager Approval")}" class="${baseClass}">
+            <select data-step-color data-index="${index}" data-action="change->${this.identifier}#syncColor"
+              class="px-2 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              ${colorSelect}
+            </select>
           </div>
         </td>
         <td class="py-2 px-2 text-right">
