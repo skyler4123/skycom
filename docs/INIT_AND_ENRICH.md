@@ -55,6 +55,7 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Stock Adjustments | ≤3 (increase + decreases, with line rows; lines only, no ledger — seeded quantities were written directly) |
 | Orders + OrderAppointments | ~10 + ~30 |
 | Invoices | ~10 |
+| Tickets + TicketComments | ~6 tickets per company (with comments; workflow states across phases) |
 | Billing Data | 7 days of metrics + 2 invoices |
 
 ## Seeding Flow

@@ -95,6 +95,7 @@ class Seed::RetailEnrichService
     create_discount_data
     create_dynamic_sidebar_samples
     create_support_ticket_data
+    create_internal_ticket_data
     create_notification_data
     create_shifts
     create_attendance_configs
@@ -811,6 +812,25 @@ class Seed::RetailEnrichService
       Seed::CompanyTicketService.create_sample_thread(
         company: @retail,
         employee: employees[i % employees.length],
+        staff: staff,
+        index: i
+      )
+    end
+  end
+
+  def create_internal_ticket_data
+    employees = @retail.employees.where.not(business_type: :owner).limit(6).to_a
+    return if employees.empty?
+
+    requesters = employees.select { |e| e.can?(:update, Ticket) }
+    return if requesters.empty?
+
+    staff = requesters.last
+
+    6.times do |i|
+      Seed::TicketService.create_sample_thread(
+        company: @retail,
+        employee: requesters[i % requesters.length],
         staff: staff,
         index: i
       )

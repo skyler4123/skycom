@@ -79,6 +79,7 @@ class Seed::HotelEnrichService
     create_purchase_data
     create_discount_data
     create_dynamic_sidebar_samples
+    create_internal_ticket_data
     create_shifts
     create_attendance_configs
     create_attendance_event_data
@@ -502,6 +503,25 @@ class Seed::HotelEnrichService
       OrderServiceAppointment.create!(
         company: @company, order: order, service: service,
         quantity: 1, unit_price: rand(50.0..500.0).round(2), total_price: 0
+      )
+    end
+  end
+
+  def create_internal_ticket_data
+    employees = @company.employees.where.not(business_type: :owner).limit(6).to_a
+    return if employees.empty?
+
+    requesters = employees.select { |e| e.can?(:update, Ticket) }
+    return if requesters.empty?
+
+    staff = requesters.last
+
+    6.times do |i|
+      Seed::TicketService.create_sample_thread(
+        company: @company,
+        employee: requesters[i % requesters.length],
+        staff: staff,
+        index: i
       )
     end
   end
