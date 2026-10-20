@@ -38,4 +38,9 @@ RSpec.feature "Companies::Tickets New", type: :feature, js: true do
     expect(ticket).to be_present
     expect(page).to have_current_path(company_ticket_path(company, ticket), wait: 10)
   end
+
+  scenario "category select is present on the new ticket form" do
+    visit new_company_ticket_path(company)
+    expect(page).to have_selector('select[name="ticket[category_id]"]', wait: 10)
+  end
 end
