@@ -40,9 +40,9 @@ RSpec.feature "My Profile", type: :feature, js: true do
 
     payload = {
       user: JSON.parse(owner.to_json),
-      companies: [company_data],
+      companies: [ company_data ],
       enums: {},
-      employees: [JSON.parse(employee.to_json)]
+      employees: [ JSON.parse(employee.to_json) ]
     }
 
     page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
