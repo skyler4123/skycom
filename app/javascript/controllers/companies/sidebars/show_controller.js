@@ -50,6 +50,45 @@ export default class Companies_Sidebars_ShowController extends Controller {
     this.markCurrentPath()
   }
 
+  // Sidebar search (FE-only): filter the sidebar item pool by the typed
+  // prefix (case-insensitive) and render matching items as clickable links.
+  searchSidebar(event) {
+    const input = event.currentTarget
+    const query = (input?.value || "").toLowerCase().trim()
+    const container = this.element.querySelector("[data-sidebar-search-results]")
+    if (!container) return
+
+    if (!query) {
+      container.innerHTML = ""
+      return
+    }
+
+    const pool = [...SIDEBAR_ITEMS, ...customSidebarItems()]
+    const matches = pool.filter((item) => {
+      const label = item.custom ? item.label : translate(item.label)
+      return (label || "").toLowerCase().startsWith(query)
+    })
+
+    container.innerHTML = matches.map((item) => this.searchResultHTML(item)).join("\n")
+  }
+
+  searchResultHTML(item) {
+    const cid = this.companyId()
+    const labelHTML = item.custom ? escapeHtml(item.label) : translate(item.label)
+    const href = item.custom ? escapeHtml(item.href(cid)) : item.href(cid)
+    return `
+      <a
+        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+        href="${href}"
+        data-sidebar-link
+        ${openByPathname()}
+      >
+        <span class="material-symbols-outlined">${item.icon}</span>
+        <p class="text-sm font-medium leading-normal min-w-0 flex-1 truncate">${labelHTML}</p>
+      </a>
+    `
+  }
+
   // Re-apply current-page highlighting after a re-render (star click) wipes the
   // DOM nodes that the aside's open controller had marked on connect.
   markCurrentPath() {
@@ -65,6 +104,7 @@ export default class Companies_Sidebars_ShowController extends Controller {
 
   sidebarHTML() {
     return `
+      ${this.searchHTML()}
       ${this.favouritesHTML()}
       ${customSidebarGroups().map(g => this.groupHTML(g)).join("\n")}
       ${SIDEBAR_GROUPS.map(g => this.groupHTML(g)).join("\n")}
@@ -94,6 +134,31 @@ export default class Companies_Sidebars_ShowController extends Controller {
           ${translate("Favourites")}
         </p>
         ${body}
+      </div>
+    `
+  }
+
+  // Search box rendered ABOVE the Favourites section. FE-only: filters the
+  // sidebar item pool (static + custom) by a case-insensitive prefix and
+  // renders the matches as clickable links.
+  searchHTML() {
+    return `
+      <div class="flex flex-col gap-1 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700" data-sidebar-search>
+        <label for="sidebar-search" class="sr-only">${translate("Search sidebar")}</label>
+        <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <span class="material-symbols-outlined text-[18px] text-gray-500 dark:text-gray-400">search</span>
+          <input
+            id="sidebar-search"
+            name="sidebar_search"
+            type="search"
+            class="flex-1 min-w-0 bg-transparent border-none outline-none text-sm text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
+            placeholder="${translate("Search sidebar items...")}"
+            aria-label="${translate("Search sidebar")}"
+            data-sidebar-search-input
+            data-action="input->${this.identifier}#searchSidebar"
+          />
+        </div>
+        <div data-sidebar-search-results class="flex flex-col gap-1"></div>
       </div>
     `
   }
