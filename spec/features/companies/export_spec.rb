@@ -83,4 +83,16 @@ RSpec.feature "Skycom Index Export", type: :feature, js: true do
     # Page should remain usable after triggering export
     expect(page).to have_selector("table", wait: 10)
   end
+
+  scenario "export reports progress percentage in a toast" do
+    seed_client_cache(EXPORT_ENABLED_RESOURCES)
+
+    visit company_products_path(company, category_id: default_category.id)
+
+    expect(page).to have_button("Export", wait: 10)
+    click_button "Export"
+
+    # Progress toast should surface a percentage number
+    expect(page).to have_content(/\d+%/, wait: 30)
+  end
 end
