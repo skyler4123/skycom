@@ -52,25 +52,46 @@ export default class Companies_LayoutController extends Controller {
         return
       }
 
+      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+      const EXPORT_STEP_DELAY_MS = 2000
+
       const baseParams = new URLSearchParams(window.location.search)
       baseParams.set("export", "1")
 
       let all = []
+      let totalPages = 1
+      let completedPages = 0
+
+      const reportProgress = () => {
+        const pct = totalPages > 0 ? Math.round((completedPages / totalPages) * 100) : 100
+        toast({ type: "info", message: `${translate("Exporting...")} ${pct}%` })
+      }
+
       const first = await fetchJson(`${pathname()}.json?${baseParams.toString()}`)
       const key = Object.keys(first).find(k => Array.isArray(first[k]))
       const records = key ? (first[key] || []) : []
 
       if (!first.pagination || !first.pagination.next) {
         all = records
+        totalPages = 1
+        completedPages = 1
+        reportProgress()
       } else {
         all = [...records]
+        totalPages = first.pagination.last || totalPages
+        completedPages = 1
+        reportProgress()
         let next = first.pagination.next
         while (next) {
+          await sleep(EXPORT_STEP_DELAY_MS)
           const p = new URLSearchParams(baseParams)
           p.set("page[page]", next)
           const r = await fetchJson(`${pathname()}.json?${p.toString()}`)
           const k2 = Object.keys(r).find(k => Array.isArray(r[k]))
           all = all.concat(k2 ? (r[k2] || []) : [])
+          completedPages++
+          if (r.pagination?.last) totalPages = r.pagination.last
+          reportProgress()
           next = r.pagination?.next || null
           if (all.length > 100000) break
         }
