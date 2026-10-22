@@ -680,11 +680,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -695,46 +690,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_branches_on_business_type"
@@ -804,11 +774,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -819,46 +784,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_brands_on_business_type"
@@ -927,11 +867,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -942,46 +877,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_cart_groups_on_branch_id"
@@ -1024,11 +934,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -1039,46 +944,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_carts_on_branch_id"
@@ -1815,11 +1695,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -1830,46 +1705,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_customer_groups_on_branch_id"
@@ -1940,11 +1790,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -1955,46 +1800,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_customer_profiles_on_branch_id"
@@ -2099,11 +1919,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -2114,46 +1929,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_customer_subprofiles_on_branch_id"
@@ -2230,11 +2020,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -2245,46 +2030,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_customers_on_branch_id"
@@ -2412,11 +2172,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -2427,46 +2182,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_departments_on_business_type"
@@ -2625,11 +2355,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -2640,46 +2365,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.string "external_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -2952,11 +2652,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -2967,46 +2662,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_employee_groups_on_branch_id"
@@ -3160,11 +2830,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -3175,46 +2840,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_employee_profiles_on_branch_id"
@@ -3375,11 +3015,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -3390,46 +3025,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_employee_subprofiles_on_branch_id"
@@ -3562,11 +3172,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -3577,46 +3182,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_employees_on_branch_id"
@@ -3924,11 +3504,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -3939,46 +3514,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_events_on_branch_id"
@@ -4137,11 +3687,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -4152,46 +3697,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_facilities_on_branch_id"
@@ -4290,11 +3810,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -4305,46 +3820,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_facility_groups_on_branch_id"
@@ -4470,11 +3960,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -4485,46 +3970,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_invoices_on_branch_id"
@@ -4567,11 +4027,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -4582,46 +4037,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_memberships_on_branch_id"
@@ -4791,11 +4221,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -4806,46 +4231,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_order_groups_on_branch_id"
@@ -5083,11 +4483,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -5098,46 +4493,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_orders_on_branch_id"
@@ -5400,11 +4770,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -5415,46 +4780,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_product_groups_on_branch_id"
@@ -5555,11 +4895,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -5570,46 +4905,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_products_on_branch_id"
@@ -5681,11 +4991,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -5696,46 +5001,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_project_groups_on_branch_id"
@@ -5807,11 +5087,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -5822,46 +5097,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_projects_on_branch_id"
@@ -6013,11 +5263,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -6028,46 +5273,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_purchase_items_on_business_type"
@@ -6170,11 +5390,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -6185,46 +5400,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_purchases_on_branch_id"
@@ -6438,11 +5628,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -6453,46 +5638,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_service_groups_on_branch_id"
@@ -6592,11 +5752,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -6607,46 +5762,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_services_on_branch_id"
@@ -6913,11 +6043,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -6928,46 +6053,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_exports_on_appoint_by"
@@ -7081,11 +6181,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -7096,46 +6191,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_imports_on_appoint_by"
@@ -7261,11 +6331,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -7276,46 +6341,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_transactions_on_appoint_by"
@@ -7434,11 +6474,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -7449,46 +6484,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_transfers_on_appoint_by"
@@ -7542,11 +6552,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -7557,46 +6562,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_stocks_on_branch_id"
@@ -7816,11 +6796,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -7831,46 +6806,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_suppliers_on_business_type"
@@ -8139,11 +7089,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -8154,46 +7099,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_task_groups_on_branch_id"
@@ -8236,11 +7156,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -8251,46 +7166,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_tasks_on_branch_id"
@@ -8388,11 +7278,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -8403,46 +7288,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["assigned_employee_id"], name: "index_tickets_on_assigned_employee_id"
@@ -8493,11 +7353,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -8508,46 +7363,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_transactions_on_branch_id"
@@ -8640,11 +7470,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -8655,46 +7480,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_warehouses_on_branch_id"

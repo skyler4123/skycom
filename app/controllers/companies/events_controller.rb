@@ -222,11 +222,11 @@ class Companies::EventsController < Companies::ApplicationController
   end
 
   def property_keys
-    (1..10).map { |i| "property_string_#{i}" } +
-      (1..20).map { |i| "property_integer_#{i}" } +
-      (1..10).map { |i| "property_decimal_#{i}" } +
-      (1..10).map { |i| "property_boolean_#{i}" } +
-      (1..10).map { |i| "property_datetime_#{i}" }
+    (1..5).map { |i| "property_string_#{i}" } +
+      (1..10).map { |i| "property_integer_#{i}" } +
+      (1..5).map { |i| "property_decimal_#{i}" } +
+      (1..5).map { |i| "property_boolean_#{i}" } +
+      (1..5).map { |i| "property_datetime_#{i}" }
   end
 
   def event_params
