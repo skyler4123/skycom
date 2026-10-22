@@ -168,8 +168,16 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   }
 
   addColumn() {
+    const usedKeys = new Set((this.columnsMetadata || []).map(c => c.key))
+    const candidates = [
+      'name', 'description', 'code', 'title',
+      ...(this.allPropertySlots ? this.allPropertySlots().map(s => s.key) : [])
+    ]
+    const nextKey = candidates.find(k => !usedKeys.has(k)) || null
+    if (!nextKey) return
+
     this.columnsMetadata.push({
-      key: 'name',
+      key: nextKey,
       name: '',
       visible: true,
       search: false,
@@ -177,6 +185,19 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
       width: null
     })
     this.rerenderEditor()
+  }
+
+  allPropertySlots() {
+    const slots = []
+    for (let i = 1; i <= 5; i++) slots.push({ key: `property_string_${i}` })
+    for (let i = 1; i <= 10; i++) slots.push({ key: `property_integer_${i}` })
+    for (let i = 1; i <= 5; i++) slots.push({ key: `property_decimal_${i}` })
+    for (let i = 1; i <= 5; i++) slots.push({ key: `property_boolean_${i}` })
+    for (let i = 1; i <= 5; i++) slots.push({ key: `property_datetime_${i}` })
+    // include extra columns defined on the property mapping (unsearchable)
+    const pm = (window.currentPropertyMappings?.() || []).find(m => m.id === this.config?.property_mapping_id)
+    ;(pm?.metadata?.extra_columns || []).forEach(ec => slots.push({ key: ec.key }))
+    return slots
   }
 
   removeColumn(event) {
@@ -198,18 +219,28 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     return this.propertyEntries.find(p => p.key === key) || null
   }
 
+  extraEntryFor(key) {
+    const pm = (window.currentPropertyMappings?.() || []).find(m => m.id === this.config?.property_mapping_id)
+    return (pm?.metadata?.extra_columns || []).find(e => e.key === key) || null
+  }
+
   columnType(key) {
     const entry = this.propertyEntryFor(key)
     if (entry?.type) return entry.type
+    const pm = (window.currentPropertyMappings?.() || []).find(m => m.id === this.config?.property_mapping_id)
+    const extra = (pm?.metadata?.extra_columns || []).find(e => e.key === key)
+    if (extra?.type) return extra.type
     const match = /^property_(string|integer|decimal|boolean|datetime)_\d+$/.exec(key)
     return match ? match[1] : null
   }
 
   isSearchableColumn(key) {
+    if (!key || key.startsWith("extra_")) return false
     return key === "name" || key === "description" || key === "code" || key.startsWith("property_string_")
   }
 
   canFilter(col) {
+    if (col.key?.startsWith("extra_")) return false
     const type = this.columnType(col.key)
     return type === "integer" || type === "decimal" || type === "boolean" || type === "datetime"
   }
@@ -242,11 +273,11 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     return `
       <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
         <td class="py-2 px-3">
-          <input type="text" name="table_config[metadata][columns][${index}][key]" value="${key}"
-            class="w-full px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+          <input type="text" name="table_config[metadata][columns][${index}][key]" value="${key}" readonly
+            class="w-full px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed">
         </td>
         <td class="py-2 px-3">
-          ${key.startsWith('property_') ? `
+          ${key.startsWith('property_') || key.startsWith('extra_') ? `
             <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
               class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
               readonly
