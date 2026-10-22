@@ -1,11 +1,11 @@
 module DynamicSearchConcern
   extend ActiveSupport::Concern
 
-  PROPERTY_STRING_COLUMNS = (1..10).map { |i| "property_string_#{i}" }.freeze
-  PROPERTY_INTEGER_COLUMNS = (1..20).map { |i| "property_integer_#{i}" }.freeze
-  PROPERTY_DECIMAL_COLUMNS = (1..10).map { |i| "property_decimal_#{i}" }.freeze
-  PROPERTY_BOOLEAN_COLUMNS = (1..10).map { |i| "property_boolean_#{i}" }.freeze
-  PROPERTY_DATETIME_COLUMNS = (1..10).map { |i| "property_datetime_#{i}" }.freeze
+  PROPERTY_STRING_COLUMNS = (1..5).map { |i| "property_string_#{i}" }.freeze
+  PROPERTY_INTEGER_COLUMNS = (1..10).map { |i| "property_integer_#{i}" }.freeze
+  PROPERTY_DECIMAL_COLUMNS = (1..5).map { |i| "property_decimal_#{i}" }.freeze
+  PROPERTY_BOOLEAN_COLUMNS = (1..5).map { |i| "property_boolean_#{i}" }.freeze
+  PROPERTY_DATETIME_COLUMNS = (1..5).map { |i| "property_datetime_#{i}" }.freeze
 
   PROPERTY_COLUMNS = (PROPERTY_STRING_COLUMNS + PROPERTY_INTEGER_COLUMNS +
     PROPERTY_DECIMAL_COLUMNS + PROPERTY_BOOLEAN_COLUMNS + PROPERTY_DATETIME_COLUMNS).freeze

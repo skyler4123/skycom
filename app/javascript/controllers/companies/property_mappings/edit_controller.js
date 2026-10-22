@@ -234,11 +234,11 @@ export default class Companies_PropertyMappings_EditController extends Companies
 
   allPropertySlots() {
     const slots = []
-    for (let i = 1; i <= 10; i++) slots.push({ key: `property_string_${i}`, type: 'string' })
-    for (let i = 1; i <= 20; i++) slots.push({ key: `property_integer_${i}`, type: 'integer' })
-    for (let i = 1; i <= 10; i++) slots.push({ key: `property_decimal_${i}`, type: 'decimal' })
-    for (let i = 1; i <= 10; i++) slots.push({ key: `property_boolean_${i}`, type: 'boolean' })
-    for (let i = 1; i <= 10; i++) slots.push({ key: `property_datetime_${i}`, type: 'datetime' })
+    for (let i = 1; i <= 5; i++) slots.push({ key: `property_string_${i}`, type: 'string' })
+    for (let i = 1; i <= 10; i++) slots.push({ key: `property_integer_${i}`, type: 'integer' })
+    for (let i = 1; i <= 5; i++) slots.push({ key: `property_decimal_${i}`, type: 'decimal' })
+    for (let i = 1; i <= 5; i++) slots.push({ key: `property_boolean_${i}`, type: 'boolean' })
+    for (let i = 1; i <= 5; i++) slots.push({ key: `property_datetime_${i}`, type: 'datetime' })
     return slots
   }
 }
