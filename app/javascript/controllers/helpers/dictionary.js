@@ -637,6 +637,9 @@ export const dictionary = () => {
     "Width": { vi: "Độ rộng" },
     "system_name": { vi: "tên_hệ_thống" },
     "Display Name": { vi: "Tên hiển thị" },
+    "Extra Columns (unsearchable)": { vi: "Cột bổ sung (không thể tìm kiếm)" },
+    "Additional columns outside the default dynamic slots. These are not indexed by search.": { vi: "Các cột bổ sung ngoài các slot động mặc định. Các cột này không được lập chỉ mục tìm kiếm." },
+    "Add Extra Column": { vi: "Thêm cột bổ sung" },
     "This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name.": {
       vi: "Trường này được đồng bộ từ PropertyMapping. Vui lòng truy cập trang chỉnh sửa Property Mapping để cập nhật tên này.",
     },
