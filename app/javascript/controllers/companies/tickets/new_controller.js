@@ -196,12 +196,12 @@ export default class Companies_Tickets_NewController extends Companies_LayoutCon
 
   contentHTML() {
     const categoryFilter = this.ticketsCategories()
-    const businessTypes = Enums()?.ticket?.business_types || [
+    const businessTypes = ENUMS?.ticket?.business_types || [
       { name: "Office Supply", value: "office_supply" },
       { name: "Equipment", value: "equipment" },
       { name: "Service", value: "service" }
     ]
-    const currencies = Enums()?.ticket?.currencies || [ { name: "USD", value: "usd" } ]
+    const currencies = ENUMS?.ticket?.currencies || [ { name: "USD", value: "usd" } ]
 
     const fields = `
       <div class="space-y-6">

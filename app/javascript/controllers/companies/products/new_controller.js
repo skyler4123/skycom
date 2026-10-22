@@ -100,7 +100,7 @@ export default class Companies_Products_NewController extends Companies_LayoutCo
 
   contentHTML() {
     const categoryFilter = this.productsCategories()
-    const typeOptions = (Enums()?.product?.business_types || []).map(t =>
+    const typeOptions = (ENUMS?.product?.business_types || []).map(t =>
       `<option value="${t.value}">${t.name}</option>`
     ).join('')
 

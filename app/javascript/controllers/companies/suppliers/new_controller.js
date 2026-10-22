@@ -102,7 +102,7 @@ export default class Companies_Suppliers_NewController extends Companies_LayoutC
     const categoryFilter = this.suppliersCategories()
     // Static fallback per docs/FLAKY_TESTS.md §6 — dropdown always has options
     // even when the client cache hasn't loaded its enums yet.
-    const typeOptions = (Enums()?.supplier?.business_types || [
+    const typeOptions = (ENUMS?.supplier?.business_types || [
       { name: "Manufacturer", value: "manufacturer" },
       { name: "Distributor", value: "distributor" },
       { name: "Wholesaler", value: "wholesaler" },

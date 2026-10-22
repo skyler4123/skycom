@@ -217,12 +217,12 @@ export default class Companies_Tickets_EditController extends Companies_LayoutCo
     if (!p) return `<div class="p-8 text-center">${translate("Ticket not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.ticket?.business_types || [
+    const businessTypes = ENUMS?.ticket?.business_types || [
       { name: "Office Supply", value: "office_supply" },
       { name: "Equipment", value: "equipment" },
       { name: "Service", value: "service" }
     ]
-    const currencies = Enums()?.ticket?.currencies || [ { name: "USD", value: "usd" } ]
+    const currencies = ENUMS?.ticket?.currencies || [ { name: "USD", value: "usd" } ]
 
     const fields = `
       <div class="space-y-6">

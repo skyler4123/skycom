@@ -17,7 +17,7 @@ export default class Companies_Roles_NewController extends Companies_LayoutContr
   }
 
   contentHTML() {
-    const typeOptions = (Enums()?.role?.business_types || [
+    const typeOptions = (ENUMS?.role?.business_types || [
       { name: "Administrative", value: "administrative" },
       { name: "Management", value: "management" },
       { name: "Technical", value: "technical" },

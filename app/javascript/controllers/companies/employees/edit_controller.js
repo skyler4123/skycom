@@ -100,7 +100,7 @@ export default class Companies_Employees_EditController extends Companies_Layout
 
     const companyId = window.location.pathname.split("/")[2]
     const branchFilter = currentBranches()
-    const typeOptions = (Enums()?.employee?.business_types || [
+    const typeOptions = (ENUMS?.employee?.business_types || [
       { name: translate("Full Time"), value: "full_time" },
       { name: translate("Part Time"), value: "part_time" },
       { name: translate("Contractor"), value: "contractor" },
@@ -108,7 +108,7 @@ export default class Companies_Employees_EditController extends Companies_Layout
     ]).filter(t => t.value !== 'owner').map(t =>
       `<option value="${t.value}" ${t.value === e.business_type ? 'selected' : ''}>${t.name}</option>`
     ).join('')
-    const workflowOptions = (Enums()?.employee?.workflow_statuses || [
+    const workflowOptions = (ENUMS?.employee?.workflow_statuses || [
       { name: translate("Draft"), value: "draft" },
       { name: translate("Pending"), value: "pending" },
       { name: translate("Active"), value: "active" },

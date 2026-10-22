@@ -84,11 +84,11 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
   contentHTML() {
     const categoryFilter = this.ordersCategories()
 
-    const typeOptions = (Enums()?.order?.business_types || []).map(t =>
+    const typeOptions = (ENUMS?.order?.business_types || []).map(t =>
       `<option value="${t.value}">${t.name === 'in_store' ? translate("In Store") : (t.name ? t.name.charAt(0).toUpperCase() + t.name.slice(1) : t.value)}</option>`
     ).join('')
 
-    const currencyOptions = (Enums()?.order?.currencies || []).map(c =>
+    const currencyOptions = (ENUMS?.order?.currencies || []).map(c =>
       `<option value="${c.value}">${c.name?.toUpperCase() || c.value?.toUpperCase()}</option>`
     ).join('')
 

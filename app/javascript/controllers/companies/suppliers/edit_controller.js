@@ -48,13 +48,13 @@ export default class Companies_Suppliers_EditController extends Companies_Layout
     const companyId = window.location.pathname.split("/")[2]
     // Static fallbacks per docs/FLAKY_TESTS.md §6 — dropdowns always have options
     // even when the client cache hasn't loaded its enums yet.
-    const businessTypes = Enums()?.supplier?.business_types || [
+    const businessTypes = ENUMS?.supplier?.business_types || [
       { name: "Manufacturer", value: "manufacturer" },
       { name: "Distributor", value: "distributor" },
       { name: "Wholesaler", value: "wholesaler" },
       { name: "Service provider", value: "service_provider" }
     ]
-    const workflowStatuses = Enums()?.supplier?.workflow_statuses || []
+    const workflowStatuses = ENUMS?.supplier?.workflow_statuses || []
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">

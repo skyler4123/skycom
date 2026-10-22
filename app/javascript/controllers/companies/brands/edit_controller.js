@@ -46,8 +46,8 @@ export default class Companies_Brands_EditController extends Companies_LayoutCon
     if (!b) return `<div class="p-8 text-center">${translate('Brand not found.')}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.brand?.business_types || []
-    const workflowStatuses = Enums()?.brand?.workflow_statuses || []
+    const businessTypes = ENUMS?.brand?.business_types || []
+    const workflowStatuses = ENUMS?.brand?.workflow_statuses || []
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">

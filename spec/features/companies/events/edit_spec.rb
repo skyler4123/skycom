@@ -15,7 +15,7 @@ RSpec.feature "Companies::Events Edit", type: :feature, js: true do
 
   before do
     sign_in(owner)
-    seed_event_client_cache(company: company, owner: owner, enums: event_enums_payload)
+    seed_event_client_cache(company: company, owner: owner)
   end
 
   scenario "edit page renders prefilled form and saves changes" do

@@ -46,8 +46,8 @@ export default class Companies_Services_EditController extends Companies_LayoutC
     if (!s) return `<div class="p-8 text-center">${translate("Service not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.service?.business_types || []
-    const workflowStatuses = Enums()?.service?.workflow_statuses || []
+    const businessTypes = ENUMS?.service?.business_types || []
+    const workflowStatuses = ENUMS?.service?.workflow_statuses || []
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">

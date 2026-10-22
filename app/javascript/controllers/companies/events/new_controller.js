@@ -195,7 +195,7 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
     const categoryFilter = this.eventsCategories()
     // Static fallback per docs/FLAKY_TESTS.md §6 — dropdown always has options
     // even when the client cache hasn't loaded its enums yet.
-    const typeOptions = (Enums()?.event?.business_types || [
+    const typeOptions = (ENUMS?.event?.business_types || [
       { name: "Appointment", value: "appointment" },
       { name: "Procedure", value: "procedure" },
       { name: "Reservation", value: "reservation" },
@@ -203,7 +203,7 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
     ]).map(t =>
       `<option value="${t.value}">${t.name}</option>`
     ).join('')
-    const statusOptions = (Enums()?.event?.workflow_statuses || [
+    const statusOptions = (ENUMS?.event?.workflow_statuses || [
       { name: "Pending", value: "pending" },
       { name: "Confirmed", value: "confirmed" },
       { name: "In Progress", value: "in_progress" }

@@ -46,8 +46,8 @@ export default class Companies_EmployeeSubprofiles_EditController extends Compan
     if (!b) return `<div class="p-8 text-center">${translate('Employee Subprofile not found.')}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.employee_subprofile?.business_types || [{ name: "General", value: "general" }, { name: "Special", value: "special" }]
-    const workflowStatuses = Enums()?.employee_subprofile?.workflow_statuses || [{ name: "Draft", value: "draft" }, { name: "Pending", value: "pending" }, { name: "Confirmed", value: "confirmed" }]
+    const businessTypes = ENUMS?.employee_subprofile?.business_types || [{ name: "General", value: "general" }, { name: "Special", value: "special" }]
+    const workflowStatuses = ENUMS?.employee_subprofile?.workflow_statuses || [{ name: "Draft", value: "draft" }, { name: "Pending", value: "pending" }, { name: "Confirmed", value: "confirmed" }]
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">

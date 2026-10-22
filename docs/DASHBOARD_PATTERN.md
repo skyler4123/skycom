@@ -458,7 +458,7 @@ export default class Companies_Products_NewController extends Companies_LayoutCo
             <label class="text-[10px] font-bold text-slate-400 uppercase">Type</label>
             <select name="product[business_type]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
-              ${(Enums()?.product?.business_types || []).map(t =>
+              ${(ENUMS?.product?.business_types || []).map(t =>
                 `<option value="${t.value}">${t.name}</option>`
               ).join('')}
             </select>
@@ -730,8 +730,8 @@ export default class Companies_Products_EditController extends Companies_LayoutC
     if (!p) return '<div class="p-8 text-center">Product not found.</div>'
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.product?.business_types || []
-    const workflowStatuses = Enums()?.product?.workflow_statuses || []
+    const businessTypes = ENUMS?.product?.business_types || []
+    const workflowStatuses = ENUMS?.product?.workflow_statuses || []
 
     // Dynamic property fields — same type-aware rendering as new page
     const dynamicFields = this.propertyMetadata.length > 0 ? `

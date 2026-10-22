@@ -46,8 +46,8 @@ export default class Companies_CustomerProfiles_EditController extends Companies
     if (!b) return `<div class="p-8 text-center">${translate('Customer Profile not found.')}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.customer_profile?.business_types || [{ name: "General", value: "general" }, { name: "Special", value: "special" }]
-    const workflowStatuses = Enums()?.customer_profile?.workflow_statuses || [{ name: "Draft", value: "draft" }, { name: "Pending", value: "pending" }, { name: "Confirmed", value: "confirmed" }]
+    const businessTypes = ENUMS?.customer_profile?.business_types || [{ name: "General", value: "general" }, { name: "Special", value: "special" }]
+    const workflowStatuses = ENUMS?.customer_profile?.workflow_statuses || [{ name: "Draft", value: "draft" }, { name: "Pending", value: "pending" }, { name: "Confirmed", value: "confirmed" }]
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">

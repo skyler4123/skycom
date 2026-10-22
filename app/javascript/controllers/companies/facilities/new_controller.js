@@ -101,7 +101,7 @@ export default class Companies_Facilities_NewController extends Companies_Layout
   contentHTML() {
     const categoryFilter = this.facilitiesCategories()
     const branchFilter = currentBranches()
-    const typeOptions = (Enums()?.facility?.business_types || []).map(t =>
+    const typeOptions = (ENUMS?.facility?.business_types || []).map(t =>
       `<option value="${t.value}">${t.name}</option>`
     ).join('')
 

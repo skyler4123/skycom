@@ -3,7 +3,7 @@
 # Give the latest cache for client.
 # Serves Stimulus: client_cache_controller (sync: version-cookie compare → GET index JSON → localStorage)
 # Endpoints: GET /client_cache(.json) — { user, companies[] (with branches, departments,
-#   roles, categories, property_mappings, table_configs, company_settings), enums, employees[] }
+#   roles, categories, property_mappings, table_configs, company_settings), employees[] }
 # Docs: docs/CACHE.md (client cache incl. dynamic sidebar settings), docs/SIDEBAR.md
 class ClientCacheController < ApplicationController
   def index
@@ -25,112 +25,6 @@ class ClientCacheController < ApplicationController
             },
             methods: [ :resource_names ]
           ),
-          enums: {
-            employee: {
-              lifecycle_statuses: Employee.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Employee.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Employee.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            branch: {
-              lifecycle_statuses: Branch.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Branch.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Branch.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            department: {
-              lifecycle_statuses: LIFECYCLE_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
-              workflow_statuses: WORKFLOW_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
-              business_types: Department.business_types.keys.map { |t| { name: t.to_s.humanize, value: t.to_s } }
-            },
-            brand: {
-              lifecycle_statuses: Brand.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Brand.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Brand.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            facility: {
-              lifecycle_statuses: Facility.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Facility.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Facility.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            warehouse: {
-              lifecycle_statuses: Warehouse.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Warehouse.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Warehouse.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            category: {
-              lifecycle_statuses: LIFECYCLE_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
-              workflow_statuses: WORKFLOW_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
-              resource_names: [ "products", "employees", "branches", "departments", "brands", "suppliers", "customers", "services", "facilities" ]
-            },
-            product: {
-              lifecycle_statuses: Product.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Product.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Product.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            service: {
-              lifecycle_statuses: Service.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Service.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Service.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            order: {
-              lifecycle_statuses: Order.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Order.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Order.business_types.keys.map { |t| { name: t.humanize, value: t } },
-              currencies: Order.currencies.keys.map { |c| { name: c.humanize, value: c } }
-            },
-            customer: {
-              lifecycle_statuses: Customer.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Customer.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Customer.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            invoice: {
-              lifecycle_statuses: Invoice.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Invoice.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Invoice.business_types.keys.map { |t| { name: t.humanize, value: t } },
-              currencies: Invoice.currencies.keys.map { |c| { name: c.humanize, value: c } }
-            },
-            company: {
-              business_types: Company.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            stock: {
-              lifecycle_statuses: Stock.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Stock.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Stock.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            stock_transfer: {
-              lifecycle_statuses: StockTransfer.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: StockTransfer.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: StockTransfer.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            stock_import: {
-              lifecycle_statuses: StockImport.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: StockImport.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: StockImport.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            stock_export: {
-              lifecycle_statuses: StockExport.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: StockExport.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: StockExport.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            supplier: {
-              lifecycle_statuses: Supplier.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Supplier.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Supplier.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            purchase: {
-              lifecycle_statuses: Purchase.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Purchase.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Purchase.business_types.keys.map { |t| { name: t.humanize, value: t } },
-              currencies: Purchase.currencies.keys.map { |c| { name: c.humanize, value: c } }
-            },
-            document: {
-              lifecycle_statuses: Document.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Document.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Document.business_types.keys.map { |t| { name: t.humanize, value: t } }
-            },
-            workflow: {
-              process_types: Workflow.process_types.keys.map { |t| { name: t.to_s.humanize, value: t.to_s } }
-            }
-          },
           employees: current_user.employees,
           export_pages: EXPORT_ENABLED_RESOURCES
         }

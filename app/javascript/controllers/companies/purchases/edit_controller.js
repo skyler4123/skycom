@@ -217,12 +217,12 @@ export default class Companies_Purchases_EditController extends Companies_Layout
     if (!p) return `<div class="p-8 text-center">${translate("Purchase not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.purchase?.business_types || [
+    const businessTypes = ENUMS?.purchase?.business_types || [
       { name: "Office Supply", value: "office_supply" },
       { name: "Equipment", value: "equipment" },
       { name: "Service", value: "service" }
     ]
-    const currencies = Enums()?.purchase?.currencies || [ { name: "USD", value: "usd" } ]
+    const currencies = ENUMS?.purchase?.currencies || [ { name: "USD", value: "usd" } ]
 
     const fields = `
       <div class="space-y-6">

@@ -135,7 +135,7 @@ export default class Companies_Events_EditController extends Companies_LayoutCon
     if (!e) return `<div class="p-8 text-center">${translate("Event not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const typeOptions = (Enums()?.event?.business_types || [
+    const typeOptions = (ENUMS?.event?.business_types || [
       { name: "Appointment", value: "appointment" },
       { name: "Procedure", value: "procedure" },
       { name: "Reservation", value: "reservation" },
@@ -143,7 +143,7 @@ export default class Companies_Events_EditController extends Companies_LayoutCon
     ]).map(t =>
       `<option value="${t.value}" ${e.business_type === t.value ? 'selected' : ''}>${t.name}</option>`
     ).join('')
-    const statusOptions = (Enums()?.event?.workflow_statuses || [
+    const statusOptions = (ENUMS?.event?.workflow_statuses || [
       { name: "Pending", value: "pending" },
       { name: "Confirmed", value: "confirmed" },
       { name: "In Progress", value: "in_progress" },

@@ -100,7 +100,7 @@ export default class Companies_Departments_NewController extends Companies_Layou
 
   contentHTML() {
     const categoryFilter = this.departmentsCategories()
-    const typeOptions = (Enums()?.department?.business_types || []).map(t =>
+    const typeOptions = (ENUMS?.department?.business_types || []).map(t =>
       `<option value="${t.value}">${t.name}</option>`
     ).join('')
 

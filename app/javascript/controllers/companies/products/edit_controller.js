@@ -46,8 +46,8 @@ export default class Companies_Products_EditController extends Companies_LayoutC
     if (!p) return `<div class="p-8 text-center">${translate("Product not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.product?.business_types || []
-    const workflowStatuses = Enums()?.product?.workflow_statuses || []
+    const businessTypes = ENUMS?.product?.business_types || []
+    const workflowStatuses = ENUMS?.product?.workflow_statuses || []
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
