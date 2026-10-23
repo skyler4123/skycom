@@ -4,7 +4,6 @@ class EmployeeProfile < ApplicationRecord
   include DynamicSearchConcern
   include TagConcern
   include Discard::Model
-  include Cache::RecordsConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us

@@ -144,7 +144,6 @@ validates :email, presence: true
 normalizes :email, with: -> { _1.strip.downcase }
 before_validation if: :email_changed?, on: :update do ... end
 # ----
-include Cache::RecordsConcern
 has_many :companies
 enum :system_role, { ... }
 include User::RetailConcern
@@ -153,7 +152,6 @@ def accessible_companies; end
 
 **After** (canonical order, comments preserved):
 ```ruby
-include Cache::RecordsConcern
 include User::CacheConcern
 include User::AvatarConcern
 include AddressConcern

@@ -344,21 +344,6 @@ Callbacks defined in shared concerns that apply to any model that includes them.
 
 ---
 
-### Cache::RecordsConcern (`app/models/concerns/cache/records_concern.rb`)
-
-Managed attribute caching in `Rails.sync_cache` (Solid Cache SQLite + Redis pub/sub invalidation). Keeps model attributes synchronized across all server instances. Reads are local SQLite only (no Redis per request); writes and deletes broadcast invalidation via Redis pub/sub so all instances evict stale keys.
-
-| Callback | Line | Method | Description |
-|----------|------|--------|-------------|
-| `after_commit :write_attribute_cache, on: [ :create, :update ]` | 7 | `write_attribute_cache` | Writes model attributes hash to `Rails.sync_cache` after successful create or update. Cache key pattern: `"#{plural_model_name}_#{id}"`. Also publishes pub/sub invalidation for cross-instance sync. |
-| `after_commit :remove_attribute_cache, on: :destroy` | 8 | `remove_attribute_cache` | Deletes model attributes hash from `Rails.sync_cache` after successful destroy. Also publishes pub/sub invalidation so other instances evict immediately. |
-
-**Included in (5 models):** `Company`, `Employee`, `Session`, `User`, `RoleAppointment`
-
-**Usage example:** `User.cached_find(id)` or `Employee.cached_where(company_id: id)` use `Rails.sync_cache` populated by these callbacks.
-
----
-
 ### ImmutableRecordConcern (`app/models/concerns/immutable_record_concern.rb`)
 
 Renders records read-only after creation. Prevents both updates and deletion.
@@ -469,7 +454,7 @@ Each concern defines the same callback:
 | `before_destroy` | 5 | Employee, System, PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_discard` | 1 | Employee |
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
-| `after_commit` | 2 | (Cache::RecordsConcern → 5 models) |
+| `after_commit` | 0 | (none — Cache::RecordsConcern removed) |
 | `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 45 models), (PropertyMappingConcern → 45 models), (ImageAttachmentsConcern → 6 models + Product) |
 
 **Total unique callback declarations: ~34 directly across 15 model files + 7 concern files propagating to ~63+ models.**

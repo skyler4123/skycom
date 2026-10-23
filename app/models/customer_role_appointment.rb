@@ -9,7 +9,6 @@ class CustomerRoleAppointment < ApplicationRecord
   # <Holder>RoleAppointment with a concrete holder FK. company_id derives from
   # the holder via SetDefaultCompanyConcern. Rows with business_type :owner are
   # immutable and clear the permissions cache on change.
-  include Cache::RecordsConcern
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }

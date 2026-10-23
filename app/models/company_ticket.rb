@@ -1,5 +1,4 @@
 class CompanyTicket < ApplicationRecord
-  include Cache::RecordsConcern
   include CompanyTicket::FileAttachmentConcern
 
   class AlreadyAssigned < StandardError; end

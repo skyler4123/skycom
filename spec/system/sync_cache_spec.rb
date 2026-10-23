@@ -31,29 +31,7 @@ RSpec.describe "Rails.sync_cache & RecordsConcern Integration", type: :model do
     end
   end
 
-  describe "Cache::RecordsConcern integration" do
-    it "caches record attributes on cached_find" do
-      cached_user = User.cached_find(user.id)
-      expect(cached_user.id).to eq(user.id)
-
-      expect(Rails.sync_cache.read(cache_key)).not_to be_nil
-    end
-
-    it "automatically updates cache after_commit on update" do
-      User.cached_find(user.id) # warm cache
-      user.update!(email: "updated_#{SecureRandom.hex(4)}@example.com")
-
-      cached_data = Rails.sync_cache.read(cache_key)
-      expect(cached_data["email"]).to eq(user.email)
-    end
-
-    it "evicts cache after_commit on destroy" do
-      User.cached_find(user.id) # warm cache
-      session = user.sessions.create!
-
-      session.destroy # triggers after_commit :remove_attribute_cache
-
-      expect(Rails.sync_cache.read("sessions_#{session.id}")).to be_nil
-    end
-  end
+  # Cache::RecordsConcern (cached_find/cached_where) removed; records are
+  # loaded via normal DB queries. Rails.sync_cache basic behavior remains
+  # covered above.
 end

@@ -1,6 +1,5 @@
 # app/models/session.rb
 class Session < ApplicationRecord
-  include Cache::RecordsConcern
 
   belongs_to :user
 

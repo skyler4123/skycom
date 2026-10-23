@@ -46,7 +46,7 @@ module Employee::PermissionConcern
     # cache_key_with_version anyway.
     def owner_role?
       Rails.ram_cache.fetch("#{cache_key_with_version}/owner_role", expires_in: OWNER_ROLE_CACHE_EXPIRY) do
-        EmployeeRoleAppointment.cached_where(employee_id: id).any? { |ra| ra.business_type == OWNER_BUSINESS_TYPE }
+        EmployeeRoleAppointment.where(employee_id: id).any? { |ra| ra.business_type == OWNER_BUSINESS_TYPE }
       end
     end
 
