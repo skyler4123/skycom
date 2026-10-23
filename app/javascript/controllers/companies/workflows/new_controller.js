@@ -122,7 +122,7 @@ export default class Companies_Workflows_NewController extends Companies_LayoutC
   }
 
   contentHTML() {
-    const processTypes = Enums()?.workflow?.process_types || [
+    const processTypes = ENUMS?.workflow?.process_types || [
       { name: "Purchase Process", value: "purchase_process" },
       { name: "Leave Process", value: "leave_process" }
     ]

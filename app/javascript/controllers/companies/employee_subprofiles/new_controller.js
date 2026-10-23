@@ -100,7 +100,7 @@ export default class Companies_EmployeeSubprofiles_NewController extends Compani
 
   contentHTML() {
     const categoryFilter = this.employee_subprofilesCategories()
-    const typeOptions = (Enums()?.employee_subprofile?.business_types || [{ name: "General", value: "general" }, { name: "Special", value: "special" }]).map(t =>
+    const typeOptions = (ENUMS?.employee_subprofile?.business_types || [{ name: "General", value: "general" }, { name: "Special", value: "special" }]).map(t =>
       `<option value="${t.value}">${t.name}</option>`
     ).join('')
 

@@ -56,7 +56,7 @@ export default class Companies_DiscountGroups_NewController extends Companies_La
   }
 
   currencies() {
-    return Enums()?.discount_group?.currencies || [
+    return ENUMS?.discount_group?.currencies || [
       { name: "USD", value: "usd" },
       { name: "VND", value: "vnd" }
     ]

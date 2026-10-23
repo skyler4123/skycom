@@ -46,12 +46,12 @@ export default class Companies_Customers_EditController extends Companies_Layout
     if (!c) return `<div class="p-8 text-center">${translate('Customer not found.')}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.customer?.business_types || [
+    const businessTypes = ENUMS?.customer?.business_types || [
       { name: translate("Individual"), value: "individual" },
       { name: translate("Small Business"), value: "small_business" },
       { name: translate("Enterprise"), value: "enterprise" }
     ]
-    const workflowStatuses = Enums()?.customer?.workflow_statuses || [
+    const workflowStatuses = ENUMS?.customer?.workflow_statuses || [
       { name: translate("Draft"), value: "draft" },
       { name: translate("Pending"), value: "pending" },
       { name: translate("Confirmed"), value: "confirmed" },

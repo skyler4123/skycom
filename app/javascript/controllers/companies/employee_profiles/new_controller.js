@@ -100,7 +100,7 @@ export default class Companies_EmployeeProfiles_NewController extends Companies_
 
   contentHTML() {
     const categoryFilter = this.employee_profilesCategories()
-    const typeOptions = (Enums()?.employee_profile?.business_types || [{ name: "General", value: "general" }, { name: "Special", value: "special" }]).map(t =>
+    const typeOptions = (ENUMS?.employee_profile?.business_types || [{ name: "General", value: "general" }, { name: "Special", value: "special" }]).map(t =>
       `<option value="${t.value}">${t.name}</option>`
     ).join('')
 

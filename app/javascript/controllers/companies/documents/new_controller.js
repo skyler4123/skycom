@@ -39,7 +39,7 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
   }
 
   documentBusinessTypes() {
-    return Enums()?.document?.business_types || [
+    return ENUMS?.document?.business_types || [
       { name: "General", value: "general" },
       { name: "Policy", value: "policy" },
       { name: "Guide", value: "guide" },
@@ -48,7 +48,7 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
   }
 
   documentWorkflowStatuses() {
-    return Enums()?.document?.workflow_statuses || [
+    return ENUMS?.document?.workflow_statuses || [
       { name: "Draft", value: "draft" },
       { name: "Published", value: "published" },
       { name: "Archived", value: "archived" }

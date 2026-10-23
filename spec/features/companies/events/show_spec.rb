@@ -16,7 +16,7 @@ RSpec.feature "Companies::Events Show", type: :feature, js: true do
 
   before do
     sign_in(owner)
-    seed_event_client_cache(company: company, owner: owner, enums: event_enums_payload)
+    seed_event_client_cache(company: company, owner: owner)
   end
 
   scenario "show page displays event details" do

@@ -46,13 +46,13 @@ export default class Companies_Warehouses_EditController extends Companies_Layou
     if (!f) return `<div class="p-8 text-center">${translate("Warehouse not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.warehouse?.business_types || [
+    const businessTypes = ENUMS?.warehouse?.business_types || [
       { name: "Main", value: "main" },
       { name: "Distribution", value: "distribution" },
       { name: "Fulfillment", value: "fulfillment" },
       { name: "Cold Storage", value: "cold_storage" }
     ]
-    const workflowStatuses = Enums()?.warehouse?.workflow_statuses || []
+    const workflowStatuses = ENUMS?.warehouse?.workflow_statuses || []
     const branchFilter = currentBranches()
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `

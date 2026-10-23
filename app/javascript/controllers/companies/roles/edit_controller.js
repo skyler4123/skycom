@@ -49,7 +49,7 @@ export default class Companies_Roles_EditController extends Companies_LayoutCont
     if (!r) return `<div class="p-8 text-center">${translate("Role not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const typeOptions = (Enums()?.role?.business_types || [
+    const typeOptions = (ENUMS?.role?.business_types || [
       { name: "Administrative", value: "administrative" },
       { name: "Management", value: "management" },
       { name: "Technical", value: "technical" },

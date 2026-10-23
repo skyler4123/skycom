@@ -90,9 +90,7 @@ export const currentRoles = () => {
   return currentCompany().roles
 }
 
-export const Enums =  () => {
-  return getCache().enums
-}
+
 /**
  * Retrieves the current user profile from the client cache.
  * @returns {object|null} The user object (id, email, avatar, etc.) or null if not found.

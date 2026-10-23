@@ -28,7 +28,7 @@ export default class Companies_Categories_IndexController extends Companies_Layo
   }
 
   contentHTML() {
-    const resourceNameFilter = (Enums()?.category?.resource_names || []).map(r => ({
+    const resourceNameFilter = (ENUMS?.category?.resource_names || []).map(r => ({
       name: r.charAt(0).toUpperCase() + r.slice(1),
       value: r
     }))

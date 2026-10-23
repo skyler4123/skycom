@@ -37,6 +37,7 @@ RSpec.describe "ClientCacheController", type: :request do
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
       expect(body).not_to have_key("personal_settings")
+      expect(body).not_to have_key("enums")
     end
   end
 end

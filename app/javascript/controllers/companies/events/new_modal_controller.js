@@ -211,13 +211,13 @@ export default class Companies_Events_NewModalController extends Controller {
 
   modalHTML() {
     const categoryFilter = currentCategories().filter(c => c.resource_name === "events")
-    const typeOptions = (Enums()?.event?.business_types || [
+    const typeOptions = (ENUMS?.event?.business_types || [
       { name: "Appointment", value: "appointment" },
       { name: "Procedure", value: "procedure" },
       { name: "Reservation", value: "reservation" },
       { name: "Banquet", value: "banquet" }
     ]).map(t => `<option value="${t.value}">${t.name}</option>`).join('')
-    const statusOptions = (Enums()?.event?.workflow_statuses || [
+    const statusOptions = (ENUMS?.event?.workflow_statuses || [
       { name: "Pending", value: "pending" },
       { name: "Confirmed", value: "confirmed" },
       { name: "In Progress", value: "in_progress" }

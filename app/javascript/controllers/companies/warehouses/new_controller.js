@@ -101,7 +101,7 @@ export default class Companies_Warehouses_NewController extends Companies_Layout
   contentHTML() {
     const categoryFilter = this.warehousesCategories()
     const branchFilter = currentBranches()
-    const typeOptions = (Enums()?.warehouse?.business_types || [
+    const typeOptions = (ENUMS?.warehouse?.business_types || [
       { name: "Main", value: "main" },
       { name: "Distribution", value: "distribution" },
       { name: "Fulfillment", value: "fulfillment" },

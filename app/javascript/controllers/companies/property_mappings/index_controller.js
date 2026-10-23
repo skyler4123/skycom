@@ -29,7 +29,7 @@ export default class Companies_PropertyMappings_IndexController extends Companie
 
   contentHTML() {
     const urlParams = new URLSearchParams(window.location.search)
-    const resourceNameFilter = (Enums()?.category?.resource_names || []).map(r => ({
+    const resourceNameFilter = (ENUMS?.category?.resource_names || []).map(r => ({
       name: r.charAt(0).toUpperCase() + r.slice(1),
       value: r
     }))

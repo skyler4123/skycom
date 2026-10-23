@@ -100,7 +100,7 @@ export default class Companies_Customers_NewController extends Companies_LayoutC
 
   contentHTML() {
     const categoryFilter = this.customersCategories()
-    const typeOptions = (Enums()?.customer?.business_types || [
+    const typeOptions = (ENUMS?.customer?.business_types || [
       { name: translate("Individual"), value: "individual" },
       { name: translate("Small Business"), value: "small_business" },
       { name: translate("Enterprise"), value: "enterprise" }

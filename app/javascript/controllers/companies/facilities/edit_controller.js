@@ -46,8 +46,8 @@ export default class Companies_Facilities_EditController extends Companies_Layou
     if (!f) return `<div class="p-8 text-center">${translate("Facility not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.facility?.business_types || []
-    const workflowStatuses = Enums()?.facility?.workflow_statuses || []
+    const businessTypes = ENUMS?.facility?.business_types || []
+    const workflowStatuses = ENUMS?.facility?.workflow_statuses || []
     const branchFilter = currentBranches()
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
