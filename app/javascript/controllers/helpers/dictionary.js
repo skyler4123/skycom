@@ -628,6 +628,7 @@ export const dictionary = () => {
     "New Property Mapping": { vi: "Ánh xạ thuộc tính mới" },
     "New Table Config": { vi: "Cấu hình bảng mới" },
     "All property slots are in use.": { vi: "Tất cả các ô thuộc tính đã được sử dụng." },
+    "All columns are in use.": { vi: "Tất cả các cột đã được sử dụng." },
     "Add Property": { vi: "Thêm thuộc tính" },
     "Add Column": { vi: "Thêm cột" },
     "columns": { vi: "cột" },

@@ -25,9 +25,20 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
       this.config = response.table_config
       this.columnsMetadata = this.config?.metadata?.columns || []
 
-      const pm = currentPropertyMappings().find(m => m.id === this.config?.property_mapping_id)
+      /** @type {any | null} */
+      this.propertyMapping = null
+      if (this.config?.property_mapping_id) {
+        try {
+          const pmResponse = await fetchJson(`${Helpers.company_property_mapping_path(companyId, this.config.property_mapping_id)}.json`)
+          this.propertyMapping = pmResponse.property_mapping || null
+        } catch (e) {
+          this.propertyMapping = currentPropertyMappings().find(m => m.id === this.config?.property_mapping_id) || null
+        }
+      }
       /** @type {Array} */
-      this.propertyEntries = pm?.metadata?.properties || []
+      this.propertyEntries = this.propertyMapping?.metadata?.properties || []
+      /** @type {Array} */
+      this.extraColumns = this.propertyMapping?.metadata?.extra_columns || []
 
       poll(() => {
         if (this.hasContentTarget) {
@@ -136,10 +147,9 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
             </table>
           </div>
 
-          <button type="button" data-action="click->${this.identifier}#addColumn"
-            class="mt-3 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer">
-            ${translate("Add Column")}
-          </button>
+          <div id="add-column-area" class="mt-3">
+            ${this.addColumnDropdownHTML()}
+          </div>
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
@@ -167,36 +177,102 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     `
   }
 
-  addColumn() {
+  addColumn(event) {
+    let selectedKey = null
+    if (event?.currentTarget?.tagName === 'SELECT') {
+      selectedKey = event.currentTarget.value
+    } else {
+      const select = document.getElementById('new-column-slot')
+      selectedKey = select?.value || null
+    }
+    if (!selectedKey) return
+
     const usedKeys = new Set((this.columnsMetadata || []).map(c => c.key))
-    const candidates = [
-      'name', 'description', 'code', 'title',
-      ...(this.allPropertySlots ? this.allPropertySlots().map(s => s.key) : [])
-    ]
-    const nextKey = candidates.find(k => !usedKeys.has(k)) || null
-    if (!nextKey) return
+    if (usedKeys.has(selectedKey)) return
 
     this.columnsMetadata.push({
-      key: nextKey,
-      name: '',
+      key: selectedKey,
+      name: this.rawColumnNameFor(selectedKey),
       visible: true,
       search: false,
       align: 'left',
       width: null
     })
+
+    const select = document.getElementById('new-column-slot')
+    if (select) select.value = ''
     this.rerenderEditor()
+  }
+
+  availableColumns() {
+    const usedKeys = new Set((this.columnsMetadata || []).map(c => c.key))
+    const candidateKeys = [
+      'name', 'description', 'code', 'title',
+      ...(this.allPropertySlots ? this.allPropertySlots().map(s => s.key) : [])
+    ]
+    const seen = new Set()
+    const result = []
+    for (const key of candidateKeys) {
+      if (seen.has(key) || usedKeys.has(key)) continue
+      seen.add(key)
+      result.push({ key, name: this.rawColumnNameFor(key) })
+    }
+    return result
+  }
+
+  rawColumnNameFor(key) {
+    if (key === 'name') return 'Name'
+    if (key === 'description') return 'Description'
+    if (key === 'code') return 'Code'
+    if (key === 'title') return 'Title'
+    const entry = this.propertyEntryFor(key)
+    if (entry?.name) return entry.name
+    const extra = this.extraEntryFor(key)
+    if (extra?.name) return extra.name
+    return key
+  }
+
+  addColumnDropdownHTML() {
+    const available = this.availableColumns()
+    if (available.length === 0) {
+      return `<p class="text-sm text-slate-400 mt-3">${translate("All columns are in use.")}</p>`
+    }
+    return `
+      <div class="flex items-center gap-2 mt-3">
+        <label for="new-column-slot" class="sr-only">${translate("Add Column")}</label>
+        <select id="new-column-slot"
+          class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+          data-action="change->${this.identifier}#addColumn">
+          <option value="">${translate("Add Column")}</option>
+          ${available.map(c => `<option value="${this.escapeHTML(c.key)}">${this.escapeHTML(c.name)}</option>`).join('')}
+        </select>
+        <button type="button" data-action="click->${this.identifier}#addColumn"
+          class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer">
+          ${translate("Add Column")}
+        </button>
+      </div>
+    `
   }
 
   allPropertySlots() {
     const slots = []
-    for (let i = 1; i <= 5; i++) slots.push({ key: `property_string_${i}` })
-    for (let i = 1; i <= 10; i++) slots.push({ key: `property_integer_${i}` })
-    for (let i = 1; i <= 5; i++) slots.push({ key: `property_decimal_${i}` })
-    for (let i = 1; i <= 5; i++) slots.push({ key: `property_boolean_${i}` })
-    for (let i = 1; i <= 5; i++) slots.push({ key: `property_datetime_${i}` })
-    // include extra columns defined on the property mapping (unsearchable)
-    const pm = (window.currentPropertyMappings?.() || []).find(m => m.id === this.config?.property_mapping_id)
-    ;(pm?.metadata?.extra_columns || []).forEach(ec => slots.push({ key: ec.key }))
+    // Only columns actually defined in the Property Mapping (no undefined dynamic slots).
+    for (const entry of (this.propertyEntries || [])) {
+      if (entry?.key) slots.push({ key: entry.key })
+    }
+    for (const ec of (this.extraColumns || [])) {
+      if (ec?.key) slots.push({ key: ec.key })
+    }
+    // Fall back to client cache if the fresh fetch did not populate anything.
+    if (slots.length === 0) {
+      const pm = (window.currentPropertyMappings?.() || []).find(m => m.id === this.config?.property_mapping_id)
+      for (const entry of (pm?.metadata?.properties || [])) {
+        if (entry?.key) slots.push({ key: entry.key })
+      }
+      for (const ec of (pm?.metadata?.extra_columns || [])) {
+        if (ec?.key) slots.push({ key: ec.key })
+      }
+    }
     return slots
   }
 
@@ -210,9 +286,9 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
   rerenderEditor() {
     const tbody = document.getElementById('columns-body')
-    if (!tbody) return
-
-    tbody.innerHTML = this.columnsMetadata.map((col, index) => this.columnRowHTML(col, index)).join('')
+    if (tbody) tbody.innerHTML = this.columnsMetadata.map((col, index) => this.columnRowHTML(col, index)).join('')
+    const addArea = document.getElementById('add-column-area')
+    if (addArea) addArea.innerHTML = this.addColumnDropdownHTML()
   }
 
   propertyEntryFor(key) {
@@ -220,6 +296,8 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   }
 
   extraEntryFor(key) {
+    const found = (this.extraColumns || []).find(e => e.key === key)
+    if (found) return found
     const pm = (window.currentPropertyMappings?.() || []).find(m => m.id === this.config?.property_mapping_id)
     return (pm?.metadata?.extra_columns || []).find(e => e.key === key) || null
   }
