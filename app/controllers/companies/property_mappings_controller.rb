@@ -74,6 +74,16 @@ class Companies::PropertyMappingsController < Companies::ApplicationController
           end
         end
       end
+
+      if meta["extra_columns"].is_a?(Hash)
+        meta["extra_columns"] = meta["extra_columns"].values.to_a
+        meta["extra_columns"].each do |entry|
+          if entry["validates"].is_a?(String) && entry["validates"].present?
+            entry["validates"] = JSON.parse(entry["validates"]) rescue {}
+          end
+          entry["key"] = "extra_#{SecureRandom.hex(4)}" if entry["key"].blank?
+        end
+      end
       p_params[:metadata] = meta
     end
 

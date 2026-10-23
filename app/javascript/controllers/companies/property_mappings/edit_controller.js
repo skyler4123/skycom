@@ -18,6 +18,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
       const response = await fetchJson(`${Helpers.company_property_mapping_path(companyId, mappingId)}.json`)
       this.mapping = response.property_mapping
       this.propertyMetadata = this.mapping?.metadata?.properties || []
+      this.extraColumns = this.mapping?.metadata?.extra_columns || []
 
       poll(() => {
         if (this.hasContentTarget) {
@@ -68,6 +69,23 @@ export default class Companies_PropertyMappings_EditController extends Companies
           </button>
         </td>
       </tr>
+    `).join('')
+
+    const extraRowsHTML = this.extraColumns.map((field, index) => `
+      <div class="grid grid-cols-4 gap-2 items-center">
+        <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-600 dark:text-slate-400">${field.key}</span>
+        <input type="hidden" name="property_mapping[metadata][extra_columns][${index}][key]" value="${field.key}">
+        <input type="text" name="property_mapping[metadata][extra_columns][${index}][name]" value="${field.name || ''}" placeholder="Display Name"
+          class="px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+        <select name="property_mapping[metadata][extra_columns][${index}][type]"
+          class="px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+          ${['string','integer','decimal','boolean','datetime'].map(t => `<option value="${t}" ${field.type === t ? 'selected' : ''}>${t}</option>`).join('')}
+        </select>
+        <button type="button" data-action="click->${this.identifier}#removeExtraColumn" data-index="${index}"
+          class="inline-flex items-center justify-center p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]!">delete</span>
+        </button>
+      </div>
     `).join('')
 
     const addDropdownHTML = availableSlots.length > 0 ? `
@@ -138,6 +156,18 @@ export default class Companies_PropertyMappings_EditController extends Companies
           <div id="add-property-area">
             ${addDropdownHTML}
           </div>
+        </div>
+
+        <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
+          <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">${translate("Extra Columns (unsearchable)")}</h3>
+          <p class="text-xs text-slate-400 mb-4">${translate("Additional columns outside the default dynamic slots. These are not indexed by search.")}</p>
+          <div id="extra-columns-body" class="space-y-2">
+            ${extraRowsHTML}
+          </div>
+          <button type="button" data-action="click->${this.identifier}#addExtraColumn"
+            class="mt-3 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer">
+            ${translate("Add Extra Column")}
+          </button>
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
@@ -230,6 +260,40 @@ export default class Companies_PropertyMappings_EditController extends Companies
         </button>
       </div>
     ` : `<p class="text-sm text-slate-400 mt-3">${translate("All property slots are in use.")}</p>`
+  }
+
+  addExtraColumn() {
+    const next = this.extraColumns.length + 1
+    this.extraColumns.push({ key: `extra_${next}`, name: '', type: 'string', validates: {} })
+    this.rerenderExtraColumns()
+  }
+
+  removeExtraColumn(event) {
+    const index = parseInt(event.currentTarget.getAttribute('data-index'))
+    if (isNaN(index)) return
+    this.extraColumns.splice(index, 1)
+    this.rerenderExtraColumns()
+  }
+
+  rerenderExtraColumns() {
+    const container = document.getElementById('extra-columns-body')
+    if (!container) return
+    container.innerHTML = this.extraColumns.map((field, index) => `
+      <div class="grid grid-cols-4 gap-2 items-center">
+        <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-600 dark:text-slate-400">${field.key}</span>
+        <input type="hidden" name="property_mapping[metadata][extra_columns][${index}][key]" value="${field.key}">
+        <input type="text" name="property_mapping[metadata][extra_columns][${index}][name]" value="${field.name || ''}" placeholder="Display Name"
+          class="px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+        <select name="property_mapping[metadata][extra_columns][${index}][type]"
+          class="px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+          ${['string','integer','decimal','boolean','datetime'].map(t => `<option value="${t}" ${field.type === t ? 'selected' : ''}>${t}</option>`).join('')}
+        </select>
+        <button type="button" data-action="click->${this.identifier}#removeExtraColumn" data-index="${index}"
+          class="inline-flex items-center justify-center p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]!">delete</span>
+        </button>
+      </div>
+    `).join('')
   }
 
   allPropertySlots() {
