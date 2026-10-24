@@ -32,8 +32,28 @@ class Companies::ApplicationController < ApplicationController
   end
   def set_company
     company_id = params[:company_id]
-    # @current_company ||= Company.find(company_id) if company_id.present?
-    @current_company ||= Company.find_by(id: company_id) if company_id.present?
+    return unless company_id.present?
+
+    cached_company = Rails.sync_cache.fetch("companies_#{company_id}:v2", expires_in: Company::COMPANY_CACHE_EXPIRY) do
+      c = Company.find_by(id: company_id)
+      next nil unless c
+      attrs = c.attributes
+      c.class.defined_enums.each do |enum_name, mapping|
+        value = attrs[enum_name]
+        attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
+      end
+      attrs
+    end
+    if cached_company.present?
+      attrs = cached_company.dup
+      Company.defined_enums.each do |enum_name, mapping|
+        value = attrs[enum_name]
+        attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
+      end
+      @current_company = Company.instantiate(attrs)
+    else
+      @current_company = nil
+    end
   end
 
   def current_company
@@ -41,8 +61,29 @@ class Companies::ApplicationController < ApplicationController
   end
 
   def set_employee
-    # @current_employee ||= current_user.employees.where(company: current_company).first
-    @current_employee ||= Employee.find_by(user: current_user, company: current_company)
+    return unless current_user && current_company
+
+    cache_key = "employees_#{current_user.id}_#{current_company.id}:v2"
+    cached_employee = Rails.sync_cache.fetch(cache_key, expires_in: Employee::EMPLOYEE_CACHE_EXPIRY) do
+      e = Employee.find_by(user: current_user, company: current_company)
+      next nil unless e
+      attrs = e.attributes
+      e.class.defined_enums.each do |enum_name, mapping|
+        value = attrs[enum_name]
+        attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
+      end
+      attrs
+    end
+    if cached_employee.present?
+      attrs = cached_employee.dup
+      Employee.defined_enums.each do |enum_name, mapping|
+        value = attrs[enum_name]
+        attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
+      end
+      @current_employee = Employee.instantiate(attrs)
+    else
+      @current_employee = nil
+    end
   end
 
   def current_employee

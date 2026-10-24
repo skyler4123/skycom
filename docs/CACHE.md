@@ -251,9 +251,30 @@ The listener is resilient — if the Redis connection drops, it logs the error, 
 
 Both `write` and `delete` accept a `sync:` keyword argument (default: `true`). Set `sync: false` to suppress pub/sub for local-only operations (e.g., bulk cache clearing during maintenance).
 
-### 4.4 Removed: Cache::RecordsConcern Layer
+### 4.4 Record cache (replacement for removed Cache::RecordsConcern)
 
-The custom `Cache::RecordsConcern` (`cached_find` / `cached_where` + auto-sync callbacks) has been removed. Records (Session, User, Company, Employee, etc.) are now loaded via normal database queries. `Rails.sync_cache` remains available for other scalar cached values (e.g., the cookie cache version in `CookieConcern`).
+The old `Cache::RecordsConcern` (`cached_find` / `cached_where`) was removed in
+commit `8abe53c`. It is replaced by a **record cache** backed by
+`Rails.sync_cache`:
+
+- `Session` stores a compact hash (`id`, `user_id`) — no AR needed on the hot
+  path.
+- `User`, `Company`, and `Employee` store their full `attributes` hash and are
+  re-instantiated via `Model.instantiate` on a cache hit, eliminating the
+  per-request `User Load` / `Company Load` / `Employee Load` queries. Callers
+  keep using ActiveRecord objects/associations unchanged.
+- Keys are unversioned (`users_#{id}`, `companies_#{id}`,
+  `employees_#{user_id}_#{company_id}`, `sessions_#{id}`); writes overwrite the
+  same key and deletes propagate via pub/sub. TTLs: Session 1 hour, others 5
+  minutes.
+- `after_commit :refresh_cache` / `:remove_cache` on each model keep entries fresh.
+- The `cache_version` aggregate (`Company.where(user:).maximum(:updated_at)`) is
+  also cached per user under `user_#{id}:companies_max_updated_at` and
+  invalidated on Company create/update/destroy.
+
+`Rails.sync_cache` remains available for other scalar cached values (e.g. the
+cookie cache version in `CookieConcern`). See `docs/MODEL_CALLBACKS.md` for the
+callback list.
 
 ### 4.5 Session Authentication Flow
 

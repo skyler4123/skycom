@@ -16,7 +16,7 @@ export default class extends Controller {
           Profile
         </button>
         <div class="my-1 border-t border-slate-200 dark:border-slate-700"></div>
-        <a class="flex items-center gap-3 px-4 py-2 rounded-md text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20" href="/sign_out">
+        <a data-controller="sign-out" data-action="click->sign-out#handleClick" class="flex items-center gap-3 px-4 py-2 rounded-md text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20" href="/sign_out">
           <span class="material-symbols-outlined text-sm">logout</span>
           Sign Out
         </a>

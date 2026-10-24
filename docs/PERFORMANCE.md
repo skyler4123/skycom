@@ -89,6 +89,47 @@ Every item has the same four lines:
   counter table + backfill; read paths (`mark_all_read`, single reads) must
   keep the counter exact or the badge lies.
 
+## 6. Record cache — current state and trade-offs
+
+**Implemented**: `Session`, `User`, `Company`, `Employee` are cached in
+`Rails.sync_cache` (unversioned keys, `refresh_cache`/`remove_cache`
+invalidation, TTL backstop). `User`/`Company`/`Employee` are re-instantiated
+from cached attributes via `Model.instantiate`, eliminating per-request DB
+reads on cache hit; `Session` stays a compact hash.
+
+**Trade-off**: `instantiate` allocates an ActiveRecord object and re-casts
+attributes on every request. This is far cheaper than a DB round-trip and keeps
+all existing callers (`current_company.shift_templates`, `current_user.companies`,
+etc.) working without a refactor, but it is not zero-cost and still holds a full
+AR instance in memory per request.
+
+**Future improvement (hash-based, zero-DB, zero-instantiate)**: migrate callers
+to raw, indexed FK queries (`ShiftTemplate.where(company_id: ...)`,
+`current_user["system_role"] == "admin"`) and return compact hashes from
+`current_user`/`current_company`/`current_employee` instead of AR objects.
+See `/home/skyler/.opencode/plan/hash-based-records.md` for the field inventory
+and migration recipe. Until that refactor lands, `instantiate` remains the
+compatibility bridge.
+
+## 7. Notification bell unread count → fold into page JSON
+
+- **Trigger**: `GET .../notifications/unread_count` shows up in every
+  page-load trace, or the bell becomes a latency hotspot on navigation.
+- **Current cost**: each page load issues a separate request for the unread
+  count (shell + data + bell = 3 requests). The count is already cached
+  per employee (10-min TTL via `Notifications::UnreadQuery`), but a request
+  still fires on every navigation and the cache miss recomputes the
+  subscribed-tag join.
+- **Switch to**: include the unread count in the page's JSON response at the
+  same level as `pagination` (e.g. `unread_count` field on index/show
+  payloads), so the bell updates from data already fetched. Drop the
+  standalone `unread_count` request; fall back to the endpoint only on
+  reconnect or when the field is absent.
+- **Cost of switching**: add the field to the relevant controllers'
+  JSON payloads and update the FE bell to read from the page data (or the
+  client cache) instead of calling the endpoint. Keep the endpoint for
+  backwards compatibility / reconnect recovery.
+
 ---
 
 *See also: `docs/WEBSOCKET.md` (channels/events), `docs/CACHE.md` (tiers).*

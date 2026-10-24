@@ -8,6 +8,8 @@ class User < ApplicationRecord
   include User::OmniauthConcern
   include User::RetailConcern
   include User::SearchConcern
+
+  USER_CACHE_EXPIRY = 5.minutes
   EMAIL_VERIFICATION_TOKEN_EXPIRY = 2.days
   PASSWORD_RESET_TOKEN_EXPIRY = 20.minutes
 
@@ -51,6 +53,9 @@ class User < ApplicationRecord
 
   # ----------------------------------------------------------------------------------------------------
   validates :name, uniqueness: true, allow_blank: true
+
+  after_commit :refresh_cache, on: [ :create, :update ]
+  after_commit :remove_cache, on: :destroy
   before_validation if: :email_changed?, on: :update do
     self.verified = false
   end
@@ -122,4 +127,23 @@ class User < ApplicationRecord
     system_role_company_owner? || accessible_companies.empty?
   end
   # ----------------------------------------------------------------------------------------------------
+
+  private
+
+  def refresh_cache
+    attrs = attributes
+    self.class.defined_enums.each do |enum_name, mapping|
+      value = attrs[enum_name]
+      attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
+    end
+    Rails.sync_cache.write(
+      "users_#{id}:v2",
+      attrs,
+      expires_in: USER_CACHE_EXPIRY
+    )
+  end
+
+  def remove_cache
+    Rails.sync_cache.delete("users_#{id}:v2")
+  end
 end

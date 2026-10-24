@@ -46,9 +46,10 @@ RSpec.feature "Skycom Index Export", type: :feature, js: true do
       export_pages: export_pages
     }
 
+    cache_version = [owner.updated_at, Company.where(user: owner).maximum(:updated_at)].compact.max.to_i
     page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
-    page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
-    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
+    page.execute_script("localStorage.setItem('client_cache_version', arguments[0])", cache_version.to_s)
+    page.execute_script("document.cookie = 'client_cache_version=' + arguments[0] + '; path=/'", cache_version.to_s)
   end
 
   before do

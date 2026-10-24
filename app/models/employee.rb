@@ -11,6 +11,9 @@ class Employee < ApplicationRecord
   include Employee::PermissionConcern
   include TagConcern
   include Discard::Model
+
+  EMPLOYEE_CACHE_EXPIRY = 5.minutes
+
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
@@ -115,11 +118,31 @@ class Employee < ApplicationRecord
   before_destroy :prevent_destroy_if_owner
   after_create :subscribe_to_all_employees_tag
 
+  after_commit :refresh_cache, on: [ :create, :update ]
+  after_commit :remove_cache, on: :destroy
+
   def subscribed_notification_tag_ids
     employee_notification_tag_appointments.pluck(:notification_tag_id)
   end
 
   private
+
+  def refresh_cache
+    attrs = attributes
+    self.class.defined_enums.each do |enum_name, mapping|
+      value = attrs[enum_name]
+      attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
+    end
+    Rails.sync_cache.write(
+      "employees_#{user_id}_#{company_id}:v2",
+      attrs,
+      expires_in: EMPLOYEE_CACHE_EXPIRY
+    )
+  end
+
+  def remove_cache
+    Rails.sync_cache.delete("employees_#{user_id}_#{company_id}:v2")
+  end
 
   def subscribe_to_all_employees_tag
     tag = NotificationTag.find_by(company_id: company_id, name: NotificationTag::ALL_EMPLOYEES_TAG_NAME)
