@@ -4,6 +4,8 @@ class Company < ApplicationRecord
   include Company::HospitalConcern
   include Company::RestaurantConcern
   include Company::PermissionConcern
+
+  COMPANY_CACHE_EXPIRY = 5.minutes
   OWNER_POLICY_RESOURCE = "all".freeze
   OWNER_POLICY_ACTION = "all".freeze
   # Single-file map: country (enum key) → currency (enum key). Used only here
@@ -200,6 +202,9 @@ class Company < ApplicationRecord
 
   after_create :initialize_company
 
+  after_commit :refresh_cache, on: [ :create, :update ]
+  after_commit :remove_cache, on: :destroy
+
   # True when a System record points at this company (systems.company_id FK).
   # Derived from the FK — the single source of truth; no memoization.
   def system_company?
@@ -328,6 +333,25 @@ class Company < ApplicationRecord
   end
 
   private
+
+  def refresh_cache
+    attrs = attributes
+    self.class.defined_enums.each do |enum_name, mapping|
+      value = attrs[enum_name]
+      attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
+    end
+    Rails.sync_cache.write(
+      "companies_#{id}:v2",
+      attrs,
+      expires_in: COMPANY_CACHE_EXPIRY
+    )
+    Rails.sync_cache.delete("user_#{user_id}:companies_max_updated_at")
+  end
+
+  def remove_cache
+    Rails.sync_cache.delete("companies_#{id}:v2")
+    Rails.sync_cache.delete("user_#{user_id}:companies_max_updated_at")
+  end
 
   def assign_currency_from_country
     mapped = COUNTRY_CURRENCY_MAP[country]

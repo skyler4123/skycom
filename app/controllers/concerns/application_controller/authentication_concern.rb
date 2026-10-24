@@ -7,16 +7,39 @@ module ApplicationController::AuthenticationConcern
   end
 
   def current_user
-    @current_user ||= User.find_by(id: current_session&.user_id)
+    return nil unless Current.user_id
+    @current_user ||= begin
+      cached = Rails.sync_cache.fetch("users_#{Current.user_id}:v2", expires_in: User::USER_CACHE_EXPIRY) do
+        u = User.find_by(id: Current.user_id)
+        next nil unless u
+        attrs = u.attributes
+        u.class.defined_enums.each do |enum_name, mapping|
+          value = attrs[enum_name]
+          attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
+        end
+        attrs
+      end
+      if cached.present?
+        attrs = cached.dup
+        User.defined_enums.each do |enum_name, mapping|
+          value = attrs[enum_name]
+          attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
+        end
+        User.instantiate(attrs)
+      else
+        nil
+      end
+    end
   end
 
   def current_session
-    @current_session ||= Current.session
+    return nil unless Current.session_id
+    @current_session ||= Session.find_by(id: Current.session_id)
   end
 
   def is_signed_in?
     return false unless cookies[:is_signed_in]
-    current_session.present?
+    Current.session_id.present?
   end
 
   private
@@ -30,15 +53,19 @@ module ApplicationController::AuthenticationConcern
     token = cookies.signed[:session_token]
     return unless token
 
-    # Normal DB lookup (no custom cached_* instantiation path).
-    session_record = Session.find_by(id: token)
+    session_hash = Rails.sync_cache.fetch("sessions_#{token}", expires_in: Session::SESSION_CACHE_EXPIRY) do
+      s = Session.find_by(id: token)
+      next nil unless s
+      { "id" => s.id, "user_id" => s.user_id }
+    end
 
-    unless session_record
+    if session_hash.nil?
       cleanup_invalid_session(token)
       return
     end
 
-    Current.session = session_record
+    Current.session_id = session_hash["id"]
+    Current.user_id    = session_hash["user_id"]
   end
 
   def authenticate

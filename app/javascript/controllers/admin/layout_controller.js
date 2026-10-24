@@ -82,7 +82,7 @@ export default class Admin_LayoutController extends Controller {
                 <p class="text-xs text-slate-500 dark:text-slate-400 truncate">${user?.email || ''}</p>
               </div>
             </div>
-            <a href="/sign_out"
+            <a data-controller="sign-out" data-action="click->sign-out#handleClick" href="/sign_out"
               class="mt-3 flex items-center gap-2 px-3 py-2 text-sm text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer">
               <span class="material-symbols-outlined text-[18px]!">logout</span>
               Sign out

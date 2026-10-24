@@ -1,11 +1,16 @@
 class Current < ActiveSupport::CurrentAttributes
-  attribute :session
-  attribute :user_agent, :ip_address
-
-  delegate :user, to: :session, allow_nil: true
-
-  # ------------------------------------------------------------------------
+  attribute :session_id, :user_id, :user_agent, :ip_address
   attribute :company_id
+
+  def session
+    return nil unless session_id.present?
+    @session ||= Session.find_by(id: session_id)
+  end
+
+  def user
+    return nil unless user_id.present?
+    @user ||= User.find_by(id: user_id)
+  end
 
   # company_owner is User
   def self.company_owner
