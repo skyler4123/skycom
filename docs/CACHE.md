@@ -105,7 +105,7 @@ OWNER_ROLE_CACHE_EXPIRY = 1.day
 
 def owner_role?
   Rails.ram_cache.fetch("#{cache_key_with_version}/owner_role", expires_in: OWNER_ROLE_CACHE_EXPIRY) do
-    EmployeeRoleAppointment.cached_where(employee_id: id).any? { |ra| ra.business_type == OWNER_BUSINESS_TYPE }
+    EmployeeRoleAppointment.where(employee_id: id).any? { |ra| ra.business_type == OWNER_BUSINESS_TYPE }
   end
 end
 ```
@@ -147,7 +147,7 @@ Solid Cache database files per environment:
 
 **Backend**: Solid Cache (SQLite) for reads + Redis pub/sub for write/delete invalidation.
 
-**Purpose**: The default server-side cache. Records cached by `Cache::RecordsConcern` (Session, User, Company, Employee, RoleAppointment) use this tier, as do permissions hashes and billing dashboard data.
+**Purpose**: The default server-side cache. Used for scalar values such as the cookie cache version and other independent cached data. (The custom `Cache::RecordsConcern` record-cache layer has been removed; records are loaded via normal DB queries.)
 
 ### 4.1 The SyncCache Class
 
@@ -251,152 +251,23 @@ The listener is resilient — if the Redis connection drops, it logs the error, 
 
 Both `write` and `delete` accept a `sync:` keyword argument (default: `true`). Set `sync: false` to suppress pub/sub for local-only operations (e.g., bulk cache clearing during maintenance).
 
-### 4.4 Cache::RecordsConcern Integration
+### 4.4 Removed: Cache::RecordsConcern Layer
 
-**File**: `app/models/concerns/cache/records_concern.rb`
-
-All ActiveRecord models that include `Cache::RecordsConcern` (Session, User, Company, Employee, RoleAppointment) automatically use `sync_cache` for both reads and writes:
-
-```ruby
-module Cache::RecordsConcern
-  included do
-    after_commit :write_attribute_cache, on: [ :create, :update ]
-    after_commit :remove_attribute_cache, on: :destroy
-  end
-
-  class_methods do
-    def cached_find(id, expires_in: DEFAULT_CACHE_EXPIRY)
-      cache_key = "#{model_name.plural}_#{id}"
-      attributes = Rails.sync_cache.fetch(cache_key, expires_in: expires_in) do
-        find_by(id: id)&.attributes
-      end
-      return nil if attributes.blank?
-      normalize_enum_attributes!(attributes)
-      instantiate(attributes)
-    end
-
-    def cached_where(**filters)
-      # ... similar pattern with query-hash cache key ...
-      Rails.sync_cache.fetch(cache_key, expires_in: expires_in) do
-        relation.map(&:attributes)
-      end
-    end
-  end
-
-  # Instance methods trigger cross-instance invalidation via sync_cache
-  def write_attribute_cache
-    Rails.sync_cache.write(cache_key, attributes)
-  end
-
-  def remove_attribute_cache
-    Rails.sync_cache.delete(cache_key)
-  end
-end
-```
-
-When a model record is **created or updated**, the `after_commit` callback calls `Rails.sync_cache.write(...)`, which:
-1. Writes attributes to the local SQLite cache
-2. Publishes an invalidation message to Redis
-
-When a model record is **destroyed**, the `after_commit` callback calls `Rails.sync_cache.delete(...)`, which:
-1. Deletes from the local SQLite cache
-2. Publishes an invalidation message to Redis
-
-Other instances receive the invalidation message and evict only the stale key from their local cache. When they next read it, they fetch from the database and repopulate.
+The custom `Cache::RecordsConcern` (`cached_find` / `cached_where` + auto-sync callbacks) has been removed. Records (Session, User, Company, Employee, etc.) are now loaded via normal database queries. `Rails.sync_cache` remains available for other scalar cached values (e.g., the cookie cache version in `CookieConcern`).
 
 ### 4.5 Session Authentication Flow
 
-The old pattern required a Redis `exist?` check on every request. The new pattern reads only from `sync_cache`:
+Session authentication now uses a normal DB lookup:
 
 ```ruby
-def set_current_session
-  token = cookies.signed[:session_token]
-  return unless token
-
-  # Pure L1 read (Local Cache + Pub/Sub invalidation on destroy/logout)
-  session_record = Session.cached_find(token, expires_in: SESSION_CACHE_EXPIRY)
-
-  unless session_record
-    cleanup_invalid_session(token)
-    return
-  end
-
-  Current.session = session_record
-end
+session_record = Session.find_by(id: token)
 ```
 
-**Authentication requires zero Redis calls per request.** If the session was destroyed on another instance, the invalidation message already evicted it from this instance's local cache.
-
-### 4.6 Cross-Instance Invalidation Scenarios
-
-#### Scenario: User signs out on Instance A
-
-```
-Instance A                      Redis Pub/Sub                  Instance B
-─────────                       ──────────────                  ──────────
-session.destroy
-  │
-  └─ Cache::RecordsConcern
-       remove_attribute_cache
-         └─ Rails.sync_cache.delete("sessions_<id>")
-              │
-              ├─ local_cache.delete (Instance A)
-              │
-              └─ Redis PUBLISH "sync_cache:invalidation"
-                   { action: "delete", key: "sessions_<id>" }
-                                      │
-                                      │  SUBSCRIBED
-                                      ▼
-                                 handle_invalidation(message)
-                                   └─ local_cache.delete(key)
-                                                             (milliseconds later)
-                                                             AJAX request arrives
-                                                               └─ Session.cached_find(token)
-                                                                   └─ sync_cache MISS
-                                                                   └─ DB query → nil
-                                                                   └─ cleanup_invalid_session
-```
-
-#### Scenario: Session created on Instance A, request hits Instance B
-
-```
-Instance A                      Redis Pub/Sub                  Instance B
-─────────                       ──────────────                  ──────────
-session.create
-  │
-  └─ Cache::RecordsConcern
-       write_attribute_cache
-         └─ Rails.sync_cache.write("sessions_<id>", attrs)
-              │
-              ├─ local_cache.write (Instance A)
-              │
-              └─ Redis PUBLISH "sync_cache:invalidation"
-                   { action: "write", key: "sessions_<id>" }
-                                      │
-                                      │  SUBSCRIBED
-                                      ▼
-                                 handle_invalidation(message)
-                                   └─ local_cache.delete(key)
-                                                             First request for this session
-                                                               └─ Session.cached_find(token)
-                                                                   └─ sync_cache MISS
-                                                                   └─ DB query → found
-                                                                   └─ cached locally + synced
-```
-
-The write-side invalidation ensures Instance B evicts any stale (pre-creation) value. If Instance B never had the key, the eviction is a no-op — no harm done.
-
-### 4.7 Session Lifecycle
-
-| Event | What Happens | Cache Effect |
-|-------|-------------|--------------|
-| **Sign in** | `user.sessions.create!` → `after_commit` fires | `sync_cache.write("sessions_<id>", attrs)` → local write + pub/sub |
-| **Request** | `Session.cached_find(token)` | Pure local read — zero Redis calls |
-| **Sign out** | `session.destroy` → `after_commit` fires | `sync_cache.delete("sessions_<id>")` → local delete + pub/sub |
-| **TTL expiry** | `SESSION_CACHE_EXPIRY` (1 hour) passes | Local entry evicted automatically |
+No `sync_cache` read or invalidation is involved for sessions.
 
 ---
 
+## 5. Tier 4: `Rails.global_cache`
 ## 5. Tier 4: `Rails.global_cache`
 
 **Backend**: Redis (in-memory, cross-cluster).
@@ -442,7 +313,7 @@ Per the `docs/CONSTANTS.md` convention, single-file constants live at their usag
 
 | Constant | Value | Defined In | Purpose |
 |----------|-------|------------|---------|
-| `DEFAULT_CACHE_EXPIRY` | 5 minutes | `app/models/concerns/cache/records_concern.rb` | Default TTL for `cached_find` / `cached_where` |
+| `DEFAULT_CACHE_EXPIRY` | (removed) | `Cache::RecordsConcern` removed | No longer used |
 | `SESSION_CACHE_EXPIRY` | 1 hour | `app/controllers/concerns/application_controller/authentication_concern.rb` | Session record cache TTL (longer — sessions rarely change) |
 | `PERMISSIONS_CACHE_EXPIRY` | 1 minute | `config/initializers/constants.rb` | Permissions hash cache TTL (used by both permission concerns) |
 | `OWNER_ROLE_CACHE_EXPIRY` | 1 day | `app/models/concerns/employee/permission_concern.rb` | `ram_cache` TTL for the `Employee#owner_role?` hot boolean |
@@ -587,7 +458,7 @@ Tests cover:
 - Basic write/read lifecycle
 - Pub/sub invalidation on delete
 - Incoming invalidation handling
-- `Cache::RecordsConcern` integration (cached_find, auto-update, auto-evict)
+- (Cache::RecordsConcern integration removed; records load via normal DB queries)
 
 ram_cache coverage: `spec/models/employee_owner_role_spec.rb` — caches `true`/`false` values and evicts on `clear_permissions_cache`.
 
@@ -636,8 +507,8 @@ Rails.global_cache.clear       rescue nil
 | `spec/models/employee_owner_role_spec.rb` | ram_cache caching + eviction specs |
 | `config/initializers/constants.rb` | `PERMISSIONS_CACHE_EXPIRY` |
 | `config/redis/shared.yml` | Redis connection configuration per environment |
-| `app/models/concerns/cache/records_concern.rb` | `cached_find` / `cached_where` + auto-sync callbacks + `DEFAULT_CACHE_EXPIRY` |
-| `app/controllers/concerns/application_controller/authentication_concern.rb` | `set_current_session` with `sync_cache` reads + `SESSION_CACHE_EXPIRY` |
+| (removed) `app/models/concerns/cache/records_concern.rb` | Custom record cache layer removed |
+| `app/controllers/concerns/application_controller/authentication_concern.rb` | `set_current_session` with normal DB lookup |
 | `app/controllers/concerns/application_controller/cookie_concern.rb` | Session and client cache version cookies + `COOKIE_EXPIRY` |
 | `app/controllers/client_cache_controller.rb` | `/client_cache` JSON endpoint |
 | `app/javascript/controllers/client_cache_controller.js` | Frontend client cache sync |

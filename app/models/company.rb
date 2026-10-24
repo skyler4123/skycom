@@ -1,6 +1,5 @@
 class Company < ApplicationRecord
   include AddressConcern
-  include Cache::RecordsConcern
   include Company::EducationConcern
   include Company::HospitalConcern
   include Company::RestaurantConcern

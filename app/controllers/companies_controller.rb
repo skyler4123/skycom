@@ -63,7 +63,7 @@ class CompaniesController < ApplicationController
 
   def authorize_company_owner!
     @company = Company.find(params[:id])
-    employee = Employee.cached_where(user: current_user, company: @company).first
+    employee = Employee.find_by(user: current_user, company: @company)
     return if employee&.owner_role?
 
     respond_to do |format|
