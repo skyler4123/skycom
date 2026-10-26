@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">Skycom Android</string>
+    <string name="app_name">Skycom</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_employee">Employee</string>
+    <string name="tab_attendance">Attendance</string>
+    <string name="tab_payroll">Payroll</string>
+    <string name="tab_requests">Requests</string>
 </resources>
