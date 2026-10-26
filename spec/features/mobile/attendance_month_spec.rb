@@ -32,6 +32,6 @@ RSpec.feature "Mobile Attendance Month", type: :feature, js: true do
 
   scenario "redirects to sign-in for unauthenticated user" do
     visit mobile_attendance_month_path
-    expect(page).to have_current_path(root_path)
+    expect(page).to have_current_path(mobile_sign_in_path)
   end
 end

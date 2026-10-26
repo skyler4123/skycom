@@ -39,9 +39,9 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
     expect(page).to have_button("Check In")
   end
 
-  scenario "redirects to sign-in for unauthenticated user" do
+  scenario "redirects to mobile sign-in for unauthenticated user" do
     visit mobile_home_path
 
-    expect(page).to have_current_path(root_path)
+    expect(page).to have_current_path(mobile_sign_in_path)
   end
 end
