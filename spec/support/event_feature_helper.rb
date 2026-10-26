@@ -27,7 +27,6 @@ module EventFeatureHelper
     page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
-
 end
 
 RSpec.configure do |config|

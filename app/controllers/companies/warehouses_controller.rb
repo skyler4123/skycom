@@ -109,7 +109,7 @@ class Companies::WarehousesController < Companies::ApplicationController
       :property_integer_6, :property_integer_7, :property_integer_8, :property_integer_9, :property_integer_10,
       :property_decimal_1, :property_decimal_2, :property_decimal_3, :property_decimal_4, :property_decimal_5,
       :property_boolean_1, :property_boolean_2, :property_boolean_3, :property_boolean_4, :property_boolean_5,
-      :property_datetime_1, :property_datetime_2, :property_datetime_3, :property_datetime_4, :property_datetime_5,
+      :property_datetime_1, :property_datetime_2, :property_datetime_3, :property_datetime_4, :property_datetime_5
     ]).merge(
       category: warehouse.category&.as_json(only: [ :id, :name ]),
       branch: warehouse.branch&.as_json(only: [ :id, :name ])
