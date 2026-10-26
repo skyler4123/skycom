@@ -1,0 +1,6 @@
+<% icon = local_assigns[:icon] || "inbox" %>
+<div class="flex flex-col items-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center dark:border-slate-700 dark:bg-slate-900">
+  <span class="material-symbols-outlined text-3xl text-slate-400 dark:text-slate-500"><%= icon %></span>
+  <p class="text-sm font-semibold text-slate-900 dark:text-white"><%= title %></p>
+  <p class="text-xs text-slate-500 dark:text-slate-400"><%= hint %></p>
+</div>

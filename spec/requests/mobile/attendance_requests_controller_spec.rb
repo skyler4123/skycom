@@ -22,8 +22,8 @@ RSpec.describe "Mobile::AttendanceRequestsController", type: :request do
       post mobile_attendance_requests_path, params: {
         attendance_request: {
           attendance_date: Date.yesterday,
-          check_in: Time.zone.parse("#{Date.yesterday} 09:00"),
-          check_out: Time.zone.parse("#{Date.yesterday} 17:00"),
+          check_in_time: "09:00",
+          check_out_time: "17:00",
           reason: "Remote work"
         }
       }
@@ -45,7 +45,7 @@ RSpec.describe "Mobile::AttendanceRequestsController", type: :request do
       post mobile_attendance_requests_path, params: {
         attendance_request: {
           attendance_date: Date.yesterday,
-          check_in: Time.zone.parse("#{Date.yesterday} 09:00"),
+          check_in_time: "09:00",
           reason: "Remote work"
         }
       }
@@ -62,7 +62,7 @@ RSpec.describe "Mobile::AttendanceRequestsController", type: :request do
     post mobile_attendance_requests_path, params: {
       attendance_request: {
         attendance_date: Date.yesterday,
-        check_in: Time.zone.parse("#{Date.yesterday} 09:00"),
+        check_in_time: "09:00",
         reason: "Remote work"
       }
     }

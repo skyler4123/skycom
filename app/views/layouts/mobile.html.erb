@@ -1,15 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>Skycom</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title><%= content_for?(:title) ? yield(:title) : "Skycom" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="turbo-prefetch" content="false">
+    <script>
+      // Pre-apply the persisted theme before first paint (same key as the desktop layout).
+      try {
+        if (localStorage.getItem("darkmode") === "true") {
+          document.documentElement.classList.add("dark");
+        }
+      } catch (e) {}
+    </script>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
   </head>
-  <body class="bg-gray-50 min-h-screen">
+  <body class="min-h-dvh bg-slate-50 font-sans text-slate-900 antialiased dark:bg-slate-950 dark:text-white">
+    <%= render "mobile/shared/flash" %>
     <%= yield %>
   </body>
 </html>
