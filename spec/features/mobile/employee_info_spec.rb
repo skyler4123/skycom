@@ -29,6 +29,6 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
 
   scenario "redirects to sign-in for unauthenticated user" do
     visit mobile_employee_path
-    expect(page).to have_current_path(root_path)
+    expect(page).to have_current_path(mobile_sign_in_path)
   end
 end
