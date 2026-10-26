@@ -6,6 +6,10 @@ class Mobile::AttendancesController < Mobile::BaseController
       redirect_to mobile_home_path, alert: "No employee record found" and return
     end
 
+    if employee.attendance_logs.where(logged_at: Date.current.all_day, log_type: :check_in).exists?
+      redirect_to mobile_home_path, alert: "Already checked in today" and return
+    end
+
     branch = employee.branch || employee.company.branches.first
 
     AttendanceLog.create!(

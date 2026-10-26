@@ -6,6 +6,8 @@ class Mobile::SessionsController < Mobile::BaseController
   end
 
   def create
+    @email = params[:email]
+
     if user = User.authenticate_by(email: params[:email], password: params[:password])
       session = user.sessions.create!(single_access_token: SecureRandom.hex(20))
       user.update!(single_access_token: session.single_access_token)

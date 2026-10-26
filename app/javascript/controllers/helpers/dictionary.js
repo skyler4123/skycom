@@ -1036,6 +1036,8 @@ export const dictionary = () => {
     "Import updated": { vi: "Lượt nhập đã cập nhật" },
     "Could not load this import": { vi: "Không tải được lượt nhập này" },
     "Back to Data Import": { vi: "Quay lại Nhập dữ liệu" },
-    "All chunks are already uploaded — re-pick the source file to continue": { vi: "Tất cả các phần đã được tải lên — chọn lại tệp nguồn để tiếp tục" }
+    "All chunks are already uploaded — re-pick the source file to continue": { vi: "Tất cả các phần đã được tải lên — chọn lại tệp nguồn để tiếp tục" },
+    "Copied to clipboard": { vi: "Đã sao chép vào clipboard" },
+    "Copy failed — select the text manually": { vi: "Sao chép thất bại — hãy chọn văn bản thủ công" }
   }
 }

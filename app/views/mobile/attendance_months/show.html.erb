@@ -1,64 +1,94 @@
-<div class="flex min-h-screen flex-col px-6 py-8">
-  <div class="w-full max-w-sm mx-auto">
+<% content_for :title, "Attendance" %>
 
-    <h1 class="text-2xl font-bold mb-6">Attendance Month</h1>
+<%= render "mobile/shared/header", title: "Attendance", avatar_name: @employee.name, avatar_path: mobile_employee_path %>
+
+<main class="mx-auto w-full max-w-lg px-4 pb-8 pt-4">
+  <div class="flex flex-col gap-4">
+    <section class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div class="flex min-w-0 items-center gap-3">
+        <%= render "mobile/shared/avatar", name: @employee.name, size: "h-10 w-10 text-xs" %>
+        <div class="min-w-0">
+          <p class="truncate text-base font-semibold text-slate-900 dark:text-white"><%= @employee.name %></p>
+          <p class="truncate text-xs text-slate-500 dark:text-slate-400"><%= [ @employee.branch&.name, @company.name ].compact.join(" • ") %></p>
+        </div>
+      </div>
+      <span class="shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+        <%= @month == Date.current.beginning_of_month ? "Current month" : "Past month" %>
+      </span>
+    </section>
+
+    <%= render "mobile/shared/month_nav",
+          label: mobile_month_label(@month),
+          prev_path: mobile_attendance_month_path(month: mobile_month_param(@prev_month)),
+          next_path: mobile_attendance_month_path(month: mobile_month_param(@next_month)),
+          next_disabled: @next_disabled %>
 
     <% if @attendance_month %>
-      <div class="space-y-3 text-sm mb-6">
-        <div class="flex justify-between">
-          <span class="text-gray-500">Employee</span>
-          <span class="font-semibold"><%= @employee.name %></span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-500">Month</span>
-          <span class="font-semibold"><%= @attendance_month.month.strftime("%B %Y") %></span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-500">Total Worked</span>
-          <span class="font-semibold"><%= @attendance_month.total_work_minutes %> min</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-500">Days Present</span>
-          <span class="font-semibold"><%= @attendance_month.total_present_days %></span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-gray-500">Days Absent</span>
-          <span class="font-semibold"><%= @attendance_month.total_absent_days %></span>
-        </div>
-      </div>
+      <section class="grid grid-cols-2 gap-2">
+        <%= render "mobile/shared/stat_tile", label: "Total Worked", value: mobile_duration(@attendance_month.total_work_minutes), hint: "#{@attendance_month.total_work_minutes.to_i} minutes total", icon: "schedule" %>
+        <%= render "mobile/shared/stat_tile", label: "Present Days", value: "#{@attendance_month.total_present_days.to_i} Days", hint: "of #{@attendance_month.total_records.to_i} recorded", icon: "task_alt", hint_class: "text-green-700 dark:text-green-400" %>
+        <%= render "mobile/shared/stat_tile", label: "Absent", value: "#{@attendance_month.total_absent_days.to_i} Days", hint: "This month", icon: "event_busy" %>
+        <%= render "mobile/shared/stat_tile", label: "Overtime", value: mobile_duration(@attendance_month.total_overtime_minutes), hint: "This month", icon: "more_time" %>
+      </section>
     <% else %>
-      <p class="text-gray-500 text-sm mb-6">No attendance data for this month.</p>
+      <%= render "mobile/shared/empty_state", title: "No summary for this month", hint: "Attendance totals appear once this month has been aggregated.", icon: "summarize" %>
     <% end %>
 
-    <%= form_with url: mobile_attendance_month_path, method: :get, local: true do %>
-      <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Month</label>
-        <%= select_tag :month,
-              options_for_select(@months.map { |m| [m.month.strftime("%B %Y"), m.month.strftime("%Y-%m")] }, @month.strftime("%Y-%m")),
-              class: "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" %>
+    <div class="flex items-center justify-between gap-2 pt-1">
+      <div class="flex items-center gap-2">
+        <h2 class="text-base font-bold text-slate-900 dark:text-white">Daily Breakdown</h2>
+        <span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-100 px-1.5 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"><%= @attendance_days.size %></span>
       </div>
-      <%= submit_tag "Change Month", class: "w-full rounded-lg bg-blue-600 px-4 py-3 text-base font-semibold text-white hover:bg-blue-700 cursor-pointer mb-4" %>
-    <% end %>
-
-    <h2 class="text-lg font-bold mb-3">Daily Breakdown</h2>
-    <% if @attendance_days.any? %>
-      <div class="space-y-2 mb-6">
-        <% @attendance_days.each do |day| %>
-          <div class="flex justify-between text-sm border border-gray-200 rounded-lg px-3 py-2">
-            <span><%= day.attendance_date.strftime("%d %b") %></span>
-            <span><%= day.attendance_status&.humanize || "—" %></span>
-            <span><%= (day.total_seconds_worked.to_i / 60) %>min</span>
-          </div>
-        <% end %>
-      </div>
-    <% else %>
-      <p class="text-gray-500 text-sm mb-6">No daily records for this month yet.</p>
-    <% end %>
-
-    <div class="mt-4">
-      <%= link_to "Back to Home", mobile_home_path,
-            class: "block text-center w-full rounded-lg bg-gray-600 px-4 py-3 text-base font-semibold text-white hover:bg-gray-700 cursor-pointer" %>
+      <%= link_to new_mobile_attendance_request_path, class: "flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600" do %>
+        New Request
+      <% end %>
     </div>
 
+    <section class="flex flex-col gap-2">
+      <% if @attendance_days.any? %>
+        <% @attendance_days.each do |day| %>
+          <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex min-w-0 items-center gap-3">
+                <div class="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
+                  <span class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400"><%= mobile_weekday(day.attendance_date) %></span>
+                  <span class="text-base font-bold leading-none text-blue-600 dark:text-blue-400"><%= day.attendance_date.strftime("%d") %></span>
+                </div>
+                <div class="min-w-0">
+                  <p class="truncate text-sm font-semibold text-slate-900 dark:text-white"><%= mobile_date(day.attendance_date) %></p>
+                  <p class="truncate text-xs text-slate-500 dark:text-slate-400">
+                    <% if day.recorded_method == "request" %>
+                      Recorded via request
+                    <% elsif day.recorded_method == "check_in" %>
+                      Recorded via check-in
+                    <% else %>
+                      Attendance record
+                    <% end %>
+                  </p>
+                </div>
+              </div>
+              <%= mobile_attendance_status_badge(day.attendance_status) %>
+            </div>
+
+            <div class="mt-3 flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-700 dark:bg-slate-800">
+              <div class="flex flex-wrap items-center gap-3">
+                <span class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-base text-green-600 dark:text-green-400">login</span>
+                  <span class="text-xs font-medium text-slate-900 dark:text-white"><%= mobile_time(day.check_in) %></span>
+                </span>
+                <span class="text-xs text-slate-400 dark:text-slate-500">•</span>
+                <span class="flex items-center gap-1">
+                  <span class="material-symbols-outlined text-base text-slate-400 dark:text-slate-500">logout</span>
+                  <span class="text-xs font-medium text-slate-900 dark:text-white"><%= mobile_time(day.check_out) %></span>
+                </span>
+              </div>
+              <span class="shrink-0 text-sm font-bold text-blue-600 dark:text-blue-400"><%= mobile_duration_from_seconds(day.total_seconds_worked) %></span>
+            </div>
+          </article>
+        <% end %>
+      <% else %>
+        <%= render "mobile/shared/empty_state", title: "No daily records for this month yet", hint: "Check in from Home or file an attendance request.", icon: "event_note" %>
+      <% end %>
+    </section>
   </div>
-</div>
+</main>

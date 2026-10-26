@@ -1,15 +1,18 @@
 class Mobile::AttendanceMonthsController < Mobile::BaseController
   def show
-    @employee = current_user.employees.first
+    @employee = current_user.employees.includes(:company, :branch).first
 
     unless @employee
       redirect_to mobile_home_path, alert: "No employee record found" and return
     end
 
+    @company = @employee.company
     @month = parse_month(params[:month]) || Date.current.beginning_of_month
     @attendance_month = AttendanceMonth.find_by(employee: @employee, month: @month.beginning_of_month)
-    @attendance_days = @attendance_month ? AttendanceDay.where(employee: @employee, attendance_date: @month.beginning_of_month..@month.end_of_month).order(:attendance_date) : []
-    @months = AttendanceMonth.where(employee: @employee).order(month: :desc)
+    @attendance_days = @employee.attendance_days.where(attendance_date: @month.beginning_of_month..@month.end_of_month).order(:attendance_date)
+    @prev_month = @month - 1.month
+    @next_month = @month + 1.month
+    @next_disabled = @next_month > Date.current.beginning_of_month
   end
 
   private

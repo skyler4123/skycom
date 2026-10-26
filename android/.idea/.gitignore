@@ -5,3 +5,9 @@
 # Android Studio-generated local metadata; Gradle is the source of truth
 /misc.xml
 /kotlinc.xml
+
+# Machine-specific project paths and local run state
+/gradle.xml
+/migrations.xml
+/vcs.xml
+/deploymentTargetSelector.xml

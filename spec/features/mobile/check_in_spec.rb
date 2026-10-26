@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.feature "Mobile Check In", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:user) { company.user }
   let(:branch) { create(:branch, company: company) }
-  let!(:employee) { create(:employee, user: user, company: company, branch: branch) }
+  let!(:employee) { company.employees.find_by(user: user).tap { |record| record.update!(branch: branch) } }
 
   scenario "creates attendance log and shows success notice" do
     sign_in(user)
     visit mobile_home_path
 
-    click_button "Check In"
+    click_button "Clock In"
 
     expect(page).to have_content("Checked in successfully")
     expect(AttendanceLog.count).to eq(1)
@@ -20,13 +22,23 @@ RSpec.feature "Mobile Check In", type: :feature, js: true do
     sign_in(user)
     visit mobile_home_path
 
-    click_button "Check In"
+    click_button "Clock In"
 
     expect(page).to have_content("Checked in successfully")
 
     log = AttendanceLog.last
     expect(log.log_type).to eq("check_in")
-    expect(log.employee_id).to be_present
+    expect(log.employee_id).to eq(employee.id)
     expect(log.company_id).to eq(company.id)
+  end
+
+  scenario "does not allow a second check-in on the same day" do
+    sign_in(user)
+    visit mobile_home_path
+
+    click_button "Clock In"
+
+    expect(page).to have_content("Checked In")
+    expect(page).not_to have_button("Clock In")
   end
 end
