@@ -4,6 +4,9 @@ Server-rendered `/mobile/*` pages inside the Android Hotwire Native shell.
 No desktop sidebar/workspace, no JSON page endpoints, no HTML tab bar — the
 native app owns the five-tab bottom navigation.
 
+> Feature parity, pending work, and the Android shell audit live in
+> [`docs/MOBILE_FEATURE_MATRIX.md`](MOBILE_FEATURE_MATRIX.md).
+
 ---
 
 ## 1. Routes and pages

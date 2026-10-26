@@ -57,7 +57,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | Sidebar items, settings, custom groups | `docs/SIDEBAR.md` |
 | Marketing homepage, sign-in/up, company page | `docs/HOMEPAGE.md` — caching contract + SEO rules, read before touching |
 | Tailwind classes, dark mode, mobile layout | `docs/STYLING_GUIDELINES.md` |
-| Any `/mobile/*` page or mobile controller (Hotwire Native) | `docs/MOBILE.md` — shell, page data contract, sample-data policy, mobile tests |
+| Any `/mobile/*` page, mobile controller, or Android shell work | `docs/MOBILE.md` — implementation contract; `docs/MOBILE_FEATURE_MATRIX.md` — web parity, backlog, native audit |
 | User-facing strings or translations | `docs/LANGUAGE.md` — **mandatory**: `translate()` usage + dictionary entries in `app/javascript/controllers/helpers/dictionary.js` |
 | User avatars | `docs/AVATAR.md` — helper + controller + concerns |
 | Seed-driven model validations | `docs/DYNAMIC_VALIDATION.md` — supported validators + affected models |
