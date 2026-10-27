@@ -1,5 +1,6 @@
 class Mobile::Companies::BaseController < Mobile::BaseController
   before_action :set_employee_and_company
+  include Mobile::Companies::Authorizable
 
   rescue_from ActiveRecord::RecordNotFound, with: :not_found
 

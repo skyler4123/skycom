@@ -68,4 +68,15 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
     visit new_mobile_company_attendance_request_path(company)
     expect(page).to have_current_path(mobile_sign_in_path)
   end
+
+  scenario "redirects an unauthorized employee away from the new request form" do
+    unauthorized_user = create(:user)
+    create(:employee, user: unauthorized_user, company: company)
+
+    sign_in(unauthorized_user)
+    visit new_mobile_company_attendance_request_path(company)
+
+    expect(page).to have_current_path(mobile_company_home_path(company))
+    expect(page).to have_content("not authorized")
+  end
 end

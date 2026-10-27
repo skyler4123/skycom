@@ -9,10 +9,6 @@ class Mobile::Companies::AttendanceRequestsController < Mobile::Companies::BaseC
   end
 
   def create
-    unless @employee.can?(:create, AttendanceRequest)
-      redirect_to mobile_company_home_path(@company), alert: "You are not authorized to create attendance requests" and return
-    end
-
     attendance_request = AttendanceRequest.new(request_params)
     attendance_request.company = @employee.company
     attendance_request.branch ||= @employee.branch
