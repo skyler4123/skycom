@@ -10,7 +10,7 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
 
   scenario "shows employee profile details" do
     sign_in(user)
-    visit mobile_employee_path
+    visit mobile_company_employee_path(company)
 
     expect(page).to have_content("Employee")
     expect(page).to have_content(employee.name)
@@ -25,7 +25,7 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
 
   scenario "does not render a working mobile profile editor" do
     sign_in(user)
-    visit mobile_employee_path
+    visit mobile_company_employee_path(company)
 
     expect(page).to have_button("Edit Profile Details", disabled: true)
     expect(page).to have_content("Available on desktop")
@@ -33,16 +33,16 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
 
   scenario "has a back to home link" do
     sign_in(user)
-    visit mobile_employee_path
+    visit mobile_company_employee_path(company)
 
-    expect(page).to have_link("Back to Home", href: mobile_home_path)
+    expect(page).to have_link("Back to Home", href: mobile_company_home_path(company))
     click_link "Back to Home"
     expect(page).to have_content(user.name.split.first)
   end
 
   scenario "signs out from the employee page" do
     sign_in(user)
-    visit mobile_employee_path
+    visit mobile_company_employee_path(company)
 
     click_button "Sign Out"
 
@@ -50,7 +50,7 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
   end
 
   scenario "redirects to sign-in for unauthenticated user" do
-    visit mobile_employee_path
+    visit mobile_company_employee_path(company)
     expect(page).to have_current_path(mobile_sign_in_path)
   end
 end

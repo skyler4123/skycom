@@ -1,6 +1,6 @@
 <% content_for :title, "Employee" %>
 
-<%= render "mobile/shared/header", title: "Employee", avatar_name: @employee.name, avatar_path: mobile_employee_path %>
+<%= render "mobile/shared/header", title: "Employee", avatar_name: @employee.name, avatar_path: mobile_company_employee_path(@company) %>
 
 <main class="mx-auto w-full max-w-lg px-4 pb-8 pt-4">
   <div class="flex flex-col gap-4">
@@ -172,7 +172,7 @@
       </button>
       <p class="text-center text-xs text-slate-400 dark:text-slate-500">Available on desktop</p>
 
-      <%= link_to mobile_home_path, class: "flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-white text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-slate-200 transition-colors hover:bg-slate-50 dark:bg-slate-900 dark:text-white dark:ring-slate-700 dark:hover:bg-slate-800" do %>
+      <%= link_to mobile_company_home_path(@company), class: "flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-white text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-slate-200 transition-colors hover:bg-slate-50 dark:bg-slate-900 dark:text-white dark:ring-slate-700 dark:hover:bg-slate-800" do %>
         Back to Home
       <% end %>
 

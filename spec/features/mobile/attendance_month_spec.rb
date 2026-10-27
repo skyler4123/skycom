@@ -33,7 +33,7 @@ RSpec.feature "Mobile Attendance Month", type: :feature, js: true do
 
   scenario "shows attendance month details" do
     sign_in(user)
-    visit mobile_attendance_month_path
+    visit mobile_company_attendance_month_path(company)
 
     expect(page).to have_content("Attendance")
     expect(page).to have_content(employee.name)
@@ -50,14 +50,14 @@ RSpec.feature "Mobile Attendance Month", type: :feature, js: true do
 
   scenario "links to filing a new attendance request" do
     sign_in(user)
-    visit mobile_attendance_month_path
+    visit mobile_company_attendance_month_path(company)
 
-    expect(page).to have_link("New Request", href: new_mobile_attendance_request_path)
+    expect(page).to have_link("New Request", href: new_mobile_company_attendance_request_path(company))
   end
 
   scenario "navigates to the previous month" do
     sign_in(user)
-    visit mobile_attendance_month_path
+    visit mobile_company_attendance_month_path(company)
 
     expect(page).to have_selector("a[aria-label='Previous month']")
     find("a[aria-label='Previous month']").click
@@ -70,14 +70,14 @@ RSpec.feature "Mobile Attendance Month", type: :feature, js: true do
     empty_user = empty_company.user
     sign_in(empty_user)
 
-    visit mobile_attendance_month_path
+    visit mobile_company_attendance_month_path(empty_company)
 
     expect(page).to have_content("No summary for this month")
     expect(page).to have_content("No daily records for this month yet")
   end
 
   scenario "redirects to sign-in for unauthenticated user" do
-    visit mobile_attendance_month_path
+    visit mobile_company_attendance_month_path(company)
     expect(page).to have_current_path(mobile_sign_in_path)
   end
 end

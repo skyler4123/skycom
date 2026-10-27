@@ -1,6 +1,6 @@
 <% content_for :title, "Payroll" %>
 
-<%= render "mobile/shared/header", title: "Payroll", avatar_name: @employee.name, avatar_path: mobile_employee_path %>
+<%= render "mobile/shared/header", title: "Payroll", avatar_name: @employee.name, avatar_path: mobile_company_employee_path(@company) %>
 
 <main class="mx-auto w-full max-w-lg px-4 pb-8 pt-4">
   <div class="flex flex-col gap-4">
@@ -8,7 +8,7 @@
       <span class="material-symbols-outlined text-xl text-blue-600 dark:text-blue-400">calendar_month</span>
       <select data-controller="mobile--select-nav" data-action="change->mobile--select-nav#navigate" aria-label="Pay period" class="w-full cursor-pointer appearance-none rounded-lg bg-white text-sm font-semibold text-slate-900 outline-none dark:bg-slate-900 dark:text-white">
         <% @month_options.each do |month| %>
-          <option value="<%= mobile_payroll_path(month: mobile_month_param(month)) %>" <%= "selected" if month == @month %>><%= mobile_month_label(month) %></option>
+          <option value="<%= mobile_company_payroll_path(@company, month: mobile_month_param(month)) %>" <%= "selected" if month == @month %>><%= mobile_month_label(month) %></option>
         <% end %>
       </select>
       <span class="material-symbols-outlined pointer-events-none text-xl text-slate-400 dark:text-slate-500">expand_more</span>
@@ -63,7 +63,7 @@
         <button type="button" disabled class="flex h-11 cursor-not-allowed items-center justify-center gap-1.5 rounded-lg bg-slate-100 px-3 text-xs font-semibold text-slate-400 dark:bg-slate-800 dark:text-slate-500">
           Draft Payslip
         </button>
-        <%= link_to mobile_attendance_month_path(month: mobile_month_param(@month)), class: "flex h-11 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600" do %>
+        <%= link_to mobile_company_attendance_month_path(@company, month: mobile_month_param(@month)), class: "flex h-11 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600" do %>
           View Timesheet
         <% end %>
       </div>

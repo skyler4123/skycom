@@ -10,7 +10,7 @@ RSpec.feature "Mobile Check In", type: :feature, js: true do
 
   scenario "creates attendance log and shows success notice" do
     sign_in(user)
-    visit mobile_home_path
+    visit mobile_company_home_path(company)
 
     click_button "Clock In"
 
@@ -20,7 +20,7 @@ RSpec.feature "Mobile Check In", type: :feature, js: true do
 
   scenario "records check_in log type with correct employee" do
     sign_in(user)
-    visit mobile_home_path
+    visit mobile_company_home_path(company)
 
     click_button "Clock In"
 
@@ -34,7 +34,7 @@ RSpec.feature "Mobile Check In", type: :feature, js: true do
 
   scenario "does not allow a second check-in on the same day" do
     sign_in(user)
-    visit mobile_home_path
+    visit mobile_company_home_path(company)
 
     click_button "Clock In"
 

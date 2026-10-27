@@ -1,7 +1,8 @@
 # Skycom Mobile Feature Matrix
 
-> **Last verified:** 2026-10-26
-> **Scope:** Android Hotwire Native app + the server-rendered `/mobile/*` pages.
+> **Last verified:** 2026-10-27
+> **Scope:** Android Hotwire Native app + the server-rendered
+> `/mobile/companies/:company_id/*` pages.
 > **Purpose:** the single place to compare mobile with web, track what works,
 > and decide what to build next.
 
@@ -29,7 +30,7 @@ Source files for the inventory:
 - Web routes: `config/routes.rb`
 - Mobile routes/controllers: `config/routes.rb` (`namespace :mobile`) + `app/controllers/mobile/`
 - Mobile views: `app/views/mobile/`
-- Android shell: `android/app/src/main/java/com/example/skycomandroid/MainActivity.kt`
+- Android shell: `android/app/src/main/java/com/example/skycomandroid/{SignInActivity,MainActivity}.kt`
 - Mobile implementation contract: `docs/MOBILE.md`
 
 ---
@@ -71,18 +72,22 @@ month, payroll). The web has **69 sidebar items** across 16 active groups plus
 
 | # | Screen | Route | Controller | Reads | Writes | Limits |
 |---|---|---|---|---|---|---|
-| 1 | Sign in | `GET/POST /mobile/sign_in` | `Mobile::SessionsController#new/create` | `User`, session | Sign in | No forgot password or biometrics |
-| 2 | Home | `GET /mobile/home` | `Mobile::HomeController#index` | `Employee`, `AttendanceMonth`, `ScheduledShift`, `AttendanceLog`, `AttendanceRequest`, `Payroll` | Check-in via `POST /mobile/attendances` | Paid leave and notice are samples; no checkout or break |
-| 3 | Employee | `GET /mobile/employee` | `Mobile::EmployeesController#show` | `Employee`, roles, departments, category, next shift, month totals | — | Read-only; no edit or dynamic profiles |
-| 4 | Attendance month | `GET /mobile/attendance_month` | `Mobile::AttendanceMonthsController#show` | `AttendanceMonth`, `AttendanceDay` | — | Read-only; no PDF, collect, or request list |
-| 5 | Payroll | `GET /mobile/payroll` | `Mobile::PayrollsController#show` | `Payroll`, `AttendanceMonth` | — | Money is a sample; no payslip download |
-| 6 | New request | `GET/POST /mobile/attendance_requests` | `Mobile::AttendanceRequestsController#new/create` | `Employee`, `AttendanceRequest` | Create request | Approver is a sample; no attachments |
+| 1 | Sign in | `GET/POST /mobile/sign_in` | `Mobile::SessionsController#new/create` | `User`, session | Sign in | No forgot password or biometrics; sign-in activity has no tabs |
+| 2 | Home | `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `Employee`, `AttendanceMonth`, `ScheduledShift`, `AttendanceLog`, `AttendanceRequest`, `Payroll` | Check-in via `POST /mobile/companies/:company_id/attendances` | Paid leave and notice are samples; no checkout or break |
+| 3 | Employee | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `Employee`, roles, departments, category, next shift, month totals | — | Read-only; no edit or dynamic profiles |
+| 4 | Attendance month | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `AttendanceMonth`, `AttendanceDay` | — | Read-only; no PDF, collect, or request list |
+| 5 | Payroll | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `Payroll`, `AttendanceMonth` | — | Money is a sample; no payslip download |
+| 6 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee`, `AttendanceRequest` | Create request | Approver is a sample; no attachments |
+
+`GET /mobile/home` remains the signed-in no-employee fallback and renders
+without a company id. Every tenant page asserts membership through
+`current_user.employees`; cross-tenant requests return `404`.
 
 Cross-cutting mobile behavior:
 
 | Capability | Status | Notes |
 |---|---|---|
-| Native bottom tabs | ✅ | Owned by the Android shell; HTML has no tab bar |
+| Native bottom tabs | ✅ | Owned by the Android shell; hidden on sign-in; roots use the stored company id |
 | Theme toggle + persistence | ✅ | `localStorage["darkmode"]`, same key as desktop |
 | Pull-to-refresh | ✅ | Enabled by the Android path configuration, except sign-in/new |
 | Safe area | ✅ | HTML emits `env(safe-area-inset-top)` |

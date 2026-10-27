@@ -1,8 +1,9 @@
 # Skycom Mobile (Hotwire Native)
 
-Server-rendered `/mobile/*` pages inside the Android Hotwire Native shell.
-No desktop sidebar/workspace, no JSON page endpoints, no HTML tab bar — the
-native app owns the five-tab bottom navigation.
+Server-rendered mobile pages inside the Android Hotwire Native shell. Tenant
+pages are scoped to the company in the URL (`/mobile/companies/:company_id/*`);
+the native app owns the five-tab bottom navigation and shows it only after
+authentication.
 
 > Feature parity, pending work, and the Android shell audit live in
 > [`docs/MOBILE_FEATURE_MATRIX.md`](MOBILE_FEATURE_MATRIX.md).
@@ -15,21 +16,51 @@ native app owns the five-tab bottom navigation.
 |---|---|---|
 | `GET/POST /mobile/sign_in` | `Mobile::SessionsController#new/create` | `mobile/sessions/new` |
 | `DELETE /mobile/sign_out` | `Mobile::SessionsController#destroy` | redirect |
-| `GET /mobile/home` | `Mobile::HomeController#index` | `mobile/home/index` |
-| `GET /mobile/employee` | `Mobile::EmployeesController#show` | `mobile/employees/show` |
-| `GET /mobile/attendance_month` | `Mobile::AttendanceMonthsController#show` | `mobile/attendance_months/show` |
-| `GET /mobile/payroll` | `Mobile::PayrollsController#show` | `mobile/payrolls/show` |
-| `GET /mobile/attendance_requests/new` | `Mobile::AttendanceRequestsController#new` | `mobile/attendance_requests/new` |
-| `POST /mobile/attendance_requests` | `Mobile::AttendanceRequestsController#create` | redirect / 422 re-render |
-| `POST /mobile/attendances` | `Mobile::AttendancesController#create` | redirect |
+| `GET /mobile/home` | `Mobile::HomeController#index` | `mobile/companies/home/index` (no-employee fallback) |
+| `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `mobile/companies/home/index` |
+| `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `mobile/companies/employees/show` |
+| `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `mobile/companies/attendance_months/show` |
+| `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `mobile/companies/payrolls/show` |
+| `GET /mobile/companies/:company_id/attendance_requests/new` | `Mobile::Companies::AttendanceRequestsController#new` | `mobile/companies/attendance_requests/new` |
+| `POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#create` | redirect / 422 re-render |
+| `POST /mobile/companies/:company_id/attendances` | `Mobile::Companies::AttendancesController#create` | redirect |
 
-The Android tab roots (`android/.../MainActivity.kt`) point at `home`,
-`employee`, `attendance_month`, `payroll`, and `attendance_requests/new`.
-Keep those paths stable unless the native shell is updated in the same change.
+`Mobile::Companies::BaseController` resolves the employee through
+`current_user.employees.find_by!(company_id: params[:company_id])`. A company
+the user does not belong to returns `404`; the stored company id on the device
+is never treated as authorization.
+
+### Native auth gate
+
+`android/.../SignInActivity` is the launcher and has no bottom navigation. It
+loads `/mobile/sign_in`. After a successful sign-in, Rails redirects to
+`/mobile/companies/:company_id/home`; the activity extracts that id, stores it
+in `SharedPreferences` (`CompanyStore`), and starts `MainActivity`.
+
+`MainActivity` builds the five tab roots from the stored id:
+
+```
+/mobile/companies/<company_id>/home
+/mobile/companies/<company_id>/employee
+/mobile/companies/<company_id>/attendance_month
+/mobile/companies/<company_id>/payroll
+/mobile/companies/<company_id>/attendance_requests/new
+```
+
+On `/mobile/sign_in`, `/mobile/home`, or a `404`, `MainActivity` clears the
+stored id and returns to `SignInActivity` with a cleared task. Company ids are
+UUIDs (PostgreSQL `uuidv7`), not numeric ids.
 
 ---
 
 ## 2. Shell
+
+Native activities:
+
+| Activity | Purpose |
+|---|---|
+| `SignInActivity` | Launcher; loads `/mobile/sign_in`; no bottom navigation; stores the company id from the post-login redirect. |
+| `MainActivity` | Authenticated shell; builds the five company-scoped tab roots from the stored id; returns to sign-in on auth loss. |
 
 `app/views/layouts/mobile.html.erb`:
 
@@ -88,15 +119,16 @@ Rules:
 
 ## 4. Flows
 
-**Check-in** — `POST /mobile/attendances` writes one `AttendanceLog`
-(`log_type: check_in`) for `current_user.employees.first`. A second check-in
-on the same local day is rejected. There is no checkout, break, or geofence
-check in this namespace yet.
+**Check-in** — `POST /mobile/companies/:company_id/attendances` writes one
+`AttendanceLog` (`log_type: check_in`) for the employee resolved from the URL
+company. A second check-in on the same local day is rejected. There is no
+checkout, break, or geofence check in this namespace yet.
 
 **Attendance request** — the form posts `attendance_date`, `business_type`,
-`check_in_time`, `check_out_time`, and `reason`. The controller combines the
+`check_in_time`, `check_out_time`, and `reason` to
+`/mobile/companies/:company_id/attendance_requests`. The controller combines the
 date + times into `check_in`/`check_out`, forces the employee/company/branch
-from the session, sets `pending`, and:
+from the URL employee, sets `pending`, and:
 
 - success → redirect back to `new` with a flash toast (stays in the native
   Requests tab);
@@ -104,9 +136,9 @@ from the session, sets `pending`, and:
 
 Attachments and approver assignment are not modelled.
 
-**Month browsing** — attendance uses `?month=YYYY-MM` with prev/next links.
-Payroll uses a `<select>` whose option values are full URLs
-(`mobile--select-nav` navigates on change).
+**Month browsing** — attendance uses `?month=YYYY-MM` with prev/next links that
+preserve the company id. Payroll uses a `<select>` whose option values are full
+company-scoped URLs (`mobile--select-nav` navigates on change).
 
 ---
 
@@ -136,15 +168,16 @@ Coverage:
 
 | File | Covers |
 |---|---|
-| `spec/features/mobile/sign_in_spec.rb` | form, password toggle, invalid/valid auth, redirect, sign-out |
-| `spec/features/mobile/home_spec.rb` | dashboard data, check-in, dark toggle, no-employee fallback, auth redirect |
+| `spec/features/mobile/sign_in_spec.rb` | form, password toggle, invalid/valid auth, company-scoped redirect, sign-out |
+| `spec/features/mobile/home_spec.rb` | dashboard data, check-in, dark toggle, no-employee fallback, company redirect, auth redirect |
 | `spec/features/mobile/check_in_spec.rb` | log creation, employee/company stamping, checked-in state |
 | `spec/features/mobile/employee_info_spec.rb` | profile sections, disabled editor, back/sign-out |
 | `spec/features/mobile/attendance_month_spec.rb` | summary, daily rows, prev/next, empty state |
 | `spec/features/mobile/payroll_spec.rb` | status, sample banner, timesheet link, disabled payslip, month switch |
 | `spec/features/mobile/attendance_request_spec.rb` | valid submit, validation errors, future date, auth |
-| `spec/requests/mobile/attendances_controller_spec.rb` | check-in, duplicate guard, no employee |
-| `spec/requests/mobile/attendance_requests_controller_spec.rb` | pending create, permission/no-employee redirects |
+| `spec/requests/mobile/attendances_controller_spec.rb` | check-in, duplicate guard, cross-tenant 404 |
+| `spec/requests/mobile/attendance_requests_controller_spec.rb` | pending create, permission failure, cross-tenant 404 |
+| `spec/requests/mobile/company_scoping_spec.rb` | member access, cross-tenant 404, malformed company id |
 | `spec/helpers/mobile_helper_spec.rb` | formatting/labels/preview helpers |
 
 Native date/time inputs are unreliable through Selenium `send_keys`; the
@@ -154,13 +187,15 @@ request feature spec sets them through the DOM with `set_native_field`.
 
 ## 7. Known limitations / next
 
-- Multi-employee/company switching is still `current_user.employees.first`.
-  The mockup's tenant selector is not wired.
+- Multi-employee/company switching is still first/last used; the tenant picker
+  is not wired. The URL structure already supports a picker.
 - No checkout, break, geofence validation, attachments, approver assignment,
   leave balances, announcements, or payroll money engine.
 - Mobile ERB remains English-only; `dictionary.js` covers the new JS toasts
   (`Copied to clipboard`, copy failure).
 - No HTML tab bar; browser-only users navigate through Home quick actions.
+- The Android shell stores the last company id in `SharedPreferences`. It is a
+  routing hint only; the server checks membership on every request.
 
 ---
 
@@ -168,11 +203,18 @@ request feature spec sets them through the DOM with `set_native_field`.
 
 ```
 app/views/layouts/mobile.html.erb
-app/views/mobile/{sessions,home,employees,attendance_months,payrolls,attendance_requests}/
+app/views/mobile/sessions/
+app/views/mobile/companies/{home,employees,attendance_months,payrolls,attendance_requests}/
 app/views/mobile/shared/
 app/helpers/mobile_helper.rb
-app/controllers/mobile/
+app/controllers/mobile/{base,sessions,home}_controller.rb
+app/controllers/mobile/companies/
 app/javascript/controllers/mobile/
+android/.../SignInActivity.kt
+android/.../MainActivity.kt
+android/.../SkycomWebFragment.kt
+android/.../CompanyStore.kt
+android/.../CompanyUrl.kt
 spec/features/mobile/
 spec/requests/mobile/
 spec/helpers/mobile_helper_spec.rb

@@ -9,14 +9,14 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
 
   scenario "shows the dashboard for the signed-in employee" do
     sign_in(user)
-    visit mobile_home_path
+    visit mobile_company_home_path(company)
 
     expect(page).to have_content(user.name.split.first)
     expect(page).to have_content(company.name)
-    expect(page).to have_link(href: mobile_employee_path)
-    expect(page).to have_link(href: mobile_attendance_month_path)
-    expect(page).to have_link(href: mobile_payroll_path)
-    expect(page).to have_link(href: new_mobile_attendance_request_path)
+    expect(page).to have_link(href: mobile_company_employee_path(company))
+    expect(page).to have_link(href: mobile_company_attendance_month_path(company))
+    expect(page).to have_link(href: mobile_company_payroll_path(company))
+    expect(page).to have_link(href: new_mobile_company_attendance_request_path(company))
     expect(page).to have_content("Employee Info")
     expect(page).to have_content("Attendance")
     expect(page).to have_content("Payroll")
@@ -29,7 +29,7 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
 
   scenario "toggles dark mode from the header" do
     sign_in(user)
-    visit mobile_home_path
+    visit mobile_company_home_path(company)
 
     was_dark = page.evaluate_script("document.documentElement.classList.contains('dark')")
     find("button[aria-label='Toggle dark mode']").click
@@ -40,13 +40,24 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
 
   scenario "records a check-in and shows the checked-in state" do
     sign_in(user)
-    visit mobile_home_path
+    visit mobile_company_home_path(company)
 
     click_button "Clock In"
 
     expect(page).to have_content("Checked in successfully")
     expect(page).to have_content("Checked In")
     expect(page).not_to have_button("Clock In")
+  end
+
+  scenario "redirects to the company home when an employee exists" do
+    other_user = create(:user)
+    other_company = create(:company)
+    other_company.employees.find_by(user: other_company.user).update!(user: other_user)
+    sign_in(other_user)
+
+    visit mobile_home_path
+
+    expect(page).to have_current_path(mobile_company_home_path(other_company))
   end
 
   scenario "does not offer check-in without an employee record" do
@@ -61,7 +72,7 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
   end
 
   scenario "redirects to mobile sign-in for unauthenticated user" do
-    visit mobile_home_path
+    visit mobile_company_home_path(company)
 
     expect(page).to have_current_path(mobile_sign_in_path)
   end

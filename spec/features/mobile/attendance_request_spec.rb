@@ -19,7 +19,7 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
 
   scenario "submits a valid attendance request" do
     sign_in(user)
-    visit new_mobile_attendance_request_path
+    visit new_mobile_company_attendance_request_path(company)
 
     expect(page).to have_content("New Request")
     set_native_field("attendance_date", Date.yesterday.strftime("%Y-%m-%d"))
@@ -39,7 +39,7 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
 
   scenario "shows validation errors and does not create a request" do
     sign_in(user)
-    visit new_mobile_attendance_request_path
+    visit new_mobile_company_attendance_request_path(company)
 
     set_native_field("attendance_date", Date.yesterday.strftime("%Y-%m-%d"))
     select "Onsite Miss", from: "Type"
@@ -52,7 +52,7 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
 
   scenario "rejects a future attendance date" do
     sign_in(user)
-    visit new_mobile_attendance_request_path
+    visit new_mobile_company_attendance_request_path(company)
 
     set_native_field("attendance_date", Date.tomorrow.strftime("%Y-%m-%d"))
     select "Field Work", from: "Type"
@@ -65,7 +65,7 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
   end
 
   scenario "redirects to sign-in for unauthenticated user" do
-    visit new_mobile_attendance_request_path
+    visit new_mobile_company_attendance_request_path(company)
     expect(page).to have_current_path(mobile_sign_in_path)
   end
 end

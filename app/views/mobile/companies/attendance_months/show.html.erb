@@ -1,6 +1,6 @@
 <% content_for :title, "Attendance" %>
 
-<%= render "mobile/shared/header", title: "Attendance", avatar_name: @employee.name, avatar_path: mobile_employee_path %>
+<%= render "mobile/shared/header", title: "Attendance", avatar_name: @employee.name, avatar_path: mobile_company_employee_path(@company) %>
 
 <main class="mx-auto w-full max-w-lg px-4 pb-8 pt-4">
   <div class="flex flex-col gap-4">
@@ -19,8 +19,8 @@
 
     <%= render "mobile/shared/month_nav",
           label: mobile_month_label(@month),
-          prev_path: mobile_attendance_month_path(month: mobile_month_param(@prev_month)),
-          next_path: mobile_attendance_month_path(month: mobile_month_param(@next_month)),
+          prev_path: mobile_company_attendance_month_path(@company, month: mobile_month_param(@prev_month)),
+          next_path: mobile_company_attendance_month_path(@company, month: mobile_month_param(@next_month)),
           next_disabled: @next_disabled %>
 
     <% if @attendance_month %>
@@ -39,7 +39,7 @@
         <h2 class="text-base font-bold text-slate-900 dark:text-white">Daily Breakdown</h2>
         <span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-slate-100 px-1.5 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"><%= @attendance_days.size %></span>
       </div>
-      <%= link_to new_mobile_attendance_request_path, class: "flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600" do %>
+      <%= link_to new_mobile_company_attendance_request_path(@company), class: "flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600" do %>
         New Request
       <% end %>
     </div>

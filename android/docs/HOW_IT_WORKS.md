@@ -3,9 +3,9 @@
 > **Audience:** a developer who knows Rails but has never used Hotwire Native
 > or Android. Read this before changing anything under `android/`.
 >
-> **Status:** development shell for the existing mobile web surface. It is
-> intentionally small: one Activity, five tabs, one path-configuration file,
-> and the Rails pages it loads.
+> **Status:** development shell for the existing mobile web surface. Two
+> activities: an unauthenticated sign-in gate and an authenticated five-tab
+> shell. All tenant pages are company-scoped.
 
 ---
 
@@ -19,10 +19,12 @@
   check.
 - Web parts: sign-in, home, employee info, attendance month, payroll, and the
   attendance-request form — all rendered by Rails + Turbo.
-- Start URL: `${BASE_URL}/mobile/home`, default
-  `http://10.88.0.2:3000/mobile/home`.
-- Signed-out visitors are redirected by Rails to `/mobile/sign_in` (this was
-  fixed as part of the Android work).
+- Start URL: `${BASE_URL}/mobile/sign_in`, default
+  `http://10.88.0.2:3000/mobile/sign_in`.
+- Signed-out visitors stay in `SignInActivity`, which has **no bottom tabs**.
+- After sign-in, Rails redirects to
+  `/mobile/companies/<company_id>/home`; the app stores that id and starts
+  `MainActivity`, which builds company-scoped tab roots.
 - Build with `./gradlew :app:assembleDebug`. **Build ≠ install**: use Android
   Studio's **Run** button (or `adb install`) to put it on a device.
 
@@ -65,27 +67,27 @@ Native adds:
 
 ```
 ┌──────────────────────────── Android app ─────────────────────────────┐
+│ SignInActivity : HotwireActivity     (no bottom navigation)          │
+│   └─ NavigatorHost "sign_in" → WebView → /mobile/sign_in             │
+│        └─ on company redirect: persist company id → start MainActivity│
+│                                                                      │
 │ MainActivity : HotwireActivity                                       │
-│                                                                      │
-│  HotwireActivityDelegate                                             │
-│   ├─ NavigatorHost "home"       → Navigator → WebView → /mobile/home │
-│   ├─ NavigatorHost "employee"   → Navigator → WebView → /mobile/employee
-│   ├─ NavigatorHost "attendance" → Navigator → WebView → /mobile/attendance_month
-│   ├─ NavigatorHost "payroll"    → Navigator → WebView → /mobile/payroll
-│   ├─ NavigatorHost "requests"   → Navigator → WebView → /mobile/attendance_requests/new
-│   └─ OnBackPressedCallback (pops the current Navigator)              │
-│                                                                      │
-│  BottomNavigationView                                                │
-│   └─ HotwireBottomNavigationController (switches the NavigatorHosts) │
+│   ├─ NavigatorHost "home"       → /mobile/companies/<id>/home        │
+│   ├─ NavigatorHost "employee"   → /mobile/companies/<id>/employee    │
+│   ├─ NavigatorHost "attendance" → /mobile/companies/<id>/attendance_month
+│   ├─ NavigatorHost "payroll"    → /mobile/companies/<id>/payroll     │
+│   ├─ NavigatorHost "requests"   → /mobile/companies/<id>/attendance_requests/new
+│   └─ BottomNavigationView (Hidden until a company page loads)        │
 │                                                                      │
 │ SkycomApplication                                                    │
+│   ├─ SkycomWebFragment (reports final WebView URL/errors)            │
 │   └─ Hotwire.loadPathConfiguration(asset + remote JSON)              │
 └──────────────────────────────────────────────────────────────────────┘
                                    │ HTTP
                                    ▼
 ┌──────────────────────────── Rails app ───────────────────────────────┐
-│ /mobile/home, /mobile/sign_in, /mobile/employee, ...                 │
-│ Mobile::BaseController → layout "mobile" → ERB + Turbo               │
+│ /mobile/sign_in, /mobile/companies/:company_id/...                   │
+│ Mobile::Companies::BaseController → layout "mobile" → ERB + Turbo    │
 │ /configurations/android_v1.json (static path configuration)          │
 └──────────────────────────────────────────────────────────────────────┘
 ```
@@ -146,7 +148,7 @@ version as the library.
 
 | File | Purpose |
 |---|---|
-| `android/app/src/main/AndroidManifest.xml` | `INTERNET` permission, application class, Material theme, `MainActivity` as the launcher, orientation/keyboard handling, predictive back. |
+| `android/app/src/main/AndroidManifest.xml` | `INTERNET` permission, application class, Material theme, `SignInActivity` as the launcher, orientation/keyboard handling, predictive back. |
 | `android/app/src/debug/AndroidManifest.xml` | Adds `android:usesCleartextTraffic="true"` **for debug builds only**, so the app can talk to `http://10.88.0.2:3000`. Release builds do not get this. |
 
 ### 3.3 Kotlin
@@ -154,7 +156,12 @@ version as the library.
 | File | Purpose |
 |---|---|
 | `android/app/src/main/java/com/example/skycomandroid/SkycomApplication.kt` | Runs before any Activity. Enables WebView debugging in debug, sets Hotwire log level, and loads the path configuration from the bundled asset + remote URL. |
-| `android/app/src/main/java/com/example/skycomandroid/MainActivity.kt` | The only Activity. Extends `HotwireActivity`, builds the five `HotwireBottomTab`s, wires the `HotwireBottomNavigationController`, and restores the selected tab. |
+| `android/app/src/main/java/com/example/skycomandroid/SignInActivity.kt` | Unauthenticated gate. Loads `/mobile/sign_in`, has no bottom tabs, stores the company id from the post-login redirect, and starts `MainActivity`. |
+| `android/app/src/main/java/com/example/skycomandroid/MainActivity.kt` | Authenticated shell. Builds five `HotwireBottomTab`s from the stored company id, wires the `HotwireBottomNavigationController`, and returns to sign-in on auth loss. |
+| `android/app/src/main/java/com/example/skycomandroid/SkycomWebFragment.kt` | Custom `HotwireWebFragment` that reports the final WebView URL and HTTP errors to the active activity. |
+| `android/app/src/main/java/com/example/skycomandroid/CompanyStore.kt` | `SharedPreferences` wrapper for the last company id. |
+| `android/app/src/main/java/com/example/skycomandroid/CompanyUrl.kt` | Parses `/mobile/companies/<uuid>/...`, `/mobile/sign_in`, and `/mobile/home`. |
+| `android/app/src/main/java/com/example/skycomandroid/MobileWebListener.kt` | URL/error callback contract shared by both activities. |
 | `android/app/src/main/java/com/example/skycomandroid/MainActivityViewModel.kt` | Keeps `selectedTabIndex` across Activity recreation/process recreation. |
 
 ### 3.4 Layout and resources
@@ -185,15 +192,12 @@ color.
 
 | File | Purpose |
 |---|---|
-| `config/routes.rb` | `namespace :mobile` routes: `sign_in`, `sign_out`, `home`, `employee`, `attendance_month`, `payroll`, `attendances`, `attendance_requests`. |
+| `config/routes.rb` | `namespace :mobile` routes: `sign_in`, `sign_out`, the no-employee `home` fallback, and `/mobile/companies/:company_id/{home,employee,attendance_month,payroll,attendances,attendance_requests}`. |
 | `app/controllers/mobile/base_controller.rb` | `layout "mobile"`; **overrides `authenticate`** to redirect to `mobile_sign_in_path` instead of the marketing root. |
-| `app/controllers/mobile/sessions_controller.rb` | Mobile sign-in/sign-out. Skips `authenticate` for `new`/`create`; creates a `Session`, sets cookies, redirects home. |
-| `app/controllers/mobile/home_controller.rb` | Renders the mobile home dashboard. |
-| `app/controllers/mobile/employees_controller.rb` | Employee info page. |
-| `app/controllers/mobile/attendance_months_controller.rb` | Attendance month page. |
-| `app/controllers/mobile/payrolls_controller.rb` | Payroll page. |
-| `app/controllers/mobile/attendances_controller.rb` | Check-in POST. |
-| `app/controllers/mobile/attendance_requests_controller.rb` | Attendance request form + create. |
+| `app/controllers/mobile/sessions_controller.rb` | Mobile sign-in/sign-out. Skips `authenticate` for `new`/`create`; creates a `Session`, sets cookies, and redirects to the employee's company home (or the no-employee fallback). |
+| `app/controllers/mobile/home_controller.rb` | No-employee fallback; redirects employees to their company-scoped home. |
+| `app/controllers/mobile/companies/base_controller.rb` | Resolves `@employee` through `current_user.employees.find_by!(company_id:)`; non-members get `404`. |
+| `app/controllers/mobile/companies/*_controller.rb` | Company-scoped home, employee, attendance, payroll, check-in, and request actions. |
 | `app/views/layouts/mobile.html.erb` | Mobile HTML shell: viewport meta, CSRF/CSP tags, stylesheet, importmap/Turbo. |
 | `app/views/mobile/**` | The HTML pages rendered inside the WebView. |
 | `public/configurations/android_v1.json` | Remote path configuration served by Rails as a static file. |
@@ -240,9 +244,33 @@ What each line does:
   asset loads immediately; the remote copy is fetched asynchronously and cached
   for the next launch. See §6.
 
-### 4.2 `MainActivity.onCreate()`
+### 4.2 `SignInActivity.onCreate()` — no tabs
+
+The launcher is `SignInActivity`, not `MainActivity`. It loads
+`${BuildConfig.BASE_URL}/mobile/sign_in` in a single full-screen `NavigatorHost`
+and has no `BottomNavigationView`.
+
+1. `enableEdgeToEdge()` lets the page draw behind the system bars.
+2. `super.onCreate()` creates a `HotwireActivityDelegate` with one navigator
+   configuration (`sign_in_navigator_host`).
+3. If `CompanyStore` already has a company id, the activity immediately starts
+   `MainActivity` and finishes. `MainActivity` validates the session by loading
+   the company home; if Rails redirects to sign-in, it returns here.
+4. Otherwise it inflates `activity_sign_in.xml` and the WebView loads
+   `/mobile/sign_in`.
+5. `SkycomWebFragment` reports the final WebView URL. When it becomes
+   `/mobile/companies/<uuid>/...`, `SignInActivity`:
+   - writes the company id to `SharedPreferences`;
+   - starts `MainActivity` with that id;
+   - finishes, so the sign-in WebView is not left underneath the tabs.
+
+### 4.3 `MainActivity.onCreate()` — authenticated shell
+
+`MainActivity` is only started with a stored company id.
 
 ```kotlin
+companyId = intent.getStringExtra(EXTRA_COMPANY_ID) ?: CompanyStore.read(this)
+
 enableEdgeToEdge()
 super.onCreate(savedInstanceState)
 
@@ -252,56 +280,27 @@ findViewById<View>(R.id.root).applyDefaultImeWindowInsets()
 bottomNavigationController = HotwireBottomNavigationController(
     activity = this,
     view = findViewById<BottomNavigationView>(R.id.bottom_nav),
-    lazyLoadTabs = true
+    lazyLoadTabs = true,
+    initialVisibility = HotwireBottomNavigationController.Visibility.HIDDEN
 )
-bottomNavigationController.load(tabs, viewModel.selectedTabIndex)
-bottomNavigationController.setOnTabSelectedListener { index, _ ->
-    viewModel.selectedTabIndex = index
-}
-
-WebViewVersionCompatibility.displayUpdateDialogIfOutdated(
-    activity = this,
-    requiredVersion = WebViewInfo.REQUIRED_WEBVIEW_VERSION
-)
+bottomNavigationController.view.visibility = View.GONE
+bottomNavigationController.load(buildTabs(companyId), viewModel.selectedTabIndex)
 ```
 
 What happens under the hood:
 
-1. `enableEdgeToEdge()` lets the WebView draw behind the status/navigation bars.
-2. `super.onCreate()` calls `HotwireActivity.onCreate()`, which creates a
+1. `super.onCreate()` calls `HotwireActivity.onCreate()`, which creates a
    `HotwireActivityDelegate`.
-3. The delegate's initializer calls `navigatorConfigurations().first()`. That
-   initializes the lazy `tabs` list and tells the delegate which tab is the
-   initial one (Home).
-4. `setContentView(...)` inflates the five `NavigatorHost` fragments. Each one
-   is a fragment container that will own a WebView/navigation graph.
-5. `applyDefaultImeWindowInsets(...)` makes the content resize above the
-   keyboard.
-6. `HotwireBottomNavigationController.load(...)`:
-   - marks the tab hosts as lazy (only the selected tab loads initially),
-   - builds the bottom-nav menu items from the `HotwireBottomTab` list,
-   - selects the initial tab,
-   - installs the tab-selection listener,
-   - applies bottom system-bar insets to the `BottomNavigationView`,
-   - switches to the initial tab (`setCurrentNavigator` + host visibility).
-7. `WebViewVersionCompatibility` shows a native dialog if the device's WebView
-   is older than Hotwire Native requires.
-
-### 4.3 Loading `/mobile/home`
-
-The Home `NavigatorConfiguration.startLocation` is
-`${BuildConfig.BASE_URL}/mobile/home`.
-
-1. The `Navigator` creates a `WebFragment` (the library's built-in web
-   fragment) and its WebView.
-2. The WebView requests `http://10.88.0.2:3000/mobile/home`.
-3. Rails routes to `Mobile::HomeController#index`.
-4. `ApplicationController`'s `before_action :authenticate` runs. Because
-   `Mobile::BaseController` overrides it, a signed-out request redirects to
-   `/mobile/sign_in` (not `/`).
-5. `Mobile::SessionsController#new` renders the mobile sign-in form.
-6. The WebView renders the HTML. Turbo (loaded by `javascript_importmap_tags`)
-   intercepts links and forms.
+2. The delegate's initializer calls `navigatorConfigurations().first()`. The
+   list is built from the stored company id.
+3. `setContentView(...)` inflates the five `NavigatorHost` fragments.
+4. The bottom navigation starts hidden. `SkycomWebFragment` reports a
+   company-scoped URL after the first page loads, and the bar becomes visible.
+5. `HotwireBottomNavigationController.load(...)` marks the hosts lazy, builds
+   the menu, selects Home, and applies insets.
+6. If the URL becomes `/mobile/sign_in`, `/mobile/home`, or a `404`,
+   `MainActivity` clears the stored id and starts `SignInActivity` with
+   `CLEAR_TASK`, so no authenticated tab stack survives sign-out.
 
 ### 4.4 Signing in
 
@@ -310,11 +309,12 @@ The Home `NavigatorConfiguration.startLocation` is
 2. `Mobile::SessionsController#create` calls
    `User.authenticate_by(email:, password:)`.
 3. On success it creates a `Session`, stores the token in a signed HttpOnly
-   cookie, sets `is_signed_in` + `client_cache_version`, and redirects to
-   `/mobile/home`.
-4. The WebView keeps those cookies (Android `CookieManager`); every later
+   cookie, sets `is_signed_in` + `client_cache_version`, and redirects to the
+   employee's company home, e.g. `/mobile/companies/<uuid>/home`.
+4. `SkycomWebFragment` reads the final WebView URL, `SignInActivity` stores the
+   company id, and `MainActivity` starts with company-scoped tabs.
+5. The WebView keeps the session cookies (Android `CookieManager`); every later
    request is authenticated.
-5. `Mobile::HomeController#index` renders the home dashboard.
 
 On failure it renders `:new` with HTTP 422; Turbo displays the response with
 the "Invalid email or password" alert.
@@ -323,7 +323,9 @@ the "Invalid email or password" alert.
 
 `button_to "Sign Out", mobile_sign_out_path, method: :delete` sends a DELETE via
 Turbo. `Mobile::SessionsController#destroy` destroys the session, clears
-cookies, and redirects to `/mobile/sign_in`.
+cookies, and redirects to `/mobile/sign_in`. `MainActivity` observes that URL,
+clears the stored company id, and returns to `SignInActivity` with a cleared
+task.
 
 ---
 
@@ -331,15 +333,20 @@ cookies, and redirects to `/mobile/sign_in`.
 
 | Tab | Title string | Host ID | Start location |
 |---|---|---|---|
-| Home | `tab_home` | `home_navigator_host` | `/mobile/home` |
-| Employee | `tab_employee` | `employee_navigator_host` | `/mobile/employee` |
-| Attendance | `tab_attendance` | `attendance_navigator_host` | `/mobile/attendance_month` |
-| Payroll | `tab_payroll` | `payroll_navigator_host` | `/mobile/payroll` |
-| Requests | `tab_requests` | `requests_navigator_host` | `/mobile/attendance_requests/new` |
+| Home | `tab_home` | `home_navigator_host` | `/mobile/companies/<id>/home` |
+| Employee | `tab_employee` | `employee_navigator_host` | `/mobile/companies/<id>/employee` |
+| Attendance | `tab_attendance` | `attendance_navigator_host` | `/mobile/companies/<id>/attendance_month` |
+| Payroll | `tab_payroll` | `payroll_navigator_host` | `/mobile/companies/<id>/payroll` |
+| Requests | `tab_requests` | `requests_navigator_host` | `/mobile/companies/<id>/attendance_requests/new` |
+
+`<id>` is the UUID extracted from the post-login redirect and stored in
+`CompanyStore`. The bar is hidden on `SignInActivity`; it appears in
+`MainActivity` only after a company-scoped page loads.
 
 **Why these five?** They mirror the five actions on the mobile home page.
-**Check In** is a POST action (`/mobile/attendances`), not a page, so it stays a
-button on the Home page rather than a tab.
+**Check In** is a POST action
+(`/mobile/companies/<id>/attendances`), not a page, so it stays a button on the
+Home page rather than a tab.
 
 ### 5.1 How a tab is defined
 
@@ -352,17 +359,17 @@ HotwireBottomTab(
     configuration = NavigatorConfiguration(
         name = "home",
         navigatorHostId = R.id.home_navigator_host,
-        startLocation = "${BuildConfig.BASE_URL}/mobile/home"
+        startLocation = "${BuildConfig.BASE_URL}/mobile/companies/$companyId/home"
     )
 )
 ```
 
-`MainActivity.createTabs()` returns the list. The same list is used twice:
+`MainActivity.buildTabs(companyId)` returns the list. The same list is used
+twice:
 
-- `navigatorConfigurations()` returns `tabs.navigatorConfigurations` (the
-  configs, for the delegate).
-- `bottomNavigationController.load(tabs, ...)` renders the menu and switches
-  hosts.
+- `navigatorConfigurations()` returns the configs for the delegate.
+- `bottomNavigationController.load(buildTabs(companyId), ...)` renders the
+  menu and switches hosts.
 
 The `navigatorHostId` must match a `FragmentContainerView` ID in
 `activity_main.xml`. If they do not match, navigation will crash or show a
@@ -486,7 +493,7 @@ Explanation:
 - **`/mobile/sign_in$`** disables pull-to-refresh on the sign-in page (so a
   downward gesture cannot clear the form).
 - **`/new$`** disables pull-to-refresh on the attendance-request form
-  (`/mobile/attendance_requests/new`).
+  (`/mobile/companies/<id>/attendance_requests/new`).
 
 Rules are applied in order; a later matching rule can override properties from
 an earlier one. That is why the catch-all rule comes first and the specific
@@ -550,7 +557,10 @@ Kotlin:
 
 The value is used for:
 
-- tab start locations: `"${BuildConfig.BASE_URL}/mobile/home"`,
+- `SignInActivity`'s start location:
+  `"${BuildConfig.BASE_URL}/mobile/sign_in"`,
+- `MainActivity`'s company-scoped tab roots:
+  `"${BuildConfig.BASE_URL}/mobile/companies/<company_id>/..."`,
 - the remote path configuration:
   `"${BuildConfig.BASE_URL}/configurations/android_v1.json"`.
 
@@ -635,12 +645,12 @@ end
 
 Why this was necessary:
 
-- The Hotwire Native app starts at `/mobile/home`.
-- If the user is signed out, the old behavior redirected to `/` (the public
-  marketing homepage). The Android app would show the marketing site instead of
-  the mobile sign-in page.
-- The existing feature spec was named "redirects to sign-in" but asserted
-  `root_path`; it now asserts `mobile_sign_in_path`.
+- The Android shell now starts on `/mobile/sign_in` in `SignInActivity` and has
+  no bottom tabs until authentication.
+- If a signed-in user opens `/mobile/home` without an employee record, it
+  renders the no-employee fallback instead of redirecting to `/`.
+- `Mobile::Companies::BaseController` inherits this override, so an expired
+  session on any company-scoped page redirects to mobile sign-in.
 
 `Mobile::SessionsController` skips `authenticate` for `new`/`create`, so the
 override does not create a redirect loop.
@@ -655,7 +665,10 @@ override does not create a redirect loop.
    - `cookies.signed[:session_token]` (HttpOnly, 1-day expiry),
    - `cookies[:is_signed_in]`,
    - `cookies[:client_cache_version]`.
-4. Redirects to `/mobile/home`.
+4. Redirects to the employee's company home
+   (`/mobile/companies/<uuid>/home`), or to `/mobile/home` when there is no
+   employee record.
+5. `SignInActivity` stores the company id and starts `MainActivity`.
 
 `ApplicationController` resolves the session on every request via
 `cookies.signed[:session_token]` and `Current.session_id` / `Current.user_id`.
@@ -702,14 +715,22 @@ Or Android Settings → Apps → Skycom → Storage → Clear storage.
 ```
 Application.onCreate
   → load path configuration (asset + remote)
+SignInActivity.onCreate
+  → HotwireActivityDelegate (one navigator: /mobile/sign_in)
+  → inflate activity_sign_in (no bottom nav)
+  → WebView loads /mobile/sign_in
+  → user signs in
+  → Rails redirects to /mobile/companies/<uuid>/home
+  → SkycomWebFragment reports the URL
+  → CompanyStore.write(company_id)
+  → start MainActivity, finish SignInActivity
 MainActivity.onCreate
-  → HotwireActivityDelegate (reads navigatorConfigurations)
-  → inflate layout (5 NavigatorHosts)
+  → HotwireActivityDelegate (reads buildTabs(company_id))
+  → inflate layout (5 NavigatorHosts, tab bar hidden)
   → create HotwireBottomNavigationController
-  → load(tabs, selectedTabIndex = 0)
-  → switchTab(Home)
-  → Home Navigator loads /mobile/home
-  → Rails auth redirect (if signed out) → /mobile/sign_in
+  → load(buildTabs(company_id), selectedTabIndex = 0)
+  → Home Navigator loads /mobile/companies/<uuid>/home
+  → company URL observed → show tab bar
 ```
 
 ### 9.2 Tab switch
@@ -721,7 +742,7 @@ tap Payroll
   → delegate.setCurrentNavigator(payroll.configuration)
   → hide all hosts except payroll_navigator_host
   → back callback targets the payroll Navigator
-  → if first visit: payroll Navigator loads /mobile/payroll
+  → if first visit: payroll Navigator loads /mobile/companies/<id>/payroll
 ```
 
 ### 9.3 Back
@@ -830,7 +851,7 @@ This is the most common confusion:
 | Action | What it does |
 |---|---|
 | **Build → Make Project** / `assembleDebug` | Compiles the APK. Does **not** install or launch it. |
-| **Run → Run 'app'** (Shift+F10) | Builds, installs on the selected device, and launches `MainActivity`. |
+| **Run → Run 'app'** (Shift+F10) | Builds, installs on the selected device, and launches `SignInActivity`. |
 | **Apply Changes** | Pushes code/resource changes to the running app (limited). |
 
 If you only run `assembleDebug`, the APK exists at
@@ -855,7 +876,7 @@ JAVA_HOME=/path/to/android-studio/jbr ./gradlew :app:assembleDebug
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 # Launch
-adb shell am start -n com.example.skycomandroid/.MainActivity
+adb shell am start -n com.example.skycomandroid/.SignInActivity
 
 # Build + install in one Gradle task
 JAVA_HOME=/path/to/android-studio/jbr ./gradlew :app:installDebug
@@ -1097,10 +1118,11 @@ during development.
        app:layout_constraintBottom_toTopOf="@id/bottom_nav"
        app:layout_constraintTop_toTopOf="parent" />
    ```
-2. Add a `HotwireBottomTab` in `MainActivity.createTabs()` with the title,
-   icon, host ID, and URL path.
+2. Add a `HotwireBottomTab` in `MainActivity.buildTabs(companyId)` with the
+   title, icon, host ID, and company-scoped URL path.
 3. Add the title to `strings.xml` and a vector icon to `res/drawable/`.
-4. Add the Rails route/controller/view under `namespace :mobile`.
+4. Add the Rails route/controller/view under `namespace :mobile` (use the
+   `/mobile/companies/:company_id/*` scope for tenant pages).
 5. If the page needs different presentation (modal, no pull-to-refresh), update
    both path-configuration JSON files.
 6. Rebuild. The controller/delegate need no changes.
@@ -1147,7 +1169,8 @@ library supports it.
 
 ### 13.5 Add a deep link
 
-1. Add an `<intent-filter>` for the scheme/host to `MainActivity` in the
+1. Add an `<intent-filter>` for the scheme/host to `SignInActivity` (or to
+   `MainActivity` only after a company id/session is available) in the
    manifest.
 2. Route the incoming URL to the right tab/navigator (for example, through a
    `NavigatorConfiguration` or `controller.route(url)`).
@@ -1179,8 +1202,13 @@ the translated tab titles. This is not set up yet.
   add a keystore, signing config, R8/ProGuard rules, and HTTPS.
 - **No push notifications, deep links, widgets, or app shortcuts.**
 - **No bridge components or native screens** yet.
-- **No Android UI tests/CI:** only the generated unit/instrumented boilerplate
-  exists. The Rails mobile feature specs cover the web pages.
+- **No Android UI tests/CI:** only unit tests for URL parsing exist; the Rails
+  mobile feature specs cover the web pages.
+- **Stored company id:** `MainActivity` trusts the last stored company id for
+  routing. The server still authorizes every request; an invalid/stale id gets
+  a `404` and returns the app to sign-in.
+- **Company switching:** not built yet. The stored id is the last company used;
+  a future picker would update it and rebuild the tab roots.
 - **English-only native labels.**
 - **Duplicated navigation:** the mobile home page still links to
   Employee/Attendance/Payroll/Requests, and the detail pages still have
@@ -1204,7 +1232,10 @@ the translated tab titles. This is not set up yet.
 | Five bottom tabs | Mirrors the five mobile destinations; Check In is an action, not a page. |
 | One `NavigatorHost` per tab | Each tab keeps its own back stack and WebView state. |
 | Lazy tab loading | Avoids loading five WebViews at launch. |
-| Fix the mobile auth redirect | `/mobile/home` must land on `/mobile/sign_in`, not the marketing homepage. |
+| Auth gate with no tabs | `SignInActivity` loads `/mobile/sign_in`; `MainActivity` is created only after Rails redirects to a company page. |
+| Company-scoped URLs | Tenant pages live at `/mobile/companies/:company_id/*`; the server enforces membership on every request. |
+| Store the company id in `SharedPreferences` | Lets the authenticated shell build company-scoped tab roots without a `current` redirect; cleared on sign-out/auth loss. |
+| Custom `SkycomWebFragment` | Reports final WebView URLs and HTTP errors to the activities so tabs hide on sign-in and auth loss returns to the gate. |
 | Static path configuration | No auth/database needed; works offline with the bundled copy. |
 | Kotlin 2.3.0 / compileSdk 35 / Java 17 | Required by Hotwire Native 1.3.2 and modern AndroidX. |
 | Remove Compose | The generated project was a Compose "Hello Android" sample; Hotwire navigation is Fragment/View-based. Compose can be added later for native screens. |
@@ -1241,8 +1272,9 @@ Run these after changing the Android shell or the mobile Rails pages.
 
 ```bash
 bundle exec parallel_rspec -n 14 \
-  spec/features/mobile/home_spec.rb \
-  spec/features/mobile/sign_in_spec.rb
+  spec/features/mobile \
+  spec/requests/mobile \
+  spec/helpers/mobile_helper_spec.rb
 ```
 
 Expected: all examples pass.
@@ -1252,6 +1284,8 @@ Manual:
 ```bash
 curl -I http://10.88.0.2:3000/mobile/home
 # expect 302 -> /mobile/sign_in
+curl -I http://10.88.0.2:3000/mobile/companies/00000000-0000-0000-0000-000000000000/home
+# expect 302 -> /mobile/sign_in (signed out)
 curl http://10.88.0.2:3000/configurations/android_v1.json
 # expect 200 JSON
 ```
@@ -1281,11 +1315,17 @@ Expected: `0 errors` (warnings about newer dependency versions are fine).
 2. Confirm `adb devices` shows `device`, not `offline`/`unauthorized`.
 3. Run the `app` configuration in Android Studio (or install the APK).
 4. Open **Skycom** from the app drawer.
-5. Sign in (or confirm the sign-in page appears).
-6. Check each tab: Home, Employee, Attendance, Payroll, Requests.
-7. Check Back navigation inside a tab.
-8. Pull to refresh on a normal page (should refresh) and on the sign-in/new
+5. Confirm the sign-in page has **no bottom tabs**.
+6. Sign in; confirm the bottom tabs appear and the URL is
+   `/mobile/companies/<company_id>/home` (not a `current` alias).
+7. Check each tab: Home, Employee, Attendance, Payroll, Requests; every URL is
+   company-scoped.
+8. Check Back navigation inside a tab.
+9. Pull to refresh on a normal page (should refresh) and on the sign-in/new
    form (should be disabled).
-9. Sign out; confirm the app returns to `/mobile/sign_in`.
+10. Sign out; confirm the tabs disappear and the app returns to
+    `/mobile/sign_in`.
+11. Relaunch while signed in: the app should go straight to the stored company
+    tabs. Relaunch while signed out: sign-in only, no tabs.
 
 If something fails, use §12 and the logs in §10 before changing code.

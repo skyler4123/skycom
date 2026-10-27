@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe "Mobile::AttendanceRequestsController", type: :request do
+RSpec.describe "Mobile::Companies::AttendanceRequestsController", type: :request do
   let(:company) { create(:company) }
   let(:user) { company.user }
   let(:branch) { create(:branch, company: company) }
@@ -19,7 +19,7 @@ RSpec.describe "Mobile::AttendanceRequestsController", type: :request do
 
   it "creates a pending request for own employee" do
     expect {
-      post mobile_attendance_requests_path, params: {
+      post mobile_company_attendance_requests_path(company), params: {
         attendance_request: {
           attendance_date: Date.yesterday,
           check_in_time: "09:00",
@@ -33,7 +33,7 @@ RSpec.describe "Mobile::AttendanceRequestsController", type: :request do
     expect(created.employee.user_id).to eq(user.id)
     expect(created.company).to eq(company)
     expect(created).to be_status_pending
-    expect(response).to have_http_status(:found)
+    expect(response).to redirect_to(new_mobile_company_attendance_request_path(company))
   end
 
   it "redirects with alert when the employee lacks create permission" do
@@ -42,7 +42,7 @@ RSpec.describe "Mobile::AttendanceRequestsController", type: :request do
     get sign_in_for_test_path(email: other_user.email)
 
     expect {
-      post mobile_attendance_requests_path, params: {
+      post mobile_company_attendance_requests_path(company), params: {
         attendance_request: {
           attendance_date: Date.yesterday,
           check_in_time: "09:00",
@@ -51,23 +51,40 @@ RSpec.describe "Mobile::AttendanceRequestsController", type: :request do
       }
     }.not_to change(AttendanceRequest, :count)
 
-    expect(response).to redirect_to(mobile_home_path)
+    expect(response).to redirect_to(mobile_company_home_path(company))
     expect(flash[:alert]).to be_present
   end
 
-  it "redirects with alert when the user has no employee record" do
+  it "returns not found when the user has no employee record" do
     stranger = create(:user)
     get sign_in_for_test_path(email: stranger.email)
 
-    post mobile_attendance_requests_path, params: {
-      attendance_request: {
-        attendance_date: Date.yesterday,
-        check_in_time: "09:00",
-        reason: "Remote work"
+    expect {
+      post mobile_company_attendance_requests_path(company), params: {
+        attendance_request: {
+          attendance_date: Date.yesterday,
+          check_in_time: "09:00",
+          reason: "Remote work"
+        }
       }
-    }
+    }.not_to change(AttendanceRequest, :count)
 
-    expect(response).to redirect_to(mobile_home_path)
-    expect(flash[:alert]).to be_present
+    expect(response).to have_http_status(:not_found)
+  end
+
+  it "does not create a request for another company" do
+    other_company = create(:company)
+
+    expect {
+      post mobile_company_attendance_requests_path(other_company), params: {
+        attendance_request: {
+          attendance_date: Date.yesterday,
+          check_in_time: "09:00",
+          reason: "Cross-tenant attempt"
+        }
+      }
+    }.not_to change(AttendanceRequest, :count)
+
+    expect(response).to have_http_status(:not_found)
   end
 end

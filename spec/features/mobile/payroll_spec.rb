@@ -31,7 +31,7 @@ RSpec.feature "Mobile Payroll", type: :feature, js: true do
 
   scenario "shows the payroll overview for the current month" do
     sign_in(user)
-    visit mobile_payroll_path
+    visit mobile_company_payroll_path(company)
 
     expect(page).to have_content("Payroll")
     expect(page).to have_content(employee.name)
@@ -43,24 +43,24 @@ RSpec.feature "Mobile Payroll", type: :feature, js: true do
 
   scenario "links to the attendance timesheet" do
     sign_in(user)
-    visit mobile_payroll_path
+    visit mobile_company_payroll_path(company)
 
-    expect(page).to have_link("View Timesheet", href: mobile_attendance_month_path(month: Date.current.beginning_of_month.strftime("%Y-%m")))
+    expect(page).to have_link("View Timesheet", href: mobile_company_attendance_month_path(company, month: Date.current.beginning_of_month.strftime("%Y-%m")))
   end
 
   scenario "switches pay period from the selector" do
     sign_in(user)
-    visit mobile_payroll_path
+    visit mobile_company_payroll_path(company)
 
     previous_month = Date.current.beginning_of_month - 1.month
     find("select[aria-label='Pay period']").select(previous_month.strftime("%B %Y"))
 
-    expect(page).to have_current_path(mobile_payroll_path(month: previous_month.strftime("%Y-%m")))
+    expect(page).to have_current_path(mobile_company_payroll_path(company, month: previous_month.strftime("%Y-%m")))
   end
 
   scenario "does not render a working payslip download" do
     sign_in(user)
-    visit mobile_payroll_path
+    visit mobile_company_payroll_path(company)
 
     expect(page).to have_button("Draft Payslip", disabled: true)
   end
@@ -70,13 +70,13 @@ RSpec.feature "Mobile Payroll", type: :feature, js: true do
     empty_user = empty_company.user
     sign_in(empty_user)
 
-    visit mobile_payroll_path
+    visit mobile_company_payroll_path(empty_company)
 
     expect(page).to have_content("No payroll data for this month.")
   end
 
   scenario "redirects to sign-in for unauthenticated user" do
-    visit mobile_payroll_path
+    visit mobile_company_payroll_path(company)
     expect(page).to have_current_path(mobile_sign_in_path)
   end
 end

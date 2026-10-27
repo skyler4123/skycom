@@ -5,12 +5,20 @@ Rails.application.routes.draw do
     get "sign_in", to: "sessions#new"
     post "sign_in", to: "sessions#create"
     delete "sign_out", to: "sessions#destroy"
+
+    # Signed-in users without an employee record land here; every tenant page
+    # below is scoped to the company in the path.
     get "home", to: "home#index"
-    get "employee", to: "employees#show"
-    get "attendance_month", to: "attendance_months#show"
-    get "payroll", to: "payrolls#show"
-    post "attendances", to: "attendances#create"
-    resources :attendance_requests, only: %i[new create]
+
+    scope "companies/:company_id", as: :company, module: :companies,
+          constraints: { company_id: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i } do
+      get "home", to: "home#index"
+      get "employee", to: "employees#show"
+      get "attendance_month", to: "attendance_months#show"
+      get "payroll", to: "payrolls#show"
+      post "attendances", to: "attendances#create"
+      resources :attendance_requests, only: %i[new create]
+    end
   end
   namespace :admin do
     resources :companies

@@ -1,11 +1,5 @@
-class Mobile::AttendanceRequestsController < Mobile::BaseController
+class Mobile::Companies::AttendanceRequestsController < Mobile::Companies::BaseController
   def new
-    @employee = current_user.employees.includes(:company, :branch).first
-
-    unless @employee
-      redirect_to mobile_home_path, alert: "No employee record found" and return
-    end
-
     @attendance_request = AttendanceRequest.new(
       attendance_date: Date.current,
       business_type: :onsite_miss,
@@ -15,14 +9,8 @@ class Mobile::AttendanceRequestsController < Mobile::BaseController
   end
 
   def create
-    @employee = current_user.employees.includes(:company, :branch).first
-
-    unless @employee
-      redirect_to mobile_home_path, alert: "No employee record found" and return
-    end
-
     unless @employee.can?(:create, AttendanceRequest)
-      redirect_to mobile_home_path, alert: "You are not authorized to create attendance requests" and return
+      redirect_to mobile_company_home_path(@company), alert: "You are not authorized to create attendance requests" and return
     end
 
     attendance_request = AttendanceRequest.new(request_params)
@@ -32,7 +20,7 @@ class Mobile::AttendanceRequestsController < Mobile::BaseController
     attendance_request.status = :pending
 
     if attendance_request.save
-      redirect_to new_mobile_attendance_request_path, notice: "Attendance request submitted successfully"
+      redirect_to new_mobile_company_attendance_request_path(@company), notice: "Attendance request submitted successfully"
     else
       @attendance_request = attendance_request
       render :new, status: :unprocessable_content
