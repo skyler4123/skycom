@@ -2,7 +2,7 @@
 
 <%= render "mobile/shared/header", title: "Payroll", avatar_name: @employee.name, avatar_path: mobile_company_employee_path(@company) %>
 
-<main class="mx-auto w-full max-w-lg px-4 pb-8 pt-4">
+<main class="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl px-4 pb-8 pt-4">
   <div class="flex flex-col gap-4">
     <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <span class="material-symbols-outlined text-xl text-blue-600 dark:text-blue-400">calendar_month</span>
@@ -59,7 +59,7 @@
         </div>
       </section>
 
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
         <button type="button" disabled class="flex h-11 cursor-not-allowed items-center justify-center gap-1.5 rounded-lg bg-slate-100 px-3 text-xs font-semibold text-slate-400 dark:bg-slate-800 dark:text-slate-500">
           Draft Payslip
         </button>
@@ -73,7 +73,7 @@
           <h2 class="text-sm font-bold text-slate-900 dark:text-white">Compensation Breakdown</h2>
           <%= mobile_sample_badge %>
         </div>
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
           <%= render "mobile/shared/stat_tile", label: "Gross Pay", value: mobile_preview(:payroll_gross), hint: "Base contract rate", icon: "payments", sample: true %>
           <%= render "mobile/shared/stat_tile", label: "Shifts", value: mobile_duration(@attendance_month&.total_work_minutes), hint: "#{@attendance_month&.total_present_days.to_i} present days", icon: "clinical_notes" %>
           <%= render "mobile/shared/stat_tile", label: "Overtime", value: mobile_preview(:payroll_overtime_amount), hint: "#{mobile_duration(@attendance_month&.total_overtime_minutes)} recorded", icon: "more_time", sample: true %>

@@ -2,7 +2,7 @@
 
 <%= render "mobile/shared/header", title: "Attendance", avatar_name: @employee.name, avatar_path: mobile_company_employee_path(@company) %>
 
-<main class="mx-auto w-full max-w-lg px-4 pb-8 pt-4">
+<main class="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl px-4 pb-8 pt-4">
   <div class="flex flex-col gap-4">
     <section class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div class="flex min-w-0 items-center gap-3">
@@ -24,7 +24,7 @@
           next_disabled: @next_disabled %>
 
     <% if @attendance_month %>
-      <section class="grid grid-cols-2 gap-2">
+      <section class="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
         <%= render "mobile/shared/stat_tile", label: "Total Worked", value: mobile_duration(@attendance_month.total_work_minutes), hint: "#{@attendance_month.total_work_minutes.to_i} minutes total", icon: "schedule" %>
         <%= render "mobile/shared/stat_tile", label: "Present Days", value: "#{@attendance_month.total_present_days.to_i} Days", hint: "of #{@attendance_month.total_records.to_i} recorded", icon: "task_alt", hint_class: "text-green-700 dark:text-green-400" %>
         <%= render "mobile/shared/stat_tile", label: "Absent", value: "#{@attendance_month.total_absent_days.to_i} Days", hint: "This month", icon: "event_busy" %>

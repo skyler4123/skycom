@@ -145,6 +145,10 @@ company-scoped URLs (`mobile--select-nav` navigates on change).
 ## 5. Styling
 
 - Default Tailwind classes only, Tailwind v4, no config file.
+- Responsive: phone-first; use `md:` (tablet) and `lg:` (desktop) to widen
+  containers (`max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl`) and to
+  upgrade grids (`md:grid-cols-3`, `md:gap-4`). Never ship a phone-only
+  fixed width on tablet breakpoints.
 - Skycom palette: `blue-600/700` primary, `slate` surfaces/text, `green`
   success, `amber` pending, `red` error.
 - Every card/tile has a border or distinct background in light **and** dark.
