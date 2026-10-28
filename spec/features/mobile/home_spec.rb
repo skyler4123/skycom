@@ -49,28 +49,6 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
     expect(page).not_to have_button("Clock In")
   end
 
-  scenario "redirects to the company home when an employee exists" do
-    other_user = create(:user)
-    other_company = create(:company)
-    other_company.employees.find_by(user: other_company.user).update!(user: other_user)
-    sign_in(other_user)
-
-    visit mobile_home_path
-
-    expect(page).to have_current_path(mobile_company_home_path(other_company))
-  end
-
-  scenario "does not offer check-in without an employee record" do
-    other_user = create(:user)
-    sign_in(other_user)
-
-    visit mobile_home_path
-
-    expect(page).to have_content("No employee profile linked")
-    expect(page).to have_button("Sign Out")
-    expect(page).not_to have_button("Clock In")
-  end
-
   scenario "redirects to mobile sign-in for unauthenticated user" do
     visit mobile_company_home_path(company)
 

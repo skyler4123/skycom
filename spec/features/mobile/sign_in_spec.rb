@@ -27,15 +27,17 @@ RSpec.feature "Mobile Sign In", type: :feature, js: true do
   end
 
   scenario "signs in with valid credentials and redirects to home" do
+    company = create(:company)
+
     visit mobile_sign_in_path
 
-    fill_in "Email", with: user.email
+    fill_in "Email", with: company.user.email
     fill_in "Password", with: "Password@1234"
     click_button "Sign In"
 
     expect(page).to have_content("Signed in")
-    expect(page).to have_content(user.name.split.first)
-    expect(page).to have_current_path(mobile_home_path)
+    expect(page).to have_content(company.user.name.split.first)
+    expect(page).to have_current_path(mobile_company_home_path(company))
   end
 
   scenario "signs in with an employee and redirects to the company home" do
@@ -64,16 +66,19 @@ RSpec.feature "Mobile Sign In", type: :feature, js: true do
   end
 
   scenario "redirects to home if already signed in" do
-    sign_in(user)
+    company = create(:company)
+    sign_in(company.user)
 
     visit mobile_sign_in_path
 
-    expect(page).to have_content(user.name.split.first)
+    expect(page).to have_content(company.user.name.split.first)
+    expect(page).to have_current_path(mobile_company_home_path(company))
   end
 
   scenario "signs out and redirects to the sign-in page" do
-    sign_in(user)
-    visit mobile_home_path
+    company = create(:company)
+    sign_in(company.user)
+    visit mobile_company_employee_path(company)
 
     click_button "Sign Out"
 

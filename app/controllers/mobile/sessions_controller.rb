@@ -35,7 +35,7 @@ class Mobile::SessionsController < Mobile::BaseController
       session[:mobile_company_id] = employee.company_id
       redirect_to mobile_company_home_path(employee.company), **options
     else
-      redirect_to mobile_home_path, **options
+      redirect_to mobile_sign_in_path, **options
     end
   end
 

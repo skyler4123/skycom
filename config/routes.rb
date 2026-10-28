@@ -6,10 +6,6 @@ Rails.application.routes.draw do
     post "sign_in", to: "sessions#create"
     delete "sign_out", to: "sessions#destroy"
 
-    # Signed-in users without an employee record land here; every tenant page
-    # below is scoped to the company in the path.
-    get "home", to: "home#index"
-
     scope "companies/:company_id", as: :company, module: :companies,
           constraints: { company_id: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i } do
       get "home", to: "home#index"

@@ -28,7 +28,7 @@
         <span class="hidden dark:block"><span class="material-symbols-outlined text-2xl">light_mode</span></span>
       </button>
       <% if avatar_name.present? %>
-        <%= link_to(avatar_path || mobile_home_path, class: "ml-1 flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white") do %>
+        <%= link_to(avatar_path || mobile_sign_in_path, class: "ml-1 flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white") do %>
           <%= mobile_initials(avatar_name) %>
         <% end %>
       <% end %>
