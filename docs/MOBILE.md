@@ -18,6 +18,7 @@ authentication.
 | `DELETE /mobile/sign_out` | `Mobile::SessionsController#destroy` | redirect |
 | `GET /mobile/home` | `Mobile::HomeController#index` | `mobile/companies/home/index` (no-employee fallback) |
 | `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `mobile/companies/home/index` |
+| `GET /mobile/companies/:company_id/notifications` | `Mobile::Companies::NotificationsController#index` | `mobile/companies/notifications/index` |
 | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `mobile/companies/employees/show` |
 | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `mobile/companies/attendance_months/show` |
 | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `mobile/companies/payrolls/show` |
