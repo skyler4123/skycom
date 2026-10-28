@@ -3,7 +3,10 @@ class Mobile::HomeController < Mobile::BaseController
   # employee record are redirected to their company-scoped home.
   def index
     @employee = current_user.employees.includes(:company, :branch).first
-    redirect_to mobile_company_home_path(@employee.company) and return if @employee
+    if @employee
+      redirect_to mobile_company_home_path(@employee.company)
+      return
+    end
 
     render "mobile/companies/home/index"
   end

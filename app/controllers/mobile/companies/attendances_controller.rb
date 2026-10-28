@@ -1,7 +1,8 @@
 class Mobile::Companies::AttendancesController < Mobile::Companies::BaseController
   def create
     if @employee.attendance_logs.where(logged_at: Date.current.all_day, log_type: :check_in).exists?
-      redirect_to mobile_company_home_path(@company), alert: "Already checked in today" and return
+      redirect_to mobile_company_home_path(@company), alert: "Already checked in today"
+      return
     end
 
     branch = @employee.branch || @employee.company.branches.first
