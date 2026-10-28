@@ -1,6 +1,9 @@
 class Mobile::Companies::BaseController < Mobile::BaseController
   before_action :set_employee_and_company
   include Mobile::Companies::Authorizable
+  include ApplicationController::WebsocketConcern
+
+  before_action :set_websocket_channels
 
   rescue_from ActiveRecord::RecordNotFound, with: :not_found
 
@@ -11,6 +14,11 @@ class Mobile::Companies::BaseController < Mobile::BaseController
 
     @employee = current_user.employees.includes(*employee_includes).find_by!(company_id: params[:company_id])
     @company = @employee.company
+    @current_company = @company
+  end
+
+  def current_company
+    @company
   end
 
   def employee_includes

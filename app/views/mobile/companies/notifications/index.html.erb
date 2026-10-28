@@ -2,7 +2,7 @@
 
 <%= render "mobile/shared/header", title: "Notifications", avatar_name: (@employee ? @employee.name : current_user.name), avatar_path: (@employee ? mobile_company_employee_path(@company) : nil) %>
 
-<main class="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl px-4 pb-8 pt-4">
+<main class="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl px-4 pb-8 pt-4" data-controller="mobile--notifications" data-mobile--notifications-company-id-value="<%= @company.id %>">
   <div class="flex flex-col gap-4">
     <% if @notifications.any? %>
       <% @notifications.each do |notification| %>
