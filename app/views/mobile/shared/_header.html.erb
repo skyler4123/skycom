@@ -1,0 +1,37 @@
+<% back_path = local_assigns[:back_path] %>
+<% avatar_name = local_assigns[:avatar_name] %>
+<% avatar_path = local_assigns[:avatar_path] %>
+<header class="sticky top-0 z-40 border-b border-slate-200 bg-white/90 pt-[env(safe-area-inset-top)] backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/90">
+  <div class="flex h-16 items-center justify-between gap-2 px-4">
+    <% if back_path.present? %>
+      <div class="flex min-w-0 items-center gap-1">
+        <%= link_to back_path, class: "flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800", aria: { label: "Go back" } do %>
+          <span class="material-symbols-outlined text-2xl">arrow_back</span>
+        <% end %>
+        <h1 class="truncate text-base font-semibold leading-tight text-slate-900 dark:text-white"><%= title %></h1>
+      </div>
+    <% else %>
+      <div class="flex min-w-0 items-center gap-2">
+        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm dark:bg-blue-500">
+          <span class="material-symbols-outlined text-xl">hub</span>
+        </div>
+        <div class="flex min-w-0 flex-col">
+          <span class="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">Skycom ERP</span>
+          <h1 class="truncate text-base font-semibold leading-tight text-slate-900 dark:text-white"><%= title %></h1>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="flex shrink-0 items-center gap-1">
+      <button type="button" data-controller="mobile--theme" data-action="click->mobile--theme#toggle" class="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white" aria-label="Toggle dark mode">
+        <span class="dark:hidden"><span class="material-symbols-outlined text-2xl">dark_mode</span></span>
+        <span class="hidden dark:block"><span class="material-symbols-outlined text-2xl">light_mode</span></span>
+      </button>
+      <% if avatar_name.present? %>
+        <%= link_to(avatar_path || mobile_sign_in_path, class: "ml-1 flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white") do %>
+          <%= mobile_initials(avatar_name) %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</header>

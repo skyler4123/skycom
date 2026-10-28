@@ -4,6 +4,9 @@ import android.app.Application
 import dev.hotwire.core.config.Hotwire
 import dev.hotwire.core.logging.HotwireLogLevel
 import dev.hotwire.core.turbo.config.PathConfiguration
+import dev.hotwire.navigation.config.defaultFragmentDestination
+import dev.hotwire.navigation.config.registerFragmentDestinations
+import dev.hotwire.navigation.fragments.HotwireWebBottomSheetFragment
 
 class SkycomApplication : Application() {
     override fun onCreate() {
@@ -15,6 +18,14 @@ class SkycomApplication : Application() {
         } else {
             HotwireLogLevel.NONE
         }
+
+        // The custom fragment reports final WebView URLs so the activities can
+        // keep tabs off the sign-in screen and return to sign-in when auth ends.
+        Hotwire.defaultFragmentDestination = SkycomWebFragment::class
+        Hotwire.registerFragmentDestinations(
+            SkycomWebFragment::class,
+            HotwireWebBottomSheetFragment::class
+        )
 
         Hotwire.loadPathConfiguration(
             context = this,
