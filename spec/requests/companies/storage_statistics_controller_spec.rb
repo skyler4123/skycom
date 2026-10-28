@@ -73,7 +73,7 @@ RSpec.describe "Companies::StorageStatisticsController", type: :request do
       get "/companies/#{company.id}/storage_statistics.json"
       expect(JSON.parse(response.body)["total_files"]).to eq(1) # cached
 
-      Rails.local_cache.delete("storage_statistics/#{company.id}")
+      Rails.sync_cache.delete("storage_statistics/#{company.id}")
       get "/companies/#{company.id}/storage_statistics.json"
       expect(JSON.parse(response.body)["total_files"]).to eq(2)
       expect(JSON.parse(response.body)["total_size"]).to eq(111)

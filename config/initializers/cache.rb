@@ -25,8 +25,8 @@ module Rails
     # Scope: shared across workers on the same host. Risk: disk usage.
     # Best for: larger query results, generated fragments, items that
     # shouldn't vanish on deploy.
-    # Used directly by AnalyticsController and PermissionConcern
-    # for cached data that doesn't need cross-instance synchronization.
+    # No app code uses local_cache directly anymore; all application
+    # cached data goes through sync_cache (cross-instance invalidation).
     def local_cache
       @local_cache ||= ActiveSupport::Cache.lookup_store(:solid_cache_store)
     end

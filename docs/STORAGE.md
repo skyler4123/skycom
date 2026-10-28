@@ -85,11 +85,11 @@ Read-only company-wide overview of storage usage at
 ### Backend
 
 - `Companies::StorageStatisticsController#index` — Shell-First (HTML shell +
-  JSON), payload cached in `Rails.local_cache` under
+  JSON), payload cached in `Rails.sync_cache` under
   `storage_statistics/<company_id>` with `STATISTICS_CACHE_EXPIRY = 1.hour`.
   **No invalidation hooks** — after uploads/deletes the page keeps serving the
   cached numbers until the TTL passes; clear the key
-  (`Rails.local_cache.delete`) to refresh (the specs do exactly this).
+  (`Rails.sync_cache.delete`) to refresh (the specs do exactly this).
 - `Storage::StatisticsService.call(company:)` — aggregates the `StoredFile`
   audit columns only (`file_size`, `content_type`), never blobs. Buckets are
   the 5 upload categories (`STORED_FILE_MAX_SIZES_BY_TYPE.keys`: image, pdf,
