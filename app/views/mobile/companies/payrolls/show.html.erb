@@ -15,11 +15,6 @@
     </div>
 
     <% if @payroll %>
-      <section class="flex items-start gap-2 rounded-xl border border-warning/20 bg-warning/10 p-3 ">
-        <span class="material-symbols-outlined text-xl text-warning ">info</span>
-        <p class="text-xs font-medium text-warning ">Preview layout — amounts marked <span class="font-bold">Sample</span> are placeholders; payroll money is not stored yet.</p>
-      </section>
-
       <section class="relative overflow-hidden rounded-xl border border-line bg-card p-5 shadow-sm ">
         <div class="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-primary/10 "></div>
         <div class="relative flex items-start justify-between gap-2">
@@ -34,11 +29,8 @@
         </div>
 
         <div class="relative mt-4 rounded-lg border border-line bg-background p-3 ">
-          <div class="flex items-center justify-between gap-2">
-            <span class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estimated Net Earnings</span>
-            <%= mobile_sample_badge %>
-          </div>
-          <p class="mt-1 text-4xl font-extrabold tracking-tight text-primary"><%= mobile_preview(:payroll_net) %></p>
+          <span class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estimated Net Earnings</span>
+          <p class="mt-1 text-4xl font-extrabold tracking-tight text-primary"><%= mobile_money(@payroll.net_amount_cents, @payroll.currency) %></p>
           <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
             <span class="flex items-center gap-1">
               <span class="material-symbols-outlined text-base">event_repeat</span>
@@ -71,23 +63,19 @@
       <section class="flex flex-col gap-2">
         <div class="flex items-center justify-between px-1">
           <h2 class="text-sm font-bold text-foreground">Compensation Breakdown</h2>
-          <%= mobile_sample_badge %>
         </div>
         <div class="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
-          <%= render "mobile/shared/stat_tile", label: "Gross Pay", value: mobile_preview(:payroll_gross), hint: "Base contract rate", icon: "payments", sample: true %>
+          <%= render "mobile/shared/stat_tile", label: "Gross Pay", value: mobile_money(@payroll.gross_amount_cents, @payroll.currency), hint: "Base contract rate", icon: "payments" %>
           <%= render "mobile/shared/stat_tile", label: "Shifts", value: mobile_duration(@attendance_month&.total_work_minutes), hint: "#{@attendance_month&.total_present_days.to_i} present days", icon: "clinical_notes" %>
-          <%= render "mobile/shared/stat_tile", label: "Overtime", value: mobile_preview(:payroll_overtime_amount), hint: "#{mobile_duration(@attendance_month&.total_overtime_minutes)} recorded", icon: "more_time", sample: true %>
-          <%= render "mobile/shared/stat_tile", label: "Deductions", value: mobile_preview(:payroll_deductions), hint: "Tax & social health", icon: "receipt_long", sample: true %>
+          <%= render "mobile/shared/stat_tile", label: "Overtime", value: mobile_money(@payroll.overtime_amount_cents, @payroll.currency), hint: "#{mobile_duration(@attendance_month&.total_overtime_minutes)} recorded", icon: "more_time" %>
+          <%= render "mobile/shared/stat_tile", label: "Deductions", value: mobile_money(@payroll.total_deductions_cents, @payroll.currency), hint: "Tax & social health", icon: "receipt_long" %>
         </div>
       </section>
 
       <section class="rounded-xl border border-line bg-card p-4 shadow-sm ">
         <div class="flex items-center justify-between gap-2">
           <h2 class="text-sm font-bold text-foreground">Line Items Summary</h2>
-          <div class="flex items-center gap-1.5">
-            <%= mobile_sample_badge %>
-            <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground ">Pre-approval</span>
-          </div>
+          <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground "><%= @payroll.status.humanize %></span>
         </div>
 
         <div class="mt-3 flex flex-col divide-y divide-line ">
@@ -99,7 +87,7 @@
                 <p class="truncate text-xs text-muted-foreground">Base contract rate</p>
               </div>
             </div>
-            <span class="shrink-0 text-sm font-bold text-foreground"><%= mobile_preview(:payroll_base_salary) %></span>
+            <span class="shrink-0 text-sm font-bold text-foreground"><%= mobile_money(@payroll.base_amount_cents, @payroll.currency) %></span>
           </div>
 
           <div class="flex items-center justify-between gap-2 py-2.5">
@@ -107,10 +95,10 @@
               <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground "><span class="material-symbols-outlined text-base">emergency</span></span>
               <div class="min-w-0">
                 <p class="truncate text-sm font-semibold text-foreground">Shift Allowance</p>
-                <p class="truncate text-xs text-muted-foreground">Sample allowance</p>
+                <p class="truncate text-xs text-muted-foreground">Monthly allowance</p>
               </div>
             </div>
-            <span class="shrink-0 text-sm font-bold text-foreground"><%= mobile_preview(:payroll_allowance) %></span>
+            <span class="shrink-0 text-sm font-bold text-foreground"><%= mobile_money(@payroll.allowance_amount_cents, @payroll.currency) %></span>
           </div>
 
           <div class="flex items-center justify-between gap-2 py-2.5">
@@ -121,7 +109,7 @@
                 <p class="truncate text-xs text-muted-foreground"><%= mobile_duration(@attendance_month&.total_overtime_minutes) %> recorded</p>
               </div>
             </div>
-            <span class="shrink-0 text-sm font-bold text-foreground"><%= mobile_preview(:payroll_overtime_amount) %></span>
+            <span class="shrink-0 text-sm font-bold text-foreground"><%= mobile_money(@payroll.overtime_amount_cents, @payroll.currency) %></span>
           </div>
 
           <div class="flex items-center justify-between gap-2 py-2.5">
@@ -129,10 +117,10 @@
               <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground "><span class="material-symbols-outlined text-base">shield</span></span>
               <div class="min-w-0">
                 <p class="truncate text-sm font-semibold text-foreground">Withholding Tax &amp; Social</p>
-                <p class="truncate text-xs text-muted-foreground"><%= mobile_preview(:payroll_tax_label) %></p>
+                <p class="truncate text-xs text-muted-foreground"><%= mobile_payroll_tax_label %></p>
               </div>
             </div>
-            <span class="shrink-0 text-sm font-bold text-danger "><%= mobile_preview(:payroll_tax) %></span>
+            <span class="shrink-0 text-sm font-bold text-danger "><%= mobile_money(@payroll.total_deductions_cents, @payroll.currency) %></span>
           </div>
         </div>
 
@@ -141,18 +129,15 @@
             <p class="text-xs font-medium text-muted-foreground">Total Payout (Net)</p>
             <p class="text-xs text-muted-foreground">Disbursement on <%= mobile_date(@month.end_of_month + 2.days) %></p>
           </div>
-          <div class="flex items-center gap-1.5">
-            <span class="text-lg font-extrabold text-primary"><%= mobile_preview(:payroll_total) %></span>
-            <%= mobile_sample_badge %>
-          </div>
+          <span class="text-lg font-extrabold text-primary"><%= mobile_money(@payroll.net_amount_cents, @payroll.currency) %></span>
         </div>
       </section>
 
       <section class="flex items-start gap-2 rounded-xl border border-line bg-card p-4 shadow-sm ">
         <span class="material-symbols-outlined mt-0.5 text-xl text-primary">info</span>
         <div>
-          <p class="text-sm font-semibold text-foreground">Payroll audit in progress</p>
-          <p class="mt-1 text-xs leading-relaxed text-muted-foreground">Hours and days come from your attendance records. Amounts marked Sample are placeholders until payroll money is implemented.</p>
+          <p class="text-sm font-semibold text-foreground">How this payroll is calculated</p>
+          <p class="mt-1 text-xs leading-relaxed text-muted-foreground">Hours and days come from your attendance records. Pay is prorated from your monthly salary and allowance, with overtime, tax, and social-insurance deductions applied.</p>
         </div>
       </section>
     <% else %>

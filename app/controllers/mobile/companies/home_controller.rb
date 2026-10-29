@@ -11,5 +11,7 @@ class Mobile::Companies::HomeController < Mobile::Companies::BaseController
     @checked_in = @check_in_logs.any?
     @pending_requests_count = AttendanceRequest.where(employee: @employee, status: :pending).count
     @current_payroll = @employee.payrolls.find_by(month: company_today.beginning_of_month)
+    @leave_balance = LeaveBalance.for(employee: @employee, year: company_today.year)
+    @announcement = @employee.documents.announcements.published.order(updated_at: :desc).first
   end
 end

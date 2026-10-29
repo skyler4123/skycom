@@ -5,7 +5,8 @@ require "rails_helper"
 RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:user) { company.user }
-  let(:employee) { company.employees.find_by(user: user) }
+  let!(:manager) { create(:employee, company: company, name: "Alex Approver") }
+  let!(:employee) { company.employees.find_by(user: user).tap { |record| record.update!(manager: manager) } }
 
   # Native date/time inputs are unreliable through send_keys in headless
   # Chrome; set them through the DOM the way the picker would.
@@ -35,6 +36,16 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
     expect(AttendanceRequest.last.employee).to eq(employee)
     expect(AttendanceRequest.last).to be_status_pending
     expect(AttendanceRequest.last.business_type).to eq("remote_work")
+  end
+
+  scenario "shows the assigned approver from the manager chain" do
+    sign_in(user)
+    visit new_mobile_company_attendance_request_path(company)
+
+    expect(page).to have_content("Assigned Approver")
+    expect(page).to have_content("Alex Approver")
+    expect(page).to have_content("AA")
+    expect(page).not_to have_content("Sample")
   end
 
   scenario "shows validation errors and does not create a request" do

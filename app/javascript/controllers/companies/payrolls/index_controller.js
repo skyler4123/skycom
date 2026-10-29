@@ -94,6 +94,15 @@ export default class Companies_Payrolls_IndexController extends Companies_Layout
     downloadCSV(flat, cols, `payroll-${this.month}.csv`)
   }
 
+  formatMoney(cents, currency = "usd") {
+    const amount = (cents || 0) / 100
+    return new Intl.NumberFormat(currency === "vnd" ? "vi-VN" : "en-US", {
+      style: "currency",
+      currency: currency.toUpperCase(),
+      maximumFractionDigits: currency === "vnd" ? 0 : 2
+    }).format(amount)
+  }
+
   contentHTML() {
     const s = this.summary || {}
     const rowsHtml = this.payrolls.map(r => `
@@ -102,12 +111,13 @@ export default class Companies_Payrolls_IndexController extends Companies_Layout
         <td class="py-2 px-4 text-sm">${r.month || "—"}</td>
         <td class="py-2 px-4 text-sm">${r.status || "—"}</td>
         <td class="py-2 px-4 text-sm">${r.metadata?.total_work_minutes ?? "—"}</td>
+        <td class="py-2 px-4 text-sm font-semibold">${this.formatMoney(r.net_amount_cents, r.currency)}</td>
       </tr>
     `).join("")
 
     return `
       <div class="p-4 overflow-y-auto space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div class="p-4 bg-card rounded-xl border border-line">
             <p class="text-xs text-muted-foreground uppercase">Total</p>
             <p class="text-lg font-bold">${s.total ?? 0}</p>
@@ -123,6 +133,10 @@ export default class Companies_Payrolls_IndexController extends Companies_Layout
           <div class="p-4 bg-card rounded-xl border border-line">
             <p class="text-xs text-muted-foreground uppercase">Paid</p>
             <p class="text-lg font-bold">${s.paid ?? 0}</p>
+          </div>
+          <div class="p-4 bg-card rounded-xl border border-line">
+            <p class="text-xs text-muted-foreground uppercase">Total Net</p>
+            <p class="text-lg font-bold">${this.formatMoney(s.total_net_amount_cents, s.currency || "usd")}</p>
           </div>
         </div>
 
@@ -144,6 +158,7 @@ export default class Companies_Payrolls_IndexController extends Companies_Layout
                 <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Month</th>
                 <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Status</th>
                 <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Work Minutes</th>
+                <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Net Pay</th>
               </tr>
             </thead>
             <tbody>

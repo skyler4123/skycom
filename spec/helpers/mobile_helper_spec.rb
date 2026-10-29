@@ -111,19 +111,23 @@ RSpec.describe MobileHelper, type: :helper do
     end
   end
 
-  describe "#mobile_preview" do
-    it "returns the labelled sample value" do
-      expect(helper.mobile_preview(:payroll_net)).to eq("$4,862.50")
+  describe "#mobile_money" do
+    it "formats USD cents with two decimals" do
+      expect(helper.mobile_money(486_540, :usd)).to eq("$4,865.40")
     end
 
-    it "returns a dash for an unknown key" do
-      expect(helper.mobile_preview(:not_a_key)).to eq("—")
+    it "formats VND cents without decimals" do
+      expect(helper.mobile_money(6_000_000_000, :vnd)).to eq("60,000,000 ₫")
+    end
+
+    it "formats a missing amount as zero" do
+      expect(helper.mobile_money(nil, :usd)).to eq("$0.00")
     end
   end
 
-  describe "#mobile_sample_badge" do
-    it "renders a visible sample marker" do
-      expect(helper.mobile_sample_badge).to include("Sample")
+  describe "#mobile_payroll_tax_label" do
+    it "labels the combined statutory rate" do
+      expect(helper.mobile_payroll_tax_label).to eq("Statutory (18.4%)")
     end
   end
 end

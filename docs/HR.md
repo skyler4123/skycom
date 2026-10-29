@@ -25,8 +25,11 @@ The system supports multiple business types (retail, hospital) through the same 
 | 4b | `attendance_requests` | Manual attendance tickets (approve → creates day) | employee_id, attendance_date, check_in, check_out, reason, status |
 | 5 | `attendance_months` | Payroll-ready monthly rollup | employee_id, month, total_work_minutes, total_late_minutes, total_overtime_minutes, total_present_days, total_absent_days |
 | 6 | `attendance_configs` | Per-branch geofence + resolution config | branch_id, latitude, longitude, allowed_radius_meters, resolution_strategy |
+| 7 | `leave_balances` | Paid-leave entitlement per employee/year | employee_id, year, entitled_days |
+| 8 | `leave_requests` | Paid/sick/unpaid leave requests | employee_id, leave_type, status, start_date, end_date, days, decided_by_id |
+| 9 | `payrolls` | Payroll run per employee/month | month, status, currency, salary/allowance/overtime/tax/net `*_cents` columns, attendance_month_id |
 
-All tables include the standard System Fields Block (lifecycle_status, workflow_status, business_type, metadata, discarded_at, permission_resource_name).
+All tables include the standard System Fields Block (lifecycle_status, workflow_status, business_type, metadata, discarded_at, permission_resource_name). `employees` additionally stores `manager_id`, `monthly_salary_cents`, `monthly_allowance_cents`, and `expiration_date` (contract renewal).
 
 ### Key Design Decisions
 
@@ -224,11 +227,19 @@ Hospital and retail enrich services create the same shift/attendance data
 | Attendance Days | ~400 | Aggregated per employee per date |
 | Attendance Months | ~80 | Monthly payroll rollups |
 | Attendance Configs | 2 | 1 per clinic (GPS: 10.773, 106.694 / 100m radius) |
+| Compensation + reporting lines | Every employee | `manager_id`, monthly salary/allowance, contract expiration |
+| Leave Balances | Every employee | 14 paid days per current year |
+| Leave Requests | 2 approved + selected pending | Derived used/pending days on mobile Home |
+| Payrolls | Current + previous month | Money computed from salary + attendance by `Payrolls::GenerateService` |
+| Announcement | 1 per company | Published `Document` linked to every employee |
 
 Shift seeds include realistic edge cases:
 - Employees checking in 5-15 minutes early
 - Some check-outs slightly late (overtime)
 - Weekends are skipped (no shifts on Sat/Sun)
+- Seeded `AttendanceConfig`s use the `paired` resolution strategy, and past
+  attendance samples prefer morning templates so every check-out stays on the
+  same calendar day. Night/midnight-crossover resolution remains future work.
 
 ---
 
@@ -238,7 +249,7 @@ Shift seeds include realistic edge cases:
 
 | Component | Status |
 |-----------|--------|
-| Database tables (6) | Done |
+| Database tables (9, including leave + payroll) | Done |
 | Models with validations | Done |
 | Model specs (35 examples) | Done |
 | CheckInService | Done |
@@ -254,6 +265,9 @@ Shift seeds include realistic edge cases:
 | Hospital seeding (shift/attendance data) | Done |
 | MOCK_OAUTH_EMAIL → hospital Manager | Done |
 | Geofence calculation (Haversine) | Done |
+| Compensation/reporting lines + contract renewal seed | Done |
+| Leave balances + leave requests (seed + mobile Home read) | Done |
+| Payroll money engine (salary + attendance → gross/tax/net) | Done |
 
 ### ⬜ Next (Future Development)
 
@@ -270,7 +284,8 @@ Shift seeds include realistic edge cases:
 | **Under-hours deficit tracking** | Monthly account tracking minutes below full-time target |
 | **Core hours enforcement** | Flag policy violations when core hours are missed even if total hours are met |
 | **Midnight crossover** | Handle shifts crossing midnight (e.g., 23:00-07:00) in scheduled_shift association |
-| **Payroll integration** | Link attendance_months to payroll/commission engine |
+| **Salary history** | Payroll currently uses the employee's current salary for historical months |
+| **Leave request workflow** | Mobile/web leave form, approvals, and history (balances/requests already persisted) |
 | **Employee self-service** | Employee-facing dashboard to view their own attendance_days and flag issues |
 | **Attendance configs UI** | CRUD dashboard for per-branch geofence configuration |
 
@@ -286,6 +301,15 @@ Shift seeds include realistic edge cases:
 | `db/migrate/*create_attendance_days.rb` | Migration (redesigned) |
 | `db/migrate/*create_attendance_months.rb` | Migration (redesigned) |
 | `db/migrate/*create_attendance_configs.rb` | Migration |
+| `db/migrate/*create_leave_balances.rb` | Migration |
+| `db/migrate/*create_leave_requests.rb` | Migration |
+| `db/migrate/*add_money_to_payrolls.rb` | Migration |
+| `app/models/leave_balance.rb` | Model |
+| `app/models/leave_request.rb` | Model |
+| `app/models/payroll.rb` | Model |
+| `app/services/payrolls/generate_service.rb` | Payroll money engine |
+| `app/services/seed/compensation_service.rb` | Seed reporting lines + salary/contract |
+| `app/services/seed/leave_service.rb` | Seed leave balances/requests |
 | `app/models/shift_template.rb` | Model |
 | `app/models/scheduled_shift.rb` | Model |
 | `app/models/attendance_log.rb` | Model (redesigned) |

@@ -47,6 +47,9 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Pages | 4 (2 per branch) |
 | Departments | 4 |
 | Employees | ~76 (across 2 branches) |
+| Compensation / reporting lines | Every employee: `manager_id`, salary, allowance, contract `expiration_date`; owner attached to the first branch |
+| Leave balances + requests | 1 paid-leave balance per employee (14 days) + approved/pending `LeaveRequest` rows |
+| Company announcement | 1 published `Document` (`business_type: announcement`) linked to every employee |
 | Customers | 100 (50 per branch) |
 | Products | 28 (14 per branch) |
 | Services | 10 (5 per branch) |
@@ -75,21 +78,31 @@ Seed::ApplicationService.run
    |   +- Company.create! -> after_create -> HotelInitService -> roles, categories, etc.
    |
    |- Enrich Company 1 (RetailEnrichService)
-   |   +- Brands, branches, employees, products, stocks, orders...
+   |   +- Brands, branches, employees, compensation/reporting lines, leave,
+   |      announcement, products, stocks, orders...
    |- Enrich Company 2 (RetailEnrichService)
-   |   +- Brands, branches, employees, products, stocks, orders...
+   |   +- Brands, branches, employees, compensation/reporting lines, leave,
+   |      announcement, products, stocks, orders...
    |
    +- Enrich Company 3 (HospitalEnrichService)
-       +- Branches, departments, facilities, employees, patients, services,
-          pharmacy products, warehouses, stocks, transfers/imports/exports,
-          shifts + attendance, credit data
+       +- Branches, departments, facilities, employees, compensation/reporting
+          lines, leave, announcement, patients, services, pharmacy products,
+          warehouses, stocks, transfers/imports/exports, shifts + attendance,
+          credit data
    |
    +- Enrich Company 4 (HotelEnrichService)
-       +- Branches, departments, facilities, employees, guests, accommodation
-          services, minibar products, warehouses, stocks, transfers/imports/exports,
-          stay orders + folios, bookings, purchases, discounts, shifts + attendance,
-          credit data
+       +- Branches, departments, facilities, employees, compensation/reporting
+          lines, leave, announcement, guests, accommodation services, minibar
+          products, warehouses, stocks, transfers/imports/exports, stay orders +
+          folios, bookings, purchases, discounts, shifts + attendance, credit data
 ```
+
+All three enrich services call `Seed::CompensationService`,
+`Seed::LeaveService`, and `Seed::AnnouncementService` after employees exist.
+Compensation also attaches the owner to the first branch and includes the
+owner in shift/attendance seeding, so the owner demo login gets payroll data
+too. Payroll drafts are then generated from salary + attendance by
+`Payrolls::GenerateService`.
 
 Future business types (Restaurant, Education) will follow the same pattern
 with their own `*InitService` and `*EnrichService`.

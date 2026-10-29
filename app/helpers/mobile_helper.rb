@@ -1,29 +1,7 @@
 # frozen_string_literal: true
 
 # Formatting and labelling helpers for the server-rendered /mobile pages.
-# Preview values are the only hardcoded sample data in the mobile namespace;
-# every view that uses one must render mobile_sample_badge next to it.
 module MobileHelper
-  PREVIEW = {
-    paid_leave_days: "14 Days",
-    paid_leave_pending: "3 Pending",
-    notice_title: "Sample company notice",
-    notice_body: "Placeholder content — replace with a real announcement feed.",
-    supervisor: "Sample Manager",
-    contract_renewal: "Nov 2026",
-    payroll_net: "$4,862.50",
-    payroll_gross: "$5,620.00",
-    payroll_deductions: "-$1,100.00",
-    payroll_overtime_amount: "+$342.50",
-    payroll_base_salary: "$5,200.00",
-    payroll_allowance: "+$420.00",
-    payroll_tax: "-$1,100.00",
-    payroll_tax_label: "Standard statutory (18.4%)",
-    payroll_total: "$4,862.50",
-    approver_name: "Sample Approver (HR Lead)",
-    approver_initials: "SA"
-  }.freeze
-
   STATUS_BADGE_CLASSES = {
     "present" => "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
     "half day" => "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
@@ -52,12 +30,18 @@ module MobileHelper
     "field_work" => "Field Work"
   }.freeze
 
-  def mobile_preview(key)
-    PREVIEW.fetch(key.to_sym, "—")
+  def mobile_money(cents, currency = :usd)
+    amount = cents.to_i / 100.0
+
+    if currency.to_s == "vnd"
+      number_to_currency(amount, unit: "₫", precision: 0, format: "%n %u")
+    else
+      number_to_currency(amount, unit: "$", precision: 2)
+    end
   end
 
-  def mobile_sample_badge
-    tag.span("Sample", class: "inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-900/30 dark:text-amber-300")
+  def mobile_payroll_tax_label
+    format("Statutory (%.1f%%)", (PAYROLL_TAX_RATE + PAYROLL_SOCIAL_INSURANCE_RATE) * 100)
   end
 
   def mobile_greeting(name)

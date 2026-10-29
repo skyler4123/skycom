@@ -5,9 +5,6 @@
   <div class="flex items-center justify-between gap-2">
     <span class="text-xs font-medium text-muted-foreground"><%= label %></span>
     <span class="flex items-center gap-1">
-      <% if local_assigns[:sample] %>
-        <%= mobile_sample_badge %>
-      <% end %>
       <% if icon.present? %>
         <span class="material-symbols-outlined text-xl text-primary"><%= icon %></span>
       <% end %>

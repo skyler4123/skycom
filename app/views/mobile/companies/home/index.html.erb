@@ -80,11 +80,11 @@
         <div class="flex flex-col justify-between rounded-xl border border-line bg-card p-4 shadow-sm ">
           <div class="flex items-center justify-between gap-2">
             <span class="text-xs font-medium text-muted-foreground">Paid Leave</span>
-            <%= mobile_sample_badge %>
+            <span class="material-symbols-outlined text-xl text-primary">beach_access</span>
           </div>
           <div class="mt-2">
-            <p class="text-lg font-bold leading-tight text-foreground"><%= mobile_preview(:paid_leave_days) %></p>
-            <p class="mt-0.5 text-xs text-muted-foreground"><%= mobile_preview(:paid_leave_pending) %></p>
+            <p class="text-lg font-bold leading-tight text-foreground"><%= @leave_balance.remaining_days.to_i %> Days</p>
+            <p class="mt-0.5 text-xs text-muted-foreground"><%= @leave_balance.pending_days.to_i %> Pending</p>
           </div>
         </div>
         <%= render "mobile/shared/stat_tile", label: "Overtime", value: mobile_duration(@attendance_month&.total_overtime_minutes), hint: "This month", icon: "schedule" %>
@@ -162,19 +162,18 @@
         </div>
       </section>
 
-      <section class="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/10 p-4 ">
-        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-card text-primary shadow-sm ">
-          <span class="material-symbols-outlined text-2xl">campaign</span>
-        </span>
-        <div class="min-w-0">
-          <div class="flex flex-wrap items-center gap-1.5">
+      <% if @announcement %>
+        <section class="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/10 p-4 ">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-card text-primary shadow-sm ">
+            <span class="material-symbols-outlined text-2xl">campaign</span>
+          </span>
+          <div class="min-w-0">
             <span class="text-xs font-bold uppercase tracking-wider text-primary">Company Notice</span>
-            <%= mobile_sample_badge %>
+            <p class="mt-0.5 text-sm font-semibold text-foreground"><%= @announcement.name %></p>
+            <p class="text-xs text-muted-foreground"><%= @announcement.description %></p>
           </div>
-          <p class="mt-0.5 text-sm font-semibold text-foreground"><%= mobile_preview(:notice_title) %></p>
-          <p class="text-xs text-muted-foreground"><%= mobile_preview(:notice_body) %></p>
-        </div>
-      </section>
+        </section>
+      <% end %>
 
       <section class="rounded-xl border border-line bg-card p-4 shadow-sm ">
         <div class="flex items-center justify-between">

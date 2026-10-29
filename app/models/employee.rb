@@ -36,9 +36,14 @@ class Employee < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :user, optional: true
+  belongs_to :manager, class_name: "Employee", optional: true, inverse_of: :direct_reports
   belongs_to :category
   belongs_to :property_mapping
 
+  has_many :direct_reports, class_name: "Employee", foreign_key: :manager_id,
+           dependent: :nullify, inverse_of: :manager
+  has_many :leave_balances, dependent: :destroy
+  has_many :leave_requests, dependent: :destroy
   has_many :employee_role_appointments, dependent: :destroy
   has_many :roles, through: :employee_role_appointments
   has_many :scheduled_shifts, dependent: :destroy
@@ -113,6 +118,8 @@ class Employee < ApplicationRecord
   validates :name, presence: true, uniqueness: { scope: :company_id }
   validates :business_type, presence: true
   validate :only_one_owner_per_company, on: :create
+  validate :manager_belongs_to_same_company
+  validate :manager_is_not_self
 
   before_discard :prevent_discard_if_owner
   before_destroy :prevent_destroy_if_owner
@@ -126,6 +133,20 @@ class Employee < ApplicationRecord
   end
 
   private
+
+  def manager_belongs_to_same_company
+    return if manager.blank? || company_id.blank?
+    return if manager.company_id == company_id
+
+    errors.add(:manager, "must belong to the same company")
+  end
+
+  def manager_is_not_self
+    return if manager_id.blank? || id.blank?
+    return unless manager_id == id
+
+    errors.add(:manager, "cannot be yourself")
+  end
 
   def refresh_cache
     attrs = attributes

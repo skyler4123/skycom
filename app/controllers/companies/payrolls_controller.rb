@@ -23,7 +23,9 @@ class Companies::PayrollsController < Companies::ApplicationController
         total: scope.count,
         draft: scope.where(status: :draft).count,
         approved: scope.where(status: :approved).count,
-        paid: scope.where(status: :paid).count
+        paid: scope.where(status: :paid).count,
+        total_net_amount_cents: scope.sum(:net_amount_cents),
+        currency: current_company.currency
       }
     }
   end
@@ -143,6 +145,15 @@ class Companies::PayrollsController < Companies::ApplicationController
       notes: payroll.notes,
       employee: payroll.employee.as_json(only: [ :id, :name ]),
       branch: payroll.branch&.as_json(only: [ :id, :name ]),
+      currency: payroll.currency,
+      base_amount_cents: payroll.base_amount_cents,
+      allowance_amount_cents: payroll.allowance_amount_cents,
+      overtime_amount_cents: payroll.overtime_amount_cents,
+      gross_amount_cents: payroll.gross_amount_cents,
+      tax_amount_cents: payroll.tax_amount_cents,
+      deduction_amount_cents: payroll.deduction_amount_cents,
+      total_deductions_cents: payroll.total_deductions_cents,
+      net_amount_cents: payroll.net_amount_cents,
       metadata: payroll.metadata,
       created_at: payroll.created_at,
       updated_at: payroll.updated_at
