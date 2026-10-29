@@ -151,6 +151,13 @@ class MainActivity : HotwireActivity(), MobileWebListener {
                 path = "$root/home"
             ),
             hotwireTab(
+                titleResId = R.string.tab_notifications,
+                iconResId = R.drawable.ic_tab_notifications,
+                name = "notifications",
+                navigatorHostId = R.id.notifications_navigator_host,
+                path = "$root/notifications"
+            ),
+            hotwireTab(
                 titleResId = R.string.tab_employee,
                 iconResId = R.drawable.ic_tab_employee,
                 name = "employee",
@@ -170,13 +177,6 @@ class MainActivity : HotwireActivity(), MobileWebListener {
                 name = "payroll",
                 navigatorHostId = R.id.payroll_navigator_host,
                 path = "$root/payroll"
-            ),
-            hotwireTab(
-                titleResId = R.string.tab_requests,
-                iconResId = R.drawable.ic_tab_requests,
-                name = "requests",
-                navigatorHostId = R.id.requests_navigator_host,
-                path = "$root/attendance_requests/new"
             )
         )
     }

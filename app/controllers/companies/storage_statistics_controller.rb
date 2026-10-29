@@ -3,7 +3,7 @@
 # app/controllers/companies/storage_statistics_controller.rb
 #
 # Storage Statistics overview (Shell-First). Aggregates StoredFile audit
-# columns via Storage::StatisticsService, cached 1 hour in local_cache —
+# columns via Storage::StatisticsService, cached 1 hour in sync_cache —
 # uploads/deletes do not bust it (accepted staleness; clear the
 # "storage_statistics/<company_id>" key to refresh).
 # Serves Stimulus: Companies_StorageStatistics_IndexController
@@ -17,7 +17,7 @@ class Companies::StorageStatisticsController < Companies::ApplicationController
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        statistics = Rails.local_cache.fetch(
+        statistics = Rails.sync_cache.fetch(
           "storage_statistics/#{current_company.id}",
           expires_in: STATISTICS_CACHE_EXPIRY
         ) do

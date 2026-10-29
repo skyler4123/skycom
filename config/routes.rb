@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     scope "companies/:company_id", as: :company, module: :companies,
           constraints: { company_id: /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i } do
       get "home", to: "home#index"
+      get "notifications", to: "notifications#index"
       get "employee", to: "employees#show"
       get "attendance_month", to: "attendance_months#show"
       get "payroll", to: "payrolls#show"

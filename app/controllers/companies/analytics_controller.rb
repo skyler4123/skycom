@@ -6,7 +6,7 @@ class Companies::AnalyticsController < Companies::ApplicationController
       format.html { render html: "", layout: true }
       format.json do
         period = params[:period] || "this_month"
-        data = Rails.local_cache.fetch("analytics/#{current_company.id}/#{period}", expires_in: 5.minutes) do
+        data = Rails.sync_cache.fetch("analytics/#{current_company.id}/#{period}", expires_in: 5.minutes) do
           Analytics::DashboardService.call(company: current_company, period: period)
         end
         render json: data

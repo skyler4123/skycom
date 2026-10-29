@@ -77,7 +77,7 @@ module Employee::PermissionConcern
     # Used for Permissions UI page
     def permissions
       cache_key = "#{cache_key_with_version}/permissions"
-      Rails.local_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
+      Rails.sync_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
         load_permissions_from_db
       end
     end
@@ -118,7 +118,7 @@ module Employee::PermissionConcern
     # 5. Only active PolicyRoleAppointments - used for can? checks
     def permissions_by_role
       cache_key = "#{cache_key_with_version}/permissions_by_role"
-      Rails.local_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
+      Rails.sync_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
         roles.includes(:policy_role_appointments).each_with_object({}) do |role, hash|
           active_appointments = role.policy_role_appointments.active.includes(:policy)
 
@@ -143,9 +143,9 @@ module Employee::PermissionConcern
 
     def clear_permissions_cache
       Rails.ram_cache.delete("#{cache_key_with_version}/owner_role")
-      Rails.local_cache.delete("#{cache_key_with_version}/permissions")
-      Rails.local_cache.delete("#{cache_key_with_version}/permissions_by_role")
-      Rails.local_cache.delete("#{cache_key_with_version}/owner_role")
+      Rails.sync_cache.delete("#{cache_key_with_version}/permissions")
+      Rails.sync_cache.delete("#{cache_key_with_version}/permissions_by_role")
+      Rails.sync_cache.delete("#{cache_key_with_version}/owner_role")
       touch
     end
   end

@@ -18,6 +18,7 @@ authentication.
 | `DELETE /mobile/sign_out` | `Mobile::SessionsController#destroy` | redirect |
 | `GET /mobile/home` | `Mobile::HomeController#index` | `mobile/companies/home/index` (no-employee fallback) |
 | `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `mobile/companies/home/index` |
+| `GET /mobile/companies/:company_id/notifications` | `Mobile::Companies::NotificationsController#index` | `mobile/companies/notifications/index` |
 | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `mobile/companies/employees/show` |
 | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `mobile/companies/attendance_months/show` |
 | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `mobile/companies/payrolls/show` |
@@ -145,6 +146,10 @@ company-scoped URLs (`mobile--select-nav` navigates on change).
 ## 5. Styling
 
 - Default Tailwind classes only, Tailwind v4, no config file.
+- Responsive: phone-first; use `md:` (tablet) and `lg:` (desktop) to widen
+  containers (`max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl`) and to
+  upgrade grids (`md:grid-cols-3`, `md:gap-4`). Never ship a phone-only
+  fixed width on tablet breakpoints.
 - Skycom palette: `blue-600/700` primary, `slate` surfaces/text, `green`
   success, `amber` pending, `red` error.
 - Every card/tile has a border or distinct background in light **and** dark.
