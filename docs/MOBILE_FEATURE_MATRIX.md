@@ -40,7 +40,7 @@ Source files for the inventory:
 | Domain | Mobile today | What works | Main gap |
 |---|---|---|---|
 | Auth | 🟡 | Email/password sign-in, sign-out, session cookie | Forgot password, biometrics, SSO |
-| Home | 🟡 🧪 | Greeting, live clock, check-in state, today shift, monthly stats, quick actions, activity | Paid leave and notice are samples |
+| Home | 🟡 🧪 | Greeting, live clock, multi check-in state/times, today shift, monthly stats, quick actions, activity | Paid leave and notice are samples |
 | Profile | 🟡 🧪 | Own name, code, type, roles, category, email, phone, company, branch, departments, next shift, monthly totals | No edit, no dynamic profiles, reports-to/contract are samples |
 | Attendance | 🟡 | Own month summary, daily rows, month navigation, check-in | No check-out, geofence, QR, request history, or PDF |
 | Requests | 🟡 | Create attendance request with validation | No inbox, status, approver, or attachments |
@@ -109,7 +109,7 @@ Cross-cutting mobile behavior:
 | Biometric sign-in | — | ⛔ | No native biometric permission or library |
 | Home dashboard | — (web Dashboard is manager analytics) | ✅ | Mobile-only employee dashboard |
 | Live clock | — | ✅ | Client-side clock |
-| Check-in | ✅ manager view | ✅ | Writes `AttendanceLog`; no geofence |
+| Check-in | ✅ manager view | ✅ | Writes one `AttendanceLog` per tap; Home lists all company-local check-ins; no geofence |
 | Check-out | ✅ manager view | ⛔ | `Attendance::CheckOutService` exists |
 | Break tracking | — | ⛔ | No mobile break action |
 | Geofence validation | ✅ config + service | ⛔ | Mobile bypasses `Attendance::CheckInService` |
