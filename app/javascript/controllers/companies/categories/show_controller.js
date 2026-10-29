@@ -24,7 +24,7 @@ export default class Companies_Categories_ShowController extends Companies_Layou
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load category.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load category.")}</div>`
           return true
         }
         return false
@@ -41,70 +41,70 @@ export default class Companies_Categories_ShowController extends Companies_Layou
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-          <a href="${Helpers.company_categories_path(companyId)}" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6">
+        <div class="p-6 bg-card rounded-xl border border-line">
+          <a href="${Helpers.company_categories_path(companyId)}" class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back to Categories")}
           </a>
 
           <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-start mb-6">
-            <div class="size-24 shrink-0 overflow-hidden rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <span class="material-symbols-outlined text-4xl text-purple-600 dark:text-purple-400">category</span>
+            <div class="size-24 shrink-0 overflow-hidden rounded-xl bg-primary/10 flex items-center justify-center">
+              <span class="material-symbols-outlined text-4xl text-primary ">category</span>
             </div>
             <div class="flex flex-1 flex-col text-center sm:text-left">
-              <h2 class="text-2xl font-black text-slate-900 dark:text-white">${c.name}</h2>
-              <p class="font-semibold text-slate-600 dark:text-slate-400">${c.description || ''}</p>
+              <h2 class="text-2xl font-black text-foreground">${c.name}</h2>
+              <p class="font-semibold text-muted-foreground">${c.description || ''}</p>
               <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
-                <span class="inline-flex items-center rounded-lg bg-slate-100 dark:bg-slate-800/40 px-3 py-1 text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">${c.resource_name || translate("N/A")}</span>
+                <span class="inline-flex items-center rounded-lg bg-muted px-3 py-1 text-xs font-bold text-foreground uppercase">${c.resource_name || translate("N/A")}</span>
               </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 gap-6 border-t border-slate-200 dark:border-gray-800 pt-6 sm:grid-cols-2">
+          <div class="grid grid-cols-1 gap-6 border-t border-line pt-6 sm:grid-cols-2">
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-purple-600 dark:text-purple-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-primary ">
                 <span class="material-symbols-outlined">label</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Name")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${c.name || translate("N/A")}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Name")}</p>
+                <p class="text-sm font-semibold text-foreground">${c.name || translate("N/A")}</p>
               </div>
             </div>
 
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-purple-600 dark:text-purple-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-primary ">
                 <span class="material-symbols-outlined">dataset</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Resource Name")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${c.resource_name || translate("N/A")}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Resource Name")}</p>
+                <p class="text-sm font-semibold text-foreground">${c.resource_name || translate("N/A")}</p>
               </div>
             </div>
 
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-purple-600 dark:text-purple-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-primary ">
                 <span class="material-symbols-outlined">description</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Description")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${c.description || '—'}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Description")}</p>
+                <p class="text-sm font-semibold text-foreground">${c.description || '—'}</p>
               </div>
             </div>
 
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-purple-600 dark:text-purple-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-primary ">
                 <span class="material-symbols-outlined">view_column</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Property Fields")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${propertyMappingCount > 0 ? `${propertyMappingCount} ${translate('properties defined')}` : translate('No properties')}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Property Fields")}</p>
+                <p class="text-sm font-semibold text-foreground">${propertyMappingCount > 0 ? `${propertyMappingCount} ${translate('properties defined')}` : translate('No properties')}</p>
               </div>
             </div>
           </div>
 
-          <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-gray-800">
+          <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-line">
             <a href="${Helpers.edit_company_category_path(companyId, c.id)}"
-              class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors cursor-pointer">
+              class="inline-flex items-center px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm transition-colors cursor-pointer">
               ${translate("Edit Category")}
             </a>
           </div>

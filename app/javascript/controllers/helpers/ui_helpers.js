@@ -151,35 +151,35 @@ export const timeFormat = (time, format = "YYYY-MM-DDTHH:mm:ss[Z]", timezone = "
 export const statusBadge = (status) => {
   if (!status) return ""
   const statusKey = String(status).toLowerCase()
-  let color = "slate"
+  let color = "neutral"
 
   switch (statusKey) {
     case "active":
     case "confirmed":
     case "completed":
     case "paid":
-      color = "green"; break
+      color = "success"; break
     case "in_progress":
-      color = "blue"; break
+      color = "info"; break
     case "pending":
     case "suspended":
-      color = "yellow"; break
+      color = "warning"; break
     case "deleted":
     case "failed":
     case "refunded":
     case "cancelled":
-      color = "red"; break
+      color = "danger"; break
   }
 
   const styles = {
-    green: { badge: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800", dot: "bg-green-600" },
-    slate: { badge: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700", dot: "bg-slate-500" },
-    yellow: { badge: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800", dot: "bg-yellow-600" },
-    red: { badge: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800", dot: "bg-red-600" },
-    blue: { badge: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800", dot: "bg-blue-600" }
+    success: { badge: "bg-success/10 text-success border border-success/20", dot: "bg-success" },
+    neutral: { badge: "bg-muted text-muted-foreground border border-line", dot: "bg-muted-foreground" },
+    warning: { badge: "bg-warning/10 text-warning border border-warning/20", dot: "bg-warning" },
+    danger:  { badge: "bg-danger/10 text-danger border border-danger/20", dot: "bg-danger" },
+    info:    { badge: "bg-info/10 text-info border border-info/20", dot: "bg-info" }
   }
 
-  const style = styles[color] || styles.slate
+  const style = styles[color] || styles.neutral
   const label = capitalize(statusKey.replace(/_/g, " "))
 
   return `
@@ -354,11 +354,11 @@ export const pagination = (dataValue, classNames = "") => `
  */
 export const toast = ({ type = "normal", message = "", duration = 3000 }) => {
   const themes = {
-    success: "!bg-green-600 text-white border-green-700 shadow-lg",
-    error:   "!bg-red-600 text-white border-red-700 shadow-lg",
-    info:    "!bg-blue-600 text-white border-blue-700 shadow-lg",
-    warning: "!bg-amber-500 text-white border-amber-600 shadow-lg",
-    normal:  "!bg-slate-800 text-white border-slate-900 shadow-lg"
+    success: "!bg-success !text-success-foreground border-success/70 shadow-lg",
+    error:   "!bg-danger !text-danger-foreground border-danger/70 shadow-lg",
+    info:    "!bg-info !text-info-foreground border-info/70 shadow-lg",
+    warning: "!bg-warning !text-warning-foreground border-warning/70 shadow-lg",
+    normal:  "!bg-foreground !text-background border-foreground/70 shadow-lg"
   }
 
   const themeClasses = themes[type] || themes.normal
@@ -571,7 +571,7 @@ export const checkbox = ({
   const inputHtml = `
     <input 
       type="checkbox"
-      class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer ${className}"
+      class="h-5 w-5 rounded border-line text-primary cursor-pointer ${className}"
       data-controller="${controller}"
       data-${controller}-url-value="${url}"
       data-${controller}-method-value="${method}"
@@ -679,7 +679,7 @@ export const avatar = ({
   const avatarContent = hasUrl 
     ? `<img data-avatar-target="image" src="${url}" class="h-full w-full object-cover pointer-events-none" alt="Avatar" />`
     : `
-      <div data-avatar-target="image" class="h-full w-full flex items-center justify-center bg-slate-200 dark:bg-gray-700 text-slate-400 dark:text-gray-500 pointer-events-none">
+      <div data-avatar-target="image" class="h-full w-full flex items-center justify-center bg-muted text-muted-foreground pointer-events-none">
         <span class="material-symbols-outlined text-[1.5em]">person</span>
       </div>
     `;
@@ -693,14 +693,14 @@ export const avatar = ({
          class="group relative inline-block ${className} shrink-0">
          
       <div ${innerAttributes} 
-           class="${shape} h-full w-full overflow-hidden bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-800 ${isEditable ? 'cursor-pointer transition-transform hover:scale-[1.05]' : ''}"
+           class="${shape} h-full w-full overflow-hidden bg-muted border border-line ${isEditable ? 'cursor-pointer transition-transform hover:scale-[1.05]' : ''}"
            ${isEditable ? 'data-action="click->avatar#browse"' : ''}>
            
         ${avatarContent}
              
         ${isEditable ? `
-          <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            <span class="material-symbols-outlined text-white text-[1.2em]">photo_camera</span>
+          <div class="absolute inset-0 flex items-center justify-center bg-overlay opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <span class="material-symbols-outlined text-overlay-foreground text-[1.2em]">photo_camera</span>
           </div>
         ` : ""}
       </div>
@@ -778,23 +778,25 @@ export const table = ({
     }
 
     if (value === null || value === undefined) {
-      return `<span class="text-slate-300 dark:text-slate-700">—</span>`
+      return `<span class="text-muted-foreground/50">—</span>`
     }
 
     const fieldType = mappingLookup[col.key]?.type
 
     if (fieldType === "boolean") {
       const isTrue = value === true || value === "true"
-      const badgeColor = isTrue ? "emerald" : "slate"
-      return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-${badgeColor}-50 text-${badgeColor}-700 dark:bg-${badgeColor}-900/30 dark:text-${badgeColor}-400">${isTrue ? translate("True") : translate("False")}</span>`
+      const badgeClass = isTrue
+        ? "bg-success/10 text-success border border-success/20"
+        : "bg-muted text-muted-foreground border border-line"
+      return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${badgeClass}">${isTrue ? translate("True") : translate("False")}</span>`
     }
 
     if (fieldType === "integer") {
-      return `<span class="font-mono text-slate-900 dark:text-slate-100">${Number(value).toLocaleString()}</span>`
+      return `<span class="font-mono text-foreground">${Number(value).toLocaleString()}</span>`
     }
 
     if (fieldType === "decimal") {
-      return `<span class="font-mono font-medium text-blue-600 dark:text-blue-400">${Number(value).toFixed(2)}</span>`
+      return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
     }
 
     return value
@@ -811,16 +813,16 @@ export const table = ({
   return `
     <table class="${className}">
       <thead>
-        <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+        <tr class="text-sm text-muted-foreground bg-muted border-b border-line">
           ${columns.map(col => `
             <th ${widthStyle(col)} class="py-4 px-6 font-medium whitespace-nowrap ${alignmentClass(col)}">${col.name || "N/A"}</th>
           `).join('')}
           ${renderActions ? `<th class="py-4 px-6 font-medium text-right whitespace-nowrap w-[100px]">Edit</th>` : ''}
         </tr>
       </thead>
-      <tbody data-${identifier}-target="${target}" class="divide-y divide-slate-200 dark:divide-slate-800">
+      <tbody data-${identifier}-target="${target}" class="divide-y divide-line">
         ${rows.map(record => `
-          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+          <tr class="hover:bg-muted transition-colors">
             ${columns.map(col => `
               <td class="py-4 px-6 text-sm ${alignmentClass(col)}">
                 ${renderCell(record, col)}
@@ -849,10 +851,10 @@ export const dynamicSearchHTML = ({ searchCols = [], urlParams }) => {
 
   return `
     <div class="flex flex-col gap-1">
-      <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Search")}</label>
+      <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Search")}</label>
       <input type="text" name="q" value="${urlParams.get("q") || ""}"
         placeholder="${translate("Search")} ${searchCols.map(c => c.name).join(", ")}…"
-        class="pl-3 pr-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+        class="pl-3 pr-3 py-2 text-sm border border-line rounded-lg bg-card text-foreground"
         ${tooltip(translate("Keyword search across searchable columns"))}>
     </div>
   `
@@ -887,9 +889,9 @@ export const dynamicFiltersHTML = ({ filterCols = [], urlParams, mappingLookup =
     const current = urlParams.get(paramName) || ""
     return `
       <div class="flex flex-col gap-1">
-        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${col.name}</label>
+        <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${col.name}</label>
         <select name="${paramName}"
-          class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+          class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-foreground"
           ${tooltip(`${translate("Filter by")} ${col.name}`)}>
           <option value="">${translate("All")}</option>
           ${options.map(o => `<option value="${o.value}" ${current === o.value ? "selected" : ""}>${o.label}</option>`).join('')}

@@ -1,2 +1,114 @@
 @import "tailwindcss";
+
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* =============================================================================
+   Skycom semantic color tokens
+   -----------------------------------------------------------------------------
+   This is the ONLY place colors are defined. Components use the semantic
+   utilities (bg-card, text-muted-foreground, border-line, bg-primary, ...) and
+   never raw palette classes (bg-white, text-slate-500, border-slate-200, ...).
+
+   To rebrand the whole app, change --primary (and its -foreground) below.
+   To retheme dark mode, change the .dark block. No component edits needed.
+
+   Dark mode is driven by `class="dark"` on <html> (see darkmode_controller.js
+   and the pre-paint script in the layouts).
+
+   Rules:
+   - Never write `dark:` for a semantic color; the variable already switches.
+   - Need transparency? Use the opacity modifier: bg-primary/10, border-danger/30.
+   - Only raw colors allowed: third-party CSS (toastify, hint), brand art
+     (logo/icon SVG fills), and the fallbacks in helpers/chart_colors.js.
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   Light mode
+   -------------------------------------------------------------------------- */
+:root {
+  /* Surfaces */
+  --background:         oklch(0.984 0.003 247.858); /* slate-50  */
+  --card:               oklch(1 0 0);               /* white     */
+  --muted:              oklch(0.968 0.007 247.896); /* slate-100 */
+  --line:               oklch(0.929 0.013 255.508); /* slate-200 */
+  --overlay:            oklch(0 0 0 / 0.45);
+
+  /* Text */
+  --foreground:         oklch(0.208 0.042 265.755); /* slate-900 */
+  --muted-foreground:   oklch(0.554 0.046 257.417); /* slate-500 */
+  --overlay-foreground: oklch(1 0 0);               /* white     */
+
+  /* Brand */
+  --primary:            oklch(0.511 0.262 276.966); /* indigo-600 */
+  --primary-foreground: oklch(1 0 0);
+
+  /* Status */
+  --success:            oklch(0.596 0.145 163.225); /* emerald-600 */
+  --success-foreground: oklch(1 0 0);
+  --warning:            oklch(0.666 0.179 58.318);  /* amber-600 */
+  --warning-foreground: oklch(0.208 0.042 265.755); /* slate-900 */
+  --danger:             oklch(0.577 0.245 27.325);  /* red-600 */
+  --danger-foreground:  oklch(1 0 0);
+  --info:               oklch(0.546 0.245 262.881); /* blue-600 */
+  --info-foreground:    oklch(1 0 0);
+}
+
+/* -----------------------------------------------------------------------------
+   Dark mode
+   -------------------------------------------------------------------------- */
+.dark {
+  /* Surfaces */
+  --background:         oklch(0.129 0.042 264.695); /* slate-950 */
+  --card:               oklch(0.208 0.042 265.755); /* slate-900 */
+  --muted:              oklch(0.279 0.041 260.031); /* slate-800 */
+  --line:               oklch(0.372 0.044 257.287); /* slate-700 */
+  --overlay:            oklch(0 0 0 / 0.6);
+
+  /* Text */
+  --foreground:         oklch(0.968 0.007 247.896); /* slate-100 */
+  --muted-foreground:   oklch(0.704 0.04 256.788);  /* slate-400 */
+  --overlay-foreground: oklch(1 0 0);               /* white     */
+
+  /* Brand */
+  --primary:            oklch(0.673 0.182 276.935); /* indigo-400 */
+  --primary-foreground: oklch(0.129 0.042 264.695); /* slate-950 */
+
+  /* Status */
+  --success:            oklch(0.765 0.177 163.223); /* emerald-400 */
+  --success-foreground: oklch(0.129 0.042 264.695);
+  --warning:            oklch(0.828 0.189 84.429);  /* amber-400 */
+  --warning-foreground: oklch(0.129 0.042 264.695);
+  --danger:             oklch(0.704 0.191 22.216);  /* red-400 */
+  --danger-foreground:  oklch(0.129 0.042 264.695);
+  --info:               oklch(0.707 0.165 254.624); /* blue-400 */
+  --info-foreground:    oklch(0.129 0.042 264.695);
+}
+
+/* -----------------------------------------------------------------------------
+   Register tokens with Tailwind.
+   `inline` keeps a live var() reference in every utility, so changing a
+   variable at runtime (or under .dark) repaints every element using it.
+   -------------------------------------------------------------------------- */
+@theme inline {
+  --color-background:         var(--background);
+  --color-card:               var(--card);
+  --color-muted:              var(--muted);
+  --color-line:               var(--line);
+  --color-overlay:            var(--overlay);
+
+  --color-foreground:         var(--foreground);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-overlay-foreground: var(--overlay-foreground);
+
+  --color-primary:            var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-success:            var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning:            var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-danger:             var(--danger);
+  --color-danger-foreground:  var(--danger-foreground);
+  --color-info:               var(--info);
+  --color-info-foreground:    var(--info-foreground);
+}

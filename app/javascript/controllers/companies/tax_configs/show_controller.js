@@ -58,11 +58,11 @@ export default class Companies_TaxConfigs_ShowController extends Companies_Layou
     const cfg = this.taxConfig || {}
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 max-w-2xl">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">Tax Config</h2>
+        <div class="p-6 bg-card rounded-xl border border-line max-w-2xl">
+          <h2 class="text-xl font-bold text-foreground mb-4">Tax Config</h2>
           <form data-action="submit->${this.identifier}#saveConfig" class="space-y-4">
             <div>
-              <label class="text-xs text-slate-500 uppercase">Date Basis</label>
+              <label class="text-xs text-muted-foreground uppercase">Date Basis</label>
               <select name="date_basis" class="w-full px-3 py-2 border rounded-lg text-sm">
                 <option value="created_at" ${cfg.date_basis === "created_at" ? "selected" : ""}>Created At</option>
                 <option value="updated_at" ${cfg.date_basis === "updated_at" ? "selected" : ""}>Updated At</option>
@@ -72,22 +72,22 @@ export default class Companies_TaxConfigs_ShowController extends Companies_Layou
             <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="include_purchases" ${cfg.include_purchases ? "checked" : ""} /> Include purchases</label>
             <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="include_stock_exports" ${cfg.include_stock_exports ? "checked" : ""} /> Include stock exports</label>
             <div>
-              <label class="text-xs text-slate-500 uppercase">Excluded invoice statuses (comma-separated)</label>
+              <label class="text-xs text-muted-foreground uppercase">Excluded invoice statuses (comma-separated)</label>
               <input type="text" name="excluded_invoice_statuses" value="${(cfg.excluded_invoice_statuses || []).join(", ")}" class="w-full px-3 py-2 border rounded-lg text-sm" />
             </div>
             <div>
-              <label class="text-xs text-slate-500 uppercase">Excluded purchase statuses (comma-separated)</label>
+              <label class="text-xs text-muted-foreground uppercase">Excluded purchase statuses (comma-separated)</label>
               <input type="text" name="excluded_purchase_statuses" value="${(cfg.excluded_purchase_statuses || []).join(", ")}" class="w-full px-3 py-2 border rounded-lg text-sm" />
             </div>
             <div>
-              <label class="text-xs text-slate-500 uppercase">Stock export business types (comma-separated)</label>
+              <label class="text-xs text-muted-foreground uppercase">Stock export business types (comma-separated)</label>
               <input type="text" name="stock_export_business_types" value="${(cfg.stock_export_business_types || []).join(", ")}" class="w-full px-3 py-2 border rounded-lg text-sm" />
             </div>
             <div>
-              <label class="text-xs text-slate-500 uppercase">Branch IDs (comma-separated, blank = all)</label>
+              <label class="text-xs text-muted-foreground uppercase">Branch IDs (comma-separated, blank = all)</label>
               <input type="text" name="branch_ids" value="${(cfg.branch_ids || []).join(", ")}" class="w-full px-3 py-2 border rounded-lg text-sm" />
             </div>
-            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">Save Config</button>
+            <button type="submit" class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm">Save Config</button>
           </form>
         </div>
       </div>

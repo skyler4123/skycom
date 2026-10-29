@@ -32,7 +32,7 @@ export default class Companies_Employees_EditController extends Companies_Layout
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load employee.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load employee.")}</div>`
           return true
         }
         return false
@@ -41,7 +41,7 @@ export default class Companies_Employees_EditController extends Companies_Layout
   }
 
   renderField({ key, label, type, value }) {
-    const baseClass = 'w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500'
+    const baseClass = 'w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground'
 
     switch (type) {
       case 'boolean':
@@ -49,15 +49,15 @@ export default class Companies_Employees_EditController extends Companies_Layout
           <div class="flex items-center gap-3 py-2">
             <input type="hidden" name="employee[${key}]" value="false">
             <input type="checkbox" name="employee[${key}]" value="true" ${value ? 'checked' : ''}
-              class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer">
-            <span class="text-sm text-slate-900 dark:text-white">${label}</span>
+              class="h-5 w-5 rounded border-line text-primary cursor-pointer">
+            <span class="text-sm text-foreground">${label}</span>
           </div>
         `
       case 'integer':
       case 'decimal':
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${label}</label>
             <input type="number" name="employee[${key}]" step="${type === 'decimal' ? '0.01' : '1'}" value="${value ?? ''}"
               class="${baseClass}">
           </div>
@@ -65,7 +65,7 @@ export default class Companies_Employees_EditController extends Companies_Layout
       case 'datetime':
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${label}</label>
             <input type="datetime-local" name="employee[${key}]" value="${value ?? ''}"
               class="${baseClass}">
           </div>
@@ -73,7 +73,7 @@ export default class Companies_Employees_EditController extends Companies_Layout
       default:
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${label}</label>
             <input type="text" name="employee[${key}]" value="${value ?? ''}"
               class="${baseClass}">
           </div>
@@ -85,8 +85,8 @@ export default class Companies_Employees_EditController extends Companies_Layout
     if (this.propertyMetadata.length === 0) return ''
 
     return `
-      <div class="border-t border-slate-200 dark:border-slate-700 pt-6 mt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
+      <div class="border-t border-line pt-6 mt-6">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           ${this.propertyMetadata.map(f => this.renderField({ ...f, value: this.employee?.[f.key] })).join('')}
         </div>
@@ -119,51 +119,51 @@ export default class Companies_Employees_EditController extends Companies_Layout
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Employee")}</h2>
-        <p class="text-sm text-slate-500 dark:text-slate-400">${e.name}</p>
+        <h2 class="text-xl font-bold text-foreground">${translate("Edit Employee")}</h2>
+        <p class="text-sm text-muted-foreground">${e.name}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Full Name")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Full Name")}</label>
             <input type="text" name="employee[name]" value="${e.name || ''}" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Description")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Description")}</label>
             <textarea name="employee[description]" rows="2"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">${e.description || ''}</textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground">${e.description || ''}</textarea>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Employment Type")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Employment Type")}</label>
             <select name="employee[business_type]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${typeOptions}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Status")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Status")}</label>
             <select name="employee[workflow_status]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${workflowOptions}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Branch")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Branch")}</label>
             <select name="employee[branch_id]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               <option value="">${translate("Select Branch")}</option>
               ${branchFilter.map(b => `<option value="${b.id}" ${b.id === e.branch_id ? 'selected' : ''}>${b.name}</option>`).join('')}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Category")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
             <input type="text" value="${(currentCategories().find(c => c.id === e.category_id) || {}).name || ''}" disabled
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-800/40 text-sm text-slate-500 dark:text-slate-400">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-muted/40 text-sm text-muted-foreground">
             <input type="hidden" name="employee[category_id]" value="${e.category_id}">
           </div>
         </div>
@@ -172,11 +172,11 @@ export default class Companies_Employees_EditController extends Companies_Layout
 
         <div class="flex justify-end gap-3 pt-2">
           <a href="${Helpers.company_employee_path(companyId, e.id)}"
-            class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer">
+            class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer">
             ${translate("Cancel")}
           </a>
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm transition-colors cursor-pointer">
             ${translate("Save Changes")}
           </button>
         </div>
@@ -188,7 +188,7 @@ export default class Companies_Employees_EditController extends Companies_Layout
         ${form({
           action: Helpers.company_employee_path(companyId, e.id),
           method: "PATCH",
-          attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false" novalidate`,
+          attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false" novalidate`,
           html: fields
         })}
       </div>

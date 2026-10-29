@@ -30,13 +30,13 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
   contentHTML() {
     return `
       <div class="p-8 overflow-y-auto">
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
-          <div class="p-6 border-b border-slate-200 dark:border-slate-800">
-            <h2 class="text-xl font-semibold text-slate-900 dark:text-white">${translate("Permissions")}</h2>
-            <p class="text-sm text-slate-500 mt-1">${translate("Manage role-based permissions by toggling policies")}</p>
+        <div class="bg-card rounded-xl border border-line flex flex-col">
+          <div class="p-6 border-b border-line">
+            <h2 class="text-xl font-semibold text-foreground">${translate("Permissions")}</h2>
+            <p class="text-sm text-muted-foreground mt-1">${translate("Manage role-based permissions by toggling policies")}</p>
           </div>
 
-          <div class="divide-y divide-slate-200 dark:divide-slate-800">
+          <div class="divide-y divide-line">
             ${this.roles.length === 0 ? this.emptyStateHTML() : this.rolesHTML()}
           </div>
         </div>
@@ -55,12 +55,12 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
 
     return `
       <div class="role-section" data-role-id="${role.id}">
-        <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+        <div class="px-6 py-4 bg-muted flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">${role.name}</h3>
-            <p class="text-sm text-slate-500">${role.description || translate('No description')}</p>
+            <h3 class="text-lg font-semibold text-foreground">${role.name}</h3>
+            <p class="text-sm text-muted-foreground">${role.description || translate('No description')}</p>
           </div>
-          <div class="text-sm text-slate-500">
+          <div class="text-sm text-muted-foreground">
             ${role.policies.filter(p => p.policy_appointment?.workflow_status === 'active').length} / ${role.policies.length} ${translate("active")}
           </div>
         </div>
@@ -74,7 +74,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
             data-${this.identifier}-role-id-param="${role.id}"
             data-${this.identifier}-role-name-param="${role.name}"
             data-${this.identifier}-assigned-resources-param="${assignedResources.join(',')}"
-            class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+            class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg transition-colors"
           >
             <span class="material-symbols-outlined text-[18px]!">add</span>
             ${translate("Add Resource")}
@@ -100,14 +100,14 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
     const totalCount = policies.length
 
     return `
-      <div class="resource-section border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+      <div class="resource-section border border-line rounded-lg overflow-hidden">
         <details class="resource-details group" open>
-          <summary class="px-4 py-3 bg-slate-100 dark:bg-slate-800 cursor-pointer flex items-center justify-between list-none hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors select-none">
+          <summary class="px-4 py-3 bg-muted cursor-pointer flex items-center justify-between list-none hover:bg-muted transition-colors select-none">
             <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-lg text-slate-500 group-open:rotate-90 transition-transform">chevron_right</span>
-              <span class="text-sm font-semibold text-slate-900 dark:text-white">${resourceName}</span>
+              <span class="material-symbols-outlined text-lg text-muted-foreground group-open:rotate-90 transition-transform">chevron_right</span>
+              <span class="text-sm font-semibold text-foreground">${resourceName}</span>
             </div>
-            <span class="text-xs text-slate-500">${activeCount} / ${totalCount} ${translate("active")}</span>
+            <span class="text-xs text-muted-foreground">${activeCount} / ${totalCount} ${translate("active")}</span>
           </summary>
           <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             ${policies.map(policy => this.policyBadgeHTML(policy)).join('')}
@@ -132,7 +132,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
         data-policy-resource="${policy.resource}"
         data-tag-conditions='${tagConditions}'
         data-workflow-status="${policy.policy_appointment?.workflow_status || 'inactive'}"
-        class="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${isActive ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-700'}"
+        class="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${isActive ? 'bg-primary text-primary-foreground border-primary/40 hover:bg-primary/90' : 'bg-background text-muted-foreground border-line hover:bg-muted '}"
       >
         <span class="material-symbols-outlined text-[16px]">${isActive ? 'toggle_on' : 'toggle_off'}</span>
         ${policy.action}
@@ -166,11 +166,11 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
   emptyStateHTML() {
     return `
       <div class="p-12 text-center">
-        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-          <span class="material-symbols-outlined text-2xl text-slate-400">shield</span>
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+          <span class="material-symbols-outlined text-2xl text-muted-foreground">shield</span>
         </div>
-        <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">${translate("No Roles Found")}</h3>
-        <p class="text-sm text-slate-500">${translate("Create roles first to manage permissions")}</p>
+        <h3 class="text-lg font-medium text-foreground mb-2">${translate("No Roles Found")}</h3>
+        <p class="text-sm text-muted-foreground">${translate("Create roles first to manage permissions")}</p>
       </div>
     `
   }

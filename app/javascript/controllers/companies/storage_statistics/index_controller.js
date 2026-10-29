@@ -1,5 +1,6 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import ApexCharts from "apexcharts"
+import { chartPalette } from "controllers/helpers/chart_colors"
 
 // Storage Statistics overview — company-wide usage totals with two
 // ApexCharts donuts (size and file count per type) plus a breakdown table.
@@ -12,7 +13,6 @@ export default class Companies_StorageStatistics_IndexController extends Compani
   static targets = ["sizeChart", "countChart"]
 
   TYPE_LABELS = { image: "Image", pdf: "PDF", office: "Office", text: "Text", archive: "Archive" }
-  CHART_COLORS = ["#4F46E5", "#22C55E", "#F59E0B", "#EF4444", "#06B6D4"]
 
   /** @type {StorageStatistics} */ stats = { total_size: 0, total_files: 0, total_folders: 0, by_type: [] }
   /** @type {ApexCharts[]} */ charts = []
@@ -57,7 +57,7 @@ export default class Companies_StorageStatistics_IndexController extends Compani
 
     return `
       <div class="p-4 md:p-6 flex-1">
-        <h1 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Storage Statistics")}</h1>
+        <h1 class="text-2xl font-black text-foreground mb-6">${translate("Storage Statistics")}</h1>
 
         <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           ${this.statCard("total_size", translate("Total Used"), this.humanSize(s.total_size), "hard_drive")}
@@ -74,12 +74,12 @@ export default class Companies_StorageStatistics_IndexController extends Compani
 
   statCard(key, label, value, icon) {
     return `
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
+      <div class="bg-card rounded-xl border border-line p-5">
         <div class="flex items-center gap-2 mb-2">
-          <span class="material-symbols-outlined text-[18px] text-slate-400 dark:text-slate-500">${icon}</span>
-          <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${label}</span>
+          <span class="material-symbols-outlined text-[18px] text-muted-foreground">${icon}</span>
+          <span class="text-[10px] font-bold text-muted-foreground uppercase">${label}</span>
         </div>
-        <p class="text-2xl font-black text-slate-900 dark:text-white" data-statistic="${key}">${value}</p>
+        <p class="text-2xl font-black text-foreground" data-statistic="${key}">${value}</p>
       </div>
     `
   }
@@ -87,12 +87,12 @@ export default class Companies_StorageStatistics_IndexController extends Compani
   chartsHTML() {
     return `
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-4">${translate("Storage by Type")}</h2>
+        <div class="bg-card rounded-xl border border-line p-5">
+          <h2 class="text-lg font-bold text-foreground mb-4">${translate("Storage by Type")}</h2>
           <div data-chart-container="size" data-${this.identifier}-target="sizeChart" class="h-72"></div>
         </div>
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-4">${translate("Files by Type")}</h2>
+        <div class="bg-card rounded-xl border border-line p-5">
+          <h2 class="text-lg font-bold text-foreground mb-4">${translate("Files by Type")}</h2>
           <div data-chart-container="count" data-${this.identifier}-target="countChart" class="h-72"></div>
         </div>
       </div>
@@ -101,9 +101,9 @@ export default class Companies_StorageStatistics_IndexController extends Compani
 
   emptyHTML() {
     return `
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-10 mb-6 flex flex-col items-center gap-2">
-        <span class="material-symbols-outlined text-[40px] text-slate-300 dark:text-slate-600">folder_open</span>
-        <p class="text-sm text-slate-400 dark:text-slate-500">${translate("No files yet")}</p>
+      <div class="bg-card rounded-xl border border-line p-10 mb-6 flex flex-col items-center gap-2">
+        <span class="material-symbols-outlined text-[40px] text-muted-foreground/60">folder_open</span>
+        <p class="text-sm text-muted-foreground">${translate("No files yet")}</p>
       </div>
     `
   }
@@ -112,11 +112,11 @@ export default class Companies_StorageStatistics_IndexController extends Compani
     const s = this.stats
 
     return `
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-4">${translate("Breakdown by Type")}</h2>
+      <div class="bg-card rounded-xl border border-line p-5">
+        <h2 class="text-lg font-bold text-foreground mb-4">${translate("Breakdown by Type")}</h2>
         <table class="w-full text-sm">
           <thead>
-            <tr class="text-left text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase border-b border-slate-200 dark:border-slate-700">
+            <tr class="text-left text-[10px] font-bold text-muted-foreground uppercase border-b border-line">
               <th class="py-2 font-bold">${translate("Type")}</th>
               <th class="py-2 font-bold">${translate("Files")}</th>
               <th class="py-2 font-bold">${translate("Size")}</th>
@@ -135,11 +135,11 @@ export default class Companies_StorageStatistics_IndexController extends Compani
     const share = totalSize > 0 ? ((bucket.size / totalSize) * 100).toFixed(1) : "0.0"
 
     return `
-      <tr data-statistic-type="${bucket.type}" class="border-b border-slate-100 dark:border-slate-800 last:border-0">
-        <td class="py-2.5 text-slate-700 dark:text-slate-300">${this.typeLabel(bucket.type)}</td>
-        <td class="py-2.5 text-slate-700 dark:text-slate-300" data-statistic-count>${bucket.count}</td>
-        <td class="py-2.5 text-slate-700 dark:text-slate-300" data-statistic-size>${this.humanSize(bucket.size)}</td>
-        <td class="py-2.5 text-slate-500 dark:text-slate-400">${share}%</td>
+      <tr data-statistic-type="${bucket.type}" class="border-b border-line last:border-0">
+        <td class="py-2.5 text-foreground">${this.typeLabel(bucket.type)}</td>
+        <td class="py-2.5 text-foreground" data-statistic-count>${bucket.count}</td>
+        <td class="py-2.5 text-foreground" data-statistic-size>${this.humanSize(bucket.size)}</td>
+        <td class="py-2.5 text-muted-foreground">${share}%</td>
       </tr>
     `
   }
@@ -161,7 +161,7 @@ export default class Companies_StorageStatistics_IndexController extends Compani
       chart: { type: "donut", height: 280, toolbar: { show: false } },
       series,
       labels,
-      colors: this.CHART_COLORS,
+      colors: chartPalette(5),
       legend: { position: "bottom", fontSize: "12px" },
       dataLabels: { enabled: false },
       ...extraOptions

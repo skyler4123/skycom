@@ -32,13 +32,13 @@ export default class Companies_AttendanceDays_ShowController extends Companies_L
 
   statusBadge(status) {
     const colors = {
-      present: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-      half_day: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
-      late: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-      absent: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300',
-      missing_checkout: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+      present: 'bg-success/10 text-success ',
+      half_day: 'bg-warning/10 text-warning ',
+      late: 'bg-danger/10 text-danger ',
+      absent: 'bg-muted text-foreground ',
+      missing_checkout: 'bg-warning/10 text-warning '
     }
-    const color = colors[status] || 'bg-gray-100 text-gray-800'
+    const color = colors[status] || 'bg-muted text-foreground'
     return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}">${Helpers.capitalize(status?.replace('_', ' ') || '')}</span>`
   }
 
@@ -48,36 +48,36 @@ export default class Companies_AttendanceDays_ShowController extends Companies_L
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div class="p-6 bg-card rounded-xl border border-line">
           <a href="${Helpers.company_attendance_days_path(currentCompany().id)}"
-            class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6 cursor-pointer">
+            class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back")}
           </a>
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Attendance Day")}</h2>
+          <h2 class="text-2xl font-black text-foreground mb-6">${translate("Attendance Day")}</h2>
           <div class="grid grid-cols-2 gap-6">
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Employee")}</p>
-              <p class="text-sm font-semibold text-slate-900">${d.employee?.name || '—'}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Employee")}</p>
+              <p class="text-sm font-semibold text-foreground">${d.employee?.name || '—'}</p>
             </div>
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Date")}</p>
-              <p class="text-sm font-semibold text-slate-900">${this.formatDate(d.attendance_date)}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Date")}</p>
+              <p class="text-sm font-semibold text-foreground">${this.formatDate(d.attendance_date)}</p>
             </div>
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Check In")}</p>
-              <p class="text-sm font-semibold text-slate-900">${this.formatTime(d.check_in)}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Check In")}</p>
+              <p class="text-sm font-semibold text-foreground">${this.formatTime(d.check_in)}</p>
             </div>
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Check Out")}</p>
-              <p class="text-sm font-semibold text-slate-900">${this.formatTime(d.check_out)}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Check Out")}</p>
+              <p class="text-sm font-semibold text-foreground">${this.formatTime(d.check_out)}</p>
             </div>
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Worked")}</p>
-              <p class="text-sm font-semibold text-slate-900">${Math.round((d.total_seconds_worked || 0) / 60)}min</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Worked")}</p>
+              <p class="text-sm font-semibold text-foreground">${Math.round((d.total_seconds_worked || 0) / 60)}min</p>
             </div>
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Status")}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Status")}</p>
               <p class="text-sm font-semibold">${this.statusBadge(d.attendance_status)}</p>
             </div>
           </div>

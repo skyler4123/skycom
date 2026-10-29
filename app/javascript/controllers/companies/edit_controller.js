@@ -25,7 +25,7 @@ export default class Companies_EditController extends Companies_LayoutController
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load company.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load company.")}</div>`
           return true
         }
         return false
@@ -63,43 +63,43 @@ export default class Companies_EditController extends Companies_LayoutController
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Company")}</h2>
+        <h2 class="text-xl font-bold text-foreground">${translate("Edit Company")}</h2>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Name")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Name")}</label>
             <input type="text" name="company[name]" value="${c.name || ""}" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Description")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Description")}</label>
             <textarea name="company[description]" rows="3"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">${c.description || ""}</textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">${c.description || ""}</textarea>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Email")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Email")}</label>
             <input type="email" name="company[email]" value="${c.email || ""}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Phone")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Phone")}</label>
             <input type="tel" name="company[phone_number]" value="${c.phone_number || ""}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Website")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Website")}</label>
             <input type="url" name="company[website]" value="${c.website || ""}" placeholder="https://"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Timezone")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Timezone")}</label>
             <select name="company[timezone]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
               ${timezones.map(t => `
                 <option value="${t.value}" ${c.timezone === t.value ? "selected" : ""}>${t.name}</option>
               `).join("")}
@@ -107,9 +107,9 @@ export default class Companies_EditController extends Companies_LayoutController
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Currency")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Currency")}</label>
             <select name="company[currency]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
               ${currencies.map(cur => `
                 <option value="${cur.value}" ${c.currency === cur.value ? "selected" : ""}>${cur.name}</option>
               `).join("")}
@@ -119,11 +119,11 @@ export default class Companies_EditController extends Companies_LayoutController
 
         <div class="flex justify-end gap-3 pt-2">
           <a href="${Helpers.company_path(id)}"
-            class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
+            class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg cursor-pointer">
             ${translate("Cancel")}
           </a>
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer">
             ${translate("Save Changes")}
           </button>
         </div>
@@ -135,7 +135,7 @@ export default class Companies_EditController extends Companies_LayoutController
         ${form({
           action: Helpers.company_path(id),
           method: "PATCH",
-          attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 mx-auto" data-turbo="false" novalidate`,
+          attributes: `class="p-6 bg-card rounded-xl border border-line mx-auto" data-turbo="false" novalidate`,
           html: fields
         })}
       </div>

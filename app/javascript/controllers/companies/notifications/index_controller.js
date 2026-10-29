@@ -70,20 +70,20 @@ export default class Companies_Notifications_IndexController extends Companies_L
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
+        <div class="p-4 bg-card rounded-xl border border-line flex flex-col">
 
           <div class="flex items-center justify-between gap-4 mb-6">
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white">${translate("Notifications")}</h2>
+            <h2 class="text-lg font-bold text-foreground">${translate("Notifications")}</h2>
             <div class="flex items-center gap-2">
               <a href="${Helpers.company_notification_config_path(currentCompany().id)}"
-                class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer">
+                class="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg transition-colors cursor-pointer">
                 <span class="material-symbols-outlined text-[20px]">settings</span>
                 ${translate("Preferences")}
               </a>
               <button
                 type="button"
                 data-action="click->${this.identifier}#markAllAsRead"
-                class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm whitespace-nowrap cursor-pointer"
+                class="flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors font-medium text-sm whitespace-nowrap cursor-pointer"
               >
                 <span class="material-symbols-outlined text-[20px]">done_all</span>
                 ${translate("Mark all as read")}
@@ -100,15 +100,15 @@ export default class Companies_Notifications_IndexController extends Companies_L
               renderers: {
                 name: (value, record) => `
                   <a href="${Helpers.company_notification_path(currentCompany().id, record.id)}"
-                    class="font-medium ${record.read ? "text-slate-500 dark:text-slate-400" : "text-slate-900 dark:text-white"} hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                    class="font-medium ${record.read ? "text-muted-foreground" : "text-foreground"} hover:text-primary transition-colors cursor-pointer">
                     ${value || translate("Untitled notification")}
                   </a>`,
                 severity: (value) => `${Helpers.statusBadge(value || "info")}`,
-                tags: (value) => `${(value || []).map((t) => `<span class="inline-block font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium mr-1">${t.name}</span>`).join("") || '<span class="text-slate-300 dark:text-slate-700">—</span>'}`,
-                created_at: (value) => `<span class="text-xs text-slate-500 dark:text-slate-400">${value ? new Date(value).toLocaleString() : "—"}</span>`,
+                tags: (value) => `${(value || []).map((t) => `<span class="inline-block font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium mr-1">${t.name}</span>`).join("") || '<span class="text-muted-foreground/60">—</span>'}`,
+                created_at: (value) => `<span class="text-xs text-muted-foreground">${value ? new Date(value).toLocaleString() : "—"}</span>`,
                 read: (value, record) => value
-                  ? `<span class="text-xs text-slate-400 dark:text-slate-500">${translate("Read")}</span>`
-                  : `<button type="button" data-action="click->${this.identifier}#markAsRead" data-${this.identifier}-notification-id-param="${record.id}" class="px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer">${translate("Mark as read")}</button>`
+                  ? `<span class="text-xs text-muted-foreground">${translate("Read")}</span>`
+                  : `<button type="button" data-action="click->${this.identifier}#markAsRead" data-${this.identifier}-notification-id-param="${record.id}" class="px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 rounded-lg cursor-pointer">${translate("Mark as read")}</button>`
               }
             })}
           </div>

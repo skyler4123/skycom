@@ -30,7 +30,7 @@ export default class Companies_StockPendings_EditController extends Companies_La
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load stock pending.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load stock pending.")}</div>`
           return true
         }
         return false
@@ -69,14 +69,14 @@ export default class Companies_StockPendings_EditController extends Companies_La
     if (!doc) return `<div class="p-8 text-center">${translate("Stock Pending")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const inputClass = "w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-    const labelClass = "text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider"
+    const inputClass = "w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none"
+    const labelClass = "text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
 
     return `
       <div class="p-4 overflow-y-auto">
-        <form data-action="submit->${this.identifier}#handleSubmit" class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 space-y-6">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Stock Pending")}</h2>
-          <p class="text-sm text-slate-500 dark:text-slate-400">${doc.product_name || ""} · ${translate("Quantity")}: ${Number(doc.quantity || 0).toLocaleString()}</p>
+        <form data-action="submit->${this.identifier}#handleSubmit" class="p-6 bg-card rounded-xl border border-line space-y-6">
+          <h2 class="text-xl font-bold text-foreground">${translate("Edit Stock Pending")}</h2>
+          <p class="text-sm text-muted-foreground">${doc.product_name || ""} · ${translate("Quantity")}: ${Number(doc.quantity || 0).toLocaleString()}</p>
 
           <div class="grid grid-cols-1 gap-4">
             <div class="space-y-1">
@@ -90,8 +90,8 @@ export default class Companies_StockPendings_EditController extends Companies_La
           </div>
 
           <div class="flex justify-end gap-3 pt-2">
-            <a href="${Helpers.company_stock_pending_path(companyId, doc.id)}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">${translate("Cancel")}</a>
-            <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">${translate("Save Changes")}</button>
+            <a href="${Helpers.company_stock_pending_path(companyId, doc.id)}" class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg cursor-pointer">${translate("Cancel")}</a>
+            <button type="submit" class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer">${translate("Save Changes")}</button>
           </div>
         </form>
       </div>`

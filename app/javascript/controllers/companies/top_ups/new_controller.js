@@ -59,7 +59,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
 
   tierCardsHTML() {
     if (this.topUpOptions.length === 0) {
-      return `<p class="text-sm text-slate-500">${translate("No top-up options available")}</p>`
+      return `<p class="text-sm text-muted-foreground">${translate("No top-up options available")}</p>`
     }
 
     return this.topUpOptions.map(t => {
@@ -68,14 +68,14 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
         <div
           data-action="click->${this.identifier}#selectTier"
           data-${this.identifier}-money-cents-param="${t.money_amount_cents}"
-          class="relative flex flex-col items-center gap-1 p-5 rounded-xl border-2 cursor-pointer transition-all bg-white dark:bg-slate-900
+          class="relative flex flex-col items-center gap-1 p-5 rounded-xl border-2 cursor-pointer transition-all bg-card
             ${selected
-              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400"
-              : "border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600"}"
+              ? "border-primary/40 bg-primary/10 "
+              : "border-line hover:border-primary/30 "}"
         >
-          <span class="text-lg font-black text-slate-900 dark:text-white">${this.formatCents(t.money_amount_cents)}</span>
-          <span class="text-xs font-medium text-slate-500 dark:text-slate-400">${this.formatCredits(t.credit_amount)} ${translate("Credits")}</span>
-          ${selected ? `<span class="absolute top-2 right-2 material-symbols-outlined text-blue-600 dark:text-blue-400 text-[20px]">check_circle</span>` : ""}
+          <span class="text-lg font-black text-foreground">${this.formatCents(t.money_amount_cents)}</span>
+          <span class="text-xs font-medium text-muted-foreground">${this.formatCredits(t.credit_amount)} ${translate("Credits")}</span>
+          ${selected ? `<span class="absolute top-2 right-2 material-symbols-outlined text-primary text-[20px]">check_circle</span>` : ""}
         </div>
       `
     }).join("")
@@ -92,19 +92,19 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
     document.querySelectorAll(".payment-method-card").forEach(card => {
       const isSelected = card.getAttribute("data-method-id") === methodId
       card.classList.remove(
-        "border-blue-500", "bg-blue-50", "dark:bg-blue-900/20", "dark:border-blue-400",
-        "border-slate-200", "dark:border-slate-700", "bg-white", "dark:bg-slate-900"
+        "border-primary/40", "bg-primary/10",
+        "border-line", "bg-card"
       )
       if (isSelected) {
-        card.classList.add("border-blue-500", "bg-blue-50", "dark:bg-blue-900/20", "dark:border-blue-400")
+        card.classList.add("border-primary/40", "bg-primary/10")
       } else {
-        card.classList.add("border-slate-200", "dark:border-slate-700", "bg-white", "dark:bg-slate-900")
+        card.classList.add("border-line", "bg-card")
       }
 
       const checkEl = card.querySelector(".selected-check")
       if (isSelected && !checkEl) {
         card.insertAdjacentHTML("beforeend",
-          `<span class="selected-check material-symbols-outlined text-blue-600 dark:text-blue-400 text-[20px]">check_circle</span>`
+          `<span class="selected-check material-symbols-outlined text-primary text-[20px]">check_circle</span>`
         )
       } else if (!isSelected && checkEl) {
         checkEl.remove()
@@ -131,37 +131,37 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
             <div ${clickAttr}
               data-method-id="${m.id}"
               class="payment-method-card relative flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all
-                border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900
-                ${!possible ? "opacity-50 cursor-not-allowed" : "hover:border-blue-300 dark:hover:border-blue-600"}">
-              <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
+                border-line bg-card
+                ${!possible ? "opacity-50 cursor-not-allowed" : "hover:border-primary/30 "}">
+              <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-muted text-muted-foreground shrink-0">
                 <span class="material-symbols-outlined text-[22px]">${icon}</span>
               </div>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-sm font-semibold text-slate-900 dark:text-white">${m.name}</span>
-                  ${!possible ? `<span class="text-[10px] font-bold text-slate-400 uppercase">${translate("Not available")}</span>` : ""}
+                  <span class="text-sm font-semibold text-foreground">${m.name}</span>
+                  ${!possible ? `<span class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Not available")}</span>` : ""}
                 </div>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${m.code || ""}</p>
+                <p class="text-xs text-muted-foreground mt-0.5">${m.code || ""}</p>
               </div>
             </div>
           `
         }).join("")
-      : `<p class="text-sm text-slate-500">${translate("No payment methods available")}</p>`
+      : `<p class="text-sm text-muted-foreground">${translate("No payment methods available")}</p>`
 
     return `
       <div class="p-4 md:p-6 overflow-y-auto">
-        <div class="mx-auto p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div class="mx-auto p-6 bg-card rounded-xl border border-line">
           <a href="${Helpers.company_billing_path(cid)}"
-            class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6 cursor-pointer">
+            class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back to Billing")}
           </a>
 
           <div class="space-y-8" id="top-up-form">
             <div class="space-y-3">
-              <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Top Up")}</h2>
+              <h2 class="text-xl font-bold text-foreground">${translate("Top Up")}</h2>
               <div class="space-y-2">
-                <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Top Up Options")}</label>
+                <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Top Up Options")}</label>
                 <div data-${this.identifier}-target="tierList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   ${this.tierCardsHTML()}
                 </div>
@@ -169,13 +169,13 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
             </div>
 
             <div class="space-y-3">
-              <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Payment Method")}</label>
+              <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Payment Method")}</label>
               <div class="space-y-2">${methodCards}</div>
             </div>
 
             <button type="button"
               data-action="click->${this.identifier}#handleSubmit"
-              class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
+              class="w-full px-4 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm transition-colors cursor-pointer">
               ${translate("Confirm Top Up")}
             </button>
           </div>
@@ -232,18 +232,18 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
 
     formEl.innerHTML = `
       <div class="space-y-6 text-center">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Scan to Pay")}</h2>
-        <p class="text-sm text-slate-500">${translate("Scan the QR code with your banking app to complete the top-up.")}</p>
-        <p class="text-lg font-black text-slate-900 dark:text-white">${this.formatCents(amountCents)}</p>
+        <h2 class="text-xl font-bold text-foreground">${translate("Scan to Pay")}</h2>
+        <p class="text-sm text-muted-foreground">${translate("Scan the QR code with your banking app to complete the top-up.")}</p>
+        <p class="text-lg font-black text-foreground">${this.formatCents(amountCents)}</p>
         <div class="flex justify-center">
-          <div class="w-64 h-64 bg-white rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center justify-center" id="qr-container"></div>
+          <div class="w-64 h-64 bg-card rounded-xl p-4 border border-line flex items-center justify-center" id="qr-container"></div>
         </div>
-        <div class="flex items-center justify-center gap-2 text-sm text-amber-600">
+        <div class="flex items-center justify-center gap-2 text-sm text-warning">
           <span class="material-symbols-outlined text-[18px]! animate-pulse">hourglass_top</span>
           ${translate("Waiting for payment confirmation...")}
         </div>
         <button type="button" data-action="click->${this.identifier}#cancelWait"
-          class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
+          class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg cursor-pointer">
           ${translate("Cancel")}
         </button>
       </div>

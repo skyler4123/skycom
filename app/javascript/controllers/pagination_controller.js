@@ -27,7 +27,7 @@ export default class PaginationController extends Controller {
           <div class="flex items-center gap-1 mx-2">
             ${this.generatePageRange(p).map(n => {
               if (n === '...') {
-                return `<span class="px-2 text-slate-400">...</span>`
+                return `<span class="px-2 text-muted-foreground">...</span>`
               }
               return this.numberLinkHTML(n, n === p.page)
             }).join('')}
@@ -62,8 +62,8 @@ export default class PaginationController extends Controller {
     const template = (this.dataValue.url_template || "").replace(".json", "")
     const url = template.replace('P', number)
     const baseClass = "px-3 py-1 text-sm font-medium rounded-lg transition-colors border"
-    const activeClass = "bg-blue-600 border-blue-600 text-white pointer-events-none"
-    const inactiveClass = "text-slate-600 border-slate-200 hover:bg-slate-50 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-800"
+    const activeClass = "bg-primary border-primary/40 text-primary-foreground pointer-events-none"
+    const inactiveClass = "text-muted-foreground border-line hover:bg-background "
 
     return `
       <a href="${url}" class="${baseClass} ${isCurrent ? activeClass : inactiveClass}">
@@ -76,8 +76,8 @@ export default class PaginationController extends Controller {
     const template = (this.dataValue.url_template || "").replace(".json", "")
     const url = template.replace('P', page)
     const baseClass = "flex items-center gap-1 px-2 py-1 text-sm border rounded-lg transition-colors font-medium"
-    const disabledClass = "text-slate-300 border-slate-100 cursor-not-allowed pointer-events-none dark:border-slate-800 dark:text-slate-700"
-    const enabledClass = "text-slate-600 border-slate-200 hover:bg-slate-50 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-800"
+    const disabledClass = "text-muted-foreground/60 border-line cursor-not-allowed pointer-events-none "
+    const enabledClass = "text-muted-foreground border-line hover:bg-background "
 
     return `
       <a href="${enabled ? url : '#'}" class="${baseClass} ${enabled ? enabledClass : disabledClass}">

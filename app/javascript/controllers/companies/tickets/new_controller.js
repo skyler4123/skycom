@@ -57,7 +57,7 @@ export default class Companies_Tickets_NewController extends Companies_LayoutCon
   }
 
   renderField({ key, name, type }) {
-    const baseClass = 'w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500'
+    const baseClass = 'w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground'
 
     switch (type) {
       case 'boolean':
@@ -65,26 +65,26 @@ export default class Companies_Tickets_NewController extends Companies_LayoutCon
           <div class="flex items-center gap-3 py-2">
             <input type="hidden" name="ticket[${key}]" value="false">
             <input type="checkbox" name="ticket[${key}]" value="true"
-              class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer">
-            <span class="text-sm text-slate-900 dark:text-white">${name}</span>
+              class="h-5 w-5 rounded border-line text-primary cursor-pointer">
+            <span class="text-sm text-foreground">${name}</span>
           </div>`
       case 'integer':
       case 'decimal':
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${name}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${name}</label>
             <input type="number" name="ticket[${key}]" step="${type === 'decimal' ? '0.01' : '1'}" placeholder="${name}" class="${baseClass}">
           </div>`
       case 'datetime':
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${name}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${name}</label>
             <input type="datetime-local" name="ticket[${key}]" class="${baseClass}">
           </div>`
       default:
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${name}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${name}</label>
             <input type="text" name="ticket[${key}]" placeholder="${name}" class="${baseClass}">
           </div>`
     }
@@ -94,8 +94,8 @@ export default class Companies_Tickets_NewController extends Companies_LayoutCon
     if (this.propertyMetadata.length === 0) return ''
 
     return `
-      <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
+      <div class="border-t border-line pt-6">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-2 gap-4">
           ${this.propertyMetadata.map(f => this.renderField(f)).join('')}
         </div>
@@ -144,7 +144,7 @@ export default class Companies_Tickets_NewController extends Companies_LayoutCon
   }
 
   itemRowHTML(row, index) {
-    const inputClass = 'w-full px-2 py-1.5 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm'
+    const inputClass = 'w-full px-2 py-1.5 border border-line rounded-lg bg-card text-sm'
     return `
       <tr>
         <td class="py-2 px-2">
@@ -159,7 +159,7 @@ export default class Companies_Tickets_NewController extends Companies_LayoutCon
         <td class="py-2 px-2"><input type="number" step="0.01" name="ticket[ticket_ticket_item_appointments_attributes][${index}][unit_price]" value="${row.unit_price}" class="${inputClass}"></td>
         <td class="py-2 px-2 text-right">
           <button type="button" data-action="click->${this.identifier}#removeItemRow" data-${this.identifier}-index-param="${index}"
-            class="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg cursor-pointer">
+            class="p-1.5 text-danger hover:bg-danger/10 rounded-lg cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">delete</span>
           </button>
         </td>
@@ -172,17 +172,17 @@ export default class Companies_Tickets_NewController extends Companies_LayoutCon
 
   itemsSectionHTML() {
     return `
-      <div class="border-t border-slate-200 dark:border-slate-700 pt-6 mt-6">
+      <div class="border-t border-line pt-6 mt-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${translate("Items")}</h3>
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider">${translate("Items")}</h3>
           <button type="button" data-action="click->${this.identifier}#addItemRow"
-            class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium cursor-pointer">
+            class="inline-flex items-center gap-2 px-3 py-1.5 bg-muted text-foreground rounded-lg text-sm font-medium cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">add</span>${translate("Add Item")}
           </button>
         </div>
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="text-xs text-slate-500 border-b border-slate-200 dark:border-slate-700">
+            <tr class="text-xs text-muted-foreground border-b border-line">
               <th class="py-2 px-2 font-medium">${translate("Item")}</th>
               <th class="py-2 px-2 font-medium">${translate("Quantity")}</th>
               <th class="py-2 px-2 font-medium">${translate("Unit Price")}</th>
@@ -205,57 +205,57 @@ export default class Companies_Tickets_NewController extends Companies_LayoutCon
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Ticket")}</h2>
+        <h2 class="text-xl font-bold text-foreground">${translate("New Ticket")}</h2>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Category")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
             <select name="ticket[category_id]" data-action="change->${this.identifier}#onCategoryChange"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), this.categoryId)}
             </select>
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Name")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Name")}</label>
             <input type="text" name="ticket[name]" required placeholder="${translate("e.g. Office supplies restock")}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Type")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Type")}</label>
             <select name="ticket[business_type]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground">
               ${businessTypes.map(t => `<option value="${t.value}">${t.name}</option>`).join('')}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Currency")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Currency")}</label>
             <select name="ticket[currency]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground">
               ${currencies.map(c => `<option value="${c.value}">${c.name}</option>`).join('')}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Needed By")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Needed By")}</label>
             <input type="datetime-local" name="ticket[needed_by]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Supplier")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Supplier")}</label>
             <select name="ticket[supplier_id]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground">
               ${this.supplierOptions()}
             </select>
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Description")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Description")}</label>
             <textarea name="ticket[description]" rows="3"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground"></textarea>
           </div>
         </div>
 
@@ -265,9 +265,9 @@ export default class Companies_Tickets_NewController extends Companies_LayoutCon
           ${this.dynamicFieldsHTML()}
         </div>
 
-        <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
+        <div class="flex justify-end pt-6 border-t border-line">
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm transition-colors cursor-pointer">
             ${translate("Save Ticket")}
           </button>
         </div>
@@ -279,7 +279,7 @@ export default class Companies_Tickets_NewController extends Companies_LayoutCon
           ${form({
             action: Helpers.create_company_tickets_path(currentCompany().id),
             method: "POST",
-            attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false"`,
+            attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false"`,
             html: fields
           })}
         </div>

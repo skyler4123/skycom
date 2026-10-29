@@ -24,7 +24,7 @@ export default class Companies_Pages_EditController extends Companies_LayoutCont
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load page.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load page.")}</div>`
           return true
         }
         return false
@@ -63,20 +63,20 @@ export default class Companies_Pages_EditController extends Companies_LayoutCont
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Page")}</h2>
-        <p class="text-sm text-slate-500">${p.name}</p>
+        <h2 class="text-xl font-bold text-foreground">${translate("Edit Page")}</h2>
+        <p class="text-sm text-muted-foreground">${p.name}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Name")}</label>
+            <label class="text-xs font-medium text-muted-foreground">${translate("Name")}</label>
             <input type="text" name="page[name]" value="${p.name || ''}" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Branch")}</label>
+            <label class="text-xs font-medium text-muted-foreground">${translate("Branch")}</label>
             <select name="page[branch_id]" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               <option value="">${translate("Select Branch")}</option>
               ${branches.map(b =>
                 `<option value="${b.id}" ${b.id === p.branch?.id ? 'selected' : ''}>${b.name}</option>`
@@ -85,48 +85,48 @@ export default class Companies_Pages_EditController extends Companies_LayoutCont
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Business Type")}</label>
+            <label class="text-xs font-medium text-muted-foreground">${translate("Business Type")}</label>
             <select name="page[business_type]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${selectOptionsHTML(businessTypes, p.business_type || 'retail')}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Code")}</label>
+            <label class="text-xs font-medium text-muted-foreground">${translate("Code")}</label>
             <input type="text" value="${p.code || ''}" disabled
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-sm text-slate-400">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-background text-sm text-muted-foreground">
             <input type="hidden" name="page[code]" value="${p.code || ''}">
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Target Role")}</label>
+            <label class="text-xs font-medium text-muted-foreground">${translate("Target Role")}</label>
             <select name="page[target_role]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${selectOptionsHTML(targetRoles, p.target_role)}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Target Resolution")}</label>
+            <label class="text-xs font-medium text-muted-foreground">${translate("Target Resolution")}</label>
             <select name="page[target_resolution]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${selectOptionsHTML(targetResolutions, p.target_resolution)}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Status")}</label>
+            <label class="text-xs font-medium text-muted-foreground">${translate("Status")}</label>
             <select name="page[workflow_status]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${selectOptionsHTML(workflowStatuses, p.workflow_status)}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Lifecycle")}</label>
+            <label class="text-xs font-medium text-muted-foreground">${translate("Lifecycle")}</label>
             <select name="page[lifecycle_status]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               <option value="active" ${p.lifecycle_status === 'active' ? 'selected' : ''}>${translate("Active")}</option>
               <option value="draft" ${p.lifecycle_status === 'draft' ? 'selected' : ''}>${translate("Draft")}</option>
               <option value="archived" ${p.lifecycle_status === 'archived' ? 'selected' : ''}>${translate("Archived")}</option>
@@ -134,25 +134,25 @@ export default class Companies_Pages_EditController extends Companies_LayoutCont
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Description")}</label>
+            <label class="text-xs font-medium text-muted-foreground">${translate("Description")}</label>
             <textarea name="page[description]" rows="2"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">${p.description || ''}</textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">${p.description || ''}</textarea>
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Layout Manifest (JSON)")}</label>
+            <label class="text-xs font-medium text-muted-foreground">${translate("Layout Manifest (JSON)")}</label>
             <textarea name="page[metadata][layout_manifest]" rows="4"
-              class="w-full px-3 py-2 font-mono text-xs border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">${manifestStr}</textarea>
+              class="w-full px-3 py-2 font-mono text-xs border border-line rounded-lg bg-card text-foreground focus:ring-2 focus:ring-primary outline-none">${manifestStr}</textarea>
           </div>
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
           <a href="${Helpers.company_page_path(companyId, p.id)}"
-            class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
+            class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg cursor-pointer">
             ${translate("Cancel")}
           </a>
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer">
             ${translate("Save Changes")}
           </button>
         </div>
@@ -164,7 +164,7 @@ export default class Companies_Pages_EditController extends Companies_LayoutCont
         ${form({
           action: Helpers.company_page_path(companyId, p.id),
           method: "PATCH",
-          attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false" novalidate`,
+          attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false" novalidate`,
           html: fields
         })}
       </div>

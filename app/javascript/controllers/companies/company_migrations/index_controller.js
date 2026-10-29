@@ -54,17 +54,17 @@ export default class Companies_CompanyMigrations_IndexController extends Compani
   statusBadgeClasses(workflowStatus) {
     switch (workflowStatus) {
       case "completed":
-        return "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+        return "bg-success/10 text-success "
       case "failed":
-        return "bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300"
+        return "bg-danger/10 text-danger "
       case "approved":
       case "processing":
-        return "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+        return "bg-primary/10 text-primary "
       case "rolling_back":
       case "rolled_back":
-        return "bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+        return "bg-primary/10 text-primary "
       default:
-        return "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+        return "bg-muted text-muted-foreground "
     }
   }
 
@@ -86,22 +86,22 @@ export default class Companies_CompanyMigrations_IndexController extends Compani
 
     return `
       <div class="p-4 flex-1 flex flex-col">
-        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex-1">
+        <div class="p-4 bg-card rounded-xl border border-line flex-1">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white">${translate("Data Import")}</h2>
+            <h2 class="text-lg font-bold text-foreground">${translate("Data Import")}</h2>
             <button type="button" data-action="click->${this.identifier}#openNewModal"
-              class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium cursor-pointer">
+              class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm font-medium cursor-pointer">
               <span class="material-symbols-outlined text-[20px]">add</span>
               ${translate("New Import")}
             </button>
           </div>
 
           ${this.migrations.length === 0
-            ? `<p class="mt-6 text-sm text-slate-400 text-center">${translate("No imports yet")}</p>`
+            ? `<p class="mt-6 text-sm text-muted-foreground text-center">${translate("No imports yet")}</p>`
             : `<div class="overflow-x-auto">
                 <table class="w-full text-sm">
                   <thead>
-                    <tr class="text-left text-[10px] font-bold text-slate-400 uppercase border-b border-slate-200 dark:border-slate-800">
+                    <tr class="text-left text-[10px] font-bold text-muted-foreground uppercase border-b border-line">
                       <th class="py-2 pr-4">${translate("Name")}</th>
                       <th class="py-2 pr-4">${translate("Target")}</th>
                       <th class="py-2 pr-4">${translate("Status")}</th>
@@ -112,26 +112,26 @@ export default class Companies_CompanyMigrations_IndexController extends Compani
                   </thead>
                   <tbody>
                     ${this.migrations.map((migration) => `
-                      <tr data-migration-id="${migration.id}" class="border-b border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                      <tr data-migration-id="${migration.id}" class="border-b border-line/60 hover:bg-muted/40">
                         <td class="py-2 pr-4">
                           <a href="${Helpers.company_company_migration_path(companyId, migration.id)}"
-                            class="font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                            class="font-medium text-primary hover:underline">
                             ${escapeHtml(migration.name)}
                           </a>
                         </td>
-                        <td class="py-2 pr-4 text-slate-500">${escapeHtml(migration.target_resource || "—")}</td>
+                        <td class="py-2 pr-4 text-muted-foreground">${escapeHtml(migration.target_resource || "—")}</td>
                         <td class="py-2 pr-4">
                           <span class="px-2 py-0.5 rounded-full text-[11px] font-medium ${this.statusBadgeClasses(migration.workflow_status)}">
                             ${escapeHtml(this.statusLabel(migration.workflow_status))}
                           </span>
                         </td>
-                        <td class="py-2 pr-4 text-slate-500">${migration.processed_rows}/${migration.total_rows}</td>
-                        <td class="py-2 pr-4 text-slate-500">${Helpers.timeFormat(migration.created_at, "YYYY-MM-DD HH:mm")}</td>
+                        <td class="py-2 pr-4 text-muted-foreground">${migration.processed_rows}/${migration.total_rows}</td>
+                        <td class="py-2 pr-4 text-muted-foreground">${Helpers.timeFormat(migration.created_at, "YYYY-MM-DD HH:mm")}</td>
                         <td class="py-2 text-right">
                           ${migration.workflow_status === "draft" ? `
                             <button type="button" title="${translate("Delete")}" aria-label="${translate("Delete")}"
                               data-action="click->${this.identifier}#deleteMigration" data-migration-id="${migration.id}"
-                              class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg cursor-pointer">
+                              class="p-1.5 text-muted-foreground hover:text-danger hover:bg-danger/10 rounded-lg cursor-pointer">
                               <span class="material-symbols-outlined text-[18px]">delete</span>
                               <span class="sr-only">${translate("Delete")}</span>
                             </button>

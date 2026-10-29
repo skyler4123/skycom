@@ -34,19 +34,19 @@ export default class Companies_CompanyMigrations_NewModalController extends Cont
   modalHTML() {
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Import")}</h2>
+        <h2 class="text-xl font-bold text-foreground">${translate("New Import")}</h2>
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Import Name")}</label>
+          <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Import Name")}</label>
           <input type="text" name="company_migration[name]" required placeholder="e.g. Customers 2026-10"
-            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm" />
+            class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm" />
         </div>
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" data-action="click->modal#close"
-            class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
+            class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg cursor-pointer">
             ${translate("Cancel")}
           </button>
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer">
             ${translate("Save Import")}
           </button>
         </div>
@@ -55,7 +55,7 @@ export default class Companies_CompanyMigrations_NewModalController extends Cont
 
     return form({
       attributes: `
-        class="p-8 bg-white dark:bg-slate-900 rounded-2xl w-[500px] shadow-2xl"
+        class="p-8 bg-card rounded-2xl w-[500px] shadow-2xl"
         data-action="submit->${this.identifier}#handleSubmit"
       `,
       html: fields

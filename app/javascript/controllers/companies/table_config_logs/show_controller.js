@@ -26,18 +26,18 @@ export default class Companies_TableConfigLogs_ShowController extends Companies_
 
   actionBadge(action) {
     const colors = {
-      created: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-      updated: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+      created: 'bg-success/10 text-success ',
+      updated: 'bg-primary/10 text-primary '
     }
-    const color = colors[action] || 'bg-gray-100 text-gray-800'
+    const color = colors[action] || 'bg-muted text-foreground'
     return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}">${Helpers.capitalize(action || '')}</span>`
   }
 
   field(label, value) {
     return `
       <div>
-        <p class="text-xs font-medium text-slate-500">${translate(label)}</p>
-        <p class="text-sm font-semibold text-slate-900 dark:text-white">${value ?? '—'}</p>
+        <p class="text-xs font-medium text-muted-foreground">${translate(label)}</p>
+        <p class="text-sm font-semibold text-foreground">${value ?? '—'}</p>
       </div>`
   }
 
@@ -48,16 +48,16 @@ export default class Companies_TableConfigLogs_ShowController extends Companies_
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div class="p-6 bg-card rounded-xl border border-line">
           <a href="${Helpers.company_table_config_logs_path(currentCompany().id)}"
-            class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6 cursor-pointer">
+            class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back")}
           </a>
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Table Config Log")}</h2>
+          <h2 class="text-2xl font-black text-foreground mb-6">${translate("Table Config Log")}</h2>
           <div class="grid grid-cols-2 gap-6 mb-8">
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Action")}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Action")}</p>
               <p class="text-sm font-semibold">${this.actionBadge(l.action)}</p>
             </div>
             ${this.field("Changed By", l.employee?.name)}
@@ -68,11 +68,11 @@ export default class Companies_TableConfigLogs_ShowController extends Companies_
             ${this.field("Resource", l.resource_name)}
             ${this.field("Description", l.description)}
           </div>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">${translate("Columns Snapshot")}</h3>
+          <h3 class="text-lg font-bold text-foreground mb-4">${translate("Columns Snapshot")}</h3>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
-                <tr class="text-sm text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                <tr class="text-sm text-muted-foreground border-b border-line">
                   <th class="py-3 px-4 font-medium">${translate("Key")}</th>
                   <th class="py-3 px-4 font-medium">${translate("Name")}</th>
                   <th class="py-3 px-4 font-medium">${translate("Visible")}</th>
@@ -80,7 +80,7 @@ export default class Companies_TableConfigLogs_ShowController extends Companies_
                   <th class="py-3 px-4 font-medium">${translate("Width")}</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+              <tbody class="divide-y divide-line">
                 ${columns.map(c => `
                   <tr>
                     <td class="py-3 px-4 text-sm font-mono">${c.key || '—'}</td>
@@ -88,7 +88,7 @@ export default class Companies_TableConfigLogs_ShowController extends Companies_
                     <td class="py-3 px-4 text-sm">${c.visible ? translate("True") : translate("False")}</td>
                     <td class="py-3 px-4 text-sm">${c.align || '—'}</td>
                     <td class="py-3 px-4 text-sm">${c.width ?? '—'}</td>
-                  </tr>`).join('') || `<tr><td colspan="5" class="py-3 px-4 text-sm text-slate-500">—</td></tr>`}
+                  </tr>`).join('') || `<tr><td colspan="5" class="py-3 px-4 text-sm text-muted-foreground">—</td></tr>`}
               </tbody>
             </table>
           </div>

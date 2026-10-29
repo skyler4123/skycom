@@ -1,6 +1,163 @@
-<div>
-  <h1 class="font-bold text-4xl">Demo#index</h1>
-  <p>Find me in app/views/demo/index.html.erb</p>
-  <!-- app/views/some_page.html.erb -->
-  <div data-controller="calendar" class="min-h-screen bg-gray-50 py-8"></div>
+<%# Internal palette QA page. Not user-facing: no translations needed.
+    Every swatch/component below uses semantic tokens only. If a token is
+    missing from app/assets/tailwind/application.css, it renders as nothing
+    here first — before it reaches a real screen. %>
+
+<% surfaces = [
+  { name: "background", cls: "bg-background" },
+  { name: "card",       cls: "bg-card" },
+  { name: "muted",      cls: "bg-muted" },
+  { name: "line",       cls: "bg-line" },
+  { name: "overlay",    cls: "bg-overlay" }
+] %>
+
+<% texts = [
+  { name: "foreground",         cls: "text-foreground" },
+  { name: "muted-foreground",   cls: "text-muted-foreground" },
+  { name: "primary",            cls: "text-primary" },
+  { name: "success",            cls: "text-success" },
+  { name: "warning",            cls: "text-warning" },
+  { name: "danger",             cls: "text-danger" },
+  { name: "info",               cls: "text-info" }
+] %>
+
+<% solids = [
+  { name: "primary", cls: "bg-primary text-primary-foreground" },
+  { name: "success", cls: "bg-success text-success-foreground" },
+  { name: "warning", cls: "bg-warning text-warning-foreground" },
+  { name: "danger",  cls: "bg-danger text-danger-foreground" },
+  { name: "info",    cls: "bg-info text-info-foreground" }
+] %>
+
+<div class="min-h-dvh bg-background text-foreground p-4 md:p-8 space-y-8">
+
+  <header class="space-y-1">
+    <h1 class="text-2xl font-bold">Semantic color tokens</h1>
+    <p class="text-sm text-muted-foreground">
+      Light panel uses the page theme. Dark panel forces <code class="text-primary">.dark</code> on its subtree — same markup, no <code class="text-primary">dark:</code> variants.
+    </p>
+  </header>
+
+  <%# ---------------------------------------------------------------- tokens %>
+  <section class="space-y-4">
+    <h2 class="text-lg font-semibold">Surfaces</h2>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <% surfaces.each do |s| %>
+        <div class="rounded-lg border border-line overflow-hidden">
+          <div class="h-16 <%= s[:cls] %>"></div>
+          <div class="px-2 py-1.5 bg-card border-t border-line">
+            <p class="text-xs font-medium text-foreground"><%= s[:name] %></p>
+            <p class="text-[11px] text-muted-foreground"><%= s[:cls] %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="space-y-4">
+    <h2 class="text-lg font-semibold">Text</h2>
+    <div class="rounded-lg border border-line bg-card p-4 space-y-1">
+      <% texts.each do |t| %>
+        <p class="text-sm <%= t[:cls] %>">
+          <span class="font-mono"><%= t[:cls] %></span> — The quick brown fox jumps over the lazy dog.
+        </p>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="space-y-4">
+    <h2 class="text-lg font-semibold">Solid</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <% solids.each do |s| %>
+        <div class="rounded-lg p-3 <%= s[:cls] %>">
+          <p class="text-sm font-semibold"><%= s[:name] %></p>
+          <p class="text-xs opacity-80"><%= s[:cls] %></p>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="space-y-4">
+    <h2 class="text-lg font-semibold">Soft (opacity modifiers)</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <span class="inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium bg-primary/10 text-primary border border-primary/20">bg-primary/10</span>
+      <span class="inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium bg-success/10 text-success border border-success/20">bg-success/10</span>
+      <span class="inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium bg-warning/10 text-warning border border-warning/20">bg-warning/10</span>
+      <span class="inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium bg-danger/10 text-danger border border-danger/20">bg-danger/10</span>
+      <span class="inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium bg-info/10 text-info border border-info/20">bg-info/10</span>
+    </div>
+  </section>
+
+  <%# ------------------------------------------------------------ components %>
+  <section class="space-y-4">
+    <h2 class="text-lg font-semibold">Components — light / dark</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+      <% [false, true].each do |forced_dark| %>
+        <div <%= forced_dark ? "data-palette-dark" : "data-palette-light" %> class="<%= forced_dark ? 'dark' : '' %> rounded-xl border border-line bg-background p-4 space-y-4">
+          <p class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <%= forced_dark ? "Dark" : "Light" %>
+          </p>
+
+          <div class="rounded-lg border border-line bg-card p-4">
+            <h3 class="text-sm font-semibold text-foreground">Card title</h3>
+            <p class="text-xs text-muted-foreground mt-1">Secondary line inside a card.</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button type="button" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer">Primary</button>
+              <button type="button" class="px-3 py-1.5 rounded-lg text-sm font-medium border border-line text-foreground hover:bg-muted cursor-pointer">Outline</button>
+              <button type="button" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-danger text-danger-foreground hover:bg-danger/90 cursor-pointer">Delete</button>
+            </div>
+          </div>
+
+          <div class="rounded-lg border border-line bg-card p-4 space-y-2">
+            <label class="block text-xs font-medium text-foreground" for="demo-input-<%= forced_dark %>">Input</label>
+            <input id="demo-input-<%= forced_dark %>" type="text" placeholder="Placeholder text"
+                   class="w-full rounded-lg border border-line bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40">
+          </div>
+
+          <div class="rounded-lg border border-line overflow-hidden">
+            <table class="w-full text-sm">
+              <thead class="bg-muted">
+                <tr>
+                  <th class="px-3 py-2 text-left text-xs font-semibold text-muted-foreground">Name</th>
+                  <th class="px-3 py-2 text-left text-xs font-semibold text-muted-foreground">Status</th>
+                </tr>
+              </thead>
+              <tbody class="bg-card">
+                <tr class="border-t border-line">
+                  <td class="px-3 py-2 text-foreground">Row one</td>
+                  <td class="px-3 py-2">
+                    <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium bg-success/10 text-success">Active</span>
+                  </td>
+                </tr>
+                <tr class="border-t border-line">
+                  <td class="px-3 py-2 text-foreground">Row two</td>
+                  <td class="px-3 py-2">
+                    <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium bg-warning/10 text-warning">Pending</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex gap-2">
+            <div class="flex-1 rounded-lg bg-success/10 border border-success/30 px-3 py-2 text-xs text-success">Success message</div>
+            <div class="flex-1 rounded-lg bg-danger/10 border border-danger/30 px-3 py-2 text-xs text-danger">Error message</div>
+          </div>
+        </div>
+      <% end %>
+
+    </div>
+  </section>
+
+  <section class="space-y-2">
+    <h2 class="text-lg font-semibold">Overlay</h2>
+    <div class="relative h-32 rounded-xl border border-line bg-card overflow-hidden">
+      <div class="absolute inset-0 bg-overlay"></div>
+      <div class="relative h-full flex items-center justify-center">
+        <span class="text-sm font-medium text-overlay-foreground">text-overlay-foreground on bg-overlay</span>
+      </div>
+    </div>
+  </section>
+
 </div>

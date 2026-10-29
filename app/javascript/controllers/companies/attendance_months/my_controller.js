@@ -37,7 +37,7 @@ export default class Companies_AttendanceMonths_MyController extends Companies_L
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load attendance month.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load attendance month.")}</div>`
           return true
         }
         return false
@@ -63,13 +63,13 @@ export default class Companies_AttendanceMonths_MyController extends Companies_L
 
   statusBadge(status) {
     const colors = {
-      present: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-      half_day: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
-      late: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-      absent: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300',
-      missing_checkout: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+      present: 'bg-success/10 text-success ',
+      half_day: 'bg-warning/10 text-warning ',
+      late: 'bg-danger/10 text-danger ',
+      absent: 'bg-muted text-foreground ',
+      missing_checkout: 'bg-warning/10 text-warning '
     }
-    const color = colors[status] || 'bg-gray-100 text-gray-800'
+    const color = colors[status] || 'bg-muted text-foreground'
     return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}">${Helpers.capitalize(status?.replace('_', ' ') || '')}</span>`
   }
 
@@ -82,16 +82,16 @@ export default class Companies_AttendanceMonths_MyController extends Companies_L
       return `<option value="${String(x.month).slice(0, 7)}" ${selected}>${this.formatDate(String(x.month).slice(0, 10))}</option>`
     }).join('')
     const dropdown = months.length > 0
-      ? `<select onchange="window.location.href='/companies/${cid}/attendance_months/my?month='+this.value" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">${options}</select>`
+      ? `<select onchange="window.location.href='/companies/${cid}/attendance_months/my?month='+this.value" class="w-full px-3 py-2 border border-line rounded-lg bg-card text-foreground text-sm">${options}</select>`
       : ''
 
     if (!m) {
       return `
         <div class="p-4 overflow-y-auto">
-          <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Attendance Month")}</h2>
+          <div class="p-6 bg-card rounded-xl border border-line">
+            <h2 class="text-2xl font-black text-foreground mb-6">${translate("Attendance Month")}</h2>
             ${dropdown}
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-4">${translate("No attendance data for this month.")}</p>
+            <p class="text-sm text-muted-foreground mt-4">${translate("No attendance data for this month.")}</p>
           </div>
         </div>
       `
@@ -99,38 +99,38 @@ export default class Companies_AttendanceMonths_MyController extends Companies_L
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Attendance Month")}</h2>
+        <div class="p-6 bg-card rounded-xl border border-line">
+          <h2 class="text-2xl font-black text-foreground mb-6">${translate("Attendance Month")}</h2>
           ${dropdown}
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-            <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
-              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Employee")}</p>
-              <p class="text-sm font-semibold text-slate-900 dark:text-white">${m.employee?.name || this.employee?.name || '—'}</p>
+            <div class="p-3 border border-line rounded-lg bg-card">
+              <p class="text-xs font-medium text-muted-foreground">${translate("Employee")}</p>
+              <p class="text-sm font-semibold text-foreground">${m.employee?.name || this.employee?.name || '—'}</p>
             </div>
-            <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
-              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Month")}</p>
-              <p class="text-sm font-semibold text-slate-900 dark:text-white">${this.formatDate(m.month)}</p>
+            <div class="p-3 border border-line rounded-lg bg-card">
+              <p class="text-xs font-medium text-muted-foreground">${translate("Month")}</p>
+              <p class="text-sm font-semibold text-foreground">${this.formatDate(m.month)}</p>
             </div>
-            <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
-              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Total Worked")}</p>
-              <p class="text-sm font-semibold text-slate-900 dark:text-white">${m.total_work_minutes || 0} min</p>
+            <div class="p-3 border border-line rounded-lg bg-card">
+              <p class="text-xs font-medium text-muted-foreground">${translate("Total Worked")}</p>
+              <p class="text-sm font-semibold text-foreground">${m.total_work_minutes || 0} min</p>
             </div>
-            <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
-              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Days Present")}</p>
-              <p class="text-sm font-semibold text-slate-900 dark:text-white">${m.total_present_days || 0}</p>
+            <div class="p-3 border border-line rounded-lg bg-card">
+              <p class="text-xs font-medium text-muted-foreground">${translate("Days Present")}</p>
+              <p class="text-sm font-semibold text-foreground">${m.total_present_days || 0}</p>
             </div>
-            <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
-              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Days Absent")}</p>
-              <p class="text-sm font-semibold text-slate-900 dark:text-white">${m.total_absent_days || 0}</p>
+            <div class="p-3 border border-line rounded-lg bg-card">
+              <p class="text-xs font-medium text-muted-foreground">${translate("Days Absent")}</p>
+              <p class="text-sm font-semibold text-foreground">${m.total_absent_days || 0}</p>
             </div>
           </div>
-          <div class="mt-8 border-t border-slate-200 dark:border-slate-700 pt-6">
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">${translate("Daily Breakdown")}</h3>
-            ${this.attendanceDays.length === 0 ? `<p class="text-sm text-slate-500 dark:text-slate-400">${translate("No daily records for this month yet.")}</p>` : `
-              <div class="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-lg">
+          <div class="mt-8 border-t border-line pt-6">
+            <h3 class="text-lg font-bold text-foreground mb-4">${translate("Daily Breakdown")}</h3>
+            ${this.attendanceDays.length === 0 ? `<p class="text-sm text-muted-foreground">${translate("No daily records for this month yet.")}</p>` : `
+              <div class="overflow-x-auto border border-line rounded-lg">
                 <table class="w-full text-left border-collapse">
                   <thead>
-                    <tr class="text-sm text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                    <tr class="text-sm text-muted-foreground border-b border-line">
                       <th class="py-4 px-6 font-medium">${translate("Date")}</th>
                       <th class="py-4 px-6 font-medium">${translate("Check In")}</th>
                       <th class="py-4 px-6 font-medium">${translate("Check Out")}</th>
@@ -138,13 +138,13 @@ export default class Companies_AttendanceMonths_MyController extends Companies_L
                       <th class="py-4 px-6 font-medium">${translate("Status")}</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tbody class="divide-y divide-line">
                     ${this.attendanceDays.map(d => `
-                      <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                        <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${this.formatDayDate(d.attendance_date)}</td>
-                        <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${this.formatTime(d.check_in)}</td>
-                        <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${this.formatTime(d.check_out)}</td>
-                        <td class="py-4 px-6 text-sm text-slate-900 dark:text-white font-medium">${Math.round((d.total_seconds_worked || 0) / 60)}min</td>
+                      <tr class="hover:bg-muted/50">
+                        <td class="py-4 px-6 text-sm text-muted-foreground">${this.formatDayDate(d.attendance_date)}</td>
+                        <td class="py-4 px-6 text-sm text-muted-foreground">${this.formatTime(d.check_in)}</td>
+                        <td class="py-4 px-6 text-sm text-muted-foreground">${this.formatTime(d.check_out)}</td>
+                        <td class="py-4 px-6 text-sm text-foreground font-medium">${Math.round((d.total_seconds_worked || 0) / 60)}min</td>
                         <td class="py-4 px-6 text-sm">${this.statusBadge(d.attendance_status)}</td>
                       </tr>
                     `).join('')}

@@ -26,20 +26,20 @@ export default class Companies_PermissionLogs_ShowController extends Companies_L
 
   actionBadge(action) {
     const colors = {
-      granted: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-      revoked: 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300',
-      conditions_changed: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-      resource_added: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
+      granted: 'bg-success/10 text-success ',
+      revoked: 'bg-danger/10 text-danger ',
+      conditions_changed: 'bg-primary/10 text-primary ',
+      resource_added: 'bg-primary/10 text-primary '
     }
-    const color = colors[action] || 'bg-gray-100 text-gray-800'
+    const color = colors[action] || 'bg-muted text-foreground'
     return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}">${Helpers.capitalize((action || '').replace(/_/g, ' '))}</span>`
   }
 
   field(label, value) {
     return `
       <div>
-        <p class="text-xs font-medium text-slate-500">${translate(label)}</p>
-        <p class="text-sm font-semibold text-slate-900 dark:text-white">${value ?? '—'}</p>
+        <p class="text-xs font-medium text-muted-foreground">${translate(label)}</p>
+        <p class="text-sm font-semibold text-foreground">${value ?? '—'}</p>
       </div>`
   }
 
@@ -56,16 +56,16 @@ export default class Companies_PermissionLogs_ShowController extends Companies_L
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div class="p-6 bg-card rounded-xl border border-line">
           <a href="${Helpers.company_permission_logs_path(currentCompany().id)}"
-            class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6 cursor-pointer">
+            class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back")}
           </a>
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Permission Log")}</h2>
+          <h2 class="text-2xl font-black text-foreground mb-6">${translate("Permission Log")}</h2>
           <div class="grid grid-cols-2 gap-6 mb-8">
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Action")}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Action")}</p>
               <p class="text-sm font-semibold">${this.actionBadge(l.action)}</p>
             </div>
             ${this.field("Changed By", l.employee?.name)}
@@ -77,15 +77,15 @@ export default class Companies_PermissionLogs_ShowController extends Companies_L
             ${this.field("From", this.statusName(l.from_workflow_status))}
             ${this.field("To", this.statusName(l.to_workflow_status))}
           </div>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">${translate("Tag Conditions")}</h3>
+          <h3 class="text-lg font-bold text-foreground mb-4">${translate("Tag Conditions")}</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-              <p class="text-xs font-bold text-slate-400 uppercase mb-2">${translate("Before")}</p>
-              <pre class="text-xs font-mono text-slate-700 dark:text-slate-200 whitespace-pre-wrap">${before ? JSON.stringify(before, null, 2) : '—'}</pre>
+            <div class="p-4 rounded-lg bg-muted/60 border border-line">
+              <p class="text-xs font-bold text-muted-foreground uppercase mb-2">${translate("Before")}</p>
+              <pre class="text-xs font-mono text-foreground whitespace-pre-wrap">${before ? JSON.stringify(before, null, 2) : '—'}</pre>
             </div>
-            <div class="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
-              <p class="text-xs font-bold text-slate-400 uppercase mb-2">${translate("After")}</p>
-              <pre class="text-xs font-mono text-slate-700 dark:text-slate-200 whitespace-pre-wrap">${after ? JSON.stringify(after, null, 2) : '—'}</pre>
+            <div class="p-4 rounded-lg bg-muted/60 border border-line">
+              <p class="text-xs font-bold text-muted-foreground uppercase mb-2">${translate("After")}</p>
+              <pre class="text-xs font-mono text-foreground whitespace-pre-wrap">${after ? JSON.stringify(after, null, 2) : '—'}</pre>
             </div>
           </div>
         </div>

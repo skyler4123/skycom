@@ -195,7 +195,7 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
     const percent = total > 0 ? Math.min(100, Math.round((processed / total) * 100)) : 0
 
     return `
-      <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
+      <div class="flex items-center justify-between text-xs text-muted-foreground mb-1">
         <span>${processed}/${total} ${translate("Rows")}</span>
         <span>
           ${translate("Created")}: ${source.created_rows || 0} ·
@@ -203,8 +203,8 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
           ${translate("Failed")}: ${source.failed_rows || 0}
         </span>
       </div>
-      <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-        <div class="h-full bg-blue-600 transition-all" style="width: ${percent}%"></div>
+      <div class="h-2 rounded-full bg-muted overflow-hidden">
+        <div class="h-full bg-primary transition-all" style="width: ${percent}%"></div>
       </div>
     `
   }
@@ -214,17 +214,17 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
   statusBadgeClasses(workflowStatus) {
     switch (workflowStatus) {
       case "completed":
-        return "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+        return "bg-success/10 text-success "
       case "failed":
-        return "bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300"
+        return "bg-danger/10 text-danger "
       case "approved":
       case "processing":
-        return "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+        return "bg-primary/10 text-primary "
       case "rolling_back":
       case "rolled_back":
-        return "bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+        return "bg-primary/10 text-primary "
       default:
-        return "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+        return "bg-muted text-muted-foreground "
     }
   }
 
@@ -251,8 +251,8 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
     return `
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white">${escapeHtml(this.migration.name)}</h2>
-          <p class="text-xs text-slate-400 mt-0.5">${escapeHtml(this.migration.target_resource || "—")}</p>
+          <h2 class="text-lg font-bold text-foreground">${escapeHtml(this.migration.name)}</h2>
+          <p class="text-xs text-muted-foreground mt-0.5">${escapeHtml(this.migration.target_resource || "—")}</p>
         </div>
         ${this.statusBadgeHTML(this.migration.workflow_status)}
       </div>
@@ -264,16 +264,16 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
 
     return `
       <section class="space-y-2">
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white">${translate("Upload CSV chunks")}</h3>
-        <p class="text-xs text-slate-400">
+        <h3 class="text-sm font-bold text-foreground">${translate("Upload CSV chunks")}</h3>
+        <p class="text-xs text-muted-foreground">
           ${translate("The file is split in your browser and uploaded chunk by chunk")}
           (≤ ${Math.round(this.migration.chunk_max_bytes / 1024)} KB).
         </p>
         <div class="flex items-center gap-3">
           <input id="migration-upload-input" type="file" accept=".csv,text/csv"
             data-action="change->${this.identifier}#handleFileSelect"
-            class="block text-sm text-slate-500 file:mr-3 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white file:cursor-pointer" />
-          <span class="text-xs text-slate-500" data-upload-status></span>
+            class="block text-sm text-muted-foreground file:mr-3 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-primary file:text-primary-foreground file:cursor-pointer" />
+          <span class="text-xs text-muted-foreground" data-upload-status></span>
         </div>
       </section>
     `
@@ -285,10 +285,10 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
 
     return `
       <section class="space-y-2">
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white">${translate("Chunks")}</h3>
+        <h3 class="text-sm font-bold text-foreground">${translate("Chunks")}</h3>
         <table class="w-full text-sm">
           <thead>
-            <tr class="text-left text-[10px] font-bold text-slate-400 uppercase border-b border-slate-200 dark:border-slate-800">
+            <tr class="text-left text-[10px] font-bold text-muted-foreground uppercase border-b border-line">
               <th class="py-2 pr-4">${translate("Name")}</th>
               <th class="py-2 pr-4">${translate("Rows")}</th>
               <th class="py-2">${translate("Status")}</th>
@@ -296,10 +296,10 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
           </thead>
           <tbody>
             ${chunks.map((chunk) => `
-              <tr class="border-b border-slate-100 dark:border-slate-800/60">
+              <tr class="border-b border-line/60">
                 <td class="py-1.5 pr-4">${escapeHtml(chunk.name)}</td>
-                <td class="py-1.5 pr-4 text-slate-500">${chunk.row_count}</td>
-                <td class="py-1.5 text-slate-500">${escapeHtml(chunk.import_status || "")}</td>
+                <td class="py-1.5 pr-4 text-muted-foreground">${chunk.row_count}</td>
+                <td class="py-1.5 text-muted-foreground">${escapeHtml(chunk.import_status || "")}</td>
               </tr>
             `).join("")}
           </tbody>
@@ -314,18 +314,18 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
 
     return `
       <section class="space-y-2">
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white">${translate("Preview")}</h3>
+        <h3 class="text-sm font-bold text-foreground">${translate("Preview")}</h3>
         <div class="overflow-x-auto">
           <table class="w-full text-xs">
             <thead>
-              <tr class="text-left text-[10px] font-bold text-slate-400 uppercase border-b border-slate-200 dark:border-slate-800">
+              <tr class="text-left text-[10px] font-bold text-muted-foreground uppercase border-b border-line">
                 ${preview.headers.map((header) => `<th class="py-1.5 pr-4">${escapeHtml(header)}</th>`).join("")}
               </tr>
             </thead>
             <tbody>
               ${preview.rows.map((row) => `
-                <tr class="border-b border-slate-100 dark:border-slate-800/60">
-                  ${row.map((cell) => `<td class="py-1 pr-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">${escapeHtml(cell)}</td>`).join("")}
+                <tr class="border-b border-line/60">
+                  ${row.map((cell) => `<td class="py-1 pr-4 text-muted-foreground whitespace-nowrap">${escapeHtml(cell)}</td>`).join("")}
                 </tr>
               `).join("")}
             </tbody>
@@ -341,12 +341,12 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
 
     return `
       <section class="space-y-2">
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white">${translate("Mapping config (JSON)")}</h3>
+        <h3 class="text-sm font-bold text-foreground">${translate("Mapping config (JSON)")}</h3>
         <textarea data-config-editor rows="10" spellcheck="false" ${locked ? "disabled" : ""}
-          class="w-full font-mono text-xs px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-60">${json}</textarea>
+          class="w-full font-mono text-xs px-3 py-2 border border-line rounded-lg bg-card text-foreground disabled:opacity-60">${json}</textarea>
         ${locked ? "" : `
           <button type="button" data-action="click->${this.identifier}#saveConfig"
-            class="px-4 py-2 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg text-sm font-medium cursor-pointer">
+            class="px-4 py-2 bg-muted hover:bg-card text-foreground rounded-lg text-sm font-medium cursor-pointer">
             ${translate("Save config")}
           </button>
         `}
@@ -364,26 +364,26 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
 
     return `
       <section class="space-y-2">
-        <h3 class="text-sm font-bold text-slate-900 dark:text-white">${translate("Dry run result")}</h3>
-        <p class="text-sm font-medium ${result.passed ? "text-emerald-600" : "text-rose-600"}">
+        <h3 class="text-sm font-bold text-foreground">${translate("Dry run result")}</h3>
+        <p class="text-sm font-medium ${result.passed ? "text-success" : "text-danger"}">
           ${result.passed ? translate("Passed") : translate("Failed")} —
           ${translate("Created")}: ${result.created}, ${translate("Updated")}: ${result.updated}
         </p>
-        ${globalErrors.length > 0 ? `<p class="text-xs text-rose-600">${escapeHtml(globalErrors.join(", "))}</p>` : ""}
+        ${globalErrors.length > 0 ? `<p class="text-xs text-danger">${escapeHtml(globalErrors.join(", "))}</p>` : ""}
         ${errorRows.length > 0 ? `
           <div class="overflow-x-auto">
             <table class="w-full text-xs">
               <thead>
-                <tr class="text-left text-[10px] font-bold text-slate-400 uppercase">
+                <tr class="text-left text-[10px] font-bold text-muted-foreground uppercase">
                   <th class="py-1 pr-4">${translate("Row")}</th>
                   <th class="py-1">${translate("Errors")}</th>
                 </tr>
               </thead>
               <tbody>
                 ${errorRows.map((row) => `
-                  <tr class="border-t border-slate-100 dark:border-slate-800">
+                  <tr class="border-t border-line">
                     <td class="py-1 pr-4">${row.row}</td>
-                    <td class="py-1 text-rose-600">${escapeHtml((row.errors || []).join(", "))}</td>
+                    <td class="py-1 text-danger">${escapeHtml((row.errors || []).join(", "))}</td>
                   </tr>
                 `).join("")}
               </tbody>
@@ -403,17 +403,17 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
       <section class="flex items-center gap-3">
         ${configLocked ? "" : `
           <button type="button" data-action="click->${this.identifier}#runDryRun"
-            class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium cursor-pointer">
+            class="px-4 py-2 bg-warning/100 hover:bg-warning/90 text-warning-foreground rounded-lg text-sm font-medium cursor-pointer">
             ${translate("Run dry run")}
           </button>
         `}
         <button type="button" data-action="click->${this.identifier}#approve" ${canApprove ? "" : "disabled"}
-          class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+          class="px-4 py-2 bg-success hover:bg-success/90 text-success-foreground rounded-lg text-sm font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
           ${translate("Approve")}
         </button>
         ${canRollback ? `
           <button type="button" data-action="click->${this.identifier}#rollback"
-            class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm font-medium cursor-pointer">
+            class="px-4 py-2 bg-danger hover:bg-danger/90 text-danger-foreground rounded-lg text-sm font-medium cursor-pointer">
             ${translate("Rollback")}
           </button>
         ` : ""}
@@ -425,11 +425,11 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
     if (!this.migration) {
       return `
         <div class="p-4 flex-1 flex flex-col">
-          <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-rose-200 dark:border-rose-900/40">
-            <h2 class="text-lg font-bold text-rose-600 dark:text-rose-400">${translate("Could not load this import")}</h2>
-            <p class="mt-1 text-sm text-slate-500">${escapeHtml(this.loadError)}</p>
+          <div class="p-4 bg-card rounded-xl border border-danger/20 ">
+            <h2 class="text-lg font-bold text-danger ">${translate("Could not load this import")}</h2>
+            <p class="mt-1 text-sm text-muted-foreground">${escapeHtml(this.loadError)}</p>
             <a href="${Helpers.company_company_migrations_path(currentCompany()?.id)}"
-              class="mt-3 inline-block text-sm text-blue-600 dark:text-blue-400 hover:underline">
+              class="mt-3 inline-block text-sm text-primary hover:underline">
               ${translate("Back to Data Import")}
             </a>
           </div>
@@ -439,7 +439,7 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
 
     return `
       <div class="p-4 flex-1 flex flex-col">
-        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex-1 space-y-6">
+        <div class="p-4 bg-card rounded-xl border border-line flex-1 space-y-6">
           ${this.headerHTML()}
           <div data-migration-progress>${this.progressInnerHTML()}</div>
           ${this.uploadHTML()}

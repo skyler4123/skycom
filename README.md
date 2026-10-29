@@ -174,7 +174,7 @@ Always inject the helper directly inside the opening tag of the trigger element.
 <button ${tooltip({ 
   message: "<strong>Warning:</strong> This action is permanent.", 
   position: "right",
-  classes: "!bg-rose-600 border-rose-700" 
+  classes: "!bg-danger border-danger/70" 
 })}>
   Delete
 </button>
@@ -185,7 +185,7 @@ Always inject the helper directly inside the opening tag of the trigger element.
 - **HTML Support**: The `message` value is injected via `.innerHTML`. The helper uses `.replace(/"/g, '&quot;')` to ensure HTML strings don't break the data-attribute structure.
 - **Styling**: 
     - **Default**: Slate-900 (Light Mode) / White (Dark Mode).
-    - **Custom**: Use the `classes` value to pass Tailwind overrides (e.g., `!bg-rose-600` for destructive actions).
+    - **Custom**: Use the `classes` value to pass Tailwind overrides (e.g., `!bg-danger` for destructive actions).
 - **Lifecycle**: Tooltips are created dynamically on `mouseenter` and destroyed on `mouseleave` or `disconnect()`.
 
 ### 5.4 Best Practices

@@ -56,7 +56,7 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
   }
 
   renderField({ key, label, type }) {
-    const baseClass = 'w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500'
+    const baseClass = 'w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground'
 
     switch (type) {
       case 'boolean':
@@ -64,15 +64,15 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
           <div class="flex items-center gap-3 py-2">
             <input type="hidden" name="document[${key}]" value="false">
             <input type="checkbox" name="document[${key}]" value="true"
-              class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer">
-            <span class="text-sm text-slate-900 dark:text-white">${escapeHtml(label)}</span>
+              class="h-5 w-5 rounded border-line text-primary cursor-pointer">
+            <span class="text-sm text-foreground">${escapeHtml(label)}</span>
           </div>
         `
       case 'integer':
       case 'decimal':
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${escapeHtml(label)}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${escapeHtml(label)}</label>
             <input type="number" name="document[${key}]" step="${type === 'decimal' ? '0.01' : '1'}" placeholder="${escapeHtml(label)}"
               class="${baseClass}">
           </div>
@@ -80,7 +80,7 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
       case 'datetime':
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${escapeHtml(label)}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${escapeHtml(label)}</label>
             <input type="datetime-local" name="document[${key}]"
               class="${baseClass}">
           </div>
@@ -88,7 +88,7 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
       default:
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${escapeHtml(label)}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${escapeHtml(label)}</label>
             <input type="text" name="document[${key}]" placeholder="${escapeHtml(label)}"
               class="${baseClass}">
           </div>
@@ -100,8 +100,8 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
     if (this.propertyMetadata.length === 0) return ''
 
     return `
-      <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
+      <div class="border-t border-line pt-6">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-2 gap-4">
           ${this.propertyMetadata.map(f => this.renderField(f)).join('')}
         </div>
@@ -125,7 +125,7 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
     const preview = this.element.querySelector('#markdown-preview')
     if (preview) {
       const rendered = renderBody(event.target.value || '')
-      preview.innerHTML = rendered || `<p class="text-sm text-slate-400">${translate("Nothing to preview yet.")}</p>`
+      preview.innerHTML = rendered || `<p class="text-sm text-muted-foreground">${translate("Nothing to preview yet.")}</p>`
     }
   }
 
@@ -134,14 +134,14 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Document")}</h2>
+        <h2 class="text-xl font-bold text-foreground">${translate("New Document")}</h2>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Category")}</label>
+          <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
           <select
             name="document[category_id]"
             data-action="change->${this.identifier}#onCategoryChange"
-            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+            class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none"
           >
             ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), this.categoryId)}
           </select>
@@ -149,65 +149,65 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Name")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Name")}</label>
             <input type="text" name="document[name]" required placeholder="${translate("e.g. Leave Policy")}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Type")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Type")}</label>
             <select name="document[business_type]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${selectOptionsHTML(this.documentBusinessTypes(), 'general')}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Status")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Status")}</label>
             <select name="document[workflow_status]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${selectOptionsHTML(this.documentWorkflowStatuses(), 'draft')}
             </select>
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Description")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Description")}</label>
             <textarea name="document[description]" rows="2"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground"></textarea>
           </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Body")} (Markdown)</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Body")} (Markdown)</label>
             <textarea name="document[body_markdown]" rows="12"
               data-action="input->${this.identifier}#updatePreview"
               placeholder="# Title&#10;&#10;Write **markdown** here..."
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm font-mono text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm font-mono text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground"></textarea>
           </div>
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Preview")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Preview")}</label>
             <div
               id="markdown-preview"
               data-preview="markdown"
-              class="w-full min-h-[300px] px-4 py-3 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-800/50 overflow-y-auto"
+              class="w-full min-h-[300px] px-4 py-3 border border-line rounded-lg bg-muted overflow-y-auto"
             >
-              <p class="text-sm text-slate-400">${translate("Nothing to preview yet.")}</p>
+              <p class="text-sm text-muted-foreground">${translate("Nothing to preview yet.")}</p>
             </div>
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Images")} (max 10)</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Images")} (max 10)</label>
             <input type="file" name="document[image_attachments][]" multiple accept="image/jpeg,image/png,image/gif"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white cursor-pointer">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground cursor-pointer">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Files")} (max 5)</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Files")} (max 5)</label>
             <input type="file" name="document[file_attachments][]" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,image/jpeg,image/png,image/gif"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white cursor-pointer">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground cursor-pointer">
           </div>
         </div>
 
@@ -215,9 +215,9 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
           ${this.dynamicFieldsHTML()}
         </div>
 
-        <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
+        <div class="flex justify-end pt-6 border-t border-line">
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm transition-colors cursor-pointer">
             ${translate("Save Document")}
           </button>
         </div>
@@ -230,7 +230,7 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
           ${form({
             action: Helpers.create_company_documents_path(currentCompany().id),
             method: "POST",
-            attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false" enctype="multipart/form-data"`,
+            attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false" enctype="multipart/form-data"`,
             html: fields
           })}
         </div>

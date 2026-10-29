@@ -128,7 +128,7 @@ export default class Companies_CompanySettings_IndexController extends Companies
     const itemsHTML = group.items.map((item, ii) => `
       <div class="flex flex-col sm:flex-row gap-2">
         <label class="flex-1 space-y-1">
-          <span class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Item name")}</span>
+          <span class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Item name")}</span>
           <input
             type="text"
             name="company_setting[metadata][sidebar_groups][${gi}][items][${ii}][name]"
@@ -138,11 +138,11 @@ export default class Companies_CompanySettings_IndexController extends Companies
             data-${this.identifier}-group-key-param="${escapeHtml(group.key)}"
             data-${this.identifier}-item-key-param="${escapeHtml(item.key)}"
             data-${this.identifier}-field-param="name"
-            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm"
+            class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm"
           >
         </label>
         <label class="flex-[2] space-y-1">
-          <span class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Item URL")}</span>
+          <span class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Item URL")}</span>
           <input
             type="text"
             name="company_setting[metadata][sidebar_groups][${gi}][items][${ii}][url]"
@@ -152,7 +152,7 @@ export default class Companies_CompanySettings_IndexController extends Companies
             data-${this.identifier}-group-key-param="${escapeHtml(group.key)}"
             data-${this.identifier}-item-key-param="${escapeHtml(item.key)}"
             data-${this.identifier}-field-param="url"
-            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm font-mono"
+            class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm font-mono"
           >
         </label>
         <input type="hidden" name="company_setting[metadata][sidebar_groups][${gi}][items][${ii}][key]" value="${escapeHtml(item.key)}">
@@ -162,7 +162,7 @@ export default class Companies_CompanySettings_IndexController extends Companies
           data-${this.identifier}-group-key-param="${escapeHtml(group.key)}"
           data-${this.identifier}-item-key-param="${escapeHtml(item.key)}"
           title="${translate("Delete item")}"
-          class="mt-auto p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg cursor-pointer"
+          class="mt-auto p-2 text-muted-foreground hover:text-danger hover:bg-danger/10 rounded-lg cursor-pointer"
         >
           <span class="material-symbols-outlined text-[20px]">delete</span>
         </button>
@@ -170,10 +170,10 @@ export default class Companies_CompanySettings_IndexController extends Companies
     `).join("")
 
     return `
-      <div class="p-4 border border-slate-200 dark:border-slate-700 rounded-xl space-y-4">
+      <div class="p-4 border border-line rounded-xl space-y-4">
         <div class="flex items-center gap-2">
           <label class="flex-1 space-y-1">
-            <span class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Group name")}</span>
+            <span class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Group name")}</span>
             <input
               type="text"
               name="company_setting[metadata][sidebar_groups][${gi}][name]"
@@ -182,7 +182,7 @@ export default class Companies_CompanySettings_IndexController extends Companies
               data-action="input->${this.identifier}#syncField"
               data-${this.identifier}-group-key-param="${escapeHtml(group.key)}"
               data-${this.identifier}-field-param="name"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm font-medium"
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm font-medium"
             >
           </label>
           <input type="hidden" name="company_setting[metadata][sidebar_groups][${gi}][key]" value="${escapeHtml(group.key)}">
@@ -191,7 +191,7 @@ export default class Companies_CompanySettings_IndexController extends Companies
             data-action="click->${this.identifier}#removeGroup"
             data-${this.identifier}-group-key-param="${escapeHtml(group.key)}"
             title="${translate("Delete group")}"
-            class="mt-auto p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg cursor-pointer"
+            class="mt-auto p-2 text-muted-foreground hover:text-danger hover:bg-danger/10 rounded-lg cursor-pointer"
           >
             <span class="material-symbols-outlined text-[20px]">delete</span>
           </button>
@@ -201,7 +201,7 @@ export default class Companies_CompanySettings_IndexController extends Companies
           type="button"
           data-action="click->${this.identifier}#addItem"
           data-${this.identifier}-group-key-param="${escapeHtml(group.key)}"
-          class="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer"
+          class="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-primary hover:bg-primary/10 rounded-lg cursor-pointer"
         >
           <span class="material-symbols-outlined text-[18px]">add</span>
           ${translate("Add Sidebar Item")}
@@ -212,35 +212,35 @@ export default class Companies_CompanySettings_IndexController extends Companies
 
   contentHTML() {
     if (!this.loaded) {
-      return `<div class="p-8 text-center text-sm text-slate-500">...</div>`
+      return `<div class="p-8 text-center text-sm text-muted-foreground">...</div>`
     }
 
     const companyForm = !this.settingId ? `
-        <div class="p-10 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
-          <span class="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600">settings</span>
-          <h2 class="mt-3 text-lg font-bold text-slate-900 dark:text-white">${translate("Settings")}</h2>
-          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">${translate("Dynamic sidebar is not configured for this company yet.")}</p>
+        <div class="p-10 bg-card rounded-xl border border-line text-center">
+          <span class="material-symbols-outlined text-4xl text-muted-foreground/60">settings</span>
+          <h2 class="mt-3 text-lg font-bold text-foreground">${translate("Settings")}</h2>
+          <p class="mt-1 text-sm text-muted-foreground">${translate("Dynamic sidebar is not configured for this company yet.")}</p>
         </div>
       ` : (() => {
       const fields = `
         <div class="space-y-6">
           <div>
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Company Quick Links")}</h2>
-            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">${translate("Shared with everyone in this company")}</p>
+            <h2 class="text-xl font-bold text-foreground">${translate("Company Quick Links")}</h2>
+            <p class="mt-1 text-sm text-muted-foreground">${translate("Shared with everyone in this company")}</p>
           </div>
-          ${this.groups.length > 0 ? this.groups.map((g, gi) => this.groupFieldsHTML(g, gi)).join("") : `<p class="text-sm text-slate-400 dark:text-slate-500">${translate("No custom groups yet")}</p>`}
+          ${this.groups.length > 0 ? this.groups.map((g, gi) => this.groupFieldsHTML(g, gi)).join("") : `<p class="text-sm text-muted-foreground">${translate("No custom groups yet")}</p>`}
           <div class="flex items-center justify-between pt-2">
             <button
               type="button"
               data-action="click->${this.identifier}#addGroup"
-              class="inline-flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+              class="inline-flex items-center gap-2 px-4 py-2 border border-line rounded-lg font-medium text-sm text-foreground hover:bg-muted cursor-pointer"
             >
               <span class="material-symbols-outlined text-[20px]">add</span>
               ${translate("Add Group")}
             </button>
             <button
               type="submit"
-              class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer"
+              class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer"
             >
               ${translate("Save Changes")}
             </button>
@@ -251,7 +251,7 @@ export default class Companies_CompanySettings_IndexController extends Companies
       return form({
         action: this.updateUrl(),
         method: "PATCH",
-        attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-action="submit->${this.identifier}#save"`,
+        attributes: `class="p-6 bg-card rounded-xl border border-line" data-action="submit->${this.identifier}#save"`,
         html: fields
       })
     })()

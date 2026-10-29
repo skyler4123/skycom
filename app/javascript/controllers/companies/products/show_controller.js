@@ -38,7 +38,7 @@ export default class Companies_Products_ShowController extends Companies_LayoutC
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load product.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load product.")}</div>`
           return true
         }
         return false
@@ -51,20 +51,20 @@ export default class Companies_Products_ShowController extends Companies_LayoutC
   }
 
   formatDisplayValue(value, type) {
-    if (value === null || value === undefined) return '<span class="text-slate-300 dark:text-slate-700">—</span>'
+    if (value === null || value === undefined) return '<span class="text-muted-foreground/60">—</span>'
     switch (type) {
       case 'boolean':
-        return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${value ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-400'}">${value ? translate("True") : translate("False")}</span>`
+        return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${value ? 'bg-success/10 text-success ' : 'bg-background text-foreground '}">${value ? translate("True") : translate("False")}</span>`
       case 'integer':
-        return `<span class="font-mono text-slate-900 dark:text-slate-100">${Number(value).toLocaleString()}</span>`
+        return `<span class="font-mono text-foreground">${Number(value).toLocaleString()}</span>`
       case 'decimal':
-        return `<span class="font-mono font-medium text-blue-600 dark:text-blue-400">${Number(value).toFixed(2)}</span>`
+        return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
       case 'datetime': {
         const d = new Date(value)
-        return `<span class="text-sm text-slate-900 dark:text-white">${d.toLocaleString()}</span>`
+        return `<span class="text-sm text-foreground">${d.toLocaleString()}</span>`
       }
       default:
-        return `<span class="text-sm text-slate-900 dark:text-white">${value}</span>`
+        return `<span class="text-sm text-foreground">${value}</span>`
     }
   }
 
@@ -76,17 +76,17 @@ export default class Companies_Products_ShowController extends Companies_LayoutC
     const category = currentCategories().find(c => c.id === p.category_id)
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
-      <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
+      <div class="border-t border-line pt-6 mt-6">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           ${this.propertyMetadata.map(field => `
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-emerald-600 dark:text-emerald-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-success ">
                 <span class="material-symbols-outlined text-[20px]">${field.type === 'boolean' ? 'check_circle' : field.type === 'datetime' ? 'calendar_month' : 'text_fields'}</span>
               </div>
               <div class="min-w-0 flex-1">
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${field.name}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${this.formatDisplayValue(p[field.key], field.type)}</p>
+                <p class="text-xs font-medium text-muted-foreground">${field.name}</p>
+                <p class="text-sm font-semibold text-foreground">${this.formatDisplayValue(p[field.key], field.type)}</p>
               </div>
             </div>
           `).join('')}
@@ -96,82 +96,82 @@ export default class Companies_Products_ShowController extends Companies_LayoutC
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-          <a href="${Helpers.company_products_path(companyId)}" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6">
+        <div class="p-6 bg-card rounded-xl border border-line">
+          <a href="${Helpers.company_products_path(companyId)}" class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back to Products")}
           </a>
 
           <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-start mb-6">
-            <div class="size-24 shrink-0 overflow-hidden rounded-xl border-4 border-emerald-100 dark:border-emerald-900/30 bg-emerald-100 dark:bg-gray-800 shadow-lg flex items-center justify-center">
-              <span class="material-symbols-outlined text-4xl text-emerald-600 dark:text-emerald-400">inventory_2</span>
+            <div class="size-24 shrink-0 overflow-hidden rounded-xl border-4 border-success/20 bg-success/10 shadow-lg flex items-center justify-center">
+              <span class="material-symbols-outlined text-4xl text-success ">inventory_2</span>
             </div>
             <div class="flex flex-1 flex-col text-center sm:text-left">
-              <h2 class="text-2xl font-black text-slate-900 dark:text-white">${p.name}</h2>
-              <p class="font-semibold text-emerald-600 dark:text-emerald-400">${p.description || ''}</p>
+              <h2 class="text-2xl font-black text-foreground">${p.name}</h2>
+              <p class="font-semibold text-success ">${p.description || ''}</p>
               <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
-                <span class="inline-flex items-center rounded-lg bg-emerald-100 dark:bg-emerald-900/40 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase">${p.code || translate("N/A")}</span>
+                <span class="inline-flex items-center rounded-lg bg-success/10 px-3 py-1 text-xs font-bold text-success uppercase">${p.code || translate("N/A")}</span>
               </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 gap-6 border-t border-slate-200 dark:border-gray-800 pt-6 sm:grid-cols-2">
+          <div class="grid grid-cols-1 gap-6 border-t border-line pt-6 sm:grid-cols-2">
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-emerald-600 dark:text-emerald-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-success ">
                 <span class="material-symbols-outlined">category</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Type")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${Helpers.capitalize(p.business_type || 'physical')}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Type")}</p>
+                <p class="text-sm font-semibold text-foreground">${Helpers.capitalize(p.business_type || 'physical')}</p>
               </div>
             </div>
 
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-emerald-600 dark:text-emerald-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-success ">
                 <span class="material-symbols-outlined">toggle_on</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Status")}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Status")}</p>
                 <p class="text-sm font-semibold">${Helpers.statusBadge(p.workflow_status)}</p>
               </div>
             </div>
 
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-emerald-600 dark:text-emerald-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-success ">
                 <span class="material-symbols-outlined">folder</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Category")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${category?.name || p.category?.name || translate("N/A")}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Category")}</p>
+                <p class="text-sm font-semibold text-foreground">${category?.name || p.category?.name || translate("N/A")}</p>
               </div>
             </div>
           </div>
 
           ${dynamicFields}
 
-          <div class="mt-8 border-t border-slate-200 dark:border-gray-800 pt-6">
+          <div class="mt-8 border-t border-line pt-6">
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-bold text-slate-900 dark:text-white">${translate("Stocks of this product")}</h3>
-              <a href="${Helpers.company_stocks_path(companyId)}" class="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer">${translate("View all stocks")}</a>
+              <h3 class="text-lg font-bold text-foreground">${translate("Stocks of this product")}</h3>
+              <a href="${Helpers.company_stocks_path(companyId)}" class="text-sm font-medium text-primary hover:text-primary cursor-pointer">${translate("View all stocks")}</a>
             </div>
-            ${this.stocks.length === 0 ? `<p class="text-sm text-slate-500 dark:text-slate-400">${translate("No stock yet.")}</p>` : `
+            ${this.stocks.length === 0 ? `<p class="text-sm text-muted-foreground">${translate("No stock yet.")}</p>` : `
               <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                   <thead>
-                    <tr class="text-sm text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                    <tr class="text-sm text-muted-foreground border-b border-line">
                       <th class="py-4 px-6 font-medium">${translate("Warehouse")}</th>
                       <th class="py-4 px-6 font-medium">${translate("Quantity")}</th>
                       <th class="py-4 px-6 font-medium">${translate("Pending")}</th>
                       <th class="py-4 px-6 font-medium">${translate("Available")}</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tbody class="divide-y divide-line">
                     ${this.stocks.map(s => `
-                      <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                        <td class="py-4 px-6 text-sm font-medium text-slate-900 dark:text-white">${s.warehouse?.name || '—'}</td>
-                        <td class="py-4 px-6 text-sm text-slate-900 dark:text-white font-medium">${s.quantity ?? 0}</td>
-                        <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${s.pending ?? 0}</td>
-                        <td class="py-4 px-6 text-sm text-slate-900 dark:text-white font-medium">${s.available ?? 0}</td>
+                      <tr class="hover:bg-muted/50">
+                        <td class="py-4 px-6 text-sm font-medium text-foreground">${s.warehouse?.name || '—'}</td>
+                        <td class="py-4 px-6 text-sm text-foreground font-medium">${s.quantity ?? 0}</td>
+                        <td class="py-4 px-6 text-sm text-muted-foreground">${s.pending ?? 0}</td>
+                        <td class="py-4 px-6 text-sm text-foreground font-medium">${s.available ?? 0}</td>
                       </tr>
                     `).join('')}
                   </tbody>
@@ -180,9 +180,9 @@ export default class Companies_Products_ShowController extends Companies_LayoutC
             `}
           </div>
 
-          <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-gray-800">
+          <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-line">
             <a href="${Helpers.edit_company_product_path(companyId, p.id)}"
-              class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors cursor-pointer"
+              class="inline-flex items-center px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm transition-colors cursor-pointer"
             >
               ${translate("Edit Product")}
             </a>

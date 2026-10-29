@@ -135,12 +135,12 @@ export default class Companies_Events_NewModalController extends Controller {
   }
 
   linkCheckboxesHTML(name, items) {
-    if (items.length === 0) return `<p class="text-sm text-slate-400">${translate("N/A")}</p>`
+    if (items.length === 0) return `<p class="text-sm text-muted-foreground">${translate("N/A")}</p>`
     return `
-      <div class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-lg p-3">
+      <div class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border border-line rounded-lg p-3">
         ${items.map(item => `
-          <label class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
-            <input type="checkbox" name="modal_${name}" value="${item.id}" class="h-4 w-4 rounded border-slate-300 text-blue-600 cursor-pointer">
+          <label class="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+            <input type="checkbox" name="modal_${name}" value="${item.id}" class="h-4 w-4 rounded border-line text-primary cursor-pointer">
             <span class="truncate">${item.name || item.id}</span>
           </label>
         `).join('')}
@@ -150,24 +150,24 @@ export default class Companies_Events_NewModalController extends Controller {
 
   dynamicFieldsHTML() {
     if (this.propertyMetadata.length === 0) return ''
-    const baseClass = 'w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none'
+    const baseClass = 'w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none'
     return `
-      <div class="border-t border-slate-200 dark:border-slate-700 pt-4">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">${translate("Properties")}</h3>
+      <div class="border-t border-line pt-4">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">${translate("Properties")}</h3>
         <div class="grid grid-cols-2 gap-3">
           ${this.propertyMetadata.map(f => {
             if (f.type === 'boolean') {
               return `
                 <div class="flex items-center gap-2 py-1">
                   <input type="hidden" name="event[${f.key}]" value="false">
-                  <input type="checkbox" name="event[${f.key}]" value="true" class="h-4 w-4 rounded border-slate-300 text-blue-600 cursor-pointer">
-                  <span class="text-sm text-slate-900 dark:text-white">${f.name}</span>
+                  <input type="checkbox" name="event[${f.key}]" value="true" class="h-4 w-4 rounded border-line text-primary cursor-pointer">
+                  <span class="text-sm text-foreground">${f.name}</span>
                 </div>`
             }
             const inputType = f.type === 'integer' || f.type === 'decimal' ? 'number' : f.type === 'datetime' ? 'datetime-local' : 'text'
             return `
               <div class="space-y-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase">${f.name}</label>
+                <label class="text-[10px] font-bold text-muted-foreground uppercase">${f.name}</label>
                 <input type="${inputType}" name="event[${f.key}]" class="${baseClass}">
               </div>`
           }).join('')}
@@ -177,7 +177,7 @@ export default class Companies_Events_NewModalController extends Controller {
   }
 
   stockRowsHTML() {
-    const inputClass = 'w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none'
+    const inputClass = 'w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none'
     return `
       <div class="space-y-2">
         ${this.stockRows.map((row, index) => `
@@ -193,7 +193,7 @@ export default class Companies_Events_NewModalController extends Controller {
               type="button"
               data-action="click->${this.identifier}#removeStockRow"
               data-${this.identifier}-index-param="${index}"
-              class="p-2 text-slate-400 hover:text-red-600 rounded-lg cursor-pointer">
+              class="p-2 text-muted-foreground hover:text-danger rounded-lg cursor-pointer">
               <span class="material-symbols-outlined text-[20px]">delete</span>
             </button>
           </div>
@@ -202,7 +202,7 @@ export default class Companies_Events_NewModalController extends Controller {
       <button
         type="button"
         data-action="click->${this.identifier}#addStockRow"
-        class="mt-2 inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg cursor-pointer">
+        class="mt-2 inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg cursor-pointer">
         <span class="material-symbols-outlined text-[18px]">add</span>
         ${translate("Add stock")}
       </button>
@@ -225,101 +225,101 @@ export default class Companies_Events_NewModalController extends Controller {
 
     const fields = `
       <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Event")}</h2>
+        <h2 class="text-xl font-bold text-foreground">${translate("New Event")}</h2>
 
         <div class="grid grid-cols-2 gap-3">
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Category")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Category")}</label>
             <select name="event[category_id]" data-action="change->${this.identifier}#onCategoryChange"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
               ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), this.categoryId)}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Branch")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Branch")}</label>
             <select name="event[branch_id]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
               <option value="">—</option>
               ${this.branches().map(b => `<option value="${b.id}">${b.name}</option>`).join('')}
             </select>
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Event Name")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Event Name")}</label>
             <input type="text" name="event[name]" required placeholder="${translate("e.g. Root Canal Treatment")}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Type")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Type")}</label>
             <select name="event[business_type]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
               ${typeOptions}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Status")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Status")}</label>
             <select name="event[workflow_status]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
               ${statusOptions}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Start At")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Start At")}</label>
             <input type="datetime-local" name="event[start_at]" value="${this.defaultStartAt || ''}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("End At")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("End At")}</label>
             <input type="datetime-local" name="event[end_at]" value="${this.defaultEndAt || ''}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Description")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Description")}</label>
             <textarea name="event[description]" rows="2"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm"></textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm"></textarea>
           </div>
         </div>
 
         <div id="modal-dynamic-fields">${this.dynamicFieldsHTML()}</div>
 
-        <div class="border-t border-slate-200 dark:border-slate-700 pt-4">
-          <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">${translate("Customers")}</h3>
+        <div class="border-t border-line pt-4">
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-2">${translate("Customers")}</h3>
           ${this.linkCheckboxesHTML("customer_ids", this.customers)}
         </div>
 
-        <div class="border-t border-slate-200 dark:border-slate-700 pt-4">
-          <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">${translate("Employees")}</h3>
+        <div class="border-t border-line pt-4">
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-2">${translate("Employees")}</h3>
           ${this.linkCheckboxesHTML("employee_ids", this.employees)}
         </div>
 
-        <div class="border-t border-slate-200 dark:border-slate-700 pt-4">
-          <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">${translate("Services")}</h3>
+        <div class="border-t border-line pt-4">
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-2">${translate("Services")}</h3>
           ${this.linkCheckboxesHTML("service_ids", this.services)}
         </div>
 
-        <div class="border-t border-slate-200 dark:border-slate-700 pt-4">
-          <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">${translate("Facilities")}</h3>
+        <div class="border-t border-line pt-4">
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-2">${translate("Facilities")}</h3>
           ${this.linkCheckboxesHTML("facility_ids", this.facilities)}
         </div>
 
-        <div class="border-t border-slate-200 dark:border-slate-700 pt-4">
-          <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">${translate("Stocks")}</h3>
+        <div class="border-t border-line pt-4">
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-2">${translate("Stocks")}</h3>
           <div id="modal-stock-rows-container">${this.stockRowsHTML()}</div>
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" data-action="click->modal#close"
-            class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
+            class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg cursor-pointer">
             ${translate("Cancel")}
           </button>
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer">
             ${translate("Save Event")}
           </button>
         </div>
@@ -328,7 +328,7 @@ export default class Companies_Events_NewModalController extends Controller {
 
     return form({
       attributes: `
-        class="p-8 bg-white dark:bg-slate-900 rounded-2xl w-[560px] max-w-[92vw] shadow-2xl"
+        class="p-8 bg-card rounded-2xl w-[560px] max-w-[92vw] shadow-2xl"
         data-action="submit->${this.identifier}#handleSubmit"
       `,
       html: fields

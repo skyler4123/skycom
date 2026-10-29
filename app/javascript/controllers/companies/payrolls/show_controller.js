@@ -62,7 +62,7 @@ export default class Companies_Payrolls_ShowController extends Companies_LayoutC
     const emp = p.employee || {}
     const meta = p.metadata || {}
     const daysHtml = this.attendanceDays.map(d => `
-      <tr class="border-b border-slate-200 dark:border-slate-800">
+      <tr class="border-b border-line">
         <td class="py-2 px-4 text-sm">${d.attendance_date || "—"}</td>
         <td class="py-2 px-4 text-sm">${d.check_in ? new Date(d.check_in).toLocaleString() : "—"}</td>
         <td class="py-2 px-4 text-sm">${d.check_out ? new Date(d.check_out).toLocaleString() : "—"}</td>
@@ -73,17 +73,17 @@ export default class Companies_Payrolls_ShowController extends Companies_LayoutC
 
     return `
       <div class="p-4 overflow-y-auto space-y-6">
-        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Payroll Detail</h2>
-          <p class="text-sm text-slate-500">Employee: ${emp.name || "—"}</p>
-          <p class="text-sm text-slate-500">Month: ${p.month || "—"}</p>
-          <p class="text-sm text-slate-500">Status: ${p.status || "—"}</p>
-          <p class="text-sm text-slate-500">Work minutes: ${meta.total_work_minutes ?? "—"}</p>
+        <div class="p-4 bg-card rounded-xl border border-line">
+          <h2 class="text-xl font-bold text-foreground mb-2">Payroll Detail</h2>
+          <p class="text-sm text-muted-foreground">Employee: ${emp.name || "—"}</p>
+          <p class="text-sm text-muted-foreground">Month: ${p.month || "—"}</p>
+          <p class="text-sm text-muted-foreground">Status: ${p.status || "—"}</p>
+          <p class="text-sm text-muted-foreground">Work minutes: ${meta.total_work_minutes ?? "—"}</p>
         </div>
 
-        <form data-action="submit->${this.identifier}#handleSubmit" class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 space-y-4 max-w-xl">
+        <form data-action="submit->${this.identifier}#handleSubmit" class="p-4 bg-card rounded-xl border border-line space-y-4 max-w-xl">
           <div>
-            <label class="text-xs text-slate-500 uppercase">Status</label>
+            <label class="text-xs text-muted-foreground uppercase">Status</label>
             <select name="status" class="w-full px-3 py-2 border rounded-lg text-sm">
               <option value="draft" ${p.status === "draft" ? "selected" : ""}>Draft</option>
               <option value="approved" ${p.status === "approved" ? "selected" : ""}>Approved</option>
@@ -91,25 +91,25 @@ export default class Companies_Payrolls_ShowController extends Companies_LayoutC
             </select>
           </div>
           <div>
-            <label class="text-xs text-slate-500 uppercase">Notes</label>
+            <label class="text-xs text-muted-foreground uppercase">Notes</label>
             <textarea name="notes" class="w-full px-3 py-2 border rounded-lg text-sm">${p.notes || ""}</textarea>
           </div>
-          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">Save</button>
+          <button type="submit" class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm">Save</button>
         </form>
 
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-x-auto">
+        <div class="bg-card rounded-xl border border-line overflow-x-auto">
           <table class="w-full text-left">
             <thead>
-              <tr class="border-b border-slate-200 dark:border-slate-800">
-                <th class="py-2 px-4 text-xs text-slate-500 uppercase">Date</th>
-                <th class="py-2 px-4 text-xs text-slate-500 uppercase">Check In</th>
-                <th class="py-2 px-4 text-xs text-slate-500 uppercase">Check Out</th>
-                <th class="py-2 px-4 text-xs text-slate-500 uppercase">Worked (s)</th>
-                <th class="py-2 px-4 text-xs text-slate-500 uppercase">Status</th>
+              <tr class="border-b border-line">
+                <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Date</th>
+                <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Check In</th>
+                <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Check Out</th>
+                <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Worked (s)</th>
+                <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Status</th>
               </tr>
             </thead>
             <tbody>
-              ${daysHtml || `<tr><td class="py-8 text-center text-slate-400" colspan="5">No attendance days</td></tr>`}
+              ${daysHtml || `<tr><td class="py-8 text-center text-muted-foreground" colspan="5">No attendance days</td></tr>`}
             </tbody>
           </table>
         </div>

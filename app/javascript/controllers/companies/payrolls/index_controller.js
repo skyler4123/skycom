@@ -97,7 +97,7 @@ export default class Companies_Payrolls_IndexController extends Companies_Layout
   contentHTML() {
     const s = this.summary || {}
     const rowsHtml = this.payrolls.map(r => `
-      <tr class="border-b border-slate-200 dark:border-slate-800 cursor-pointer" data-action="click->${this.identifier}#viewDetail" data-id="${r.id}">
+      <tr class="border-b border-line cursor-pointer" data-action="click->${this.identifier}#viewDetail" data-id="${r.id}">
         <td class="py-2 px-4 text-sm">${r.employee?.name || "—"}</td>
         <td class="py-2 px-4 text-sm">${r.month || "—"}</td>
         <td class="py-2 px-4 text-sm">${r.status || "—"}</td>
@@ -108,46 +108,46 @@ export default class Companies_Payrolls_IndexController extends Companies_Layout
     return `
       <div class="p-4 overflow-y-auto space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <p class="text-xs text-slate-500 uppercase">Total</p>
+          <div class="p-4 bg-card rounded-xl border border-line">
+            <p class="text-xs text-muted-foreground uppercase">Total</p>
             <p class="text-lg font-bold">${s.total ?? 0}</p>
           </div>
-          <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <p class="text-xs text-slate-500 uppercase">Draft</p>
+          <div class="p-4 bg-card rounded-xl border border-line">
+            <p class="text-xs text-muted-foreground uppercase">Draft</p>
             <p class="text-lg font-bold">${s.draft ?? 0}</p>
           </div>
-          <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <p class="text-xs text-slate-500 uppercase">Approved</p>
+          <div class="p-4 bg-card rounded-xl border border-line">
+            <p class="text-xs text-muted-foreground uppercase">Approved</p>
             <p class="text-lg font-bold">${s.approved ?? 0}</p>
           </div>
-          <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <p class="text-xs text-slate-500 uppercase">Paid</p>
+          <div class="p-4 bg-card rounded-xl border border-line">
+            <p class="text-xs text-muted-foreground uppercase">Paid</p>
             <p class="text-lg font-bold">${s.paid ?? 0}</p>
           </div>
         </div>
 
         <form data-action="submit->${this.identifier}#applyMonth" class="flex flex-wrap items-end gap-3">
           <div>
-            <label class="text-xs text-slate-500 uppercase">Month</label>
+            <label class="text-xs text-muted-foreground uppercase">Month</label>
             <input type="month" name="month" value="${this.month}" class="px-3 py-2 border rounded-lg text-sm" />
           </div>
-          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">Apply</button>
-          <button type="button" data-action="click->${this.identifier}#generate" class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm">Generate</button>
-          <button type="button" data-action="click->${this.identifier}#exportCsv" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm">Export CSV</button>
+          <button type="submit" class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm">Apply</button>
+          <button type="button" data-action="click->${this.identifier}#generate" class="px-4 py-2 bg-success text-success-foreground rounded-lg text-sm">Generate</button>
+          <button type="button" data-action="click->${this.identifier}#exportCsv" class="px-4 py-2 bg-muted rounded-lg text-sm">Export CSV</button>
         </form>
 
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-x-auto">
+        <div class="bg-card rounded-xl border border-line overflow-x-auto">
           <table class="w-full text-left">
             <thead>
-              <tr class="border-b border-slate-200 dark:border-slate-800">
-                <th class="py-2 px-4 text-xs text-slate-500 uppercase">Employee</th>
-                <th class="py-2 px-4 text-xs text-slate-500 uppercase">Month</th>
-                <th class="py-2 px-4 text-xs text-slate-500 uppercase">Status</th>
-                <th class="py-2 px-4 text-xs text-slate-500 uppercase">Work Minutes</th>
+              <tr class="border-b border-line">
+                <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Employee</th>
+                <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Month</th>
+                <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Status</th>
+                <th class="py-2 px-4 text-xs text-muted-foreground uppercase">Work Minutes</th>
               </tr>
             </thead>
             <tbody>
-              ${rowsHtml || `<tr><td class="py-8 text-center text-slate-400" colspan="4">No records. Click Generate.</td></tr>`}
+              ${rowsHtml || `<tr><td class="py-8 text-center text-muted-foreground" colspan="4">No records. Click Generate.</td></tr>`}
             </tbody>
           </table>
         </div>

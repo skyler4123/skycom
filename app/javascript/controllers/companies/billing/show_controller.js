@@ -59,60 +59,60 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
           const invoice = o.invoice
           const transactions = invoice?.transactions || []
           return `
-            <tr class="border-b border-slate-100 dark:border-slate-800">
+            <tr class="border-b border-line">
               <td class="py-4 px-4 text-sm">
-                <p class="font-mono text-xs text-slate-500 dark:text-slate-400">${this.shortId(o.id)}</p>
-                <p class="text-xs text-slate-400 dark:text-slate-500">${o.created_at ? new Date(o.created_at).toLocaleDateString() : "—"}</p>
+                <p class="font-mono text-xs text-muted-foreground">${this.shortId(o.id)}</p>
+                <p class="text-xs text-muted-foreground">${o.created_at ? new Date(o.created_at).toLocaleDateString() : "—"}</p>
               </td>
-              <td class="py-4 px-4 text-sm font-semibold text-slate-900 dark:text-white">${this.formatCents(o.money_amount_cents)}</td>
-              <td class="py-4 px-4 text-sm font-mono text-emerald-600 dark:text-emerald-400">${this.formatCredits(o.credit_amount)}</td>
+              <td class="py-4 px-4 text-sm font-semibold text-foreground">${this.formatCents(o.money_amount_cents)}</td>
+              <td class="py-4 px-4 text-sm font-mono text-success ">${this.formatCredits(o.credit_amount)}</td>
               <td class="py-4 px-4 text-sm">
                 ${invoice
-                  ? `<p class="font-mono text-xs text-slate-600 dark:text-slate-300">${invoice.invoice_number}</p>${Helpers.statusBadge(invoice.payment_status)}`
-                  : `<span class="text-xs text-slate-400">${translate("No invoice")}</span>`}
+                  ? `<p class="font-mono text-xs text-muted-foreground">${invoice.invoice_number}</p>${Helpers.statusBadge(invoice.payment_status)}`
+                  : `<span class="text-xs text-muted-foreground">${translate("No invoice")}</span>`}
               </td>
               <td class="py-4 px-4 text-sm">
                 ${transactions.length > 0
                   ? transactions.map(t => `
                       <div class="flex items-center gap-2 py-0.5">
-                        <span class="text-xs text-slate-600 dark:text-slate-300">${t.company_payment_method || "—"}</span>
+                        <span class="text-xs text-muted-foreground">${t.company_payment_method || "—"}</span>
                         ${Helpers.statusBadge(t.status)}
-                        <span class="font-mono text-[10px] text-slate-400 truncate max-w-[120px]">${t.gateway_reference || ""}</span>
+                        <span class="font-mono text-[10px] text-muted-foreground truncate max-w-[120px]">${t.gateway_reference || ""}</span>
                       </div>
                     `).join("")
-                  : `<span class="text-xs text-slate-400">—</span>`}
+                  : `<span class="text-xs text-muted-foreground">—</span>`}
               </td>
             </tr>
           `
         }).join("")
       : `
         <tr>
-          <td colspan="5" class="py-10 text-center text-sm text-slate-400">${translate("No orders yet")}</td>
+          <td colspan="5" class="py-10 text-center text-sm text-muted-foreground">${translate("No orders yet")}</td>
         </tr>
       `
 
     return `
       <div class="p-4 md:p-6 overflow-y-auto space-y-6">
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
+        <div class="bg-card rounded-xl border border-line p-5">
           <div class="flex items-center gap-3">
-            <div class="size-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <div class="size-10 rounded-lg bg-success/10 text-success flex items-center justify-center">
               <span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
             </div>
             <div>
-              <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Credit Balance")}</p>
-              <p class="text-xl font-black text-slate-900 dark:text-white">${balance}</p>
+              <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Credit Balance")}</p>
+              <p class="text-xl font-black text-foreground">${balance}</p>
             </div>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-          <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">${translate("Order History")}</h3>
+        <div class="bg-card rounded-xl border border-line overflow-hidden">
+          <div class="px-4 py-3 border-b border-line">
+            <h3 class="text-sm font-bold text-foreground">${translate("Order History")}</h3>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left">
               <thead>
-                <tr class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase border-b border-slate-100 dark:border-slate-800">
+                <tr class="text-[10px] font-bold text-muted-foreground uppercase border-b border-line">
                   <th class="py-3 px-4">${translate("Order")}</th>
                   <th class="py-3 px-4">${translate("Amount")}</th>
                   <th class="py-3 px-4">${translate("Credits")}</th>

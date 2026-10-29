@@ -25,7 +25,7 @@ export default class Companies_Notifications_ShowController extends Companies_La
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load notification.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load notification.")}</div>`
           return true
         }
         return false
@@ -39,21 +39,21 @@ export default class Companies_Notifications_ShowController extends Companies_La
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div class="p-6 bg-card rounded-xl border border-line">
           <a href="${Helpers.company_notifications_path(currentCompany().id)}"
-            class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6 cursor-pointer">
+            class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back to Notifications")}
           </a>
 
           <div class="flex items-center gap-2 mb-2">
             ${Helpers.statusBadge(n.severity || "info")}
-            ${(n.tags || []).map((t) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${t.name}</span>`).join("")}
+            ${(n.tags || []).map((t) => `<span class="font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium">${t.name}</span>`).join("")}
           </div>
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white">${n.name || translate("Untitled notification")}</h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${n.created_at ? new Date(n.created_at).toLocaleString() : ""}</p>
-          <p class="text-sm text-slate-700 dark:text-slate-300 mt-4 whitespace-pre-line">${n.description || ""}</p>
-          ${n.url ? `<a href="${n.url}" class="inline-flex items-center gap-1 mt-4 text-sm text-blue-600 hover:text-blue-700 cursor-pointer">${translate("Open linked record")}<span class="material-symbols-outlined text-[18px]!">open_in_new</span></a>` : ""}
+          <h2 class="text-2xl font-black text-foreground">${n.name || translate("Untitled notification")}</h2>
+          <p class="text-xs text-muted-foreground mt-1">${n.created_at ? new Date(n.created_at).toLocaleString() : ""}</p>
+          <p class="text-sm text-foreground mt-4 whitespace-pre-line">${n.description || ""}</p>
+          ${n.url ? `<a href="${n.url}" class="inline-flex items-center gap-1 mt-4 text-sm text-primary hover:text-primary cursor-pointer">${translate("Open linked record")}<span class="material-symbols-outlined text-[18px]!">open_in_new</span></a>` : ""}
         </div>
       </div>`
   }

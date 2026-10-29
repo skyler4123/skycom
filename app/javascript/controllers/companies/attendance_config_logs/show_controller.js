@@ -25,18 +25,18 @@ export default class Companies_AttendanceConfigLogs_ShowController extends Compa
 
   actionBadge(action) {
     const colors = {
-      created: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-      updated: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+      created: 'bg-success/10 text-success ',
+      updated: 'bg-primary/10 text-primary '
     }
-    const color = colors[action] || 'bg-gray-100 text-gray-800'
+    const color = colors[action] || 'bg-muted text-foreground'
     return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}">${Helpers.capitalize(action || '')}</span>`
   }
 
   field(label, value) {
     return `
       <div>
-        <p class="text-xs font-medium text-slate-500">${translate(label)}</p>
-        <p class="text-sm font-semibold text-slate-900 dark:text-white">${value ?? '—'}</p>
+        <p class="text-xs font-medium text-muted-foreground">${translate(label)}</p>
+        <p class="text-sm font-semibold text-foreground">${value ?? '—'}</p>
       </div>`
   }
 
@@ -46,16 +46,16 @@ export default class Companies_AttendanceConfigLogs_ShowController extends Compa
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div class="p-6 bg-card rounded-xl border border-line">
           <a href="${Helpers.company_attendance_config_logs_path(currentCompany().id)}"
-            class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6 cursor-pointer">
+            class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back")}
           </a>
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Attendance Config Log")}</h2>
+          <h2 class="text-2xl font-black text-foreground mb-6">${translate("Attendance Config Log")}</h2>
           <div class="grid grid-cols-2 gap-6">
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Action")}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Action")}</p>
               <p class="text-sm font-semibold">${this.actionBadge(l.action)}</p>
             </div>
             ${this.field("Changed By", l.employee?.name)}

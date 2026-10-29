@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import ApexCharts from "apexcharts"
+import { tokenColor, tokenColorAlpha, chartGridColor } from "controllers/helpers/chart_colors"
 
 const TICK_MS = 2000
 const POOL_CAP = 10000
@@ -95,7 +96,7 @@ export default class Home_IndexController extends Controller {
 
   renderChart() {
     const categories = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"]
-    const colors = categories.map((_, i) => (i === 3 ? "#4F46E5" : "#C7D2FE"))
+    const colors = categories.map((_, i) => (i === 3 ? tokenColor("primary") : tokenColorAlpha("primary", 25)))
     const options = {
       series: [{ name: "Sales", data: this.hourly }],
       chart: { height: 176, type: "bar", toolbar: { show: false }, animations: { enabled: true, dynamicAnimation: { speed: 500 } } },
@@ -111,7 +112,7 @@ export default class Home_IndexController extends Controller {
         axisTicks: { show: false }
       },
       yaxis: { labels: { style: { fontSize: "10px" }, formatter: (val) => Math.round(val).toLocaleString("en-US") }, tickAmount: 4 },
-      grid: { borderColor: "#e2e8f0", strokeDashArray: 4, xaxis: { lines: { show: false } } }
+      grid: { borderColor: chartGridColor(), strokeDashArray: 4, xaxis: { lines: { show: false } } }
     }
     this.chart = new ApexCharts(this.velocityChartTarget, options)
     this.chart.render()

@@ -145,7 +145,7 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
 
     expect(page).to have_content("create permission updated", wait: 10)
     admin_section = find('.role-section', text: "admin")
-    expect(admin_section).to have_selector('button:not([data-controller]) .bg-blue-600, button.bg-blue-600', text: /create/, wait: 10)
+    expect(admin_section).to have_selector('button:not([data-controller]) .bg-primary, button.bg-primary', text: /create/, wait: 10)
   end
 
   scenario "click badge to deactivate permission via modal" do

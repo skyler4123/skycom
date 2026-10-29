@@ -50,7 +50,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load table config.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load table config.")}</div>`
           return true
         }
         return false
@@ -68,38 +68,38 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Table Config")}</h2>
-        <p class="text-sm text-slate-500">${translate("Controls how data is displayed in this table. To show/hide columns, add constraints or validation rules, click the Property Mapping link below.")}</p>
+        <h2 class="text-xl font-bold text-foreground">${translate("Edit Table Config")}</h2>
+        <p class="text-sm text-muted-foreground">${translate("Controls how data is displayed in this table. To show/hide columns, add constraints or validation rules, click the Property Mapping link below.")}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Name")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Name")}</label>
             <input type="text" name="table_config[name]" value="${c.name || ''}" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Description")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Description")}</label>
             <textarea name="table_config[description]" rows="2"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white">${c.description || ''}</textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground">${c.description || ''}</textarea>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Category")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
             <input type="text" value="${currentCategories().find(cat => cat.id === c.category_id)?.name || ''}" disabled
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-sm text-slate-400">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-background text-sm text-muted-foreground">
             <input type="hidden" name="table_config[category_id]" value="${c.category_id}">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Property Mapping")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Property Mapping")}</label>
             <div class="flex items-center gap-2">
               <input type="text" value="${c.property_mapping?.name || ''}" disabled
-                class="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-sm text-slate-400">
+                class="flex-1 px-3 py-2 border border-line rounded-lg bg-background text-sm text-muted-foreground">
               <input type="hidden" name="table_config[property_mapping_id]" value="${c.property_mapping_id}">
               ${c.property_mapping_id ? `
                 <a href="${Helpers.edit_company_property_mapping_path(companyId, c.property_mapping_id)}"
-                  class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                  class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-primary hover:text-primary hover:bg-primary/10 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
                   ${tooltip(translate("Manage property fields: show/hide columns, add constraints or validation rules"))}
                 >
                   <span class="material-symbols-outlined text-[18px]!">open_in_new</span>
@@ -110,13 +110,13 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           </div>
         </div>
 
-        <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
-          <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Column Config")}</h3>
+        <div class="border-t border-line pt-6 mt-6">
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Column Config")}</h3>
 
-          <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-gray-800">
+          <div class="overflow-x-auto rounded-lg border border-line">
             <table class="w-full text-left border-collapse">
               <thead>
-                <tr class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-gray-800">
+                <tr class="text-xs text-muted-foreground bg-muted border-b border-line">
                   <th class="py-2 px-3 font-medium"
                     ${tooltip(translate("Field key stored in the database (e.g. name, property_string_1)"))}
                   >${translate("Key")}</th>
@@ -154,11 +154,11 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
         <div class="flex justify-end gap-3 pt-2">
           <a href="${Helpers.company_table_config_path(companyId, c.id)}"
-            class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
+            class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg cursor-pointer">
             ${translate("Cancel")}
           </a>
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer">
             ${translate("Save Changes")}
           </button>
         </div>
@@ -170,7 +170,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
         ${form({
           action: Helpers.company_table_config_path(companyId, c.id),
           method: "PATCH",
-          attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false" novalidate`,
+          attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false" novalidate`,
           html: fields
         })}
       </div>
@@ -235,19 +235,19 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   addColumnDropdownHTML() {
     const available = this.availableColumns()
     if (available.length === 0) {
-      return `<p class="text-sm text-slate-400 mt-3">${translate("All columns are in use.")}</p>`
+      return `<p class="text-sm text-muted-foreground mt-3">${translate("All columns are in use.")}</p>`
     }
     return `
       <div class="flex items-center gap-2 mt-3">
         <label for="new-column-slot" class="sr-only">${translate("Add Column")}</label>
         <select id="new-column-slot"
-          class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+          class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground"
           data-action="change->${this.identifier}#addColumn">
           <option value="">${translate("Add Column")}</option>
           ${available.map(c => `<option value="${this.escapeHTML(c.key)}">${this.escapeHTML(c.name)}</option>`).join('')}
         </select>
         <button type="button" data-action="click->${this.identifier}#addColumn"
-          class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer">
+          class="px-3 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm font-medium transition-colors cursor-pointer">
           ${translate("Add Column")}
         </button>
       </div>
@@ -349,52 +349,52 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     const key = col.key || ''
 
     return `
-      <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
+      <tr class="border-b border-line last:border-0">
         <td class="py-2 px-3">
           <input type="text" name="table_config[metadata][columns][${index}][key]" value="${key}" readonly
-            class="w-full px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed">
+            class="w-full px-2 py-1 text-xs font-mono border border-line rounded bg-background text-muted-foreground cursor-not-allowed">
         </td>
         <td class="py-2 px-3">
           ${key.startsWith('property_') || key.startsWith('extra_') ? `
             <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
-              class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
+              class="w-full px-2 py-1 text-xs border border-line rounded bg-background text-muted-foreground cursor-not-allowed"
               readonly
               ${tooltip(translate("This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name."))}
             >
           ` : `
             <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
-              class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+              class="w-full px-2 py-1 text-xs border border-line rounded bg-card text-foreground">
           `}
         </td>
         <td class="py-2 px-3 text-center">
           <input type="hidden" name="table_config[metadata][columns][${index}][visible]" value="false">
           <input type="checkbox" name="table_config[metadata][columns][${index}][visible]" value="true" ${col.visible !== false ? 'checked' : ''}
-            class="rounded border-slate-300 text-blue-600 cursor-pointer">
+            class="rounded border-line text-primary cursor-pointer">
         </td>
         <td class="py-2 px-3 text-center">
           ${this.isSearchableColumn(key) ? `
             <input type="hidden" name="table_config[metadata][columns][${index}][search]" value="false">
             <input type="checkbox" id="col-search-${index}" name="table_config[metadata][columns][${index}][search]" value="true" ${col.search === true ? 'checked' : ''}
-              class="rounded border-slate-300 text-blue-600 cursor-pointer"
+              class="rounded border-line text-primary cursor-pointer"
               ${tooltip(translate("Allow keyword search on this column"))}>
-          ` : `<span class="text-slate-300 dark:text-slate-700">—</span>`}
+          ` : `<span class="text-muted-foreground/60">—</span>`}
         </td>
         <td class="py-2 px-3">
           ${this.canFilter(col) ? `
             <div class="flex items-center gap-2 mb-1">
               <input type="hidden" name="table_config[metadata][columns][${index}][filter_active]" value="false">
               <input type="checkbox" id="col-filter-active-${index}" name="table_config[metadata][columns][${index}][filter_active]" value="true" ${col.filter?.active !== false ? 'checked' : ''}
-                class="rounded border-slate-300 text-blue-600 cursor-pointer"
+                class="rounded border-line text-primary cursor-pointer"
                 ${tooltip(translate("Enable this filter on the index page"))}>
-              <span class="text-[10px] font-bold text-slate-400 uppercase">${translate("Active")}</span>
+              <span class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Active")}</span>
             </div>
             <textarea id="col-filter-${index}" name="table_config[metadata][columns][${index}][filter]" rows="2" placeholder='${this.filterSkeleton(col)}'
-              class="w-44 px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">${this.escapeHTML(filterValue)}</textarea>
-          ` : `<span class="text-slate-300 dark:text-slate-700">—</span>`}
+              class="w-44 px-2 py-1 text-xs font-mono border border-line rounded bg-card text-foreground">${this.escapeHTML(filterValue)}</textarea>
+          ` : `<span class="text-muted-foreground/60">—</span>`}
         </td>
         <td class="py-2 px-3">
           <select name="table_config[metadata][columns][${index}][align]"
-            class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+            class="w-full px-1 py-1 text-xs border border-line rounded bg-card text-foreground">
             <option value="left" ${col.align === 'left' ? 'selected' : ''}>left</option>
             <option value="center" ${col.align === 'center' ? 'selected' : ''}>center</option>
             <option value="right" ${col.align === 'right' ? 'selected' : ''}>right</option>
@@ -402,11 +402,11 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
         </td>
         <td class="py-2 px-3">
           <input type="number" name="table_config[metadata][columns][${index}][width]" value="${col.width ?? ''}" placeholder="auto"
-            class="w-16 px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+            class="w-16 px-1 py-1 text-xs border border-line rounded bg-card text-foreground">
         </td>
         <td class="py-2 px-3 text-right">
           <button type="button" data-action="click->${this.identifier}#removeColumn" data-index="${index}"
-            class="inline-flex items-center justify-center p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer">
+            class="inline-flex items-center justify-center p-1 text-danger hover:text-danger hover:bg-danger/10 rounded-lg cursor-pointer">
             <span class="material-symbols-outlined text-[16px]">delete</span>
           </button>
         </td>

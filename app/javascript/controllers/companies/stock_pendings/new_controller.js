@@ -96,14 +96,14 @@ export default class Companies_StockPendings_NewController extends Companies_Lay
   }
 
   contentHTML() {
-    const inputClass = "w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-    const labelClass = "text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider"
+    const inputClass = "w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none"
+    const labelClass = "text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
     const selected = this.selectedStock()
 
     return `
       <div class="p-4 overflow-y-auto">
-        <form data-action="submit->${this.identifier}#handleSubmit" class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 space-y-6">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Stock Pending")}</h2>
+        <form data-action="submit->${this.identifier}#handleSubmit" class="p-6 bg-card rounded-xl border border-line space-y-6">
+          <h2 class="text-xl font-bold text-foreground">${translate("New Stock Pending")}</h2>
 
           <div class="grid grid-cols-2 gap-4">
             <div class="space-y-1">
@@ -140,11 +140,11 @@ export default class Companies_StockPendings_NewController extends Companies_Lay
             </div>
           </div>
 
-          <p id="pending-available-hint" class="text-sm text-slate-500 dark:text-slate-400">${selected ? `${translate("Available")}: ${selected.available}` : ""}</p>
+          <p id="pending-available-hint" class="text-sm text-muted-foreground">${selected ? `${translate("Available")}: ${selected.available}` : ""}</p>
 
           <div class="flex justify-end gap-3 pt-2">
-            <a href="${Helpers.company_stock_pendings_path(currentCompany().id)}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">${translate("Cancel")}</a>
-            <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">${translate("Create")}</button>
+            <a href="${Helpers.company_stock_pendings_path(currentCompany().id)}" class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg cursor-pointer">${translate("Cancel")}</a>
+            <button type="submit" class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer">${translate("Create")}</button>
           </div>
         </form>
       </div>`

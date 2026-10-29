@@ -139,7 +139,7 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
 
     const tabButton = (key, label) => `
       <button type="button" data-action="click->${this.identifier}#switchTab" data-tab="${key}"
-        class="px-4 py-2 text-sm font-medium rounded-lg ${this.tab === key ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'}">
+        class="px-4 py-2 text-sm font-medium rounded-lg ${this.tab === key ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}">
         ${label}
       </button>
     `
@@ -147,7 +147,7 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
     let rowsHtml = ""
     if (this.tab === "invoices") {
       rowsHtml = this.invoices.map(r => `
-        <tr class="border-b border-slate-200 dark:border-slate-800">
+        <tr class="border-b border-line">
           <td class="py-2 px-4 text-sm">${r.code || "—"}</td>
           <td class="py-2 px-4 text-sm">${r.created_at ? new Date(r.created_at).toLocaleString() : "—"}</td>
           <td class="py-2 px-4 text-sm">${r.payment_status || "—"}</td>
@@ -156,7 +156,7 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
       `).join("")
     } else if (this.tab === "purchases") {
       rowsHtml = this.purchases.map(r => `
-        <tr class="border-b border-slate-200 dark:border-slate-800">
+        <tr class="border-b border-line">
           <td class="py-2 px-4 text-sm">${r.code || "—"}</td>
           <td class="py-2 px-4 text-sm">${r.name || "—"}</td>
           <td class="py-2 px-4 text-sm">${r.created_at ? new Date(r.created_at).toLocaleString() : "—"}</td>
@@ -166,7 +166,7 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
       `).join("")
     } else {
       rowsHtml = this.stockExports.map(r => `
-        <tr class="border-b border-slate-200 dark:border-slate-800">
+        <tr class="border-b border-line">
           <td class="py-2 px-4 text-sm">${r.code || "—"}</td>
           <td class="py-2 px-4 text-sm">${r.name || "—"}</td>
           <td class="py-2 px-4 text-sm">${r.created_at ? new Date(r.created_at).toLocaleString() : "—"}</td>
@@ -181,34 +181,34 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
     return `
       <div class="p-4 overflow-y-auto space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <p class="text-xs text-slate-500 uppercase">Invoices</p>
+          <div class="p-4 bg-card rounded-xl border border-line">
+            <p class="text-xs text-muted-foreground uppercase">Invoices</p>
             <p class="text-lg font-bold">${inv.count ?? 0}</p>
-            <p class="text-sm text-slate-500">Total cents: ${inv.total_cents ?? 0}</p>
+            <p class="text-sm text-muted-foreground">Total cents: ${inv.total_cents ?? 0}</p>
           </div>
-          <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <p class="text-xs text-slate-500 uppercase">Purchases</p>
+          <div class="p-4 bg-card rounded-xl border border-line">
+            <p class="text-xs text-muted-foreground uppercase">Purchases</p>
             <p class="text-lg font-bold">${pur.count ?? 0}</p>
-            <p class="text-sm text-slate-500">Total: ${pur.total_amount ?? 0}</p>
+            <p class="text-sm text-muted-foreground">Total: ${pur.total_amount ?? 0}</p>
           </div>
-          <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <p class="text-xs text-slate-500 uppercase">Stock Exports</p>
+          <div class="p-4 bg-card rounded-xl border border-line">
+            <p class="text-xs text-muted-foreground uppercase">Stock Exports</p>
             <p class="text-lg font-bold">${stk.count ?? 0}</p>
-            <p class="text-sm text-slate-500">Quantity: ${stk.total_quantity ?? 0}</p>
+            <p class="text-sm text-muted-foreground">Quantity: ${stk.total_quantity ?? 0}</p>
           </div>
         </div>
 
         <form data-action="submit->${this.identifier}#applyPeriod" class="flex flex-wrap items-end gap-3">
           <div>
-            <label class="text-xs text-slate-500 uppercase">From</label>
+            <label class="text-xs text-muted-foreground uppercase">From</label>
             <input type="date" name="from" value="${this.from}" class="px-3 py-2 border rounded-lg text-sm" />
           </div>
           <div>
-            <label class="text-xs text-slate-500 uppercase">To</label>
+            <label class="text-xs text-muted-foreground uppercase">To</label>
             <input type="date" name="to" value="${this.to}" class="px-3 py-2 border rounded-lg text-sm" />
           </div>
-          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">Apply</button>
-          <button type="button" data-action="click->${this.identifier}#exportCsv" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm">Export CSV</button>
+          <button type="submit" class="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm">Apply</button>
+          <button type="button" data-action="click->${this.identifier}#exportCsv" class="px-4 py-2 bg-muted rounded-lg text-sm">Export CSV</button>
         </form>
 
         <div class="flex gap-2">
@@ -217,10 +217,10 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
           ${tabButton("stock_exports", "COGS / Stock Issues")}
         </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-x-auto">
+        <div class="bg-card rounded-xl border border-line overflow-x-auto">
           <table class="w-full text-left">
             <tbody>
-              ${rowsHtml || `<tr><td class="py-8 text-center text-slate-400" colspan="5">No records</td></tr>`}
+              ${rowsHtml || `<tr><td class="py-8 text-center text-muted-foreground" colspan="5">No records</td></tr>`}
             </tbody>
           </table>
         </div>

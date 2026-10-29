@@ -1,5 +1,6 @@
 import ApexCharts from "apexcharts"
 import Companies_LayoutController from "controllers/companies/layout_controller"
+import { tokenColor, chartLabelColor } from "controllers/helpers/chart_colors"
 
 export default class Companies_Analytics_IndexController extends Companies_LayoutController {
   static targets = ["marginChart", "velocityChart", "clvChart", "staffChart"]
@@ -87,9 +88,9 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     return `
       <div class="p-4 overflow-y-auto">
         <div class="mb-6 flex items-center justify-between">
-          <h1 class="text-2xl font-black text-slate-900 dark:text-white">${translate("Analytics")}</h1>
+          <h1 class="text-2xl font-black text-foreground">${translate("Analytics")}</h1>
           <select data-action="change->${this.identifier}#onPeriodChange"
-            class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer">
+            class="px-3 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground cursor-pointer">
             <option value="this_month" ${period === "this_month" ? "selected" : ""}>${translate("This Month")}</option>
             <option value="last_month" ${period === "last_month" ? "selected" : ""}>${translate("Last Month")}</option>
             <option value="last_6_months" ${period === "last_6_months" ? "selected" : ""}>${translate("Last 6 Months")}</option>
@@ -106,11 +107,11 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
         </div>
 
         <!-- Profit Margins Chart -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 mb-6">
+        <div class="bg-card rounded-xl border border-line p-6 mb-6">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="text-lg font-bold text-slate-900 dark:text-white">${translate("Revenue & Profit Margins")}</h2>
-              <p class="text-sm text-slate-500">${translate("Overall margin")}: <span class="font-semibold ${this.profitMargins.overall_margin_pct >= 0 ? 'text-emerald-600' : 'text-red-600'}">${this.profitMargins.overall_margin_pct}%</span></p>
+              <h2 class="text-lg font-bold text-foreground">${translate("Revenue & Profit Margins")}</h2>
+              <p class="text-sm text-muted-foreground">${translate("Overall margin")}: <span class="font-semibold ${this.profitMargins.overall_margin_pct >= 0 ? 'text-success' : 'text-danger'}">${this.profitMargins.overall_margin_pct}%</span></p>
             </div>
           </div>
           <div data-${this.identifier}-target="marginChart" class="h-72"></div>
@@ -119,25 +120,25 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
         <!-- Two-column section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <!-- Inventory Velocity -->
-          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-1">${translate("Inventory Velocity")}</h2>
+          <div class="bg-card rounded-xl border border-line p-6">
+            <h2 class="text-lg font-bold text-foreground mb-1">${translate("Inventory Velocity")}</h2>
             ${this.inventoryVelocity.low_stock_count > 0
-              ? `<p class="text-sm text-amber-600 mb-4">${this.inventoryVelocity.low_stock_count} ${translate("low stock items")}</p>`
-              : `<p class="text-sm text-emerald-600 mb-4">${translate("Stock levels healthy")}</p>`}
+              ? `<p class="text-sm text-warning mb-4">${this.inventoryVelocity.low_stock_count} ${translate("low stock items")}</p>`
+              : `<p class="text-sm text-success mb-4">${translate("Stock levels healthy")}</p>`}
             <div data-${this.identifier}-target="velocityChart" class="h-72"></div>
           </div>
 
           <!-- Customer CLV -->
-          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-1">${translate("Customer CLV")}</h2>
-            <p class="text-sm text-slate-500 mb-4">${this.customerCLV.new_customers_30d} ${translate("new customers in 30 days")}</p>
+          <div class="bg-card rounded-xl border border-line p-6">
+            <h2 class="text-lg font-bold text-foreground mb-1">${translate("Customer CLV")}</h2>
+            <p class="text-sm text-muted-foreground mb-4">${this.customerCLV.new_customers_30d} ${translate("new customers in 30 days")}</p>
             <div data-${this.identifier}-target="clvChart" class="h-72"></div>
           </div>
         </div>
 
         <!-- Staff Performance -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-4">${translate("Staff Performance")}</h2>
+        <div class="bg-card rounded-xl border border-line p-6">
+          <h2 class="text-lg font-bold text-foreground mb-4">${translate("Staff Performance")}</h2>
           <div data-${this.identifier}-target="staffChart" class="h-72"></div>
         </div>
       </div>
@@ -146,14 +147,14 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
 
   summaryCard(key, value, label, icon) {
     return `
-      <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
+      <div class="bg-card rounded-xl border border-line p-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-[20px]">${icon}</span>
+          <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-primary text-[20px]">${icon}</span>
           </div>
           <div>
-            <p class="text-2xl font-black text-slate-900 dark:text-white">${value}</p>
-            <p class="text-xs font-medium text-slate-500">${translate(label)}</p>
+            <p class="text-2xl font-black text-foreground">${value}</p>
+            <p class="text-xs font-medium text-muted-foreground">${translate(label)}</p>
           </div>
         </div>
       </div>
@@ -189,15 +190,15 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
         { name: translate("Margin %"), type: "line", data: margins }
       ],
       chart: { height: 280, type: "line", toolbar: { show: false } },
-      colors: ["#3b82f6", "#94a3b8", "#10b981"],
+      colors: [tokenColor("primary"), tokenColor("muted-foreground"), tokenColor("success")],
       stroke: { width: [0, 0, 3] },
-      xaxis: { categories: months, labels: { style: { colors: "#94a3b8" } } },
+      xaxis: { categories: months, labels: { style: { colors: chartLabelColor() } } },
       yaxis: [
-        { title: { text: "$" }, labels: { style: { colors: "#94a3b8" } } },
-        { opposite: true, title: { text: "%" }, max: 100, labels: { style: { colors: "#10b981" } } }
+        { title: { text: "$" }, labels: { style: { colors: chartLabelColor() } } },
+        { opposite: true, title: { text: "%" }, max: 100, labels: { style: { colors: tokenColor("success") } } }
       ],
       tooltip: { shared: true, intersect: false },
-      legend: { position: "top", horizontalAlign: "right", labels: { colors: "#94a3b8" } }
+      legend: { position: "top", horizontalAlign: "right", labels: { colors: chartLabelColor() } }
     })
     chart.render()
     this.charts.push(chart)
@@ -212,10 +213,10 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     const chart = new ApexCharts(container, {
       series: [{ name: translate("Units Sold (30d)"), data: top.map(p => p.units_sold_30d) }],
       chart: { height: 280, type: "bar", toolbar: { show: false } },
-      colors: ["#3b82f6"],
+      colors: [tokenColor("primary")],
       plotOptions: { bar: { horizontal: true, borderRadius: 4 } },
-      xaxis: { categories: top.map(p => p.name), labels: { style: { colors: "#94a3b8" } } },
-      yaxis: { labels: { style: { colors: "#94a3b8" } } },
+      xaxis: { categories: top.map(p => p.name), labels: { style: { colors: chartLabelColor() } } },
+      yaxis: { labels: { style: { colors: chartLabelColor() } } },
       legend: { show: false }
     })
     chart.render()
@@ -231,10 +232,10 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     const chart = new ApexCharts(container, {
       series: [{ name: translate("Total Spent"), data: top.map(c => Math.round(c.total_spent_cents / 100)) }],
       chart: { height: 280, type: "bar", toolbar: { show: false } },
-      colors: ["#8b5cf6"],
+      colors: [tokenColor("primary")],
       plotOptions: { bar: { horizontal: true, borderRadius: 4 } },
-      xaxis: { categories: top.map(c => c.name), labels: { style: { colors: "#94a3b8" } } },
-      yaxis: { labels: { style: { colors: "#94a3b8" } } },
+      xaxis: { categories: top.map(c => c.name), labels: { style: { colors: chartLabelColor() } } },
+      yaxis: { labels: { style: { colors: chartLabelColor() } } },
       tooltip: { y: { formatter: (val) => `$${val.toLocaleString()}` } },
       legend: { show: false }
     })
@@ -256,11 +257,11 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
         { name: translate("Overtime"), data: overtime }
       ],
       chart: { height: 280, type: "bar", toolbar: { show: false } },
-      colors: ["#3b82f6", "#f59e0b"],
+      colors: [tokenColor("primary"), tokenColor("warning")],
       plotOptions: { bar: { horizontal: false, borderRadius: 4 } },
-      xaxis: { categories: employees, labels: { style: { colors: "#94a3b8" } } },
-      yaxis: { title: { text: translate("Hours") }, labels: { style: { colors: "#94a3b8" } } },
-      legend: { position: "top", horizontalAlign: "right", labels: { colors: "#94a3b8" } }
+      xaxis: { categories: employees, labels: { style: { colors: chartLabelColor() } } },
+      yaxis: { title: { text: translate("Hours") }, labels: { style: { colors: chartLabelColor() } } },
+      legend: { position: "top", horizontalAlign: "right", labels: { colors: chartLabelColor() } }
     })
     chart.render()
     this.charts.push(chart)
