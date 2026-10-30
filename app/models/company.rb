@@ -97,7 +97,7 @@ class Company < ApplicationRecord
   # tracks when usage happened. The job drains the accumulated delta into the
   # DB's hourly/daily slots and resets it to 0, so the counter always holds
   # the UNSYNCED delta since the last run.
-  kredis_counter :credit_usage
+  kredis_counter :credit_usage, key: ->(c) { CacheKeyService.company_credit_usage(c.id) }
   belongs_to :user
 
   has_many :property_mappings, dependent: :destroy
