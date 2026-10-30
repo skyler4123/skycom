@@ -18,7 +18,6 @@ mobile backlog item.
 |---|---|
 | ✅ | Available on mobile and usable end to end |
 | 🟡 | Partial: limited or read-only mobile version |
-| 🧪 | UI exists, data is a marked sample |
 | 🚧 | Planned mobile work, not built |
 | ⛔ | Web-only by design for mobile v1 |
 | 💤 | The web feature itself is coming soon |
@@ -40,13 +39,13 @@ Source files for the inventory:
 | Domain | Mobile today | What works | Main gap |
 |---|---|---|---|
 | Auth | 🟡 | Email/password sign-in, sign-out, session cookie | Forgot password, biometrics, SSO |
-| Home | 🟡 🧪 | Greeting, live clock, multi check-in state/times, today shift, monthly stats, quick actions, activity | Paid leave and notice are samples |
-| Profile | 🟡 🧪 | Own name, code, type, roles, category, email, phone, company, branch, departments, next shift, monthly totals | No edit, no dynamic profiles, reports-to/contract are samples |
+| Home | 🟡 | Greeting, live clock, multi check-in state/times, today shift, monthly stats, quick actions, activity, paid-leave balance, latest company notice | No checkout/break |
+| Profile | 🟡 | Own name, code, type, roles, category, email, phone, company, branch, departments, next shift, monthly totals, reports-to, contract renewal | No edit, no dynamic profiles |
 | Attendance | 🟡 | Own month summary, daily rows, month navigation, check-in | No check-out, geofence, QR, request history, or PDF |
-| Requests | 🟡 | Create attendance request with validation | No inbox, status, approver, or attachments |
-| Payroll | 🟡 🧪 | Own status/step, period, worked hours, present days, overtime | Money is a sample; no payslip/PDF |
+| Requests | 🟡 | Create attendance request with validation, assigned approver from manager chain | No inbox, status, or attachments |
+| Payroll | 🟡 | Own status/step, period, worked hours, present days, overtime, salary/allowance/tax/net money | No payslip/PDF |
 | Notifications | ⛔ | — | No inbox, unread badge, mark-read, push, or preferences |
-| Leave | 🧪 | Sample paid-leave card on Home | No leave model, request, balance, or history |
+| Leave | 🟡 | Paid-leave balance and pending days on Home, seeded leave requests | No leave request form or history |
 | Schedule | 🟡 | Today/next shift read | No roster, shift list, or swap |
 | Documents and help desk | ⛔ | — | Web-only; future candidates |
 | Native shell | 🟡 | Five tabs, pull-to-refresh, edge-to-edge safe area, dark mode | No GPS, camera, biometrics, push, offline, or deep links |
@@ -64,7 +63,9 @@ month, payroll). The web has **69 sidebar items** across 16 active groups plus
 4. Notifications exist on web but have no mobile surface.
 5. `current_user.employees.first` is used everywhere; multi-employee users
    can see the wrong record.
-6. Payroll money and leave are not modelled; their mobile values are samples.
+6. Payroll money, paid-leave balances, and company notices are now real
+   persisted data, but they are seed-only: there is no payroll-money editor,
+   leave request flow, or announcement management UI yet.
 
 ---
 
@@ -73,11 +74,11 @@ month, payroll). The web has **69 sidebar items** across 16 active groups plus
 | # | Screen | Route | Controller | Reads | Writes | Limits |
 |---|---|---|---|---|---|---|
 | 1 | Sign in | `GET/POST /mobile/sign_in` | `Mobile::SessionsController#new/create` | `User`, session | Sign in | No forgot password or biometrics; sign-in activity has no tabs |
-| 2 | Home | `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `Employee`, `AttendanceMonth`, `ScheduledShift`, `AttendanceLog`, `AttendanceRequest`, `Payroll` | Check-in via `POST /mobile/companies/:company_id/attendances` | Paid leave and notice are samples; no checkout or break |
-| 3 | Employee | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `Employee`, roles, departments, category, next shift, month totals | — | Read-only; no edit or dynamic profiles |
+| 2 | Home | `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `Employee`, `AttendanceMonth`, `ScheduledShift`, `AttendanceLog`, `AttendanceRequest`, `Payroll`, `LeaveBalance`, `Document` | Check-in via `POST /mobile/companies/:company_id/attendances` | No checkout or break |
+| 3 | Employee | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `Employee` (manager), roles, departments, category, next shift, month totals | — | Read-only; no edit or dynamic profiles |
 | 4 | Attendance month | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `AttendanceMonth`, `AttendanceDay` | — | Read-only; no PDF, collect, or request list |
-| 5 | Payroll | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `Payroll`, `AttendanceMonth` | — | Money is a sample; no payslip download |
-| 6 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee`, `AttendanceRequest` | Create request | Approver is a sample; no attachments |
+| 5 | Payroll | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `Payroll` (money), `AttendanceMonth` | — | No payslip download |
+| 6 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee` (manager), `AttendanceRequest` | Create request | No attachments |
 
 `GET /mobile/home` remains the signed-in no-employee fallback and renders
 without a company id. Every tenant page asserts membership through
@@ -121,15 +122,15 @@ Cross-cutting mobile behavior:
 | Attendance request create | ✅ | ✅ | Date, type, times, reason |
 | Request list/status | ✅ admin | ⛔ | Requests tab is the form |
 | Request approvals | ✅ manager | ⛔ | Web-only manager workflow |
-| Request approver | ✅ after decision | 🧪 | Sample approver; no assignment |
+| Request approver | ✅ after decision | ✅ | Derived from the employee's manager (owner/manager fallback) |
 | Request attachments | — | ⛔ | No attachment association |
 | Attendance PDF/audit | — | ⛔ | No endpoint; HR roadmap item |
 | Payroll status/step | ✅ admin | ✅ | Draft/approved/paid |
 | Payroll hours/day totals | ✅ admin | ✅ | From `AttendanceMonth` |
-| Payroll money | — | 🧪 | Table has no money columns |
+| Payroll money | ✅ admin | ✅ | `payrolls` money columns + `Payrolls::GenerateService` |
 | Payslip/PDF | ❓ route only | ⛔ | `payslips` route has no controller/model |
-| Leave balance | — | 🧪 | Sample on Home |
-| Leave request/history | — | ⛔ | No leave model |
+| Leave balance | — | ✅ | `LeaveBalance` + approved/pending `LeaveRequest` rows on Home |
+| Leave request/history | — | ⛔ | No mobile leave form or history yet |
 | Notifications inbox | ✅ | ⛔ | Web controller exists |
 | Unread badge | ✅ | ⛔ | Header has no bell |
 | Mark read/all read | ✅ | ⛔ | Web endpoints exist |
@@ -137,7 +138,7 @@ Cross-cutting mobile behavior:
 | Notification preferences | ✅ | ⛔ | Web config only |
 | Profile edit | ✅ admin | ⛔ | Mobile edit button is disabled |
 | Dynamic profiles/subprofiles | ✅ admin | ⛔ | Mobile shows basic profile only |
-| Reports-to / contract | — | 🧪 | Sample rows |
+| Reports-to / contract | — | ✅ | `manager_id` and `expiration_date` |
 | Multi-employee/company switch | ✅ employee list | ⛔ | `employees.first` everywhere |
 | Dark mode | ✅ | ✅ | Shared storage key |
 | Language switch | ✅ JS dictionary | ⛔ | Mobile ERB is English-only |
@@ -157,7 +158,7 @@ status.
 |---|---|---|
 | Employee | 🟡 | Own profile view only; web has list/create/edit |
 | Attendance | 🟡 | Own month view only; web has admin list/collect |
-| Payroll | 🟡 🧪 | Own status and hours; money is a sample |
+| Payroll | 🟡 | Own status, hours, and money; no payslip |
 
 ### General
 
@@ -272,7 +273,7 @@ status.
 
 | Web item | Mobile | Reason / next |
 |---|---|---|
-| Payroll Data | 🟡 🧪 | Own read-only status/hours; money is a sample |
+| Payroll Data | 🟡 | Own read-only status/hours/money; no payslip |
 | Payroll Config | ⛔ | Admin |
 
 ### Authorization
@@ -338,16 +339,14 @@ status.
 | M-03 | Request inbox and status | The Requests tab opens a form; employees cannot see history or decisions | `AttendanceRequestsController#index` or a mobile-only query | Own requests list with date, type, status, detail link; New Request button | M |
 | M-04 | Notifications inbox and unread badge | Web notifications exist; mobile has no surface | `Companies::NotificationsController` | List, mark read/all read, unread count in the header | M |
 | M-05 | Multi-employee/company selector | Every mobile controller uses `employees.first`; multi-account users can see the wrong record | Session/current-employee selection | Selector at sign-in or profile; all mobile pages scoped to the selection | M |
-| M-06 | Production preview-data gate | Payroll money, leave, notice, and approver are samples | Feature flag/config | Samples hidden or explicitly gated in production builds | S |
-
 ### P1 — self-service parity
 
 | ID | Feature | Why | Depends on | Acceptance | Effort |
 |---|---|---|---|---|---|
-| M-07 | Leave balance and requests | Home shows a sample paid-leave card | New leave model + endpoints | Real balance, request form, history, status | L |
-| M-08 | Payslip/PDF and payroll money | Payroll has no money columns; `payslips` route is stale | Payroll money engine + document generation | Real net/gross/deductions and a downloadable payslip | L |
-| M-09 | Announcements and company notice | Home notice is a sample; `announcements` route has no controller/model | Announcement model + read tracking | Real notice list and Home highlight | M |
-| M-10 | Approver assignment and request attachments | Request has `decided_by` only; no attachments | Model fields + ActiveStorage | Assigned approver visible; optional photo/PDF proof | M |
+| M-07 | Leave request form and history | Balance/pending days are real and seeded, but employees cannot file leave on mobile | Mobile leave form + endpoints | Request, cancel, history, status | M |
+| M-08 | Payslip/PDF | Payroll money is real; the `payslips` route is stale | Document generation | Downloadable payslip from persisted payroll money | M |
+| M-09 | Announcement list and read tracking | Home shows the latest published `Document` notice; no list/read state | Announcement list + read tracking | List and read/unread state | M |
+| M-10 | Request attachments | Approver is derived from the manager chain; no attachments | ActiveStorage + mobile upload | Optional photo/PDF proof | M |
 | M-11 | Profile edit | Mobile profile is read-only | Mobile form + permitted fields | Employee can edit allowed fields (for example phone, email) | M |
 | M-12 | GPS/geofence check-in | Mobile check-in bypasses `AttendanceConfig` and `CheckInService` | Android location permission + native/WebView geolocation | Check-in validates branch geofence or WiFi, with a clear failure state | L |
 | M-13 | Push notifications | No FCM or `POST_NOTIFICATIONS` | Firebase + native permission + backend | Push received and opens the relevant mobile page | L |
@@ -428,8 +427,9 @@ preferences, and dynamic employee profiles.
 - Use the status legend exactly; do not add a new status without updating §0.
 - A mobile feature is only ✅ when it has a real data source, a working write
   path where applicable, and a feature or request spec.
-- Samples are never ✅. If a mockup value has no backend, it is 🧪 and must be
-  labelled `Sample` in the UI.
+- A mockup value with no backend is not ✅. The mobile namespace no longer
+  ships hardcoded sample values; add the model/seed data instead of a new
+  `Sample` badge.
 - Web-only ERP/admin features stay ⛔ unless a product decision explicitly
   moves them into the mobile backlog.
 
@@ -442,7 +442,7 @@ preferences, and dynamic employee profiles.
 | Mobile routes | `config/routes.rb` (`namespace :mobile`) |
 | Mobile controllers | `app/controllers/mobile/` |
 | Mobile views/partials | `app/views/mobile/` |
-| Mobile formatting/samples | `app/helpers/mobile_helper.rb` |
+| Mobile formatting helpers | `app/helpers/mobile_helper.rb` |
 | Mobile implementation contract | `docs/MOBILE.md` |
 | Android shell | `android/app/src/main/java/com/example/skycomandroid/MainActivity.kt` |
 | Android path config | `android/app/src/main/assets/json/path-configuration.json` |

@@ -57,10 +57,34 @@ export default class Companies_Payrolls_ShowController extends Companies_LayoutC
     }
   }
 
+  formatMoney(cents, currency = "usd") {
+    const amount = (cents || 0) / 100
+    return new Intl.NumberFormat(currency === "vnd" ? "vi-VN" : "en-US", {
+      style: "currency",
+      currency: currency.toUpperCase(),
+      maximumFractionDigits: currency === "vnd" ? 0 : 2
+    }).format(amount)
+  }
+
   contentHTML() {
     const p = this.payroll || {}
     const emp = p.employee || {}
     const meta = p.metadata || {}
+    const currency = p.currency || "usd"
+    const moneyRows = [
+      { label: "Base salary", value: p.base_amount_cents },
+      { label: "Shift allowance", value: p.allowance_amount_cents },
+      { label: "Overtime", value: p.overtime_amount_cents },
+      { label: "Gross pay", value: p.gross_amount_cents },
+      { label: "Tax", value: p.tax_amount_cents },
+      { label: "Social insurance", value: p.deduction_amount_cents },
+      { label: "Net pay", value: p.net_amount_cents }
+    ].map(row => `
+      <div class="p-3 bg-background rounded-lg border border-line">
+        <p class="text-xs uppercase text-muted-foreground">${row.label}</p>
+        <p class="text-lg font-bold text-foreground">${this.formatMoney(row.value, currency)}</p>
+      </div>
+    `).join("")
     const daysHtml = this.attendanceDays.map(d => `
       <tr class="border-b border-line">
         <td class="py-2 px-4 text-sm">${d.attendance_date || "—"}</td>
@@ -79,6 +103,10 @@ export default class Companies_Payrolls_ShowController extends Companies_LayoutC
           <p class="text-sm text-muted-foreground">Month: ${p.month || "—"}</p>
           <p class="text-sm text-muted-foreground">Status: ${p.status || "—"}</p>
           <p class="text-sm text-muted-foreground">Work minutes: ${meta.total_work_minutes ?? "—"}</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          ${moneyRows}
         </div>
 
         <form data-action="submit->${this.identifier}#handleSubmit" class="p-4 bg-card rounded-xl border border-line space-y-4 max-w-xl">

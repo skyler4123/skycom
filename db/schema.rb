@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_29_000007) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -3199,6 +3199,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "manager_id"
+    t.bigint "monthly_salary_cents", default: 0, null: false
+    t.bigint "monthly_allowance_cents", default: 0, null: false
     t.index ["branch_id"], name: "index_employees_on_branch_id"
     t.index ["business_type"], name: "index_employees_on_business_type"
     t.index ["category_id"], name: "index_employees_on_category_id"
@@ -3208,6 +3211,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.index ["email"], name: "index_employees_on_email", unique: true
     t.index ["external_id"], name: "index_employees_on_external_id"
     t.index ["lifecycle_status"], name: "index_employees_on_lifecycle_status"
+    t.index ["manager_id"], name: "index_employees_on_manager_id"
     t.index ["property_mapping_id"], name: "index_employees_on_property_mapping_id"
     t.index ["user_id"], name: "index_employees_on_user_id"
     t.index ["workflow_status"], name: "index_employees_on_workflow_status"
@@ -4001,6 +4005,41 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.index ["workflow_status"], name: "index_invoices_on_workflow_status"
   end
 
+  create_table "leave_balances", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.integer "year", null: false
+    t.decimal "entitled_days", precision: 5, scale: 1, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_leave_balances_on_company_id"
+    t.index ["employee_id", "year"], name: "index_leave_balances_on_employee_id_and_year", unique: true
+    t.index ["employee_id"], name: "index_leave_balances_on_employee_id"
+  end
+
+  create_table "leave_requests", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "employee_id", null: false
+    t.uuid "decided_by_id"
+    t.integer "leave_type", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.date "start_date", null: false
+    t.date "end_date", null: false
+    t.decimal "days", precision: 5, scale: 1, default: "0.0", null: false
+    t.text "reason"
+    t.text "decision_note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_leave_requests_on_branch_id"
+    t.index ["company_id"], name: "index_leave_requests_on_company_id"
+    t.index ["decided_by_id"], name: "index_leave_requests_on_decided_by_id"
+    t.index ["employee_id", "start_date"], name: "index_leave_requests_on_employee_id_and_start_date"
+    t.index ["employee_id"], name: "index_leave_requests_on_employee_id"
+    t.index ["start_date"], name: "index_leave_requests_on_start_date"
+    t.index ["status"], name: "index_leave_requests_on_status"
+  end
+
   create_table "memberships", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -4612,6 +4651,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
     t.jsonb "metadata", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "currency", default: 840, null: false
+    t.bigint "base_amount_cents", default: 0, null: false
+    t.bigint "allowance_amount_cents", default: 0, null: false
+    t.bigint "overtime_amount_cents", default: 0, null: false
+    t.bigint "gross_amount_cents", default: 0, null: false
+    t.bigint "tax_amount_cents", default: 0, null: false
+    t.bigint "deduction_amount_cents", default: 0, null: false
+    t.bigint "net_amount_cents", default: 0, null: false
     t.index ["attendance_month_id"], name: "index_payrolls_on_attendance_month_id"
     t.index ["branch_id"], name: "index_payrolls_on_branch_id"
     t.index ["company_id", "employee_id", "month"], name: "index_payrolls_on_company_id_and_employee_id_and_month", unique: true
@@ -7872,6 +7919,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
   add_foreign_key "employees", "branches"
   add_foreign_key "employees", "categories"
   add_foreign_key "employees", "companies"
+  add_foreign_key "employees", "employees", column: "manager_id", on_delete: :nullify
   add_foreign_key "employees", "property_mappings"
   add_foreign_key "employees", "users"
   add_foreign_key "event_config_logs", "categories"
@@ -7948,6 +7996,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_20_070003) do
   add_foreign_key "invoices", "companies"
   add_foreign_key "invoices", "orders"
   add_foreign_key "invoices", "property_mappings"
+  add_foreign_key "leave_balances", "companies"
+  add_foreign_key "leave_balances", "employees"
+  add_foreign_key "leave_requests", "branches"
+  add_foreign_key "leave_requests", "companies"
+  add_foreign_key "leave_requests", "employees"
+  add_foreign_key "leave_requests", "employees", column: "decided_by_id", on_delete: :nullify
   add_foreign_key "memberships", "branches"
   add_foreign_key "memberships", "categories"
   add_foreign_key "memberships", "companies"

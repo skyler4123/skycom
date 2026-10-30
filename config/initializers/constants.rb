@@ -131,6 +131,23 @@ OWNER_BUSINESS_TYPE = "owner".freeze
 MAX_PHONE_NUMBER_LENGTH = 20
 
 # =============================================================================
+# Payroll Calculation
+# Referenced in: Payrolls::GenerateService, Payroll, MobileHelper, payroll views.
+# =============================================================================
+
+# Withholding tax applied to gross pay.
+PAYROLL_TAX_RATE = 0.10
+
+# Employee social-insurance contribution applied to gross pay.
+PAYROLL_SOCIAL_INSURANCE_RATE = 0.084
+
+# Overtime pay multiplier for recorded overtime minutes.
+PAYROLL_OVERTIME_MULTIPLIER = 1.5
+
+# Paid working minutes in a year (52 weeks × 40 hours × 60 minutes).
+PAYROLL_ANNUAL_WORK_MINUTES = 124_800
+
+# =============================================================================
 # Job Processing Defaults
 # =============================================================================
 

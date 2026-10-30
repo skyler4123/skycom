@@ -67,6 +67,17 @@ RSpec.describe Document, type: :model do
     end
   end
 
+  describe "announcement scopes" do
+    it "returns only published announcements" do
+      announcement = build_doc(name: "Announcement A", business_type: :announcement, workflow_status: :published)
+      announcement.save!
+      build_doc(name: "Announcement B", business_type: :announcement, workflow_status: :draft).save!
+      build_doc(name: "Policy A", business_type: :policy, workflow_status: :published).save!
+
+      expect(Document.announcements.published).to contain_exactly(announcement)
+    end
+  end
+
   describe "image attachments" do
     it "accepts up to 10 images" do
       doc = build_doc

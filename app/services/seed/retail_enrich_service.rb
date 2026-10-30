@@ -77,6 +77,9 @@ class Seed::RetailEnrichService
     create_departments_for_company
     create_employees
     assign_employees_to_departments
+    seed_compensation
+    seed_leave_data
+    seed_announcement_data
     create_customers_for_company
     setup_loyalty_programs
     create_inventory
@@ -301,6 +304,28 @@ class Seed::RetailEnrichService
       end
 
       @employees.concat(branch_employees)
+    end
+  end
+
+  def seed_compensation
+    puts "Assigning compensation and reporting lines..."
+    Seed::CompensationService.assign!(company: @retail)
+  end
+
+  def seed_leave_data
+    puts "Creating leave balances and requests..."
+    Seed::LeaveService.create_samples!(company: @retail)
+  end
+
+  def seed_announcement_data
+    puts "Creating company announcement..."
+    Seed::AnnouncementService.create_samples!(company: @retail)
+  end
+
+  def attendance_employees
+    @attendance_employees ||= begin
+      owner = @retail.employees.find_by(business_type: OWNER_BUSINESS_TYPE)
+      (@employees + [ owner ]).compact.uniq
     end
   end
 
@@ -900,8 +925,8 @@ class Seed::RetailEnrichService
       end
     end
 
-    # Create scheduled shifts for employees
-    @employees.each do |employee|
+    # Create scheduled shifts for employees (owner included for demo data)
+    attendance_employees.each do |employee|
       template = templates.select { |t| t.branch_id == employee.branch_id }.sample
       next unless template
 
@@ -922,7 +947,8 @@ class Seed::RetailEnrichService
       AttendanceConfig.create!(
         company: @retail, branch: branch,
         latitude: 10.773, longitude: 106.694,
-        allowed_radius_meters: 100
+        allowed_radius_meters: 100,
+        resolution_strategy: :paired
       )
     end
   end
@@ -930,10 +956,14 @@ class Seed::RetailEnrichService
   def create_attendance_event_data
     puts "Creating attendance event data..."
 
-    @employees.each do |employee|
+    attendance_employees.each do |employee|
       next unless employee.branch
 
-      template = ShiftTemplate.where(company: @retail, branch: employee.branch).sample
+      # Past attendance samples must resolve within one calendar day. Night
+      # templates cross midnight, so prefer a morning template for these rows
+      # (midnight-crossover resolution is still future work — docs/HR.md).
+      templates = ShiftTemplate.where(company: @retail, branch: employee.branch).to_a
+      template = templates.select { |candidate| candidate.start_time.hour < 12 }.sample || templates.sample
       next unless template
 
       # Create past shifts for the last 35 days
@@ -973,7 +1003,7 @@ class Seed::RetailEnrichService
 
     # Run resolution engine
     resolved_dates = (1..35).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
-    @employees.each do |emp|
+    attendance_employees.each do |emp|
       resolved_dates.each do |date|
         Attendance::DailyResolutionService.new.call(employee: emp, date: date)
       rescue => e

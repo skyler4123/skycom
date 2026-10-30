@@ -11,6 +11,14 @@ class CreatePayrolls < ActiveRecord::Migration[8.1]
       t.date :month, null: false
       t.integer :status, null: false, default: 0
       t.text :notes
+      t.integer :currency, null: false, default: 840
+      t.bigint :base_amount_cents, null: false, default: 0
+      t.bigint :allowance_amount_cents, null: false, default: 0
+      t.bigint :overtime_amount_cents, null: false, default: 0
+      t.bigint :gross_amount_cents, null: false, default: 0
+      t.bigint :tax_amount_cents, null: false, default: 0
+      t.bigint :deduction_amount_cents, null: false, default: 0
+      t.bigint :net_amount_cents, null: false, default: 0
       t.jsonb :metadata, null: false, default: {}
       t.datetime :created_at, null: false
       t.datetime :updated_at, null: false

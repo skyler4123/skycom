@@ -117,10 +117,7 @@
         <div class="h-px w-full bg-muted"></div>
         <div class="flex items-center justify-between gap-2">
           <span class="text-xs text-muted-foreground">Reports To</span>
-          <span class="flex items-center gap-1.5">
-            <span class="text-sm font-medium text-foreground"><%= mobile_preview(:supervisor) %></span>
-            <%= mobile_sample_badge %>
-          </span>
+          <span class="text-sm font-medium text-foreground"><%= @manager&.name || "—" %></span>
         </div>
       </div>
     </section>
@@ -158,10 +155,7 @@
         <div class="h-px w-full bg-muted"></div>
         <div class="flex items-center justify-between gap-2">
           <span class="text-xs text-muted-foreground">Contract Renewal</span>
-          <span class="flex items-center gap-1.5">
-            <span class="text-sm font-medium text-foreground"><%= mobile_preview(:contract_renewal) %></span>
-            <%= mobile_sample_badge %>
-          </span>
+          <span class="text-sm font-medium text-foreground"><%= mobile_date(@contract_renewal) %></span>
         </div>
       </div>
     </section>

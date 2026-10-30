@@ -6,6 +6,27 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:user) { company.user }
   let!(:employee) { company.employees.find_by(user: user) }
+  let!(:leave_balance) do
+    create(:leave_balance, company: company, employee: employee, entitled_days: 14)
+  end
+  let!(:announcement) do
+    Seed::DocumentService.create(
+      company: company,
+      name: "Payroll update",
+      description: "Payslips are now available on mobile.",
+      business_type: :announcement,
+      workflow_status: :published
+    ).tap do |document|
+      DocumentEmployeeAppointment.create!(company: company, document: document, employee: employee)
+    end
+  end
+
+  before do
+    create(:leave_request, company: company, employee: employee, status: :approved, days: 2,
+      start_date: Date.current.beginning_of_year, end_date: Date.current.beginning_of_year + 1.day)
+    create(:leave_request, company: company, employee: employee, status: :pending, days: 1,
+      start_date: Date.current.beginning_of_year + 2.days, end_date: Date.current.beginning_of_year + 2.days)
+  end
 
   scenario "shows the dashboard for the signed-in employee" do
     sign_in(user)
@@ -23,7 +44,11 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
     expect(page).to have_content("Requests")
     expect(page).to have_button("Clock In")
     expect(page).to have_content("Paid Leave")
-    expect(page).to have_content("Sample")
+    expect(page).to have_content("12 Days")
+    expect(page).to have_content("1 Pending")
+    expect(page).to have_content("Payroll update")
+    expect(page).to have_content("Payslips are now available on mobile.")
+    expect(page).not_to have_content("Sample")
     expect(page).not_to have_content("--:--:--")
   end
 

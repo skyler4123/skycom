@@ -25,7 +25,15 @@ RSpec.feature "Mobile Payroll", type: :feature, js: true do
       employee: employee,
       month: Date.current.beginning_of_month,
       status: :paid,
-      attendance_month: attendance_month
+      attendance_month: attendance_month,
+      currency: :usd,
+      base_amount_cents: 520_000,
+      allowance_amount_cents: 42_000,
+      overtime_amount_cents: 34_250,
+      gross_amount_cents: 596_250,
+      tax_amount_cents: 59_625,
+      deduction_amount_cents: 50_085,
+      net_amount_cents: 486_540
     )
   end
 
@@ -36,9 +44,11 @@ RSpec.feature "Mobile Payroll", type: :feature, js: true do
     expect(page).to have_content("Payroll")
     expect(page).to have_content(employee.name)
     expect(page).to have_content("Paid")
-    expect(page).to have_content("Preview layout")
-    expect(page).to have_content("$4,862.50")
-    expect(page).to have_content("Sample")
+    expect(page).to have_content("$5,962.50")
+    expect(page).to have_content("$4,865.40")
+    expect(page).to have_content("$5,200.00")
+    expect(page).not_to have_content("Preview layout")
+    expect(page).not_to have_content("Sample")
   end
 
   scenario "links to the attendance timesheet" do

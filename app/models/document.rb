@@ -37,6 +37,10 @@ class Document < ApplicationRecord
   has_many :document_employee_appointments, dependent: :destroy
   has_many :employees, through: :document_employee_appointments
 
+  # --- Scopes ---
+  scope :announcements, -> { where(business_type: :announcement) }
+  scope :published, -> { where(workflow_status: :published) }
+
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :body_markdown, length: { maximum: 100_000 }, allow_blank: true
