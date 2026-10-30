@@ -43,7 +43,7 @@ RSpec.describe "Employee#managers", type: :model do
     enroll(employee, create(:employee_group, company: company, manager: manager))
 
     expect(Rails.sync_cache).to receive(:fetch)
-      .with("employees_#{employee.id}:managers", expires_in: 1.hour)
+      .with(CacheKeyService.employee_manager_ids(employee.id), expires_in: 1.hour)
       .and_call_original
 
     employee.managers

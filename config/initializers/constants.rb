@@ -113,10 +113,6 @@ AVATAR_PROFILE_DIMENSIONS = [ 300, 300 ].freeze
 # TTL is a backstop: freshness comes from explicit deletes or record touches.
 CACHE_DEFAULT_EXPIRY = 1.hour
 
-# TTL for cached ABAC permission data per employee/company.
-# Used by Employee::PermissionConcern and Company::PermissionConcern.
-PERMISSIONS_CACHE_EXPIRY = 1.minute
-
 # =============================================================================
 # Owner Role Constants (ABAC)
 # Magic-string values used across the permission system to identify

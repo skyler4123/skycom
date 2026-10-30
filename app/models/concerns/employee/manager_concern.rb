@@ -7,15 +7,12 @@
 # so an employee can have several managers across teams, and the lookup should be
 # cached instead of joining on every mobile render.
 # How it works: managers reads the group manager ids from Rails.sync_cache for
-# MANAGERS_CACHE_EXPIRY, then loads the kept employees; membership and group
+# CACHE_DEFAULT_EXPIRY, then loads the kept employees; membership and group
 # manager changes clear the key.
 # Main associations: none directly; reads Employee#employee_groups and
 # EmployeeGroup#manager.
 module Employee::ManagerConcern
   extend ActiveSupport::Concern
-
-  # Single-file constant (see docs/CONSTANTS.md).
-  MANAGERS_CACHE_EXPIRY = 1.hour
 
   def managers
     return Employee.none if id.blank?
@@ -24,18 +21,17 @@ module Employee::ManagerConcern
   end
 
   def clear_managers_cache
-    Rails.sync_cache.delete(managers_cache_key)
+    Rails.sync_cache.delete(CacheKeyService.employee_manager_ids(id))
   end
 
   private
 
   def manager_ids
-    Rails.sync_cache.fetch(managers_cache_key, expires_in: MANAGERS_CACHE_EXPIRY) do
+    Rails.sync_cache.fetch(
+      CacheKeyService.employee_manager_ids(id),
+      expires_in: CACHE_DEFAULT_EXPIRY
+    ) do
       employee_groups.where.not(manager_id: nil).distinct.pluck(:manager_id)
     end
-  end
-
-  def managers_cache_key
-    "employees_#{id}:managers"
   end
 end
