@@ -41,7 +41,7 @@ RSpec.feature "Companies::Roles Management", type: :feature, js: true do
     visit company_roles_path(company)
     expect(page).to have_selector("table", wait: 10)
 
-    owner_row = find("tr", text: "owner")
+    owner_row = find("a", text: /\Aowner\z/).find(:xpath, "./ancestor::tr")
     expect(owner_row).to have_no_selector("a[href*='/edit']")
   end
 
