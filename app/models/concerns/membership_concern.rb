@@ -23,7 +23,7 @@
 #    rows of the SAME business_type (other tracks survive), creates the new row
 #    as :active, and touches the customer for cache invalidation.
 # 2. Readers (membership, membership_of_type) resolve through the latest
-#    active appointment and are Rails.cache-cached per customer version.
+#    active appointment and are Rails.sync_cache-cached per customer version.
 # 3. company_id on new rows derives from the customer via
 #    SetDefaultCompanyConcern.
 #
@@ -74,8 +74,10 @@ module MembershipConcern
 
   # Getter: Returns the most recent active Membership
   def membership
-    cache_key = "#{cache_key_with_version}/current_membership"
-    Rails.cache.fetch(cache_key) { db_membership }
+    Rails.sync_cache.fetch(
+      CacheKeyService.customer_current_membership(self),
+      expires_in: CACHE_DEFAULT_EXPIRY
+    ) { db_membership }
   end
 
   # Setter: Defaults to :primary if no context is given
@@ -109,8 +111,10 @@ module MembershipConcern
 
   # Helper to get membership by specific type
   def membership_of_type(type)
-    cache_key = "#{cache_key_with_version}/membership_#{type}"
-    Rails.cache.fetch(cache_key) do
+    Rails.sync_cache.fetch(
+      CacheKeyService.customer_membership_of_type(self, type),
+      expires_in: CACHE_DEFAULT_EXPIRY
+    ) do
       customer_membership_appointments.where(lifecycle_status: :active, business_type: type)
                                       .first&.membership
     end

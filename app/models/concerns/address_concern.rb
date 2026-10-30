@@ -28,7 +28,7 @@
 # 2. attach_address finds-or-creates the Address by fingerprint fields, archives
 #    same-business_type active rows (history is kept, never deleted), creates
 #    the new row, and touches the owner for client-cache invalidation.
-# 3. The address reader caches via Rails.cache; company_id on new rows derives
+# 3. The address reader caches via Rails.sync_cache; company_id on new rows derives
 #    from the owner via SetDefaultCompanyConcern.
 #
 # == Usage:
@@ -77,8 +77,10 @@ module AddressConcern
   end
 
   def address
-    cache_key = "#{cache_key_with_version}/current_address"
-    Rails.cache.fetch(cache_key) { db_address }
+    Rails.sync_cache.fetch(
+      CacheKeyService.current_address(self),
+      expires_in: CACHE_DEFAULT_EXPIRY
+    ) { db_address }
   end
 
   def address=(options)
