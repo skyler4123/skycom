@@ -6,8 +6,8 @@ Never hardcode values inline in models, controllers, jobs, services, or concerns
 
 **Single-file exception**: Any constant used by exactly **one** file should be declared
 directly in that file (model, controller, concern, service, job) instead of globally.
-See `docs/CACHE.md` §6 for examples (e.g., `SESSION_CACHE_EXPIRY` lives in
-`authentication_concern.rb`).
+See `docs/CACHE.md` §6 for examples (e.g., `CACHE_DEFAULT_EXPIRY` lives in
+`config/initializers/constants.rb`).
 
 ## Why
 - **Single source of truth** — change one place, not 7+
@@ -23,7 +23,7 @@ See `docs/CACHE.md` §6 for examples (e.g., `SESSION_CACHE_EXPIRY` lives in
 | Magic strings | `OWNER_BUSINESS_TYPE`, `OWNER_POLICY_RESOURCE` (single-file, in `company.rb`) |
 | File/upload constraints | `MAX_IMAGE_FILE_SIZE`, `ACCEPTABLE_IMAGE_TYPES` |
 | Image variant dimensions | `IMAGE_FULL_DIMENSIONS`, `AVATAR_PROFILE_DIMENSIONS` |
-| Cache TTLs | `PERMISSIONS_CACHE_EXPIRY` (single-file, in `permission_concern.rb`) |
+| Cache TTLs | `CACHE_DEFAULT_EXPIRY` (in `config/initializers/constants.rb`) |
 | Billing defaults & pricing | `DEFAULT_FREE_TIER_ALLOWANCES` (single-file, in `seed/billing_contract_service.rb`), `US_PRICES` / `VN_PRICES` / `PRICES_BY_COUNTRY` (in `app/models/billing_resource.rb`) |
 | Array configs | `ALLOWED_TABLE_ALIGNS`, `PROPERTY_MAPPING_SUPPORTED_KEYS` |
 | Enum mappings | `TIMEZONES`, `CURRENCIE_CODES`, `LIFECYCLE_STATUS`, `WORKFLOW_STATUS` |

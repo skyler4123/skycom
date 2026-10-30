@@ -74,10 +74,10 @@ Every item has the same four lines:
   on **every page navigation**, each hitting `Notifications::UnreadQuery`
   (`app/services/notifications/unread_query.rb`) — a subscribed-tag join +
   `created_at > last_read_all_at` + `NOT IN (reads)` + `DISTINCT` that grows
-  with notification volume and the reads table. A 10-minute per-employee
-  `sync_cache` (`notifications:unread:<id>`) absorbs the steady state, but
-  every expiry recomputes the full query and socket `notification_created`
-  only triggers yet another `GET`.
+  with notification volume and the reads table. A 1-hour per-employee
+  `sync_cache` (`CacheKeyService.employee_unread_notifications(id)`) absorbs
+  the steady state, but every expiry recomputes the full query and socket
+  `notification_created` only triggers yet another `GET`.
 - **Switch to**: push-based badge — the `notification_created` payload
   carries the increment (or the new count) so the bell updates with **zero
   GETs**, falling back to the endpoint only on reconnect; and/or a

@@ -27,8 +27,8 @@ Kredis.redis.multi { |m| m.decrby("stock:#{id}:available", qty) }
 
 | Model | Declaration | Wrapper Methods |
 |-------|-------------|-----------------|
-| `app/models/stock.rb` | `kredis_counter :available_counter` | `available_count` (read + self-heal), `reserve_stock!`, `release_reserved!` |
-| `app/models/company.rb` | `kredis_counter :credit_usage` | `record_credit_usage!`, `credit_usage_delta` |
+| `app/models/stock.rb` | `kredis_counter :available_counter, key: ->(s) { CacheKeyService.stock_available(s.id) }` | `available_count` (read + self-heal), `reserve_stock!`, `release_reserved!` |
+| `app/models/company.rb` | `kredis_counter :credit_usage, key: ->(c) { CacheKeyService.company_credit_usage(c.id) }` | `record_credit_usage!`, `credit_usage_delta` |
 
 ### The Swap Pattern
 
@@ -50,11 +50,12 @@ end
 
 ## Adding a New Counter
 
-1. Declare the DSL on the owning model: `kredis_counter :thing_counter`
-2. Write domain-named wrapper method(s) that hide the proxy entirely
-3. Use atomic ops (`increment`/`decrement` return the post-op value) for
+1. Declare the DSL on the owning model: `kredis_counter :thing_counter, key: ->(r) { CacheKeyService.thing_counter(r.id) }`
+2. Add the builder to `CacheKeyService` (six-line contract, see `docs/CACHE.md` §7)
+3. Write domain-named wrapper method(s) that hide the proxy entirely
+4. Use atomic ops (`increment`/`decrement` return the post-op value) for
    check-and-act flows — never read-then-write across processes
-4. Keep any DB fallback/healing logic inside the model, next to the counter
+5. Keep any DB fallback/healing logic inside the model, next to the counter
 
 ## Enforcement
 

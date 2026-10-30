@@ -70,7 +70,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 
 | When your task involves… | Read first |
 |---|---|
-| Server- or browser-side caching | `docs/CACHE.md` — `ram_cache` / `local_cache` / `sync_cache` / `global_cache` tiers + client cache |
+| Server- or browser-side caching | `docs/CACHE.md` — `ram_cache` / `local_cache` / `sync_cache` / `global_cache` tiers + client cache + **cache key catalog (§7)** |
 | Realtime updates | `docs/WEBSOCKET.md` — channel naming + event protocol + add-new-event recipe |
 | Search | `docs/MEILISEARCH.md` — sync architecture + making a model searchable |
 | External API integration (dev/test) | `docs/MOCK_API.md` — mock server routes + add-new-API template |

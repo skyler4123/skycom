@@ -101,10 +101,11 @@ Skycom uses a **4-tier server-side caching strategy** plus a **browser client ca
 **File**: `app/models/concerns/employee/permission_concern.rb`
 
 ```ruby
-OWNER_ROLE_CACHE_EXPIRY = 1.day
-
 def owner_role?
-  Rails.ram_cache.fetch("#{cache_key_with_version}/owner_role", expires_in: OWNER_ROLE_CACHE_EXPIRY) do
+  Rails.ram_cache.fetch(
+    CacheKeyService.employee_owner_role(self),
+    expires_in: CACHE_DEFAULT_EXPIRY
+  ) do
     EmployeeRoleAppointment.where(employee_id: id).any? { |ra| ra.business_type == OWNER_BUSINESS_TYPE }
   end
 end
@@ -113,8 +114,8 @@ end
 - Read on **every** `can?` permission check → hot path.
 - The value is a single boolean (bytes).
 - Owner assignment is immutable after creation, so per-worker divergence is harmless.
-- `cache_key_with_version` includes `updated_at` — any `touch` (e.g., role assignment) produces a new key; the old entry ages out via TTL.
-- Explicit eviction: `clear_permissions_cache` deletes the key (plus the `local_cache` permission keys) and touches the record.
+- The version segment in `CacheKeyService.employee_owner_role` comes from `cache_version` — any `touch` (e.g., role assignment) produces a new key; the old entry ages out via TTL.
+- Explicit eviction: `clear_permissions_cache` deletes the key (plus the `sync_cache` permission keys) and touches the record.
 
 **API**: standard `ActiveSupport::Cache::Store` interface — `read`, `write`, `delete`, `fetch`, `exist?`, `clear`.
 
@@ -263,17 +264,18 @@ commit `8abe53c`. It is replaced by a **record cache** backed by
   re-instantiated via `Model.instantiate` on a cache hit, eliminating the
   per-request `User Load` / `Company Load` / `Employee Load` queries. Callers
   keep using ActiveRecord objects/associations unchanged.
-- Keys are unversioned (`users_#{id}`, `companies_#{id}`,
-  `employees_#{user_id}_#{company_id}`, `sessions_#{id}`); writes overwrite the
-  same key and deletes propagate via pub/sub. TTLs: Session 1 hour, others 5
-  minutes.
+- Keys live in `CacheKeyService` (`docs/CACHE.md` §7): `CacheKeyService.user(id)`,
+  `CacheKeyService.company(id)`,
+  `CacheKeyService.employee_record(user_id:, company_id:)`, and
+  `CacheKeyService.session(id)`; writes overwrite the same key and deletes
+  propagate via pub/sub. TTL: `CACHE_DEFAULT_EXPIRY` (1 hour) for all four.
 - `after_commit :refresh_cache` / `:remove_cache` on each model keep entries fresh.
 - `Employee#managers` caches the employee's group-manager ids under
-  `employees_#{id}:managers` for `Employee::ManagerConcern::MANAGERS_CACHE_EXPIRY`
+  `CacheKeyService.employee_manager_ids(id)` for `CACHE_DEFAULT_EXPIRY`
   (1 hour). Appointment saves and group manager changes delete the key.
 - The `cache_version` aggregate (`Company.where(user:).maximum(:updated_at)`) is
-  also cached per user under `user_#{id}:companies_max_updated_at` and
-  invalidated on Company create/update/destroy.
+  also cached per user under `CacheKeyService.user_companies_max_updated_at(user_id)`
+  and invalidated on Company create/update/destroy.
 
 `Rails.sync_cache` remains available for other scalar cached values (e.g. the
 cookie cache version in `CookieConcern`). See `docs/MODEL_CALLBACKS.md` for the
@@ -291,7 +293,6 @@ No `sync_cache` read or invalidation is involved for sessions.
 
 ---
 
-## 5. Tier 4: `Rails.global_cache`
 ## 5. Tier 4: `Rails.global_cache`
 
 **Backend**: Redis (in-memory, cross-cluster).
@@ -337,24 +338,79 @@ Per the `docs/CONSTANTS.md` convention, single-file constants live at their usag
 
 | Constant | Value | Defined In | Purpose |
 |----------|-------|------------|---------|
-| `DEFAULT_CACHE_EXPIRY` | (removed) | `Cache::RecordsConcern` removed | No longer used |
-| `SESSION_CACHE_EXPIRY` | 1 hour | `app/controllers/concerns/application_controller/authentication_concern.rb` | Session record cache TTL (longer — sessions rarely change) |
-| `PERMISSIONS_CACHE_EXPIRY` | 1 minute | `config/initializers/constants.rb` | Permissions hash cache TTL (used by both permission concerns) |
-| `OWNER_ROLE_CACHE_EXPIRY` | 1 day | `app/models/concerns/employee/permission_concern.rb` | `ram_cache` TTL for the `Employee#owner_role?` hot boolean |
-| `MANAGERS_CACHE_EXPIRY` | 1 hour | `app/models/concerns/employee/manager_concern.rb` | `sync_cache` TTL for the `Employee#managers` group-manager ids |
+| `CACHE_DEFAULT_EXPIRY` | 1 hour | `config/initializers/constants.rb` | TTL for every app-owned key (§7). TTL is a backstop; freshness comes from deletes and touches |
 | `COOKIE_EXPIRY` | 1 day | `app/controllers/concerns/application_controller/cookie_concern.rb` | Session and client cache cookie lifetime |
+
+The former per-domain constants (`SESSION_CACHE_EXPIRY`, `PERMISSIONS_CACHE_EXPIRY`,
+`OWNER_ROLE_CACHE_EXPIRY`, `MANAGERS_CACHE_EXPIRY`, `COMPANY_CACHE_EXPIRY`,
+`EMPLOYEE_CACHE_EXPIRY`, `USER_CACHE_EXPIRY`, `STATISTICS_CACHE_EXPIRY`) were
+removed when keys moved into `CacheKeyService`.
 
 ---
 
-## 7. Client Cache (Browser)
+## 7. Cache Key Catalog
+
+**Every** application cache key is built by `CacheKeyService`
+(`app/services/cache_key_service.rb`). No key string may be written inline; a
+spec scans `app/` and fails on violations (`spec/services/cache_key_literals_spec.rb`).
+
+Two key families:
+
+- **Versioned** keys embed `<cache_version>` (`record.cache_version`, derived
+  from `updated_at`). Freshness comes from `touch`: the next read addresses a
+  new key and the old entry dies by TTL. These keys are never deleted.
+- **Delete-based** keys are stable. `delete` must always address the same
+  string, so they never embed a version.
+
+| Builder | Key pattern | Store | TTL | Refresh trigger |
+|---------|-------------|-------|-----|-----------------|
+| `session(id)` | `session:<id>` | `sync_cache` | 1 hour | write `Session#refresh_cache`; delete on destroy / invalid sign-out |
+| `user(id)` | `user:<id>:record:v2` | `sync_cache` | 1 hour | write `User#refresh_cache`; delete on destroy |
+| `company(id)` | `company:<id>:record:v2` | `sync_cache` | 1 hour | write `Company#refresh_cache`; delete on destroy |
+| `employee_record(user_id:, company_id:)` | `employee:user:<uid>:company:<cid>:record:v2` | `sync_cache` | 1 hour | write `Employee#refresh_cache`; delete on destroy; `Role#invalidate_employee_caches` deletes holders |
+| `user_companies_max_updated_at(user_id)` | `user:<id>:companies_max_updated_at` | `sync_cache` | 1 hour | delete on Company save/destroy |
+| `employee_manager_ids(id)` | `employee:<id>:manager_ids` | `sync_cache` | 1 hour | delete on group membership or group manager change |
+| `employee_owner_role(employee)` | `employee:<id>:<cache_version>:owner_role` | `ram_cache` | 1 hour | touch (role assignment); delete in `clear_permissions_cache` |
+| `employee_permissions(employee)` | `employee:<id>:<cache_version>:permissions` | `sync_cache` | 1 hour | touch / `Employee#clear_permissions_cache` |
+| `employee_permissions_by_role(employee)` | `employee:<id>:<cache_version>:permissions_by_role` | `sync_cache` | 1 hour | touch / `Employee#clear_permissions_cache` |
+| `company_permissions(company)` | `company:<id>:<cache_version>:permissions` | `sync_cache` | 1 hour | `Company#clear_permissions_cache` (role appointment callbacks) + touch |
+| `company_permissions_by_role(company)` | `company:<id>:<cache_version>:permissions_by_role` | `sync_cache` | 1 hour | same |
+| `company_permissions_by_resource(company)` | `company:<id>:<cache_version>:permissions_by_resource` | `sync_cache` | 1 hour | same |
+| `current_address(record)` | `<domain>:<id>:<cache_version>:current_address` | `sync_cache` | 1 hour | touch — `attach_address` touches the owner |
+| `customer_current_membership(customer)` | `customer:<id>:<cache_version>:current_membership` | `sync_cache` | 1 hour | touch — `attach_membership` touches the customer |
+| `customer_membership_of_type(customer, type)` | `customer:<id>:<cache_version>:membership:<type>` | `sync_cache` | 1 hour | same |
+| `company_open_ticket_count(id)` | `company:<id>:tickets:open_count` | `sync_cache` | 1 hour | `CompanyTicket#invalidate_count_caches` |
+| `admin_open_ticket_count` | `company_ticket:admin:open_count` | `sync_cache` | 1 hour | `CompanyTicket#invalidate_count_caches` |
+| `employee_unread_notifications(id)` | `employee:<id>:notifications:unread` | `sync_cache` | 1 hour | notification create / mark-read / mark-all-read / prune |
+| `company_analytics(id, period)` | `company:<id>:analytics:<period>` | `sync_cache` | 1 hour | TTL only — clear manually for an immediate refresh |
+| `company_storage_statistics(id)` | `company:<id>:storage_statistics` | `sync_cache` | 1 hour | TTL only — uploads/deletes intentionally do not bust it |
+| `stock_available(id)` | `stock:<id>:available` | Kredis | none | never delete — data-bearing counter |
+| `company_credit_usage(id)` | `companies:<id>:credit_usage` | Kredis | none | never delete — data-bearing delta counter |
+
+Notes:
+
+- `<cache_version>` comes from `cache_version`, so it changes on every `touch`.
+  Deleting a versioned key is impossible (the old version is unreachable); use
+  `touch` or `clear_permissions_cache` instead.
+- `period` is sanitized with `parameterize`; blank values become `unknown`, so
+  request params cannot inject separators into the key.
+- Kredis keys hold unsynced data. Changing their format requires a migration,
+  otherwise live counters are orphaned.
+- To add a key: add a `def self.` builder with the six-line comment contract
+  (`Pattern / Purpose / Store / TTL / Written by / Cleared by`), then add a row
+  here.
+
+---
+
+## 8. Client Cache (Browser)
 
 Skycom also caches company data in the browser's `localStorage` for fast frontend access across all Stimulus controllers. This avoids repeated API calls for commonly used data.
 
-### 7.1 What Gets Cached
+### 8.1 What Gets Cached
 
 The client cache stores: User, Companies, Branches, Departments, Roles, Enums, Employees, Company Settings (incl. the active sidebar record), and Billing Contract Summary (enabled features for frontend gating).
 
-### 7.2 Storage Keys
+### 8.2 Storage Keys
 
 | Key | Description |
 |-----|-------------|
@@ -364,13 +420,13 @@ The client cache stores: User, Companies, Branches, Departments, Roles, Enums, E
 | `sidebar_favourites_<company_id>_<user_id>` | Per-employee favourited sidebar item keys (FE-only, `docs/SIDEBAR.md`) |
 | `sidebar_open_groups_<company_id>_<user_id>` | Per-employee open sidebar group keys (FE-only, `docs/SIDEBAR.md`) |
 
-### 7.3 Backend Endpoint
+### 8.3 Backend Endpoint
 
 **Route**: `GET /client_cache`
 
 Returns `{ user, companies[], employees[] }` and sets a `client_cache_version` cookie. Enums are now static in `app/javascript/controllers/helpers/enums.js`.
 
-### 7.4 Frontend Controller
+### 8.4 Frontend Controller
 
 **File**: `app/javascript/controllers/client_cache_controller.js`
 
@@ -379,7 +435,7 @@ On page load:
 2. If mismatch or no cache → fetches `/client_cache`, stores in localStorage, reloads page
 3. Max 1 auto-sync per page session (prevents loops)
 
-### 7.5 Cache Helpers (`auth_helpers.js`)
+### 8.5 Cache Helpers (`auth_helpers.js`)
 
 | Helper | Description |
 |--------|-------------|
@@ -394,13 +450,13 @@ On page load:
 | `featureEnabled(key)` | Checks if a feature is in `enabled_features` |
 | `clearClientCache()` | Clears localStorage cache |
 
-### 7.6 Manual Invalidation
+### 8.6 Manual Invalidation
 
 **Frontend**: `clearClientCacheAndReload({ type: "success", message: "..." })` — clears cache and reloads page. Use after mutations that affect cached data (branch create, role change, feature toggle, etc.).
 
 **Backend**: `company.invalidate_client_cache!` — bumps `company.updated_at`, changes the `client_cache_version` cookie, triggering a frontend re-sync on next page load.
 
-### 7.7 Cookie Expiration
+### 8.7 Cookie Expiration
 
 All cookies use 1-day expiration (`COOKIE_EXPIRY`):
 
@@ -412,7 +468,7 @@ All cookies use 1-day expiration (`COOKIE_EXPIRY`):
 
 When cookies expire, the user must sign in again, which creates fresh cookies and a fresh cache.
 
-### 7.8 How Model Changes Propagate to Client
+### 8.8 How Model Changes Propagate to Client
 
 ```
 PropertyMapping.create/update/destroy
@@ -427,15 +483,15 @@ Models with `belongs_to :company, touch: true`: Branch, Department, Category, Pr
 
 ---
 
-## 8. Configuration
+## 9. Configuration
 
-### 8.1 Initializer
+### 9.1 Initializer
 
 **File**: `config/initializers/cache.rb`
 
 Defines `Rails.ram_cache`, `Rails.local_cache`, `Rails.sync_cache`, and `Rails.global_cache`. Also starts the background pub/sub listener thread.
 
-### 8.2 Redis Configuration
+### 9.2 Redis Configuration
 
 **File**: `config/redis/shared.yml`
 
@@ -455,7 +511,7 @@ test:
 
 ---
 
-## 9. Comparison: When to Use Which
+## 10. Comparison: When to Use Which
 
 | Use Case | Cache Tier | Reason |
 |----------|-----------|--------|
@@ -473,9 +529,9 @@ test:
 
 ---
 
-## 10. Testing
+## 11. Testing
 
-### 10.1 sync_cache Spec
+### 11.1 sync_cache Spec
 
 **File**: `spec/system/sync_cache_spec.rb`
 
@@ -487,7 +543,19 @@ Tests cover:
 
 ram_cache coverage: `spec/models/employee_owner_role_spec.rb` — caches `true`/`false` values and evicts on `clear_permissions_cache`.
 
-### 10.2 Cache Helper
+### 11.2 Cache Key Specs
+
+**Files**: `spec/services/cache_key_service_spec.rb`, `spec/services/cache_key_literals_spec.rb`
+
+- Pins every builder's exact string, key uniqueness, and the colon-separated
+  format.
+- Guards the data-bearing Kredis key strings (`stock:<id>:available`,
+  `companies:<id>:credit_usage`) against accidental renames.
+- Enforces the six-line doc contract on every `def self.` builder.
+- Scans `app/` and fails on inline cache keys, `Rails.cache` calls, and
+  `cache_key_with_version` outside `CacheKeyService`.
+
+### 11.3 Cache Helper
 
 **File**: `spec/cache_helper.rb`
 
@@ -502,7 +570,7 @@ Rails.global_cache.clear       rescue nil
 
 ---
 
-## 11. Error Handling
+## 12. Error Handling
 
 | Scenario | Effect | Mitigation |
 |----------|--------|------------|
@@ -523,14 +591,17 @@ Rails.global_cache.clear       rescue nil
 
 ---
 
-## 12. File Reference
+## 13. File Reference
 
 | File | Purpose |
 |------|---------|
 | `config/initializers/cache.rb` | `Rails.ram_cache`, `Rails.local_cache`, `Rails.sync_cache`, `Rails.global_cache` definitions + SyncCache class + pub/sub listener |
-| `app/models/concerns/employee/permission_concern.rb` | `Employee#owner_role?` ram_cache usage + `OWNER_ROLE_CACHE_EXPIRY` + `clear_permissions_cache` eviction |
+| `app/services/cache_key_service.rb` | Every application cache key (catalog: §7) |
+| `spec/services/cache_key_service_spec.rb` | Key builders, format, uniqueness, exact Kredis strings, doc contract |
+| `spec/services/cache_key_literals_spec.rb` | Fails on inline keys, direct `Rails.cache`, or `cache_key_with_version` in `app/` |
+| `app/models/concerns/employee/permission_concern.rb` | `Employee#owner_role?` ram_cache usage + `clear_permissions_cache` eviction |
 | `spec/models/employee_owner_role_spec.rb` | ram_cache caching + eviction specs |
-| `config/initializers/constants.rb` | `PERMISSIONS_CACHE_EXPIRY` |
+| `config/initializers/constants.rb` | `CACHE_DEFAULT_EXPIRY` |
 | `config/redis/shared.yml` | Redis connection configuration per environment |
 | (removed) `app/models/concerns/cache/records_concern.rb` | Custom record cache layer removed |
 | `app/controllers/concerns/application_controller/authentication_concern.rb` | `set_current_session` with normal DB lookup |
