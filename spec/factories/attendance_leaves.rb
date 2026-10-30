@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :leave_request do
+  factory :attendance_leave do
     association :company
     employee { association :employee, company: company }
     leave_type { :paid }

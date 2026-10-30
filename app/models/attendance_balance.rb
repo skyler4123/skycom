@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class LeaveBalance < ApplicationRecord
+class AttendanceBalance < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Associations ---
@@ -40,7 +40,7 @@ class LeaveBalance < ApplicationRecord
   end
 
   def paid_requests
-    employee.leave_requests.where(leave_type: :paid, start_date: year_range)
+    employee.attendance_leaves.where(leave_type: :paid, start_date: year_range)
   end
 
   def year_range

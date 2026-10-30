@@ -6,8 +6,8 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:user) { company.user }
   let!(:employee) { company.employees.find_by(user: user) }
-  let!(:leave_balance) do
-    create(:leave_balance, company: company, employee: employee, entitled_days: 14)
+  let!(:attendance_balance) do
+    create(:attendance_balance, company: company, employee: employee, entitled_days: 14)
   end
   let!(:announcement) do
     Seed::DocumentService.create(
@@ -22,9 +22,9 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
   end
 
   before do
-    create(:leave_request, company: company, employee: employee, status: :approved, days: 2,
+    create(:attendance_leave, company: company, employee: employee, status: :approved, days: 2,
       start_date: Date.current.beginning_of_year, end_date: Date.current.beginning_of_year + 1.day)
-    create(:leave_request, company: company, employee: employee, status: :pending, days: 1,
+    create(:attendance_leave, company: company, employee: employee, status: :pending, days: 1,
       start_date: Date.current.beginning_of_year + 2.days, end_date: Date.current.beginning_of_year + 2.days)
   end
 

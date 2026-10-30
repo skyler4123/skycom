@@ -28,7 +28,7 @@ class Seed::LeaveService
   private
 
   def create_balance(employee)
-    balance = LeaveBalance.find_or_initialize_by(employee: employee, year: Date.current.year)
+    balance = AttendanceBalance.find_or_initialize_by(employee: employee, year: Date.current.year)
     balance.company = @company
     balance.entitled_days = ENTITLED_DAYS
     balance.save! if balance.changed?
@@ -36,7 +36,7 @@ class Seed::LeaveService
 
   def create_request(employee, status:, offset:, days:)
     date = request_date(offset)
-    request = LeaveRequest.find_or_initialize_by(employee: employee, leave_type: :paid, start_date: date)
+    request = AttendanceLeave.find_or_initialize_by(employee: employee, leave_type: :paid, start_date: date)
     request.assign_attributes(
       company: @company,
       branch: employee.branch,

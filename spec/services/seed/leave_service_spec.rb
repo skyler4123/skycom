@@ -11,14 +11,14 @@ RSpec.describe Seed::LeaveService do
   it "creates a paid-leave balance for every employee" do
     described_class.create_samples!(company: company)
 
-    expect(LeaveBalance.where(company: company, year: Date.current.year).count).to eq(company.employees.count)
-    expect(LeaveBalance.find_by!(employee: staff, year: Date.current.year).entitled_days).to eq(14)
+    expect(AttendanceBalance.where(company: company, year: Date.current.year).count).to eq(company.employees.count)
+    expect(AttendanceBalance.find_by!(employee: staff, year: Date.current.year).entitled_days).to eq(14)
   end
 
   it "creates approved and pending paid leave requests" do
     described_class.create_samples!(company: company)
 
-    balance = LeaveBalance.find_by!(employee: owner, year: Date.current.year)
+    balance = AttendanceBalance.find_by!(employee: owner, year: Date.current.year)
 
     expect(balance.approved_days).to be > 0
     expect(balance.pending_days).to be > 0
@@ -29,6 +29,6 @@ RSpec.describe Seed::LeaveService do
 
     expect do
       described_class.create_samples!(company: company)
-    end.not_to change(LeaveRequest, :count)
+    end.not_to change(AttendanceLeave, :count)
   end
 end

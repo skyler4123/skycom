@@ -25,8 +25,8 @@ The system supports multiple business types (retail, hospital) through the same 
 | 4b | `attendance_requests` | Manual attendance tickets (approve → creates day) | employee_id, attendance_date, check_in, check_out, reason, status |
 | 5 | `attendance_months` | Payroll-ready monthly rollup | employee_id, month, total_work_minutes, total_late_minutes, total_overtime_minutes, total_present_days, total_absent_days |
 | 6 | `attendance_configs` | Per-branch geofence + resolution config | branch_id, latitude, longitude, allowed_radius_meters, resolution_strategy |
-| 7 | `leave_balances` | Paid-leave entitlement per employee/year | employee_id, year, entitled_days |
-| 8 | `leave_requests` | Paid/sick/unpaid leave requests | employee_id, leave_type, status, start_date, end_date, days, decided_by_id |
+| 7 | `attendance_balances` | Paid-leave entitlement per employee/year | employee_id, year, entitled_days |
+| 8 | `attendance_leaves` | Paid/sick/unpaid leave requests | employee_id, leave_type, status, start_date, end_date, days, decided_by_id |
 | 9 | `payrolls` | Payroll run per employee/month | month, status, currency, salary/allowance/overtime/tax/net `*_cents` columns, attendance_month_id |
 
 All tables include the standard System Fields Block (lifecycle_status, workflow_status, business_type, metadata, discarded_at, permission_resource_name). `employees` additionally stores `manager_id`, `monthly_salary_cents`, `monthly_allowance_cents`, and `expiration_date` (contract renewal).
@@ -301,11 +301,11 @@ Shift seeds include realistic edge cases:
 | `db/migrate/*create_attendance_days.rb` | Migration (redesigned) |
 | `db/migrate/*create_attendance_months.rb` | Migration (redesigned) |
 | `db/migrate/*create_attendance_configs.rb` | Migration |
-| `db/migrate/*create_leave_balances.rb` | Migration |
-| `db/migrate/*create_leave_requests.rb` | Migration |
+| `db/migrate/*create_attendance_balances.rb` | Migration |
+| `db/migrate/*create_attendance_leaves.rb` | Migration |
 | `db/migrate/*add_money_to_payrolls.rb` | Migration |
-| `app/models/leave_balance.rb` | Model |
-| `app/models/leave_request.rb` | Model |
+| `app/models/attendance_balance.rb` | Model |
+| `app/models/attendance_leave.rb` | Model |
 | `app/models/payroll.rb` | Model |
 | `app/services/payrolls/generate_service.rb` | Payroll money engine |
 | `app/services/seed/compensation_service.rb` | Seed reporting lines + salary/contract |

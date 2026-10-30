@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class LeaveRequest < ApplicationRecord
+class AttendanceLeave < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Enums ---

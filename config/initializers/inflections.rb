@@ -14,3 +14,10 @@
 # ActiveSupport::Inflector.inflections(:en) do |inflect|
 #   inflect.acronym "RESTful"
 # end
+
+# "leaves" is the plural of both "leaf" and "leave". Without this rule Rails
+# singularizes attendance_leaves to AttendanceLeafe, breaking model/table
+# inference for AttendanceLeave.
+ActiveSupport::Inflector.inflections(:en) do |inflect|
+  inflect.irregular "leave", "leaves"
+end
