@@ -16,6 +16,9 @@ class CreateEmployees < ActiveRecord::Migration[8.0]
       t.integer :currency
       t.integer :country
       t.integer :timezone
+      t.uuid    :manager_id, index: true
+      t.bigint  :monthly_salary_cents, null: false, default: 0
+      t.bigint  :monthly_allowance_cents, null: false, default: 0
 
       t.string :external_id, index: true
 
@@ -38,5 +41,7 @@ class CreateEmployees < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_foreign_key :employees, :employees, column: :manager_id, on_delete: :nullify
   end
 end
