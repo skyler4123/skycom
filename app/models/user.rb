@@ -25,7 +25,6 @@ class User < ApplicationRecord
   include User::RetailConcern
   include User::SearchConcern
 
-  USER_CACHE_EXPIRY = 5.minutes
   EMAIL_VERIFICATION_TOKEN_EXPIRY = 2.days
   PASSWORD_RESET_TOKEN_EXPIRY = 20.minutes
 
@@ -153,13 +152,13 @@ class User < ApplicationRecord
       attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
     end
     Rails.sync_cache.write(
-      "users_#{id}:v2",
+      CacheKeyService.user(id),
       attrs,
-      expires_in: USER_CACHE_EXPIRY
+      expires_in: CACHE_DEFAULT_EXPIRY
     )
   end
 
   def remove_cache
-    Rails.sync_cache.delete("users_#{id}:v2")
+    Rails.sync_cache.delete(CacheKeyService.user(id))
   end
 end

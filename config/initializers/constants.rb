@@ -109,6 +109,10 @@ AVATAR_PROFILE_DIMENSIONS = [ 300, 300 ].freeze
 # Cache & Expiry
 # =============================================================================
 
+# TTL applied to every application cache key (see docs/CACHE.md §7).
+# TTL is a backstop: freshness comes from explicit deletes or record touches.
+CACHE_DEFAULT_EXPIRY = 1.hour
+
 # TTL for cached ABAC permission data per employee/company.
 # Used by Employee::PermissionConcern and Company::PermissionConcern.
 PERMISSIONS_CACHE_EXPIRY = 1.minute

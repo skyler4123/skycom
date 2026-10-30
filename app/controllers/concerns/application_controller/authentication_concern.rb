@@ -9,7 +9,7 @@ module ApplicationController::AuthenticationConcern
   def current_user
     return nil unless Current.user_id
     @current_user ||= begin
-      cached = Rails.sync_cache.fetch("users_#{Current.user_id}:v2", expires_in: User::USER_CACHE_EXPIRY) do
+      cached = Rails.sync_cache.fetch(CacheKeyService.user(Current.user_id), expires_in: CACHE_DEFAULT_EXPIRY) do
         u = User.find_by(id: Current.user_id)
         next nil unless u
         attrs = u.attributes
@@ -53,7 +53,7 @@ module ApplicationController::AuthenticationConcern
     token = cookies.signed[:session_token]
     return unless token
 
-    session_hash = Rails.sync_cache.fetch("sessions_#{token}", expires_in: Session::SESSION_CACHE_EXPIRY) do
+    session_hash = Rails.sync_cache.fetch(CacheKeyService.session(token), expires_in: CACHE_DEFAULT_EXPIRY) do
       s = Session.find_by(id: token)
       next nil unless s
       { "id" => s.id, "user_id" => s.user_id }
@@ -73,7 +73,7 @@ module ApplicationController::AuthenticationConcern
   end
 
   def cleanup_invalid_session(token)
-    Rails.sync_cache.delete("sessions_#{token}")
+    Rails.sync_cache.delete(CacheKeyService.session(token))
     cookies.delete(:session_token)
     cookies.delete(:is_signed_in)
   end

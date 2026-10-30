@@ -32,10 +32,7 @@ class Employee < ApplicationRecord
   include TagConcern
   include Discard::Model
 
-  EMPLOYEE_CACHE_EXPIRY = 5.minutes
-
   attribute :permission_resource_name, :string, default: -> { self.name }
-
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
@@ -158,14 +155,14 @@ class Employee < ApplicationRecord
       attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
     end
     Rails.sync_cache.write(
-      "employees_#{user_id}_#{company_id}:v2",
+      CacheKeyService.employee_record(user_id: user_id, company_id: company_id),
       attrs,
-      expires_in: EMPLOYEE_CACHE_EXPIRY
+      expires_in: CACHE_DEFAULT_EXPIRY
     )
   end
 
   def remove_cache
-    Rails.sync_cache.delete("employees_#{user_id}_#{company_id}:v2")
+    Rails.sync_cache.delete(CacheKeyService.employee_record(user_id: user_id, company_id: company_id))
   end
 
   def subscribe_to_all_employees_tag

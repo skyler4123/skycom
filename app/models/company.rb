@@ -23,7 +23,6 @@ class Company < ApplicationRecord
   include Company::RestaurantConcern
   include Company::PermissionConcern
 
-  COMPANY_CACHE_EXPIRY = 5.minutes
   OWNER_POLICY_RESOURCE = "all".freeze
   OWNER_POLICY_ACTION = "all".freeze
   # Single-file map: country (enum key) → currency (enum key). Used only here
@@ -361,16 +360,16 @@ class Company < ApplicationRecord
       attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
     end
     Rails.sync_cache.write(
-      "companies_#{id}:v2",
+      CacheKeyService.company(id),
       attrs,
-      expires_in: COMPANY_CACHE_EXPIRY
+      expires_in: CACHE_DEFAULT_EXPIRY
     )
-    Rails.sync_cache.delete("user_#{user_id}:companies_max_updated_at")
+    Rails.sync_cache.delete(CacheKeyService.user_companies_max_updated_at(user_id))
   end
 
   def remove_cache
-    Rails.sync_cache.delete("companies_#{id}:v2")
-    Rails.sync_cache.delete("user_#{user_id}:companies_max_updated_at")
+    Rails.sync_cache.delete(CacheKeyService.company(id))
+    Rails.sync_cache.delete(CacheKeyService.user_companies_max_updated_at(user_id))
   end
 
   def assign_currency_from_country

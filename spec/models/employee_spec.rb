@@ -76,4 +76,28 @@ RSpec.describe Employee, type: :model do
     end
   end
   it_behaves_like "property_mapping concern", Employee
+
+  describe "cache keys" do
+    it "writes the employee record under the service key" do
+      employee = create(:employee)
+
+      employee.send(:refresh_cache)
+
+      expect(
+        Rails.sync_cache.read(
+          CacheKeyService.employee_record(user_id: employee.user_id, company_id: employee.company_id)
+        )
+      ).to be_present
+    end
+
+    it "removes the employee record key" do
+      employee = create(:employee)
+      employee.send(:refresh_cache)
+      key = CacheKeyService.employee_record(user_id: employee.user_id, company_id: employee.company_id)
+
+      employee.send(:remove_cache)
+
+      expect(Rails.sync_cache.read(key)).to be_nil
+    end
+  end
 end
