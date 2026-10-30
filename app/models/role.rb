@@ -164,21 +164,20 @@ class Role < ApplicationRecord
   end
 
   def invalidate_employee_caches
-    # touch alone is not enough: it updates updated_at in the DB, but the
-    # cached employee hash in sync_cache would keep the old timestamp, so the
-    # versioned permission keys would stay on the stale version. Delete the
-    # record key so the next request rebuilds it with the new version.
-    employees.find_each do |employee|
-      employee.touch
+    # Bump every holder's version and drop the cached employee hash: touch_all
+    # updates updated_at in one query, but update_all/touch_all do not run the
+    # after_commit refresh, so the sync_cache entry would keep the old
+    # timestamp and the versioned permission keys would stay stale.
+    employee_rows = employees.pluck(:user_id, :company_id)
 
-      if employee.user_id.present?
-        Rails.sync_cache.delete(
-          CacheKeyService.employee_record(
-            user_id: employee.user_id,
-            company_id: employee.company_id
-          )
-        )
-      end
+    employee_rows.each do |user_id, company_id|
+      next if user_id.blank?
+
+      Rails.sync_cache.delete(
+        CacheKeyService.employee_record(user_id: user_id, company_id: company_id)
+      )
     end
+
+    employees.touch_all
   end
 end
