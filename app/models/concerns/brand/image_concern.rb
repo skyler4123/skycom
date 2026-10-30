@@ -1,3 +1,14 @@
+# frozen_string_literal: true
+
+# Brand::ImageConcern — Atomic purpose: shared multi-image attachments for Brand
+# records.
+#
+# Why it exists: Brand images use the same attachment, variant, and validation
+# rules as other imageable models, so the behavior is centralized.
+# How it works: adds has_many_attached :image_attachments (full/thumb variants),
+# validates count/size/MIME types, and exposes #image_urls.
+# Main associations: none directly; adds has_many_attached :image_attachments to
+# includers.
 module Brand::ImageConcern
   extend ActiveSupport::Concern
 

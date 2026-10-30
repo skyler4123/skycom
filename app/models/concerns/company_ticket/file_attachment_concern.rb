@@ -1,3 +1,14 @@
+# frozen_string_literal: true
+
+# CompanyTicket::FileAttachmentConcern — Atomic purpose: shared multi-file
+# attachments for CompanyTicket records.
+#
+# Why it exists: support tickets need bounded file attachments with consistent
+# count/size/type validation and URL generation.
+# How it works: adds has_many_attached :file_attachments, validates count, size,
+# and allowed MIME types, and exposes #file_attachment_urls.
+# Main associations: none directly; adds has_many_attached :file_attachments to
+# includers.
 module CompanyTicket::FileAttachmentConcern
   extend ActiveSupport::Concern
 

@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# Page — Atomic purpose: one deployable operating-page definition for a
+# company/branch, targeting a business role and screen resolution.
+#
+# Why it exists: the platform ships role-specific POS and back-office screens;
+# this row selects which page variant a branch uses for a given target_role and
+# target_resolution (see docs/HOMEPAGE.md).
+# How it works: belongs to a company and branch and carries business_type,
+# target_role, target_resolution, lifecycle_status, and workflow_status. The
+# branch + role + resolution + code combination is unique, and the frontend
+# loads the active/deployed page for the current context.
+# Main associations: belongs_to :company, :branch (both required).
 class Page < ApplicationRecord
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc

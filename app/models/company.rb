@@ -1,3 +1,21 @@
+# frozen_string_literal: true
+
+# Company — Atomic purpose: tenant root that owns every company-scoped record
+# (branches, employees, catalog, orders, stock, payments, settings).
+#
+# Why it exists: Skycom is multi-tenant; one Company row is the authorization and
+# data boundary, and its business_type (retail, restaurant, hospital, education,
+# hotel, fitness) selects the seed and feature profile.
+# How it works: belongs to the owner User; creating a company initializes its
+# owner records, wallet, settings, and business-type seed data (initialize_company,
+# skipped via `system_owned` for the platform system company). Cache clearing and
+# permission scoping hang off the company (see docs/SYSTEM_COMPANY.md,
+# docs/ABAC.md).
+# Main associations: belongs_to :user; has_one :company_wallet; has_many
+# :branches, :employees, :roles, :policies, :customers, :products, :services,
+# :orders, :invoices, :stocks, :company_settings,
+# :company_payment_method_appointments, and the audit/log tables (all
+# dependent: :destroy).
 class Company < ApplicationRecord
   include AddressConcern
   include Company::EducationConcern

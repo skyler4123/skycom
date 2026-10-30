@@ -1,3 +1,21 @@
+# frozen_string_literal: true
+
+# Purchase — Atomic purpose: purchase order header for buying goods/services from
+# a supplier into a warehouse.
+#
+# Why it exists: purchasing is a separate money/stock flow from sales; the
+# purchase header carries supplier, destination warehouse, workflow approval, and
+# line items, and can produce a StockImport on completion
+# (see docs/PURCHASE_WORKFLOW.md).
+# How it works: belongs to company, optional branch/supplier/workflow_step,
+# warehouse, category, and property mapping. before_validation binds the
+# category's workflow; after_create records the submission log. Line items are
+# PurchasePurchaseItemAppointment rows; #total_price is always derived.
+# Main associations: belongs_to :warehouse, :company, :category,
+# :property_mapping (required), :branch, :supplier, :workflow_step (optional);
+# has_many :purchase_items through :purchase_purchase_item_appointments;
+# has_many :workflow_step_logs (as: :subject), :stock_imports (as: :appoint_from,
+# restrict_with_error).
 class Purchase < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

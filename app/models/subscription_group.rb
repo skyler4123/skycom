@@ -1,3 +1,19 @@
+# frozen_string_literal: true
+
+# SubscriptionGroup — Atomic purpose: one subscription agreement between a seller
+# and a buyer, scoped to a company/branch.
+#
+# Why it exists: models who sells what to whom, with polymorphic seller/buyer/
+# resource/processer links, and groups the SubscriptionPlans included in the
+# agreement. The record is immutable once created (ImmutableRecordConcern).
+# How it works: belongs to company, optional branch, and polymorphic
+# seller/buyer/resource/processer; plans join through
+# SubscriptionGroupSubscriptionPlanAppointment (destroy restricted while plans
+# exist).
+# Main associations: belongs_to :company (required), :branch, :resource,
+# :processer (optional), :seller and :buyer (polymorphic, required); has_many
+# :subscription_plans through :subscription_group_subscription_plan_appointments
+# (dependent: :restrict_with_error).
 class SubscriptionGroup < ApplicationRecord
   include TagConcern
   include ImmutableRecordConcern

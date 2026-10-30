@@ -1,4 +1,17 @@
-# app/models/concerns/membership_concern.rb
+# frozen_string_literal: true
+
+# MembershipConcern — Atomic purpose: versioned customer entitlement links to
+# Membership rows through CustomerMembershipAppointment.
+#
+# Why it exists: a customer can hold concurrent entitlements per business_type
+# (loyalty, subscription, segment) and history must be preserved, so attaching a
+# new membership archives only the active row of the same type.
+# How it works: attach_membership finds-or-creates the company-scoped Membership,
+# archives the previous active appointment of the same business_type, and creates
+# the new row; readers expose current and per-type memberships.
+# Main associations: none directly; adds has_many
+# :customer_membership_appointments and :memberships through them to Customer.
+
 #
 # == Purpose:
 # Gives a Customer concurrent, versioned links to Membership rows through the
@@ -31,6 +44,7 @@
 #   # 4. Default getter (the most recently attached)
 #   customer.membership # => <Membership: Pro>
 #
+
 module MembershipConcern
   extend ActiveSupport::Concern
 

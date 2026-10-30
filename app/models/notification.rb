@@ -1,3 +1,18 @@
+# frozen_string_literal: true
+
+# Notification — Atomic purpose: one company-wide message broadcast to tag
+# audiences.
+#
+# Why it exists: decouples message content from delivery; the same notification
+# can target multiple NotificationTags, and each employee sees it through their
+# subscriptions instead of a per-employee copy.
+# How it works: Notifications::CreateService writes the row plus its tag
+# appointments; `subscribed_for(employee, company)` resolves the notifications
+# visible to that employee from their subscribed tags. Per-item read state lives
+# in EmployeeNotificationRead.
+# Main associations: belongs_to :company; has_many
+# :notification_tag_appointments, :notification_tags through them, and
+# :employee_notification_reads (dependent: :destroy).
 class Notification < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

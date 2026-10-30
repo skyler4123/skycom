@@ -1,5 +1,23 @@
-# app/models/employee.rb
+# frozen_string_literal: true
 
+# Employee — Atomic purpose: company-scoped staff member (owner, full-time,
+# part-time, contractor, intern) that anchors HR, scheduling, attendance, and
+# permissions.
+#
+# Why it exists: the employee is the person-level record behind assignments,
+# shifts, attendance, payroll, roles, and many-to-many operational links; it can
+# be linked to a login User but does not require one.
+# How it works: belongs to company/branch/user/category/property mapping; roles,
+# groups, departments, services, events, exams, tasks, projects, tickets, and
+# notification subscriptions attach through atomic appointments. Addresses,
+# avatars, tags, and permission helpers come from concerns; discard is supported.
+# Main associations: belongs_to :company, :category, :property_mapping (required),
+# :branch and :user (optional); has_many :roles, :employee_groups, :departments,
+# :services, :customers, :documents, :events, :event_groups, :exams, :facilities,
+# :order_groups, :products, :projects, :project_groups, :tasks, :task_groups,
+# :related_employees, :employee_profiles, :employee_subprofiles,
+# :scheduled_shifts, :attendance_logs, :attendance_days, :attendance_months,
+# :payrolls, and ticket links; has_one :notification_config (dependent: :destroy).
 class Employee < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

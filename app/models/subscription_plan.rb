@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# SubscriptionPlan — Atomic purpose: one sellable subscription plan (price,
+# duration, scope) offered by a company/branch.
+#
+# Why it exists: plans are catalog rows reused across orders, branches, and
+# subscription groups; pricing and plan rules live here, not on each agreement.
+# How it works: belongs to company and optional branch; orders reference plans
+# through OrderSubscriptionPlanAppointment, branches through
+# BranchSubscriptionPlanAppointment, and groups through
+# SubscriptionGroupSubscriptionPlanAppointment.
+# Main associations: belongs_to :company (required), :branch (optional);
+# has_many :orders, :branches, :subscription_groups through their appointments
+# (dependent: :destroy).
 class SubscriptionPlan < ApplicationRecord
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd

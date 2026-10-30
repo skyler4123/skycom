@@ -1,3 +1,18 @@
+# frozen_string_literal: true
+
+# CompanyTicket — Atomic purpose: support ticket raised by a company employee to
+# the Skycom platform team.
+#
+# Why it exists: tenant support needs a separate queue, SLA timestamps,
+# assignment to Skycom staff, comments, and an audit log; it is distinct from
+# internal employee Tickets (see docs/TICKET.md).
+# How it works: belongs to company/employee and optional assigned_user (staff
+# admin/super_admin); status drives workflow_status mirroring and resolved_at;
+# assign_to!/transition_to!/rate! write CompanyTicketLog rows and invalidate the
+# open-count cache.
+# Main associations: belongs_to :company, :employee (required), :assigned_user
+# (optional); has_many :ticket_comments (CompanyTicketComment), :ticket_logs
+# (CompanyTicketLog) (dependent: :destroy).
 class CompanyTicket < ApplicationRecord
   include CompanyTicket::FileAttachmentConcern
 

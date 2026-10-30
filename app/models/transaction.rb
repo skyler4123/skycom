@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# Transaction — Atomic purpose: one payment attempt against an Invoice, carrying
+# the gateway reference and amount.
+#
+# Why it exists: an invoice can be settled by multiple transactions (prepayment,
+# final payment); each attempt records its gateway payload and completion status.
+# How it works: belongs to company/branch/invoice/category/property_mapping and
+# optional payment_method; after_create/after_update/after_destroy
+# sync_invoice_payment_status recomputes the invoice as paid when the sum of
+# transactions covers price_cents. gateway_reference is unique (see TODO below).
+# Main associations: belongs_to :company, :invoice, :category,
+# :property_mapping (required), :branch, :payment_method (optional).
+#
 # TODO: Unify transaction_token / gateway_reference naming — column is gateway_reference
 # but API/service layer exposes transaction_token (pay response, pay_cancel, Initiate/Cancel services).
 # Pick one canonical name and migrate the other.

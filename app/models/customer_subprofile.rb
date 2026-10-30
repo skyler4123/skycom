@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# CustomerSubprofile — Atomic purpose: leaf-level detail row under a
+# CustomerProfile, using its own category/property schema.
+#
+# Why it exists: lets the customer profile hierarchy go one level deeper (e.g.
+# per contact or contract) without widening the profile table (see
+# docs/PROFILE_SUBPROFILE.md).
+# How it works: belongs to a customer, CustomerProfile, company, category, and
+# property mapping; validates that customer/company match the parent profile.
+# Discard is supported through Discard::Model.
+# Main associations: belongs_to :customer_profile, :customer, :company,
+# :category, :property_mapping (required), :branch (optional).
 class CustomerSubprofile < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

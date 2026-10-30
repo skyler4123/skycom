@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+# PayrollConfig — Atomic purpose: company-wide payroll calculation settings
+# (date basis, attendance inclusion, branch/employee filters, excluded statuses).
+#
+# Why it exists: one persisted configuration per company replaces scattered
+# defaults and drives payroll calculation consistently.
+# How it works: belongs to a company (unique); metadata-backed settings are
+# seeded on initialize, and `for_company!` finds or creates the row idempotently.
+# Main associations: belongs_to :company (required, unique).
 class PayrollConfig < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

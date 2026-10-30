@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# FacilityGroup — Atomic purpose: company-scoped grouping of facilities
+# (building, floor, wing).
+#
+# Why it exists: groups spaces for browsing and assignment; it carries its own
+# category/property schema.
+# How it works: belongs to company/branch/category/property mapping; facilities
+# join through FacilityFacilityGroupAppointment.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :branch (optional); has_many :facilities through
+# :facility_facility_group_appointments (dependent: :destroy).
 class FacilityGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

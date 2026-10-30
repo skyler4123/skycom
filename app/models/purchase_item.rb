@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# PurchaseItem — Atomic purpose: one purchasable item definition used on purchase
+# lines, optionally bridged to a Product for stock import.
+#
+# Why it exists: purchase lines need a catalog row with its own category/property
+# schema; when product is set, completing the purchase imports that product into
+# the destination warehouse.
+# How it works: belongs to company/category/property mapping and optional product;
+# purchases reference items through PurchasePurchaseItemAppointment.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :product (optional); has_many :purchases through
+# :purchase_purchase_item_appointments (dependent: :destroy).
 class PurchaseItem < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

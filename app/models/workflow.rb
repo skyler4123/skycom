@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# Workflow — Atomic purpose: ordered approval process attached to a category and
+# process type (purchase, leave, ticket).
+#
+# Why it exists: different categories need different approval chains; the workflow
+# owns the ordered steps and is the bridge between a category and its business
+# records (see docs/PURCHASE_WORKFLOW.md).
+# How it works: belongs to company and category; has_many workflow_steps in
+# position order and workflow_step_logs for the audit trail. Destroy releases
+# Purchase/Ticket workflow_step pointers before deleting steps.
+# Main associations: belongs_to :company, :category (required); has_many
+# :workflow_steps, :workflow_step_logs (dependent: :destroy).
 class Workflow < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

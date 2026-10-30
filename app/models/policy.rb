@@ -1,3 +1,18 @@
+# frozen_string_literal: true
+
+# Policy — Atomic purpose: one ABAC rule (resource + action + tag conditions) that
+# grants or denies an action.
+#
+# Why it exists: permissions are data, not code; a Policy binds a resource and
+# action to tag conditions, and roles collect policies to form a permission set
+# (see docs/ABAC.md).
+# How it works: belongs to company (touch) and optional branch; tag_conditions
+# live in metadata; roles attach through PolicyRoleAppointment. Updating a policy
+# touches its roles so employee permission caches invalidate, and every change is
+# logged in PermissionLog.
+# Main associations: belongs_to :company (touch), :branch (optional); has_many
+# :roles through :policy_role_appointments; has_many :permission_logs
+# (dependent: :nullify).
 class Policy < ApplicationRecord
   store_accessor :metadata, :tag_conditions
   attribute :permission_resource_name, :string, default: -> { self.name }

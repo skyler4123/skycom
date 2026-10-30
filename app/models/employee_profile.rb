@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# EmployeeProfile — Atomic purpose: named sub-record under one Employee that holds
+# profile-specific data and its own dynamic schema.
+#
+# Why it exists: one employee can have multiple profiles (e.g. per position or
+# contract) without adding columns to Employee; profiles own subprofiles and use
+# the category/property mapping pattern (see docs/PROFILE_SUBPROFILE.md).
+# How it works: belongs to an employee and company; discard cascades to kept
+# subprofiles; validates that the employee belongs to the same company.
+# Main associations: belongs_to :company, :employee, :category,
+# :property_mapping (required), :branch (optional); has_many
+# :employee_subprofiles (dependent: :destroy).
 class EmployeeProfile < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# Document — Atomic purpose: company-scoped document/policy/guide/announcement
+# with a markdown body and optional attachments.
+#
+# Why it exists: stores internal documents once and assigns them to employees
+# through an atomic appointment, while supporting the category/property schema
+# and tags.
+# How it works: belongs to company/branch/category/property mapping; employees
+# join through DocumentEmployeeAppointment. AttachmentConcern adds file
+# attachments; workflow status moves draft → published → archived.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :branch (optional); has_many :employees through
+# :document_employee_appointments (dependent: :destroy).
 class Document < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

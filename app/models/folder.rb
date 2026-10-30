@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# Folder — Atomic purpose: company-scoped container that groups StoredFiles and
+# child folders.
+#
+# Why it exists: gives uploads a tenant-owned tree for browsing, permissions, and
+# import chunk storage; a folder cannot be deleted while it still has contents.
+# How it works: self-referential parent/children with same-company, not-self, and
+# no-cycle validations. before_destroy blocks deletion when children or
+# stored_files exist (no dependent: :destroy on purpose, so the 422 carries one
+# friendly message).
+# Main associations: belongs_to :company (touch), :parent (Folder, optional);
+# has_many :children (Folder), :stored_files (no dependent).
 class Folder < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

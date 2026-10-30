@@ -1,10 +1,18 @@
-# StockPending — Atomic purpose: the owner-less pending-hold record.
-# One row = one promise of `quantity` units on a Stock in a Warehouse.
-# Lifecycle runs on `workflow_status`: draft (ineffective) → holding set
-# (pending/in_progress/initiated) → released set
-# (completed/cancelled/received/shipped/failed/refunded) with `released_at`
-# stamped on exit. Pending moves ONLY through StockTransaction hold/release
-# ledger rows (see StockTransaction); this model never writes Stock columns.
+# frozen_string_literal: true
+
+# StockPending — Atomic purpose: the owner-less pending-hold record: one row is
+# one promise of `quantity` units on a Stock in a Warehouse.
+#
+# Why it exists: orders/events/transfers reserve units before they become outbound
+# movements; keeping holds separate from Stock.quantity lets availability be
+# promised without decrementing the ledger.
+# How it works: lifecycle runs on workflow_status: draft (ineffective) → holding
+# set (pending/in_progress/initiated) → released set
+# (completed/cancelled/received/shipped/failed/refunded) with released_at stamped
+# on exit. Pending moves ONLY through StockTransaction hold/release ledger rows;
+# this model never writes Stock columns.
+# Main associations: belongs_to :company, :warehouse, :stock, :product (required);
+# has_many :stock_transactions (as: :appoint_for, restrict_with_error).
 class StockPending < ApplicationRecord
   HOLDING_STATUSES = %w[pending in_progress initiated].freeze
   CODE_PREFIX = "STKPD".freeze

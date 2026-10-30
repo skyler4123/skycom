@@ -1,0 +1,77 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Verifies the top-of-file contract for every model and concern under app/models:
+#   1. `# frozen_string_literal: true` on line 1
+#   2. `# <Constant> — Atomic purpose: ...` as the first header line
+#   3. `Why it exists:`, `How it works:`, and `Main associations:` sections
+#   4. no model-description comment left immediately inside the class/module body
+#
+# Run locally with `bin/check_model_headers`; CI runs it in the lint job.
+
+require "pathname"
+
+ROOT = Pathname.new(__dir__).join("..").expand_path
+FILES = Dir[ROOT.join("app/models/**/*.rb").to_s].sort
+SECTION_STARTS = /\A(?:# ---|# NOTE:|# Dual vocabulary)/
+
+failures = Hash.new { |hash, key| hash[key] = [] }
+
+FILES.each do |absolute_path|
+  path = Pathname.new(absolute_path).relative_path_from(ROOT).to_s
+  lines = File.readlines(absolute_path)
+  declaration = lines.find { |line| line.match?(/^(?:class|module)\s/) }
+
+  unless declaration
+    failures[:no_declaration] << path
+    next
+  end
+
+  constant = declaration[/^(?:class|module)\s+([A-Z][\w:]*)/, 1]
+
+  failures[:magic] << path unless lines.first == "# frozen_string_literal: true\n"
+
+  index = 1
+  index += 1 while lines[index]&.strip&.empty?
+  header = []
+  while lines[index]&.start_with?("#")
+    header << lines[index]
+    index += 1
+  end
+
+  if header.empty?
+    failures[:header] << path
+  else
+    expected = "# #{constant} —"
+    failures[:constant] << path unless header.first.strip.start_with?(expected)
+    text = header.join
+    failures[:why] << path unless text.match?(/Why( it exists)?:/)
+    failures[:how] << path unless text.match?(/How( it works| to use)?:/)
+    failures[:associations] << path unless text.match?(/Main associations:/)
+  end
+
+  if path.start_with?("app/models/") && !path.start_with?("app/models/concerns/")
+    base = File.basename(path, ".rb").split("_").map(&:capitalize).join
+    failures[:file_name] << path unless constant == base
+  end
+
+  declaration_index = lines.index(declaration)
+  body_first = lines[declaration_index + 1]&.strip
+  if body_first&.start_with?("#") && !body_first.match?(SECTION_STARTS)
+    failures[:body_comment] << path
+  end
+end
+
+puts "Checked #{FILES.size} model/concern files."
+
+if failures.empty?
+  puts "All headers are valid."
+  exit 0
+end
+
+failures.sort.each do |kind, paths|
+  puts "\n#{kind} (#{paths.size}):"
+  paths.each { |path| puts "  #{path}" }
+end
+puts "\n#{failures.values.sum(&:size)} header violation(s)."
+exit 1

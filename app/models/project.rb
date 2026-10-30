@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# Project — Atomic purpose: one project under a ProjectGroup, assignable to
+# employees.
+#
+# Why it exists: projects are the delivery unit for client/internal work and need
+# status, category, and optional branch scoping separate from tasks.
+# How it works: belongs to company, optional branch, project_group, category, and
+# property mapping; employees join through EmployeeProjectAppointment.
+# Main associations: belongs_to :project_group, :company, :category,
+# :property_mapping (required), :branch (optional); has_many :employees through
+# :employee_project_appointments (dependent: :destroy).
 class Project < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

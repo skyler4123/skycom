@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# CustomerGroup — Atomic purpose: company-scoped customer segment (VIP,
+# wholesale, retail, new customers) used for roles, pricing, and service access.
+#
+# Why it exists: groups customers for shared roles, services, and addresses
+# without per-customer rows; it is the customer-side counterpart of EmployeeGroup.
+# How it works: belongs to company/branch (optional) and required category/
+# property mapping; customers join through CustomerCustomerGroupAppointment,
+# roles through CustomerGroupRoleAppointment, and services through
+# CustomerGroupServiceAppointment.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :branch (optional); has_many :customers, :roles, :services through
+# their appointments (dependent: :destroy).
 class CustomerGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

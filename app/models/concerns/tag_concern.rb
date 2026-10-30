@@ -1,3 +1,18 @@
+# frozen_string_literal: true
+
+# TagConcern — Atomic purpose: atomic tag writes and reads for any taggable
+# record.
+#
+# Why it exists: tags feed the ABAC matcher; each includer owns one atomic
+# <Record>TagAppointment table (Tag-first when alphabetical order requires it),
+# and tag values must stay in sync on the shared Tag row.
+# How it works: at include time it resolves the appointment class and declares
+# has_many/through plus a legacy tag_appointments reader. attach_tag
+# finds-or-creates the company-scoped Tag, syncs its value, and writes the
+# appointment inside one transaction.
+# Main associations: none directly; adds has_many :<record>_tag_appointments and
+# :tags through them to includers.
+
 # Provides instance methods for attaching and managing Tags on a resource
 # via its atomic pairwise appointment table (AWS-style tagging).
 #
@@ -30,6 +45,7 @@
 #   product.attach_tag(key: "brand", value: "Apple")
 #   product.tags.map(&:key) # => ["brand"]
 #
+
 module TagConcern
   extend ActiveSupport::Concern
 

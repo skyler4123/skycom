@@ -1,3 +1,13 @@
+# frozen_string_literal: true
+
+# User::SearchConcern — Atomic purpose: Meilisearch index declaration for User
+# records.
+#
+# Why it exists: user search needs a narrower set of indexed/searchable/
+# filterable columns than the generic DynamicSearchConcern provides.
+# How it works: includes Meilisearch::Rails and registers INDEXED_COLUMNS,
+# SEARCHABLE_COLUMNS, and FILTERABLE_COLUMNS intersected with the actual schema.
+# Main associations: none directly.
 module User::SearchConcern
   extend ActiveSupport::Concern
 

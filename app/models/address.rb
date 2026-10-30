@@ -1,4 +1,19 @@
-# app/models/address.rb
+# frozen_string_literal: true
+
+# Address — Atomic purpose: shared, immutable address row deduplicated by a
+# SHA256 fingerprint of its normalized fields.
+#
+# Why it exists: many owners (companies, branches, customers, employees, ...)
+# can point at the same address without duplicating data; immutability keeps the
+# shared row safe and preserves history (see docs/ADDRESS.md).
+# How it works: `before_validation` builds the fingerprint from line_1/line_2/
+# city/state_or_province/postal_code/country, and the unique fingerprint makes
+# `find_or_create_by!` reuse the existing row. Owners attach through their
+# AddressConcern (`record.attach_address(...)`), which archives the previous
+# active appointment instead of editing the address.
+# Main associations: has_many :<owner>_appointments (dependent: :destroy) and
+# has_many :<owners>, through: ... for Branch, Company, Customer, CustomerGroup,
+# Department, Employee, EmployeeGroup, and User.
 class Address < ApplicationRecord
   include ImmutableRecordConcern
 

@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# ProjectGroup — Atomic purpose: company-scoped grouping of projects (internal,
+# client-facing, R&D).
+#
+# Why it exists: groups related projects and assigns them to employees as a unit;
+# it carries its own category/property schema.
+# How it works: belongs to company, optional branch, category, and property
+# mapping; employees join through EmployeeProjectGroupAppointment; projects
+# reference the group.
+# Main associations: belongs_to :company, :category, :property_mapping (required),
+# :branch (optional); has_many :employees through
+# :employee_project_group_appointments (dependent: :destroy).
 class ProjectGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

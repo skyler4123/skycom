@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# Task — Atomic purpose: one work item under a TaskGroup, assignable to employees.
+#
+# Why it exists: operational work needs a trackable unit with status, category,
+# and optional branch scoping; grouping and assignment are separate atomic
+# tables.
+# How it works: belongs to company, optional branch, task_group, category, and
+# property mapping; employees join through EmployeeTaskAppointment. Tags and
+# dynamic search come from concerns.
+# Main associations: belongs_to :task_group, :company, :category,
+# :property_mapping (required), :branch (optional); has_many :employees through
+# :employee_task_appointments (dependent: :destroy).
 class Task < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

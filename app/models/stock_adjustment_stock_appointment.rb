@@ -1,15 +1,20 @@
+# frozen_string_literal: true
+
+# StockAdjustmentStockAppointment — Atomic purpose: atomic row binding a
+# StockAdjustment to one exact Stock row.
+#
+# Why it exists: quantity truth lives on the line (stock + quantity), not on the
+# document header, so stock-take corrections stay exact per warehouse+product.
+#
+# How to use: built on the adjustment document, then executed by
+# StockMovementService::Adjustments::CreateService (add on increase, remove on
+# decrease, one ledger row per line).
+#
+# How it works: concrete FKs to company/stock_adjustment/stock; company_id
+# derives from either side via SetDefaultCompanyConcern.
+#
+# Main associations: belongs_to :company, :stock_adjustment, :stock.
 class StockAdjustmentStockAppointment < ApplicationRecord
-  # Stock adjustment line — atomic row binding a StockAdjustment to one exact
-  # Stock row.
-  #
-  # Why it exists: quantity truth lives on the line (stock + quantity), not on
-  # the document header, so stock-take corrections stay exact per
-  # warehouse+product.
-  # How to use: built on the adjustment document, then executed by
-  # StockMovementService::Adjustments::CreateService (add on increase, remove
-  # on decrease, one ledger row per line).
-  # How it works: concrete FKs to company/stock_adjustment/stock; company_id
-  # derives from either side via SetDefaultCompanyConcern.
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }

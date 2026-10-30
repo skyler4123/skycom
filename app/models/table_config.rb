@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# TableConfig — Atomic purpose: per-company/category table layout definition for
+# an index page (columns, widths, visibility, and optional filters).
+#
+# Why it exists: lets each tenant shape its grid view for a resource without code
+# changes; the layout is data (metadata.columns) validated against the category's
+# property mapping (see docs/DYNAMIC_TABLE.md).
+# How it works: `columns` is a store_accessor on metadata; after_initialize seeds
+# defaults, and the validation enforces the documented column shape
+# (key/name/visible/width/align/search/filter). Updates are audited in
+# TableConfigLog.
+# Main associations: belongs_to :company (touch), :category, :property_mapping;
+# has_many :table_config_logs (dependent: :nullify).
 class TableConfig < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# User::AvatarConcern — Atomic purpose: User avatar attachment, variants, and
+# URL helper.
+#
+# Why it exists: User avatars need stricter limits than generic images
+# (JPEG/PNG, 500KB) and a profile variant used across the UI.
+# How it works: adds has_one_attached :avatar_attachment (thumb/medium/profile/
+# full variants), validates size/type, and exposes #avatar_url plus
+# #update_avatar.
+# Main associations: none directly; adds has_one_attached :avatar_attachment to
+# User.
 module User::AvatarConcern
   extend ActiveSupport::Concern
 

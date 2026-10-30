@@ -1,11 +1,16 @@
 # frozen_string_literal: true
 
-# CompanyUsageLog — Atomic purpose: opt-in per-action detail log explaining WHY
-# a wallet balance moved (action_type mirrors CREDIT_USAGE_RATES keys, e.g.
-# "create_order"). Hot-table safe: rows are written ONLY while the wallet's
-# usage logging window is active (CompanyWallet#usage_logging_active?), so
-# tracking can be enabled for a short period (default 5 minutes) to inspect
-# live credit changes.
+# CompanyUsageLog — Atomic purpose: opt-in per-action detail log explaining WHY a
+# wallet balance moved (action_type mirrors CREDIT_USAGE_RATES keys).
+#
+# Why it exists: the hot path only keeps counters; when a live balance looks
+# wrong, this table records the individual actions behind the movement for a short
+# window.
+# How it works: rows are written ONLY while the wallet's usage logging window is
+# active (CompanyWallet#usage_logging_active?, default 5 minutes); action_type
+# accepts CREDIT_USAGE_RATES keys plus top_up/deduction wallet defaults.
+# Main associations: belongs_to :company, :company_wallet (required);
+# belongs_to :source, polymorphic: true (optional).
 class CompanyUsageLog < ApplicationRecord
   # Dual vocabulary: deduction-point actions (CREDIT_USAGE_RATES keys, e.g.
   # "access_dashboard") + wallet movement defaults ("top_up" / "deduction"

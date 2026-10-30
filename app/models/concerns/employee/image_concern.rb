@@ -1,3 +1,14 @@
+# frozen_string_literal: true
+
+# Employee::ImageConcern — Atomic purpose: shared multi-image attachments for
+# Employee records.
+#
+# Why it exists: Employee images use the same attachment, variant, and validation
+# rules as other imageable models, so the behavior is centralized.
+# How it works: adds has_many_attached :image_attachments (full/thumb variants),
+# validates count/size/MIME types, and exposes #image_urls.
+# Main associations: none directly; adds has_many_attached :image_attachments to
+# includers.
 module Employee::ImageConcern
   extend ActiveSupport::Concern
 

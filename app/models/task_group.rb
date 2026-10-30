@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# TaskGroup — Atomic purpose: company-scoped grouping of tasks (project
+# management, maintenance, administrative).
+#
+# Why it exists: groups related tasks and assigns them to employees as a unit; it
+# carries its own category/property schema.
+# How it works: belongs to company, optional branch, category, and property
+# mapping; employees join through EmployeeTaskGroupAppointment; tasks reference
+# the group.
+# Main associations: belongs_to :company, :category, :property_mapping (required),
+# :branch (optional); has_many :employees through
+# :employee_task_group_appointments (dependent: :destroy).
 class TaskGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

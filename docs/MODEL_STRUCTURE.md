@@ -9,8 +9,13 @@
 ## 1. Canonical Section Order
 
 ```ruby
-# frozen_string_literal: true  # if present — keep as first line
+# frozen_string_literal: true  # mandatory — first line
 
+# Model — Atomic purpose: what this table exists to hold, in one sentence.
+#
+# Why it exists: the problem or invariant it protects.
+# How it works: the write path, read path, and key lifecycle/callbacks.
+# Main associations: the core belongs_to / has_many macros (optional/dependent).
 class Model < ApplicationRecord
   # 1. Concerns — all `include` / `extend` / `prepend`, EXACT relative order preserved
   include FooConcern
@@ -113,7 +118,12 @@ General principle: **behavior preservation beats grouping**. When in doubt, keep
 - Every `# --- Section ---` comment moves **with** its block.
 - Commented-out code stays adjacent to its live counterpart (e.g., disabled enum validations in `Branch` stay under `Validations`).
 - Decorative divider lines with no associated code (e.g., lone `# ----` at EOF) may be removed — they add noise after reordering.
-- File-path header comments (`# app/models/foo.rb`) and `frozen_string_literal` stay on line 1.
+- Every `.rb` file under `app/models` (models and concerns) starts with
+  `# frozen_string_literal: true`, a blank line, then the top-of-file header:
+  `# <Constant> — Atomic purpose: ...` followed by `Why it exists:`,
+  `How it works:`, and `Main associations:`.
+- Do not add `# app/models/foo.rb` path headers — the model name already leads the
+  header.
 
 ---
 
@@ -129,9 +139,12 @@ General principle: **behavior preservation beats grouping**. When in doubt, keep
 
 `Layout/ClassStructure` in `.rubocop.yml` is scoped to `app/models/*.rb` and mirrors the order above via `Categories` + `ExpectedOrder`. Run `bin/rubocop` — violations fail CI.
 
+`bin/check_model_headers` verifies the top-of-file contract for every model and concern under `app/models`; CI runs it in the lint job.
+
 ```
-bin/rubocop          # lint all
-bin/rubocop app/models/company.rb   # single file
+bin/rubocop                    # lint all
+bin/rubocop app/models/company.rb  # single file
+bin/check_model_headers        # verify model/concern headers
 ```
 
 ---

@@ -1,3 +1,18 @@
+# frozen_string_literal: true
+
+# StoredFile — Atomic purpose: one uploaded file (Active Storage blob) owned by a
+# company folder and optionally attached to a domain record.
+#
+# Why it exists: centralizes upload metadata, MIME/size validation, and chunk
+# bookkeeping for data imports; the polymorphic attachable lets a file belong to
+# a migration or another record without a per-domain table.
+# How it works: has_one_attached :file; before_save syncs file_size,
+# content_type, extension, and name from the blob. Validations enforce the same
+# company for folder/attachable plus the ACCEPTABLE_STORED_FILE_TYPES and
+# STORED_FILE_MAX_SIZES_BY_TYPE limits. Import chunk counters live in metadata
+# via store_accessor (see docs/STORAGE.md, docs/DATA_IMPORT.md).
+# Main associations: belongs_to :company (touch), :folder, :attachable
+# (polymorphic, optional); has_one_attached :file.
 class StoredFile < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
   store_accessor :metadata, :chunk_index, :row_count, :import_status,

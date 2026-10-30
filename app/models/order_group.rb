@@ -1,3 +1,14 @@
+# frozen_string_literal: true
+
+# OrderGroup — Atomic purpose: customer-scoped grouping/batch of orders.
+#
+# Why it exists: groups orders for a customer so they can be handled and assigned
+# as one batch; it carries its own category/property schema.
+# How it works: belongs to company, optional branch, customer, category, and
+# property mapping; employees join through EmployeeOrderGroupAppointment.
+# Main associations: belongs_to :company, :customer, :category,
+# :property_mapping (required), :branch (optional); has_many :employees through
+# :employee_order_group_appointments (dependent: :destroy).
 class OrderGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

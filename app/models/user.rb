@@ -1,3 +1,19 @@
+# frozen_string_literal: true
+
+# User — Atomic purpose: authenticated account identity (owner, staff, customer,
+# or super admin) that owns sessions and, for owners, their companies.
+#
+# Why it exists: one login identity can own multiple companies (owner) or be
+# linked to employee/customer records; system_role selects the portal and
+# permission scope (see docs/AUTHENTICATION.md, docs/ABAC.md).
+# How it works: has_secure_password plus generated email-verification and
+# password-reset tokens; sign-in sessions are separate Session rows. Password
+# changes delete the user's other sessions, and cache hooks keep the user cache
+# fresh. #company_owner resolves the parent/owner user.
+# Main associations: has_many :sessions, :sign_in_tokens, :companies, :employees,
+# :customers, :child_users (dependent: :destroy); belongs_to :parent_user
+# (optional); has_many :company_ticket_comments (as: :author,
+# restrict_with_error); has_many :assigned_company_tickets (nullify).
 class User < ApplicationRecord
   # --- Concerns ---
   # Includes functionality for handling user avatars, likely from `app/models/user/avatar_concern.rb`.

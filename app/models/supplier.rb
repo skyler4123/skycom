@@ -1,3 +1,14 @@
+# frozen_string_literal: true
+
+# Supplier — Atomic purpose: company-scoped vendor that supplies products or
+# services and is referenced by purchases.
+#
+# Why it exists: purchases need a reusable counterparty with contact, category,
+# and dynamic properties; tags keep suppliers in the ABAC vocabulary.
+# How it works: belongs to company/category/property mapping; purchases reference
+# the supplier; tags and dynamic search come from concerns.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required).
 class Supplier < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

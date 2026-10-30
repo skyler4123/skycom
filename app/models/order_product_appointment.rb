@@ -1,13 +1,16 @@
+# frozen_string_literal: true
+
+# OrderProductAppointment — Atomic purpose: order line binding one Order to one
+# Product, carrying the quantity/unit_price/total_price snapshot.
+#
+# Why it exists: captures the price snapshot at time of order, so later catalog
+# price changes never rewrite history.
+# How it works: created in bulk by OrderProcessingV1::CreateOrderService via
+# insert_all!; read via `order.order_product_appointments`. Never edit snapshots
+# after payment. company_id derives from the order via SetDefaultCompanyConcern.
+# Main associations: belongs_to :company, :order, :product (required); :stock
+# (optional — exact row reserved at POS pay time).
 class OrderProductAppointment < ApplicationRecord
-  # Order line item — atomic row binding an Order to one chargeable row.
-  #
-  # Why it exists: captures the price snapshot (quantity/unit_price/total_price)
-  # at time of order, so later catalog price changes never rewrite history.
-  # How to use: created in bulk by OrderProcessingV1::CreateOrderService via
-  # insert_all!; read via the matching has_many on Order
-  # (e.g. order_product_appointments). Never edit snapshots after payment.
-  # How it works: concrete FKs to company/order/chargeable; company_id derives
-  # from the order via SetDefaultCompanyConcern.
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }

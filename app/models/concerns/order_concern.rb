@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# OrderConcern — Atomic purpose: marker for chargeable resources that can appear
+# as order line items (Product, Service, ProductGroup, ServiceGroup,
+# SubscriptionPlan).
+#
+# Why it exists: identifies the models that own an Order*Appointment table
+# without forcing a shared polymorphic order-lines table.
+# How it works: currently a no-op marker; the concrete line-item associations
+# are declared on each chargeable model and on Order.
+# Main associations: none directly.
+
 # == Purpose:
 # Marker for chargeable resources (Product, Service, ProductGroup,
 # ServiceGroup, SubscriptionPlan) that can appear as Order line items.
@@ -20,6 +32,7 @@
 #     has_many :order_product_appointments, dependent: :destroy
 #     has_many :orders, through: :order_product_appointments
 #   end
+
 module OrderConcern
   extend ActiveSupport::Concern
 end

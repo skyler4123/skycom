@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# Cart — Atomic purpose: company-scoped shopping/wishlist cart owned by a
+# CartGroup.
+#
+# Why it exists: keeps a pre-order basket separate from the final Order, so a
+# branch can hold shopping, wishlist, or saved-for-later items with its own
+# category/property schema.
+# How it works: belongs to company/branch/cart_group/category/property mapping;
+# employees join through CartEmployeeAppointment. The checkout pipeline reads the
+# cart and produces an Order.
+# Main associations: belongs_to :company, :cart_group, :category,
+# :property_mapping (required), :branch (optional); has_many :employees through
+# :cart_employee_appointments (dependent: :destroy).
 class Cart < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

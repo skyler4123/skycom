@@ -1,4 +1,15 @@
-# app/models/session.rb
+# frozen_string_literal: true
+
+# Session — Atomic purpose: one signed-in browser session for a User.
+#
+# Why it exists: sign-in must be revocable per device; deleting the Session row
+# (or letting its cache entry expire) invalidates that browser without touching
+# the user's password.
+# How it works: before_create copies Current.user_agent/ip_address, and
+# after_commit writes or removes a short-lived `sessions_<id>` entry in
+# Rails.sync_cache (SESSION_CACHE_EXPIRY). The authentication concern reads that
+# cache before falling back to the database.
+# Main associations: belongs_to :user (required).
 class Session < ApplicationRecord
   SESSION_CACHE_EXPIRY = 1.hour
 

@@ -1,5 +1,14 @@
 # frozen_string_literal: true
 
+# TaxConfig — Atomic purpose: company-wide tax reporting settings (date basis,
+# included invoice/purchase/stock-export sources, excluded statuses, branch
+# filters).
+#
+# Why it exists: one persisted configuration per company keeps tax reports
+# consistent instead of scattering source/filter defaults.
+# How it works: belongs to a company (unique); metadata-backed settings are
+# seeded on initialize, and `for_company!` finds or creates the row idempotently.
+# Main associations: belongs_to :company (required, unique).
 class TaxConfig < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

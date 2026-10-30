@@ -1,3 +1,14 @@
+# frozen_string_literal: true
+
+# CartGroup — Atomic purpose: company-scoped grouping of carts (abandoned,
+# active carts, wishlists).
+#
+# Why it exists: separates cart groupings from individual carts and carries its
+# own category/property schema.
+# How it works: belongs to company/branch/category/property mapping; carts
+# reference the group with belongs_to :cart_group.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :branch (optional).
 class CartGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

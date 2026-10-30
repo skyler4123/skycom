@@ -1,7 +1,19 @@
+# frozen_string_literal: true
+
 # StockTransaction — Atomic purpose: the stock ledger row and SINGLE quantity
-# mutator. Its after_create callback (recalibrate_stock_metrics, with_lock +
+# mutator.
+#
+# Why it exists: every quantity change must be attributable to a movement document
+# and safe under concurrency; centralizing the write here prevents scattered Stock
+# updates.
+# How it works: its after_create callback (recalibrate_stock_metrics, with_lock +
 # floor check) is the only writer of Stock.quantity; a missing Stock row or
-# negative result raises and rolls back the whole movement.
+# negative result raises and rolls back the whole movement. direction is
+# add/remove and transaction_type covers import/export/transfer/adjustment/
+# hold/release.
+# Main associations: belongs_to :company, :warehouse, :product, :category,
+# :property_mapping (required), :branch and polymorphic appoint_from/appoint_to/
+# appoint_for/appoint_by (optional).
 class StockTransaction < ApplicationRecord
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc

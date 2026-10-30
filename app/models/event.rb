@@ -1,3 +1,18 @@
+# frozen_string_literal: true
+
+# Event — Atomic purpose: one scheduled appointment/procedure/reservation/banquet
+# that links customers, employees, services, facilities, stock, and orders.
+#
+# Why it exists: the event is the booking header; it holds the time window and
+# business type while all participants and resources attach through atomic
+# appointments (see docs/EVENTS.md).
+# How it works: belongs to company, optional event_group/branch, category, and
+# property mapping; validates end_at after start_at. EventConfig (per company +
+# category) controls stock holds, order creation, and facility/host warnings.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :event_group and :branch (optional); has_many :employees, :branches,
+# :customers, :services, :facilities, :stocks, :orders through their event
+# appointments (all dependent: :destroy).
 class Event < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

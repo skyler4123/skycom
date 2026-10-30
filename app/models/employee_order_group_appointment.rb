@@ -1,12 +1,19 @@
+# frozen_string_literal: true
+
+# EmployeeOrderGroupAppointment — Atomic purpose: atomic row binding an Employee
+# to an OrderGroup batch.
+#
+# Why it exists: carries the batch line economics
+# (quantity/unit_price/total_price) per employee within a grouped order.
+#
+# How to use: managed by the order-group flow; read via
+# `employee.employee_order_group_appointments` / `employee.order_groups`.
+#
+# How it works: concrete FKs to company/employee/order_group; company_id derives
+# via SetDefaultCompanyConcern.
+#
+# Main associations: belongs_to :company, :employee, :order_group.
 class EmployeeOrderGroupAppointment < ApplicationRecord
-  # Order-group line — atomic row binding an Employee to an OrderGroup batch.
-  #
-  # Why it exists: carries the batch line economics
-  # (quantity/unit_price/total_price) per employee within a grouped order.
-  # How to use: managed by the order-group flow; read via
-  # `employee.employee_order_group_appointments` / `employee.order_groups`.
-  # How it works: concrete FKs to company/employee/order_group; company_id
-  # derives via SetDefaultCompanyConcern.
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }

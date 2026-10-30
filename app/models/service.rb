@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# Service — Atomic purpose: company-scoped sellable service in the catalog.
+#
+# Why it exists: services are sold on orders, booked for customers/events, and
+# assigned to employees; the catalog row keeps pricing and dynamic properties
+# separate from each booking.
+# How it works: belongs to company/branch/category/property mapping; orders,
+# service groups, customers, employees, and events link through their atomic
+# appointments. Pricing uses monetize (price_cents).
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :branch (optional); has_many :orders, :service_groups,
+# :customer_groups, :customers, :employees, :events through appointments (all
+# dependent: :destroy).
 class Service < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

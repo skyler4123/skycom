@@ -1,3 +1,19 @@
+# frozen_string_literal: true
+
+# Role — Atomic purpose: company-scoped permission role that collects ABAC
+# policies and is granted to holders (employees, customers, groups, departments).
+#
+# Why it exists: policies describe individual rules; a role bundles them so the
+# same permission set can be attached to many holders without duplicating grants
+# (see docs/ABAC.md).
+# How it works: belongs to company (touch) and optional branch; policies attach
+# through PolicyRoleAppointment, and holders attach through their own
+# <Holder>RoleAppointment tables. Touching a role invalidates employee permission
+# caches, and changes are logged in PermissionLog.
+# Main associations: belongs_to :company (touch), :branch (optional); has_many
+# :policies through :policy_role_appointments; has_many :employees, :customers,
+# :customer_groups, :departments, :employee_groups through their role
+# appointments; has_many :permission_logs (dependent: :nullify).
 class Role < ApplicationRecord
   include TagConcern
 

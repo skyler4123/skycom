@@ -1,7 +1,18 @@
-# StockAdjustment — Atomic purpose: the stock-take correction document
-# (direction: increase/decrease + reason). Multi-line via
-# StockAdjustmentStockAppointment; each line spawns a StockTransaction
-# (transaction_type: adjustment, add on increase / remove on decrease).
+# frozen_string_literal: true
+
+# StockAdjustment — Atomic purpose: the stock-take correction document (direction:
+# increase/decrease + reason).
+#
+# Why it exists: physical counts drift; the adjustment document records the
+# correction and its reason, while the ledger rows carry the actual quantity
+# changes.
+# How it works: multi-line via StockAdjustmentStockAppointment; each line spawns a
+# StockTransaction (transaction_type: adjustment, add on increase / remove on
+# decrease). Transactions are restricted while present.
+# Main associations: belongs_to :company, :warehouse, :category,
+# :property_mapping (required), :branch (optional); has_many :stocks through
+# :stock_adjustment_stock_appointments; has_many :stock_transactions (as:
+# :appoint_for, restrict_with_error).
 class StockAdjustment < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

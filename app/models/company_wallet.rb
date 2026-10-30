@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 
 # CompanyWallet — Atomic purpose: store the credit balance NUMBERS only.
-# No business logic. Balance changes flow exclusively through the chain
-# (CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet) and
-# through the CompanyCreditDeduction::* services; the wallet exposes only low-level per-balance
-# mutation entry points (add_to! / deduct_from!).
 #
-# Balances:
-#   main  — real purchased credits (top-ups land here via add_credits!)
-#   promo — promotional credits (deducted FIRST by CompanyCreditDeduction::* services)
-#   debt  — absorbed shortfall when promo + main are exhausted (normally 0)
-#
-# Atomicity: every mutation runs inside with_lock (transaction + row-level
-# FOR UPDATE), so concurrent operations serialize on the wallet row and can
-# never overdraw — Rails' own locking, no manual version bookkeeping.
+# Why it exists: balances must never overdraw; keeping the three balances in one
+# lockable row lets every mutation serialize under with_lock (row-level FOR UPDATE)
+# without manual version bookkeeping. No business logic lives here.
+# How it works: balance changes flow exclusively through the chain
+# (CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet) and through
+# the CompanyCreditDeduction::* services; the wallet exposes only low-level
+# mutation entry points (add_to! / deduct_from! / add_credits!), and usage logging
+# can be enabled for a short window.
+# Balances: main — real purchased credits (top-ups land here via add_credits!);
+# promo — promotional credits (deducted FIRST by CompanyCreditDeduction::*);
+# debt — absorbed shortfall when promo + main are exhausted (normally 0).
+# Main associations: belongs_to :company, :walletable (polymorphic, required);
+# has_many :company_wallet_logs, :company_usage_logs (dependent: :destroy).
 class CompanyWallet < ApplicationRecord
   USAGE_LOGGING_WINDOW = 5.minutes
 

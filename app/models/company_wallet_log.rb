@@ -1,8 +1,15 @@
 # frozen_string_literal: true
 
-# CompanyWalletLog — Atomic purpose: immutable before/after audit trail of
-# every CompanyWallet balance change. Written explicitly by CompanyWallet
-# mutation methods (add_to!/deduct_from!/add_credits!) — no callbacks.
+# CompanyWalletLog — Atomic purpose: immutable before/after audit trail of every
+# CompanyWallet balance change.
+#
+# Why it exists: balance mutations must be explainable; each row stores the balance
+# type, amount, and before/after values after the fact.
+# How it works: written explicitly by CompanyWallet mutation methods
+# (add_to!/deduct_from!/add_credits!) — no callbacks. source is an optional
+# polymorphic link to the domain record that caused the change.
+# Main associations: belongs_to :company, :company_wallet (required);
+# belongs_to :source, polymorphic: true (optional).
 class CompanyWalletLog < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

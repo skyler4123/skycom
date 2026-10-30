@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# CompanyTicketLog — Atomic purpose: append-only audit row for a CompanyTicket
+# event (created, assigned, status_changed, commented, rated).
+#
+# Why it exists: platform support needs an auditable timeline of assignments,
+# status changes, comments, and ratings, with a polymorphic actor (Employee or
+# User).
+# How it works: belongs to company/company_ticket and optional actor; record! is
+# the single write path used by the ticket and comment flows.
+# Main associations: belongs_to :company, :company_ticket (required);
+# belongs_to :actor, polymorphic: true (optional).
 class CompanyTicketLog < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

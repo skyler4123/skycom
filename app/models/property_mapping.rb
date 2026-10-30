@@ -1,3 +1,20 @@
+# frozen_string_literal: true
+
+# PropertyMapping — Atomic purpose: per-category schema definition for dynamic
+# property slots (property_string_1, property_integer_1, ...).
+#
+# Why it exists: Skycom stores category-specific fields in a fixed set of typed
+# property columns instead of adding database columns; this record defines which
+# slots exist, their display names, types, and validation rules.
+# How it works: belongs to company/category; the metadata shape documented below
+# is validated by the model and consumed by CategoryConcern,
+# PropertyMappingConcern, and dynamic validation. Categories create a default
+# mapping on create.
+# Main associations: belongs_to :company (touch), :category (required); has_many
+# :table_configs (dependent: :destroy) and resource records such as products,
+# services, orders, and employees that belong to :property_mapping (restricted
+# while present).
+
 # PropertyMapping configuration for the "invoices" resource (e.g., Category: "B2C Retail Invoice")
 # [
 #   {
@@ -45,7 +62,6 @@
 #   type:       String  — One of: string, integer, decimal, boolean,
 #                        datetime. Derivable from the key prefix.
 #   validates:  Hash    — Validation rules (future use, currently {}).
-
 class PropertyMapping < ApplicationRecord
   include CategoryConcern
 

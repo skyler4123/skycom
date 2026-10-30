@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# Current — Atomic purpose: request-scoped context (session, user, company)
+# shared across the current thread; it is not a database table.
+#
+# Why it exists: controllers, services, and jobs need the signed-in user and
+# tenant without threading them through every call; Current also memoizes the
+# lookups so repeated `Current.company` / `Current.branches` calls stay cheap.
+# How it works: ActiveSupport::CurrentAttributes is reset per request; the
+# authentication flow assigns session_id/user_id/company_id, while #session,
+# #user, and .company memoize their records. .company_owner resolves the owner
+# User, and .branches delegates to the current company.
+# Main associations: none directly; resolves Session, User, Company, and
+# Company#branches at call time.
 class Current < ActiveSupport::CurrentAttributes
   attribute :session_id, :user_id, :user_agent, :ip_address
   attribute :company_id

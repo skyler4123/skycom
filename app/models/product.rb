@@ -1,4 +1,18 @@
-# app/models/product.rb
+# frozen_string_literal: true
+
+# Product — Atomic purpose: company-scoped sellable/stocked item in the catalog.
+#
+# Why it exists: the product is the catalog identity behind order lines, stock
+# rows, and supplier purchases; it carries pricing, brand, category, and dynamic
+# properties without duplicating them per order.
+# How it works: belongs to company/branch/brand/category/property mapping; orders
+# reference products through OrderProductAppointment, product groups through
+# ProductProductGroupAppointment, and stock rows point back to the product.
+# Tags, images, and dynamic search come from concerns.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :branch and :brand (optional); has_many :orders, :product_groups,
+# :employees through appointments; has_many :stocks, :stock_transactions
+# (dependent: :destroy).
 class Product < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

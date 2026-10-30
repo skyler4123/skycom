@@ -1,3 +1,14 @@
+# frozen_string_literal: true
+
+# User::OmniauthConcern — Atomic purpose: find-or-create and refresh a User from
+# an OmniAuth provider payload.
+#
+# Why it exists: OAuth sign-in must reconcile provider/uid with an existing email
+# account and keep profile fields current without a separate service.
+# How it works: .from_omniauth finds by provider/uid or email, fills missing
+# provider/uid/username/password, updates name fields, saves, and returns the
+# user.
+# Main associations: none directly; operates on User records.
 module User::OmniauthConcern
   extend ActiveSupport::Concern
 

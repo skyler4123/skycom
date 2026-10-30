@@ -1,3 +1,19 @@
+# frozen_string_literal: true
+
+# Ticket — Atomic purpose: internal employee support/work ticket with a workflow
+# approval chain.
+#
+# Why it exists: internal issues need an owner, assignee, priority, comments, and
+# the same category/workflow approval machinery as purchases
+# (see docs/TICKET.md, docs/PURCHASE_WORKFLOW.md).
+# How it works: belongs to company/employee and optional assigned_employee,
+# category, property_mapping, workflow_step; before_validation binds the
+# category's workflow, and after_create records the submission and created log.
+# Comments and logs are separate rows.
+# Main associations: belongs_to :company, :employee (required),
+# :assigned_employee, :category, :property_mapping, :workflow_step (optional);
+# has_many :ticket_comments, :ticket_logs, :workflow_step_logs (as: :subject,
+# dependent: :destroy).
 class Ticket < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

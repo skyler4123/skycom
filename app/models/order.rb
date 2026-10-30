@@ -1,3 +1,22 @@
+# frozen_string_literal: true
+
+# Order — Atomic purpose: sales order header that groups chargeable line items
+# (products, services, groups, subscription plans) for a customer.
+#
+# Why it exists: the order is the commercial document between the customer and
+# the branch; line items live in atomic tables with price snapshots so the order
+# total is always derived, not stored.
+# How it works: belongs to company, optional branch/customer, category, and
+# property mapping; line items are Order*Appointment rows. #line_items combines
+# them and #line_total sums their total_price. Invoices and discounts hang off the
+# order (see docs/ORDER_PROCESSING_V1.md, docs/DISCOUNTS.md).
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :branch and :customer (optional); has_many :invoices, :discounts,
+# :order_product_appointments, :order_service_appointments,
+# :order_product_group_appointments, :order_service_group_appointments,
+# :order_subscription_plan_appointments, :event_order_appointments
+# (dependent: :destroy); has_many :products, :services, :product_groups,
+# :service_groups, :subscription_plans, :events through those appointments.
 class Order < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
