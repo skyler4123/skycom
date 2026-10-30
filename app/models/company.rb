@@ -32,7 +32,7 @@ class Company < ApplicationRecord
   # Default resource names for new companies. Used by #resource_names
   # (which reads from metadata with this as a fallback).
   DEFAULT_RESOURCE_NAMES = %w[
-    Product Order Customer CustomerProfile CustomerSubprofile Employee EmployeeProfile EmployeeSubprofile Branch Department
+    Product Order Customer CustomerProfile CustomerSubprofile Employee EmployeeGroup EmployeeProfile EmployeeSubprofile Branch Department
     PolicyRoleAppointment Invoice Transaction Service Policy
     Category PropertyMapping TableConfig Brand Facility Warehouse
     Supplier

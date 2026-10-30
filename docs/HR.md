@@ -35,6 +35,8 @@ All tables include the standard System Fields Block (lifecycle_status, workflow_
 
 - **Teams own reporting lines**: `EmployeeGroup#manager_id` points at an Employee; membership is the atomic `employee_employee_group_appointments` join. There is no `employees.manager_id`, and an employee can have several managers across teams.
 
+- **Teams are managed in the web UI**: Organization → Employee Groups provides index/new/show/edit pages. The selected manager is always enrolled as a member; employees can be assigned/unassigned from the edit page. The pages use the standard TableConfig/category/property-mapping stack (`docs/DYNAMIC_TABLE.md`).
+
 - **No `period` association**: Direct time fields (start_time, end_time, check_in_at) instead of linking to shared Period records
 - **Employee-linked**: All tables reference `employee_id` (not `user_id`), matching Skycom's HR model
 - **Metrics pre-computed**: Attendance records store computed values (late_minutes, overtime_minutes) for fast payroll queries without runtime calculation

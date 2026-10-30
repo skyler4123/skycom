@@ -65,6 +65,7 @@ Rails.application.routes.draw do
       end
       resources :transactions
       resources :employees
+      resources :employee_groups, only: %i[index show new create edit update]
       resources :employee_profiles
       resources :employee_subprofiles
       resources :customer_profiles

@@ -69,6 +69,18 @@ RSpec.feature "Sidebar favourites", type: :feature, js: true do
     end
   end
 
+  scenario "organization group lists Employee Groups immediately after Employees" do
+    visit company_dashboards_path(company)
+
+    find("details[data-sidebar-group='organization'] summary", visible: :all).click
+    within("details[data-sidebar-group='organization']", visible: :all) do
+      expect(page).to have_link("Employee Groups", href: %r{/employee_groups}, visible: :all, wait: 10)
+
+      labels = all("a p", visible: :all).map { |label| label.text.strip }
+      expect(labels.index("Employee Groups")).to eq(labels.index("Employees") + 1)
+    end
+  end
+
   scenario "inventory group lists Stock Adjustments with a star" do
     visit company_dashboards_path(company)
 

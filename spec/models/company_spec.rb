@@ -29,6 +29,12 @@ RSpec.describe Company, type: :model do
     it { should have_many(:departments).dependent(:destroy) }
   end
 
+  describe "default resource names" do
+    it "includes EmployeeGroup so CRUD policies are seeded" do
+      expect(Company::DEFAULT_RESOURCE_NAMES).to include("EmployeeGroup")
+    end
+  end
+
   describe "validations" do
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:business_type) }
