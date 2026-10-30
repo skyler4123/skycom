@@ -40,9 +40,9 @@ Source files for the inventory:
 |---|---|---|---|
 | Auth | 🟡 | Email/password sign-in, sign-out, session cookie | Forgot password, biometrics, SSO |
 | Home | 🟡 | Greeting, live clock, multi check-in state/times, today shift, monthly stats, quick actions, activity, paid-leave balance, latest company notice | No checkout/break |
-| Profile | 🟡 | Own name, code, type, roles, category, email, phone, company, branch, departments, next shift, monthly totals, reports-to, contract renewal | No edit, no dynamic profiles |
+| Profile | 🟡 | Own name, code, type, roles, category, email, phone, company, branch, departments, next shift, monthly totals, group managers, contract renewal | No edit, no dynamic profiles |
 | Attendance | 🟡 | Own month summary, daily rows, month navigation, check-in | No check-out, geofence, QR, request history, or PDF |
-| Requests | 🟡 | Create attendance request with validation, assigned approver from manager chain | No inbox, status, or attachments |
+| Requests | 🟡 | Create attendance request with validation, group managers listed from employee teams | No inbox, status, or attachments |
 | Payroll | 🟡 | Own status/step, period, worked hours, present days, overtime, salary/allowance/tax/net money | No payslip/PDF |
 | Notifications | ⛔ | — | No inbox, unread badge, mark-read, push, or preferences |
 | Leave | 🟡 | Paid-leave balance and pending days on Home, seeded leave requests | No leave request form or history |
@@ -75,10 +75,10 @@ month, payroll). The web has **69 sidebar items** across 16 active groups plus
 |---|---|---|---|---|---|---|
 | 1 | Sign in | `GET/POST /mobile/sign_in` | `Mobile::SessionsController#new/create` | `User`, session | Sign in | No forgot password or biometrics; sign-in activity has no tabs |
 | 2 | Home | `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `Employee`, `AttendanceMonth`, `ScheduledShift`, `AttendanceLog`, `AttendanceRequest`, `Payroll`, `AttendanceBalance`, `Document` | Check-in via `POST /mobile/companies/:company_id/attendances` | No checkout or break |
-| 3 | Employee | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `Employee` (manager), roles, departments, category, next shift, month totals | — | Read-only; no edit or dynamic profiles |
+| 3 | Employee | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `Employee` (group managers), roles, departments, category, next shift, month totals | — | Read-only; no edit or dynamic profiles |
 | 4 | Attendance month | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `AttendanceMonth`, `AttendanceDay` | — | Read-only; no PDF, collect, or request list |
 | 5 | Payroll | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `Payroll` (money), `AttendanceMonth` | — | No payslip download |
-| 6 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee` (manager), `AttendanceRequest` | Create request | No attachments |
+| 6 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee` (group managers), `AttendanceRequest` | Create request | No attachments |
 
 `GET /mobile/home` remains the signed-in no-employee fallback and renders
 without a company id. Every tenant page asserts membership through
@@ -122,7 +122,7 @@ Cross-cutting mobile behavior:
 | Attendance request create | ✅ | ✅ | Date, type, times, reason |
 | Request list/status | ✅ admin | ⛔ | Requests tab is the form |
 | Request approvals | ✅ manager | ⛔ | Web-only manager workflow |
-| Request approver | ✅ after decision | ✅ | Derived from the employee's manager (owner/manager fallback) |
+| Request approver | ✅ after decision | ✅ | All group managers listed (owner fallback) |
 | Request attachments | — | ⛔ | No attachment association |
 | Attendance PDF/audit | — | ⛔ | No endpoint; HR roadmap item |
 | Payroll status/step | ✅ admin | ✅ | Draft/approved/paid |
@@ -138,7 +138,7 @@ Cross-cutting mobile behavior:
 | Notification preferences | ✅ | ⛔ | Web config only |
 | Profile edit | ✅ admin | ⛔ | Mobile edit button is disabled |
 | Dynamic profiles/subprofiles | ✅ admin | ⛔ | Mobile shows basic profile only |
-| Reports-to / contract | — | ✅ | `manager_id` and `expiration_date` |
+| Group managers / contract | — | ✅ | `employee_groups.manager_id` and `expiration_date` |
 | Multi-employee/company switch | ✅ employee list | ⛔ | `employees.first` everywhere |
 | Dark mode | ✅ | ✅ | Shared storage key |
 | Language switch | ✅ JS dictionary | ⛔ | Mobile ERB is English-only |
@@ -346,7 +346,7 @@ status.
 | M-07 | Leave request form and history | Balance/pending days are real and seeded, but employees cannot file leave on mobile | Mobile leave form + endpoints | Request, cancel, history, status | M |
 | M-08 | Payslip/PDF | Payroll money is real; the `payslips` route is stale | Document generation | Downloadable payslip from persisted payroll money | M |
 | M-09 | Announcement list and read tracking | Home shows the latest published `Document` notice; no list/read state | Announcement list + read tracking | List and read/unread state | M |
-| M-10 | Request attachments | Approver is derived from the manager chain; no attachments | ActiveStorage + mobile upload | Optional photo/PDF proof | M |
+| M-10 | Request attachments | Managers come from employee groups; no attachments | ActiveStorage + mobile upload | Optional photo/PDF proof | M |
 | M-11 | Profile edit | Mobile profile is read-only | Mobile form + permitted fields | Employee can edit allowed fields (for example phone, email) | M |
 | M-12 | GPS/geofence check-in | Mobile check-in bypasses `AttendanceConfig` and `CheckInService` | Android location permission + native/WebView geolocation | Check-in validates branch geofence or WiFi, with a clear failure state | L |
 | M-13 | Push notifications | No FCM or `POST_NOTIFICATIONS` | Firebase + native permission + backend | Push received and opens the relevant mobile page | L |

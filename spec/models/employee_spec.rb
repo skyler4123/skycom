@@ -12,12 +12,11 @@ RSpec.describe Employee, type: :model do
     it { should have_many(:services).through(:employee_service_appointments) }
     it { should have_many(:employee_employee_group_appointments).dependent(:destroy) }
     it { should have_many(:employee_groups).through(:employee_employee_group_appointments) }
+    it { should have_many(:managed_employee_groups).class_name("EmployeeGroup").with_foreign_key(:manager_id).dependent(:nullify) }
     it { should have_many(:department_employee_appointments).dependent(:destroy) }
     it { should have_many(:departments).through(:department_employee_appointments) }
     it { should have_many(:employee_tag_appointments).dependent(:destroy) }
     it { should have_many(:tags).through(:employee_tag_appointments) }
-    it { should belong_to(:manager).class_name("Employee").optional }
-    it { should have_many(:direct_reports).class_name("Employee").with_foreign_key(:manager_id).dependent(:nullify) }
     it { should have_many(:attendance_balances).dependent(:destroy) }
     it { should have_many(:attendance_leaves).dependent(:destroy) }
   end
@@ -31,37 +30,6 @@ RSpec.describe Employee, type: :model do
     it { should define_enum_for(:business_type).with_values(owner: 0, full_time: 1, part_time: 2, contractor: 3, intern: 4) }
     it { should define_enum_for(:lifecycle_status) }
     it { should define_enum_for(:workflow_status) }
-  end
-
-  describe "manager assignment" do
-    let(:company) { create(:company) }
-    let(:manager) { create(:employee, company: company) }
-
-    it "accepts a manager from the same company" do
-      employee = create(:employee, company: company, manager: manager)
-      expect(employee).to be_valid
-      expect(employee.manager).to eq(manager)
-    end
-
-    it "rejects a manager from another company" do
-      other_manager = create(:employee, company: create(:company))
-      employee = build(:employee, company: company, manager: other_manager)
-      expect(employee).not_to be_valid
-      expect(employee.errors[:manager]).to be_present
-    end
-
-    it "rejects reporting to yourself" do
-      employee = create(:employee, company: company)
-      employee.manager_id = employee.id
-      expect(employee).not_to be_valid
-      expect(employee.errors[:manager]).to be_present
-    end
-
-    it "nullifies direct reports when the manager is destroyed" do
-      report = create(:employee, company: company, manager: manager)
-      manager.destroy!
-      expect(report.reload.manager_id).to be_nil
-    end
   end
 
   describe "owner uniqueness validation" do

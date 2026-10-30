@@ -53,7 +53,7 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 7 | `tags` | ABAC | Key-value tags for ABAC policy evaluation |
 | 8 | `roles` | ABAC | Employee roles with associated policies |
 | 9 | `policies` | ABAC | Permission policies with tag conditions |
-| 10 | `employee_groups` | HR | Employee grouping |
+| 10 | `employee_groups` | HR | Team/group (manager + members) |
 | 11 | `employees` | HR | Staff members |
 | 12 | `customer_groups` | CRM | Customer segmentation groups |
 | 13 | `customers` | CRM | Customer/patient records |

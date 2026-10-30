@@ -11,15 +11,19 @@ RSpec.describe Seed::CompensationService do
   end
   let(:staff) { create(:employee, company: company, branch: branch) }
 
-  it "assigns the owner and branch managers as reporting lines" do
+  it "assigns branch teams and a leadership group" do
     manager
     staff
 
     described_class.assign!(company: company)
 
-    expect(owner.reload.branch).to eq(branch)
-    expect(manager.reload.manager).to eq(owner)
-    expect(staff.reload.manager).to eq(manager)
+    branch_team = EmployeeGroup.find_by!(company: company, name: "#{branch.name} Team")
+    expect(branch_team.manager).to eq(manager)
+    expect(branch_team.employees).to contain_exactly(manager, staff)
+
+    leadership = EmployeeGroup.find_by!(company: company, name: "Leadership")
+    expect(leadership.manager).to eq(owner)
+    expect(leadership.employees).to contain_exactly(owner, manager)
   end
 
   it "assigns salary, allowance, and contract renewal to every employee" do
@@ -49,14 +53,18 @@ RSpec.describe Seed::CompensationService do
     manager
     staff
     described_class.assign!(company: company)
-    original_manager = staff.reload.manager_id
-    original_expiration = staff.expiration_date
+    group_count = EmployeeGroup.where(company: company).count
+    appointment_count = EmployeeEmployeeGroupAppointment.where(company: company).count
+    original_manager_id = EmployeeGroup.find_by!(company: company, name: "#{branch.name} Team").manager_id
+    original_expiration = staff.reload.expiration_date
 
     expect do
       described_class.assign!(company: company)
     end.not_to change(Employee, :count)
 
-    expect(staff.reload.manager_id).to eq(original_manager)
-    expect(staff.expiration_date).to eq(original_expiration)
+    expect(EmployeeGroup.where(company: company).count).to eq(group_count)
+    expect(EmployeeEmployeeGroupAppointment.where(company: company).count).to eq(appointment_count)
+    expect(EmployeeGroup.find_by!(company: company, name: "#{branch.name} Team").manager_id).to eq(original_manager_id)
+    expect(staff.reload.expiration_date).to eq(original_expiration)
   end
 end

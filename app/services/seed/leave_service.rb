@@ -50,7 +50,7 @@ class Seed::LeaveService
   end
 
   def approver_for(employee)
-    employee.manager || @company.employees.find_by(business_type: OWNER_BUSINESS_TYPE)
+    employee.managers.first || @company.employees.find_by(business_type: OWNER_BUSINESS_TYPE)
   end
 
   def request_date(offset)

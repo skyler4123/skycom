@@ -7,6 +7,7 @@ RSpec.describe Seed::LeaveService do
   let(:branch) { create(:branch, company: company) }
   let!(:owner) { company.employees.find_by(business_type: :owner) }
   let!(:staff) { create(:employee, company: company, branch: branch) }
+  let(:manager) { create(:employee, company: company, branch: branch, name: "Leave Manager") }
 
   it "creates a paid-leave balance for every employee" do
     described_class.create_samples!(company: company)
@@ -30,5 +31,20 @@ RSpec.describe Seed::LeaveService do
     expect do
       described_class.create_samples!(company: company)
     end.not_to change(AttendanceLeave, :count)
+  end
+
+  it "uses the employee's group manager as the approver" do
+    employee_group = create(:employee_group, company: company, branch: branch, manager: manager)
+    create(
+      :employee_employee_group_appointment,
+      company: company,
+      employee: staff,
+      employee_group: employee_group
+    )
+
+    described_class.create_samples!(company: company)
+
+    leave = AttendanceLeave.where(employee: staff, status: :approved).order(:start_date).first
+    expect(leave.decided_by).to eq(manager)
   end
 end

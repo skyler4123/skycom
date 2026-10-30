@@ -100,10 +100,10 @@ screen shows an empty/dash state instead of fabricated content.
 |---|---|
 | Sign-in | email/password auth, errors |
 | Home | greeting, company/branch/code, live clock, multi check-in state/times, today's shift/logs, monthly attendance %, worked time, overtime, pending requests, payroll status, paid-leave balance and pending days, latest published company announcement |
-| Employee | name/code/type/roles/category, email, phone, company, branch, departments, next shift, monthly attendance, reports-to manager, contract renewal (`expiration_date`) |
+| Employee | name/code/type/roles/category, email, phone, company, branch, departments, next shift, monthly attendance, group managers, contract renewal (`expiration_date`) |
 | Attendance | month summary (worked/present/absent/overtime), daily in/out/duration/status |
 | Payroll | month, status/step, period days, worked hours, present days, overtime minutes, salary/allowance/overtime/tax/social/net amounts |
-| New request | employee/branch, date, type, times, reason, validation, assigned approver derived from the manager chain (owner fallback) |
+| New request | employee/branch, date, type, times, reason, validation, group managers listed from `EmployeeGroup#manager` (owner fallback) |
 
 Rules:
 
@@ -184,10 +184,10 @@ Coverage:
 | `spec/features/mobile/sign_in_spec.rb` | form, password toggle, invalid/valid auth, company-scoped redirect, sign-out |
 | `spec/features/mobile/home_spec.rb` | dashboard data, paid leave, company notice, check-in, dark toggle, no-employee fallback, company redirect, auth redirect |
 | `spec/features/mobile/check_in_spec.rb` | log creation, employee/company stamping, multiple check-ins, company-local day/timezone |
-| `spec/features/mobile/employee_info_spec.rb` | profile sections, manager/contract, disabled editor, back/sign-out |
+| `spec/features/mobile/employee_info_spec.rb` | profile sections, group managers/contract, disabled editor, back/sign-out |
 | `spec/features/mobile/attendance_month_spec.rb` | summary, daily rows, prev/next, empty state |
 | `spec/features/mobile/payroll_spec.rb` | status, real money amounts, timesheet link, disabled payslip, month switch |
-| `spec/features/mobile/attendance_request_spec.rb` | valid submit, approver, validation errors, future date, auth |
+| `spec/features/mobile/attendance_request_spec.rb` | valid submit, group managers, validation errors, future date, auth |
 | `spec/requests/mobile/attendances_controller_spec.rb` | check-in, multiple check-ins, cross-tenant 404 |
 | `spec/requests/mobile/home_controller_spec.rb` | company-local day/timezone for check-ins |
 | `spec/requests/mobile/attendance_requests_controller_spec.rb` | pending create, permission failure, cross-tenant 404 |

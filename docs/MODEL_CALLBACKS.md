@@ -128,6 +128,25 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 | `after_commit :refresh_cache, on: [:create, :update]` | — | `refresh_cache` | Writes a compact hash (`id`, `user_id`, `company_id`) to `Rails.sync_cache` under `employees_#{user_id}_#{company_id}:v#{updated_at.to_i}` (TTL `Employee::EMPLOYEE_CACHE_EXPIRY` = 5 min). |
 | `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `employees_#{user_id}_#{company_id}:v#{updated_at.to_i}` from `Rails.sync_cache` (pub/sub evicts other instances). |
 
+> `Employee#managers` (see `docs/CACHE.md`) caches the employee's group-manager ids in `Rails.sync_cache` for 1 hour. The appointment and group callbacks below evict it.
+
+---
+
+### EmployeeGroup (`app/models/employee_group.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `after_save :clear_members_managers_cache, if: :saved_change_to_manager_id?` | — | `clear_members_managers_cache` | Deletes each member's `employees_<id>:managers` sync-cache key when the team's manager changes. |
+
+---
+
+### EmployeeEmployeeGroupAppointment (`app/models/employee_employee_group_appointment.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `after_save :clear_employee_managers_cache` | — | `clear_employee_managers_cache` | Deletes the member's `employees_<id>:managers` sync-cache key after the membership row is created or updated. |
+| `after_destroy :clear_employee_managers_cache` | — | `clear_employee_managers_cache` | Same eviction after the membership row is removed. |
+
 ---
 
 ### Policy (`app/models/policy.rb`)

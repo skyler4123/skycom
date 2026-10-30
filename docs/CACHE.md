@@ -268,6 +268,9 @@ commit `8abe53c`. It is replaced by a **record cache** backed by
   same key and deletes propagate via pub/sub. TTLs: Session 1 hour, others 5
   minutes.
 - `after_commit :refresh_cache` / `:remove_cache` on each model keep entries fresh.
+- `Employee#managers` caches the employee's group-manager ids under
+  `employees_#{id}:managers` for `Employee::ManagerConcern::MANAGERS_CACHE_EXPIRY`
+  (1 hour). Appointment saves and group manager changes delete the key.
 - The `cache_version` aggregate (`Company.where(user:).maximum(:updated_at)`) is
   also cached per user under `user_#{id}:companies_max_updated_at` and
   invalidated on Company create/update/destroy.
@@ -338,6 +341,7 @@ Per the `docs/CONSTANTS.md` convention, single-file constants live at their usag
 | `SESSION_CACHE_EXPIRY` | 1 hour | `app/controllers/concerns/application_controller/authentication_concern.rb` | Session record cache TTL (longer — sessions rarely change) |
 | `PERMISSIONS_CACHE_EXPIRY` | 1 minute | `config/initializers/constants.rb` | Permissions hash cache TTL (used by both permission concerns) |
 | `OWNER_ROLE_CACHE_EXPIRY` | 1 day | `app/models/concerns/employee/permission_concern.rb` | `ram_cache` TTL for the `Employee#owner_role?` hot boolean |
+| `MANAGERS_CACHE_EXPIRY` | 1 hour | `app/models/concerns/employee/manager_concern.rb` | `sync_cache` TTL for the `Employee#managers` group-manager ids |
 | `COOKIE_EXPIRY` | 1 day | `app/controllers/concerns/application_controller/cookie_concern.rb` | Session and client cache cookie lifetime |
 
 ---

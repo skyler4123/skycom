@@ -29,9 +29,11 @@ The system supports multiple business types (retail, hospital) through the same 
 | 8 | `attendance_leaves` | Paid/sick/unpaid leave requests | employee_id, leave_type, status, start_date, end_date, days, decided_by_id |
 | 9 | `payrolls` | Payroll run per employee/month | month, status, currency, salary/allowance/overtime/tax/net `*_cents` columns, attendance_month_id |
 
-All tables include the standard System Fields Block (lifecycle_status, workflow_status, business_type, metadata, discarded_at, permission_resource_name). `employees` additionally stores `manager_id`, `monthly_salary_cents`, `monthly_allowance_cents`, and `expiration_date` (contract renewal).
+All tables include the standard System Fields Block (lifecycle_status, workflow_status, business_type, metadata, discarded_at, permission_resource_name). `employees` additionally stores `monthly_salary_cents`, `monthly_allowance_cents`, and `expiration_date` (contract renewal). Reporting lines live on `employee_groups.manager_id` (the team's manager, an `Employee` — independent of the `Manager` role) plus `employee_employee_group_appointments` memberships; an employee can belong to several teams and therefore report to several managers.
 
 ### Key Design Decisions
+
+- **Teams own reporting lines**: `EmployeeGroup#manager_id` points at an Employee; membership is the atomic `employee_employee_group_appointments` join. There is no `employees.manager_id`, and an employee can have several managers across teams.
 
 - **No `period` association**: Direct time fields (start_time, end_time, check_in_at) instead of linking to shared Period records
 - **Employee-linked**: All tables reference `employee_id` (not `user_id`), matching Skycom's HR model
@@ -227,7 +229,7 @@ Hospital and retail enrich services create the same shift/attendance data
 | Attendance Days | ~400 | Aggregated per employee per date |
 | Attendance Months | ~80 | Monthly payroll rollups |
 | Attendance Configs | 2 | 1 per clinic (GPS: 10.773, 106.694 / 100m radius) |
-| Compensation + reporting lines | Every employee | `manager_id`, monthly salary/allowance, contract expiration |
+| Compensation + teams | Every employee | Branch team + Leadership `EmployeeGroup` (manager + members), monthly salary/allowance, contract expiration |
 | Leave Balances | Every employee | 14 paid days per current year |
 | Leave Requests | 2 approved + selected pending | Derived used/pending days on mobile Home |
 | Payrolls | Current + previous month | Money computed from salary + attendance by `Payrolls::GenerateService` |
@@ -265,7 +267,7 @@ Shift seeds include realistic edge cases:
 | Hospital seeding (shift/attendance data) | Done |
 | MOCK_OAUTH_EMAIL → hospital Manager | Done |
 | Geofence calculation (Haversine) | Done |
-| Compensation/reporting lines + contract renewal seed | Done |
+| Compensation/teams + contract renewal seed | Done |
 | Leave balances + leave requests (seed + mobile Home read) | Done |
 | Payroll money engine (salary + attendance → gross/tax/net) | Done |
 
@@ -308,7 +310,7 @@ Shift seeds include realistic edge cases:
 | `app/models/attendance_leave.rb` | Model |
 | `app/models/payroll.rb` | Model |
 | `app/services/payrolls/generate_service.rb` | Payroll money engine |
-| `app/services/seed/compensation_service.rb` | Seed reporting lines + salary/contract |
+| `app/services/seed/compensation_service.rb` | Seed branch teams/leadership + salary/contract |
 | `app/services/seed/leave_service.rb` | Seed leave balances/requests |
 | `app/models/shift_template.rb` | Model |
 | `app/models/scheduled_shift.rb` | Model |

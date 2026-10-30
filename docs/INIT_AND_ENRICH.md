@@ -47,7 +47,7 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Pages | 4 (2 per branch) |
 | Departments | 4 |
 | Employees | ~76 (across 2 branches) |
-| Compensation / reporting lines | Every employee: `manager_id`, salary, allowance, contract `expiration_date`; owner attached to the first branch |
+| Compensation / teams | Every employee: salary, allowance, contract `expiration_date`; branch teams + Leadership `EmployeeGroup` with `employee_groups.manager_id`; owner attached to the first branch |
 | Leave balances + requests | 1 paid-leave balance per employee (14 days) + approved/pending `AttendanceLeave` rows |
 | Company announcement | 1 published `Document` (`business_type: announcement`) linked to every employee |
 | Customers | 100 (50 per branch) |
@@ -78,15 +78,15 @@ Seed::ApplicationService.run
    |   +- Company.create! -> after_create -> HotelInitService -> roles, categories, etc.
    |
    |- Enrich Company 1 (RetailEnrichService)
-   |   +- Brands, branches, employees, compensation/reporting lines, leave,
+   |   +- Brands, branches, employees, compensation/teams, leave,
    |      announcement, products, stocks, orders...
    |- Enrich Company 2 (RetailEnrichService)
-   |   +- Brands, branches, employees, compensation/reporting lines, leave,
+   |   +- Brands, branches, employees, compensation/teams, leave,
    |      announcement, products, stocks, orders...
    |
    +- Enrich Company 3 (HospitalEnrichService)
-       +- Branches, departments, facilities, employees, compensation/reporting
-          lines, leave, announcement, patients, services, pharmacy products,
+       +- Branches, departments, facilities, employees, compensation/teams,
+          leave, announcement, patients, services, pharmacy products,
           warehouses, stocks, transfers/imports/exports, shifts + attendance,
           credit data
    |

@@ -8,7 +8,9 @@
 # index-backed and mismatched pairs are impossible at the schema level.
 #
 # How to use: create rows directly or through the owning domain service; read
-# via the has_many/through declared on either side.
+# via the has_many/through declared on either side. The group's manager is
+# enrolled like any other member — EmployeeGroup#manager_id remains the source of
+# truth for who manages the team.
 #
 # How it works: table and class names use the alphabetical pair order (e.g.
 # DepartmentEmployeeAppointment). company_id derives from either side via
@@ -24,4 +26,13 @@ class EmployeeEmployeeGroupAppointment < ApplicationRecord
   belongs_to :company
   belongs_to :employee
   belongs_to :employee_group
+
+  after_save :clear_employee_managers_cache
+  after_destroy :clear_employee_managers_cache
+
+  private
+
+  def clear_employee_managers_cache
+    Employee.find_by(id: employee_id)&.clear_managers_cache
+  end
 end

@@ -1,5 +1,5 @@
 class Mobile::Companies::AttendanceRequestsController < Mobile::Companies::BaseController
-  before_action :set_approver, only: %i[new create]
+  before_action :set_managers, only: %i[new create]
 
   def new
     @attendance_request = AttendanceRequest.new(
@@ -27,10 +27,13 @@ class Mobile::Companies::AttendanceRequestsController < Mobile::Companies::BaseC
 
   private
 
-  def set_approver
-    @approver = @employee.manager ||
-      @company.employees.where.not(id: @employee.id).find_by(business_type: :owner) ||
-      @company.employees.where.not(id: @employee.id).order(:created_at).first
+  def set_managers
+    @managers = @employee.managers.to_a
+    return if @managers.any?
+
+    fallback = @company.employees.where.not(id: @employee.id).find_by(business_type: :owner) ||
+               @company.employees.where.not(id: @employee.id).order(:created_at).first
+    @managers = [ fallback ].compact
   end
 
   def request_params
