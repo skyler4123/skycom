@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
-# CompanyTransaction — Atomic purpose: record money movement for a
-# CompanyInvoice (the chain's entry point and gateway interface). On create/
-# destroy it DERIVES the invoice's payment_status from the sum of its
-# completed payment transactions. This is a rare money event — the only
-# callbacks in the credit system.
+# CompanyTransaction — Atomic purpose: record money movement for a CompanyInvoice
+# (the credit chain's entry point and gateway interface).
+#
+# Why it exists: invoices can be paid by multiple attempts (payment/refund); each
+# transaction carries the gateway payload and amount, and the invoice status must
+# always be recomputed from the full set.
+# How it works: after_create/after_destroy (and after_update when completed) run
+# sync_invoice_payment_status, which sums completed payments and writes the
+# invoice's payment_status. These are the only callbacks in the credit system.
+# Main associations: belongs_to :company, :company_invoice,
+# :company_payment_method (required); metadata holds :gateway_payload.
 class CompanyTransaction < ApplicationRecord
   store_accessor :metadata, :gateway_payload
 

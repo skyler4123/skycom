@@ -1,11 +1,17 @@
 # frozen_string_literal: true
 
-# TableConfigLog — immutable audit trail of every TableConfig change.
-# Written explicitly by Companies::TableConfigsController after successful
-# create/update — no callbacks. The metadata snapshot holds the raw columns
-# array with no schema validation; FKs exist only for filtering and are
-# optional except company so logs survive deletes (parent uses
-# dependent: :nullify).
+# TableConfigLog — Atomic purpose: immutable audit trail of every TableConfig
+# change.
+#
+# Why it exists: table layouts are tenant configuration; the log preserves who
+# changed which resource and the raw columns snapshot after the config row is
+# deleted.
+# How it works: written explicitly by Companies::TableConfigsController after a
+# successful create/update — no callbacks. The metadata snapshot holds the raw
+# columns array with no schema validation; FKs exist only for filtering and are
+# optional except company (parent uses dependent: :nullify).
+# Main associations: belongs_to :company (required); belongs_to :table_config,
+# :category, :property_mapping, :employee (optional).
 class TableConfigLog < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

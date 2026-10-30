@@ -1,11 +1,19 @@
+# frozen_string_literal: true
+
+# EmployeeNotificationTagAppointment — Atomic purpose: atomic pairwise row
+# binding one NotificationTag to one Employee.
+#
+# Why it exists: an employee listens to notifications via shared tags (never a
+# direct employee↔notification link); this table records the subscription.
+#
+# How to use: created from the notification settings UI; read via
+# `employee.subscribed_notification_tags`.
+#
+# How it works: company_id derives from the employee via
+# SetDefaultCompanyConcern.
+#
+# Main associations: belongs_to :company, :employee, :notification_tag.
 class EmployeeNotificationTagAppointment < ApplicationRecord
-  # Subscription link — atomic pairwise row binding one NotificationTag to its subscriber.
-  #
-  # Why it exists: an employee listens to notifications via shared tags (never a
-  # direct employee↔notification link); this table records the subscription.
-  # How to use: created from the notification settings UI; read via
-  # `employee.subscribed_notification_tags`.
-  # How it works: company_id derives from the employee via SetDefaultCompanyConcern.
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }

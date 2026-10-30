@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# DiscountGroup — Atomic purpose: one discount campaign/rule (fixed amount or
+# percentage, budget, active window) that issues Discount codes.
+#
+# Why it exists: separates the reusable campaign definition and budget from the
+# individual codes; the group enforces amount/percentage rules and tracks spend.
+# How it works: belongs to company; has_many discounts. adjust_spent! mutates the
+# budget under with_lock and flips campaign_status exhausted/active at the cap;
+# currently_active scopes the usable window (see docs/DISCOUNTS.md).
+# Main associations: belongs_to :company (required); has_many :discounts
+# (dependent: :destroy).
 class DiscountGroup < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
   normalizes :prefix, with: -> { _1.strip.upcase.presence }

@@ -1,3 +1,14 @@
+# frozen_string_literal: true
+
+# TicketLog — Atomic purpose: append-only audit row for a Ticket event (created,
+# assigned, commented, workflow_step_changed).
+#
+# Why it exists: keeps a readable activity history separate from the ticket and
+# supports polymorphic actors (Employee or User).
+# How it works: belongs to company/ticket and optional polymorphic actor; the
+# class method record! is the single write path.
+# Main associations: belongs_to :company, :ticket (required); belongs_to :actor,
+# polymorphic: true (optional).
 class TicketLog < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

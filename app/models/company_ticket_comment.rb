@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# CompanyTicketComment — Atomic purpose: one message on a CompanyTicket, authored
+# by an Employee (tenant) or User (Skycom staff), with at most one image or file.
+#
+# Why it exists: keeps the support conversation and attachments separate from the
+# ticket and records the first staff response for SLA.
+# How it works: belongs to company/company_ticket and polymorphic author; after
+# create stamps first_responded_at when a User replies and writes a
+# CompanyTicketLog. Attachments use built-in Active Storage slots (image XOR
+# file).
+# Main associations: belongs_to :company, :company_ticket (required);
+# belongs_to :author, polymorphic: true; has_one_attached :image_attachment,
+# :file_attachment.
 class CompanyTicketComment < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

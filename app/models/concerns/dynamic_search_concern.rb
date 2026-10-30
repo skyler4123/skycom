@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# DynamicSearchConcern — Atomic purpose: declares the Meilisearch index for a
+# model from its standard and dynamic property columns.
+#
+# Why it exists: every searchable model needs the same index shape (standard
+# columns plus property_string/integer/decimal/boolean/datetime slots), and the
+# settings must be evaluated at include time.
+# How it works: includes Meilisearch::Rails and registers indexed, searchable,
+# and filterable attributes; models can add plain metric columns by defining
+# `ms_extra_filterable_columns` before including the concern
+# (see docs/MEILISEARCH.md).
+# Main associations: none directly.
 module DynamicSearchConcern
   extend ActiveSupport::Concern
 

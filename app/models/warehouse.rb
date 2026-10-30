@@ -1,7 +1,16 @@
-# Warehouse — Atomic purpose: the storage location. A physical/logical holding
-# point that owns Stock rows (one per product) and is referenced by every
-# movement document (imports/exports/transfers/adjustments). Holds no
-# quantities itself.
+# frozen_string_literal: true
+
+# Warehouse — Atomic purpose: the storage location.
+#
+# Why it exists: separates the storage location from quantity rows so stock can be
+# queried per location and every movement can name a source/destination without
+# duplicating address data.
+# How it works: a physical/logical holding point that owns Stock rows (one per
+# product) and is referenced by every movement document
+# (imports/exports/transfers/adjustments). It holds no quantities itself.
+# Main associations: belongs_to :company, :category, :property_mapping (required),
+# :branch and :address (optional); has_many :stocks (dependent: :destroy),
+# :stock_pendings (restrict_with_error).
 class Warehouse < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

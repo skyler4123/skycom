@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# Company::PermissionConcern — Atomic purpose: company-level RBAC view helpers
+# that expose roles with their policies and cached permission maps.
+#
+# Why it exists: the Permissions UI and authorization checks need the same
+# role-to-policy projections; caching them on the company avoids N+1 queries and
+# repeated assembly.
+# How it works: #permissions, #permissions_by_role, and #permissions_by_resource
+# read through Rails.sync_cache (PERMISSIONS_CACHE_EXPIRY) and are cleared by
+# #clear_permissions_cache, which also touches the company.
+# Main associations: none directly; reads Company#roles and Company#policies,
+# and uses PolicyRoleAppointment.
 module Company::PermissionConcern
   extend ActiveSupport::Concern
 

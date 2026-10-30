@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# Department — Atomic purpose: company-scoped organizational unit that groups
+# employees and roles.
+#
+# Why it exists: HR structure needs a stable unit for department-level roles and
+# employee membership, separate from EmployeeGroup (which is more of a team or
+# crew).
+# How it works: belongs to company/category/property mapping; employees and roles
+# join through DepartmentEmployeeAppointment and DepartmentRoleAppointment.
+# Addresses, tags, and categories come from concerns.
+# Main associations: belongs_to :company (touch), :category, :property_mapping;
+# has_many :employees through :department_employee_appointments; has_many :roles
+# through :department_role_appointments (both dependent: :destroy).
 class Department < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

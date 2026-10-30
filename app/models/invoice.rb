@@ -1,3 +1,18 @@
+# frozen_string_literal: true
+
+# Invoice — Atomic purpose: one sales/service/subscription invoice for an Order,
+# with payment_status unpaid/paid/voided.
+#
+# Why it exists: separates the bill from the order; transactions settle the
+# invoice, and the invoice's payment status drives discount consumption (see
+# docs/DISCOUNTS.md, docs/MONEY_FLOW.md).
+# How it works: belongs to company, optional branch, order, category, and
+# property mapping; has_many transactions and discounts. after_update
+# sync_discount_state consumes pending codes when paid and reverts used codes
+# when the invoice leaves paid.
+# Main associations: belongs_to :order, :company, :category, :property_mapping
+# (required), :branch (optional); has_many :transactions, :discounts
+# (dependent: :destroy).
 class Invoice < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

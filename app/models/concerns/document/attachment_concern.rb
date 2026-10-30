@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# Document::AttachmentConcern — Atomic purpose: shared image and file
+# attachments for Document records.
+#
+# Why it exists: documents need both image galleries and downloadable files with
+# per-kind limits, so the attachment rules live in one place.
+# How it works: adds has_many_attached :image_attachments and :file_attachments
+# with full/thumb variants, validates counts/sizes/MIME types, and exposes
+# #image_urls/#file_urls.
+# Main associations: none directly; adds the two has_many_attached associations
+# to includers.
 module Document::AttachmentConcern
   extend ActiveSupport::Concern
 

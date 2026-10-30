@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# ServiceGroup — Atomic purpose: company-scoped grouping of services (consulting,
+# maintenance, support, training).
+#
+# Why it exists: groups related services for browsing and lets an order reference
+# a group line; it carries its own category/property schema.
+# How it works: belongs to company/branch/category/property mapping; services
+# join through ServiceServiceGroupAppointment, and orders can reference group
+# lines through OrderServiceGroupAppointment.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :branch (optional); has_many :services through
+# :service_service_group_appointments; has_many :orders through
+# :order_service_group_appointments (both dependent: :destroy).
 class ServiceGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

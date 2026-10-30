@@ -160,9 +160,9 @@ replaced them with 103 single-purpose tables:
   (`MembershipConcern`). `OrderConcern` is a no-op
   marker; order lines are bulk-inserted by
   `OrderProcessingV1::CreateOrderService`.
-- Every atomic model carries a why/use/work header comment; every routing
-  concern documents Purpose / How It Works / Usage / Example (see
-  `SetDefaultCompanyConcern` for the template).
+- Every atomic model carries a top-of-file header (what / why / how / main
+  associations); every routing concern documents Purpose / How It Works / Usage /
+  Example (see `SetDefaultCompanyConcern` for the template).
 
 ## 6. Adding a New Pair (Recipe)
 
@@ -170,8 +170,8 @@ replaced them with 103 single-purpose tables:
    `company_id` (NOT NULL), the two concrete FKs, any domain extras, and the
    standard System Fields block (`docs/ARCHITECTURE_GUIDES.md`).
 2. **Model** `app/models/a_b_appointment.rb`: `include SetDefaultCompanyConcern`,
-   the two `belongs_to`, plus the matching per-family header (why / how to
-   use / how it works).
+   the two `belongs_to`, plus the top-of-file per-family header (what / why /
+   how / main associations).
 3. **Routing**: if the pair belongs to a routed family, register it —
    `TagConcern` resolves alphabetically with no registry;
    `AddressConcern::ADDRESS_APPOINTMENT_CLASSES` needs the new entry;

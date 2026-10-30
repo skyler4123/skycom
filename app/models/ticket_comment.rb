@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# TicketComment — Atomic purpose: one message on a Ticket, with at most one image
+# or one file attachment.
+#
+# Why it exists: keeps the conversation thread separate from the ticket header and
+# preserves author/attachment metadata; creating a comment stamps a TicketLog.
+# How it works: belongs to company/ticket/employee; after_create writes a
+# commented log. Attachments use built-in Active Storage slots (image XOR file),
+# with a display variant and MIME/size validations.
+# Main associations: belongs_to :company, :ticket, :employee (required);
+# has_one_attached :image_attachment, :file_attachment.
 class TicketComment < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

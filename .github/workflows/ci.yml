@@ -62,6 +62,9 @@ jobs:
         run: bin/rubocop -f github
         # fix: bin/rubocop --auto-correct-all 
 
+      - name: Check model and concern headers
+        run: bin/check_model_headers
+
   color-guard:
     runs-on: ubuntu-latest
 

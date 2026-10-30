@@ -1,3 +1,20 @@
+# frozen_string_literal: true
+
+# Branch — Atomic purpose: one tenant's operating location (storefront, kiosk,
+# warehouse, clinic wing, ...) that scopes the company's operational records.
+#
+# Why it exists: Company is the tenant root; Branch is the physical or logical
+# unit that owns employees, catalog, orders, stock, and payment methods, so each
+# location can be filtered and authorized independently (see docs/ABAC.md).
+# How it works: inherits timezone/currency defaults from the company on
+# initialize and seeds branch-level payment methods from the company's active
+# methods on create. Addresses, tags, categories, and dynamic properties come
+# from the shared concerns.
+# Main associations: belongs_to :company (touch), :category, :property_mapping;
+# has_many :employees, :roles, :orders, :warehouses, :stocks, :stock_imports,
+# :stock_exports, :stock_transfers, :scheduled_shifts (dependent: :destroy);
+# has_one :attendance_config; has_many :payment_methods and :events through
+# their appointment tables.
 class Branch < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

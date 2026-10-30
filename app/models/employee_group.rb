@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# EmployeeGroup — Atomic purpose: company-scoped grouping of employees for
+# organization, role assignment, and permissions.
+#
+# Why it exists: employees often share a team/crew/position grouping that should
+# carry roles and addresses as a unit, without duplicating per-employee records.
+# How it works: belongs to an optional branch and the company; employees join
+# through EmployeeEmployeeGroupAppointment, and roles attach through
+# EmployeeGroupRoleAppointment. Addresses/tags/categories come from concerns.
+# Main associations: belongs_to :company, :category, :property_mapping (required),
+# :branch (optional); has_many :employees through
+# :employee_employee_group_appointments; has_many :roles through
+# :employee_group_role_appointments.
 class EmployeeGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

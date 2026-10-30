@@ -1,4 +1,18 @@
-# app/models/concerns/address_concern.rb
+# frozen_string_literal: true
+
+# AddressConcern — Atomic purpose: versioned address links for any addressable
+# record (Branch, Company, Customer, ...).
+#
+# Why it exists: addresses are shared immutable rows; the concern gives each
+# includer one atomic appointment table and a single write path instead of
+# duplicated address columns.
+# How it works: at include time it resolves the owner's Address*Appointment
+# class and declares has_many/through plus current-address readers.
+# attach_address finds-or-creates the Address, archives the previous active row
+# of the same business_type, and touches the owner.
+# Main associations: none directly; adds has_many :address_appointments and
+# :addresses through them to includers (see ADDRESS_APPOINTMENT_CLASSES).
+
 #
 # == Purpose:
 # Gives any addressable record (Branch, Company, Customer, ...) a versioned
@@ -27,6 +41,7 @@
 #                         country_code: :vn, business_type: :office)
 #   branch.address.line_1 # => "123 Le Loi"
 #
+
 module AddressConcern
   extend ActiveSupport::Concern
 

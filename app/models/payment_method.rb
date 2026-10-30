@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# PaymentMethod — Atomic purpose: global gateway/payment catalog entry (QR,
+# redirect, cash, wallet) defined by the platform.
+#
+# Why it exists: one definition per gateway strategy, shared by every tenant;
+# company/branch scoping and merchant credentials live on the appointment rows,
+# not here (see docs/PAYMENT_METHODS.md).
+# How it works: has_many company/branch payment method appointments and
+# transactions (nullify). system_payment? covers cash and wallet auto-debit
+# strategies; strategy is required for external gateways.
+# Main associations: has_many :company_payment_method_appointments,
+# :branch_payment_method_appointments (dependent: :destroy); has_many :companies,
+# :branches through them; has_many :transactions (dependent: :nullify).
 class PaymentMethod < ApplicationRecord
   # --- Specific Real-World Lifecycle Map ---
   LIFECYCLE_STATUSES = {

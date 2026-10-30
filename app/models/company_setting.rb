@@ -1,4 +1,16 @@
-# app/models/company_setting.rb
+# frozen_string_literal: true
+
+# CompanySetting — Atomic purpose: per-company configuration row for a setting
+# type (sidebar groups, S3 storage credentials).
+#
+# Why it exists: tenant-specific settings need encrypted credentials and a sidebar
+# layout without adding columns to Company; one active row per company/business
+# type is enforced.
+# How it works: belongs to company (touch); metadata stores sidebar_groups;
+# credential_1..3 are encrypted and resolved through #credential_for; validation
+# prevents two active rows of the same business_type per company.
+# Main associations: belongs_to :company (touch, required); scopes :active,
+# :active_sidebar.
 class CompanySetting < ApplicationRecord
   CREDENTIAL_COLUMNS = %w[credential_1 credential_2 credential_3].freeze
 

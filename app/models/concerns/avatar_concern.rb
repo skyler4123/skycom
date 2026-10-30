@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# AvatarConcern — Atomic purpose: shared avatar attachment, variants, and URL
+# helper for user-like records.
+#
+# Why it exists: avatar handling is identical across user-like models (one
+# avatar, multiple variants, default placeholder), so the behavior lives here.
+# How it works: adds has_one_attached :avatar_attachment with thumb/medium/
+# profile/card/full variants and exposes #avatar_url(variant) with a placeholder
+# fallback when no file is attached.
+# Main associations: none directly; adds has_one_attached :avatar_attachment to
+# includers.
 module AvatarConcern
   extend ActiveSupport::Concern
 

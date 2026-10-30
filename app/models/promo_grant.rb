@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 # PromoGrant — Atomic purpose: per-company audit row of one PromoCampaign grant.
-# Written only by PromoCampaigns::ExecuteService alongside the wallet credit.
-# Uniqueness on [promo_campaign_id, company_id] is the idempotency key.
+#
+# Why it exists: the grant must be idempotent and auditable per company, recording
+# the promo balance before/after and the amount granted.
+# How it works: written only by PromoCampaigns::ExecuteService alongside the wallet
+# credit; uniqueness on [promo_campaign_id, company_id] is the idempotency key.
+# Main associations: belongs_to :promo_campaign, :company (required).
 class PromoGrant < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

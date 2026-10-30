@@ -1,11 +1,17 @@
 # frozen_string_literal: true
 
-# EventConfigLog — immutable audit trail of every EventConfig change.
-# Written explicitly by Companies::EventConfigsController after successful
-# create/update — no callbacks. Snapshot columns are plain data (no
-# validations); FKs to company/config/category/employee exist only for
-# filtering and are all optional except company so logs survive deletes
-# (parent uses dependent: :nullify, denormalized *_name survives).
+# EventConfigLog — Atomic purpose: immutable audit trail of every EventConfig
+# change.
+#
+# Why it exists: event rules control stock holds and order creation, so the log
+# preserves who changed what and the before/after snapshot after the config is
+# deleted.
+# How it works: written explicitly by Companies::EventConfigsController after a
+# successful create/update — no callbacks. Snapshot columns are plain data (no
+# validations); FKs exist only for filtering and are optional except company
+# (parent uses dependent: :nullify; denormalized *_name survives).
+# Main associations: belongs_to :company (required); belongs_to :event_config,
+# :category, :employee (optional).
 class EventConfigLog < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

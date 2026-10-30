@@ -1,12 +1,18 @@
 # frozen_string_literal: true
 
-# PermissionLog — immutable audit trail of every permission change.
-# Written explicitly by Companies::PermissionsController after successful
-# update/create (and future Policies CRUD via PermissionLogs::WriteService) —
-# no callbacks. Snapshot columns are plain data (no validations); FKs exist
-# only for filtering and are optional except company so logs survive deletes
-# (parents use dependent: :nullify). tag_conditions before/after live in
-# metadata as tag_conditions_before/tag_conditions_after.
+# PermissionLog — Atomic purpose: immutable audit trail of every permission
+# change.
+#
+# Why it exists: ABAC grants and tag conditions are security-sensitive; the log
+# preserves the before/after conditions and who made the change after the related
+# rows are deleted.
+# How it works: written explicitly by Companies::PermissionsController after a
+# successful update/create (and Policies CRUD via PermissionLogs::WriteService) —
+# no callbacks. Snapshot columns are plain data; FKs are optional except company
+# (parents use dependent: :nullify); tag_conditions before/after live in metadata
+# as tag_conditions_before/tag_conditions_after.
+# Main associations: belongs_to :company (required); belongs_to :policy, :role,
+# :policy_role_appointment, :employee (optional).
 class PermissionLog < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

@@ -1,9 +1,16 @@
 # frozen_string_literal: true
 
-# CompanyInvoice — Atomic purpose: the bill for a credit purchase. payment_status
-# is DERIVED from the sum of its CompanyTransactions (never set directly by
-# business code — only the sync callback in CompanyTransaction writes it). When
-# the invoice becomes paid it completes its CompanyOrder, which credits the wallet.
+# CompanyInvoice — Atomic purpose: the bill for a credit purchase.
+#
+# Why it exists: separates the invoice from the order and its transactions;
+# payment_status is DERIVED from the sum of CompanyTransactions and never set by
+# business code.
+# How it works: only the sync callback in CompanyTransaction writes payment_status.
+# When the invoice becomes paid it completes its CompanyOrder, which credits the
+# wallet. Invoice numbers are generated on create and amount/credit values are
+# validated.
+# Main associations: belongs_to :company (required), :company_order (optional);
+# has_many :company_transactions (dependent: :destroy).
 class CompanyInvoice < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

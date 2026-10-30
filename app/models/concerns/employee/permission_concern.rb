@@ -1,5 +1,16 @@
-# app/models/concerns/employee/permission_concern.rb
+# frozen_string_literal: true
 
+# Employee::PermissionConcern — Atomic purpose: ABAC permission checks for
+# Employee records, including tag-condition matching and owner bypass.
+#
+# Why it exists: every controller/policy asks `employee.can?(action, target)`,
+# and the logic (owner bypass, role policies, tag conditions, caching) belongs on
+# the employee rather than in each caller.
+# How it works: can? collects active policies for the resource/action,
+# short-circuits owner/class checks, evaluates tag conditions against the target,
+# and caches the owner role for OWNER_ROLE_CACHE_EXPIRY (see docs/ABAC.md).
+# Main associations: none directly; reads Employee#roles,
+# PolicyRoleAppointment, Policy, and Tag.
 module Employee::PermissionConcern
   extend ActiveSupport::Concern
 

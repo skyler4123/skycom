@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# CustomerProfile — Atomic purpose: named sub-record under one Customer that holds
+# profile-specific data and its own dynamic schema.
+#
+# Why it exists: one customer can have multiple profiles (e.g. per household,
+# contract, or contact) without widening Customer; profiles own subprofiles and
+# use the category/property mapping pattern (see docs/PROFILE_SUBPROFILE.md).
+# How it works: belongs to a customer and company; discard cascades to kept
+# subprofiles; validates that the customer belongs to the same company.
+# Main associations: belongs_to :company, :customer, :category,
+# :property_mapping (required), :branch (optional); has_many
+# :customer_subprofiles (dependent: :destroy).
 class CustomerProfile < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

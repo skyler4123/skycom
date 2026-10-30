@@ -1,5 +1,17 @@
 # frozen_string_literal: true
 
+# DynamicValidationConcern — Atomic purpose: turns a PropertyMapping's
+# validation metadata into ActiveModel validations at runtime.
+#
+# Why it exists: categories define validators as data (presence, numericality,
+# inclusion, format, length), so records need a generic runtime validator
+# instead of generated code.
+# How it works: the included validation reads property_mapping.properties and
+# instantiates the matching ActiveModel validator per key;
+# auto_populate_property_fields seeds empty property slots through
+# Seed::PropertyPopulator.
+# Main associations: none directly; requires the includer to respond to
+# :property_mapping and the property_* columns.
 module DynamicValidationConcern
   extend ActiveSupport::Concern
 

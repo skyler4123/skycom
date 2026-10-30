@@ -1,4 +1,13 @@
-# app/models/concerns/immutable_record.rb
+# frozen_string_literal: true
+
+# ImmutableRecordConcern — Atomic purpose: blocks update and destroy for shared
+# reference rows.
+#
+# Why it exists: records such as Address and Membership are shared by many
+# owners; editing or deleting them would rewrite history for everyone.
+# How it works: before_update/before_destroy raise ActiveRecord::ReadOnlyRecord;
+# callers must create a new row instead.
+# Main associations: none directly.
 module ImmutableRecordConcern
   extend ActiveSupport::Concern
 

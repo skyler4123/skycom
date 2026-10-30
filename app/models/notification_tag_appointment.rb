@@ -1,11 +1,19 @@
+# frozen_string_literal: true
+
+# NotificationTagAppointment — Atomic purpose: atomic pairwise row binding one
+# NotificationTag to one Notification.
+#
+# Why it exists: a system-generated notification broadcasts to tag audiences;
+# this table records WHICH tags it was published to.
+#
+# How to use: created by Notifications::CreateService via bulk insert; read via
+# `notification.notification_tags`.
+#
+# How it works: company_id derives from the notification via
+# SetDefaultCompanyConcern.
+#
+# Main associations: belongs_to :company, :notification, :notification_tag.
 class NotificationTagAppointment < ApplicationRecord
-  # Publish link — atomic pairwise row binding one NotificationTag to its notification.
-  #
-  # Why it exists: a system-generated notification broadcasts to tag audiences;
-  # this table records WHICH tags it was published to.
-  # How to use: created by Notifications::CreateService via bulk insert; read via
-  # `notification.notification_tags`.
-  # How it works: company_id derives from the notification via SetDefaultCompanyConcern.
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }

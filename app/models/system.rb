@@ -1,7 +1,21 @@
-# app/models/system.rb
+# frozen_string_literal: true
+
+# System — Atomic purpose: the platform's singleton system record that provisions
+# and owns the dedicated system company.
+#
+# Why it exists: Skycom itself needs a tenant for platform-level data (a
+# super-admin user and company); the System row's identity is immutable and it can
+# never be destroyed (see docs/SYSTEM_COMPANY.md).
+# How it works: before_create ensure_company! creates or heals the system User and
+# Company (skipping business-type seeding via Company#system_owned); identity
+# changes and destruction are blocked. The country enum adds a non-ISO `global`
+# value without leaking into COUNTRY_CODES.
+# Main associations: belongs_to :company (optional until ensure_company! creates
+# it); SYSTEM_COMPANY_COUNTRIES/SYSTEM_COMPANY_CURRENCIES map the platform
+# country/currency to Company enums.
 class System < ApplicationRecord
-  # Single-file country enum: adds a non-ISO `global` scope without leaking
-  # into the shared COUNTRY_CODES used by every other model.
+  # NOTE: single-file country enum — adds a non-ISO `global` scope without
+  # leaking into the shared COUNTRY_CODES used by every other model.
   SYSTEM_COUNTRY_CODES = { global: 0, us: 840, vn: 704 }.freeze
 
   # Country/currency used for the auto-created system company

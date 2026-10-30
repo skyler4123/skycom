@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# WorkflowStep — Atomic purpose: one ordered step in a Workflow (position, name,
+# colors, approval rules).
+#
+# Why it exists: approval chains need explicit ordered steps so a record can move
+# forward/backward and leave an audit log at each step.
+# How it works: belongs to company and workflow; position is unique within the
+# workflow; #next_step/#previous_step navigate by position, and each transition
+# writes a WorkflowStepLog.
+# Main associations: belongs_to :company, :workflow (required); has_many
+# :workflow_step_logs (dependent: :destroy).
 class WorkflowStep < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

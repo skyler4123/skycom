@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# AttendanceRequest — Atomic purpose: employee request to correct or add an
+# attendance record for one date (onsite miss, remote work, field work).
+#
+# Why it exists: not every day is captured by a punch; an employee can request a
+# manual attendance entry, and a manager approves or rejects it.
+# How it works: belongs to company/branch/employee and an optional deciding
+# Employee; validates date/check-in/reason, no future dates, check-out ordering,
+# one live request per employee/date, and company scoping. On approval the
+# matching AttendanceDay is created or used.
+# Main associations: belongs_to :company, :employee (required), :branch and
+# :decided_by (Employee, optional).
 class AttendanceRequest < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

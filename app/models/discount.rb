@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# Discount — Atomic purpose: one issued discount code and its lifecycle
+# (unused → pending → used/expired).
+#
+# Why it exists: the code is reserved against an order while payment is in
+# flight and consumed only when the invoice is paid; the row carries the amount
+# applied and the order/invoice/customer/employee that used it.
+# How it works: belongs to a DiscountGroup (the campaign/budget), company, and
+# optional order/invoice/customer/employee. reserve!/consume!/release!/revert!
+# drive the state machine; consume/revert adjust the group's spent budget
+# (see docs/DISCOUNTS.md).
+# Main associations: belongs_to :company, :discount_group (required); :order,
+# :invoice, :customer, :employee (optional).
 class Discount < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
   normalizes :code, with: -> { _1.strip.upcase }

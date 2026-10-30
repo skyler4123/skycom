@@ -1,5 +1,16 @@
 # frozen_string_literal: true
 
+# SetDefaultCompanyConcern — Atomic purpose: derives company_id on atomic
+# appointment rows from the associated resource.
+#
+# Why it exists: every appointment needs company_id for tenant scoping and ABAC,
+# but callers should not have to pass it when one side already knows the company.
+# How it works: before_validation copies company_id from the first associated
+# record that responds to it (skipping when already set); Company itself is
+# skipped to avoid self-reference.
+# Main associations: none directly; requires the includer to belong_to :company
+# and at least one company-scoped record.
+
 # == Purpose:
 # Automatically sets +company_id+ on Appointment records by deriving it from
 # the associated resource (Role, Policy, Tag, Service, Task, etc.).
@@ -27,6 +38,7 @@
 #     belongs_to :role
 #   end
 #
+
 module SetDefaultCompanyConcern
   extend ActiveSupport::Concern
 

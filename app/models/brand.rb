@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# Brand — Atomic purpose: company-scoped product brand that groups products under
+# a commercial identity.
+#
+# Why it exists: products need a reusable brand dimension (manufacturer,
+# retailer, service provider, technology) with its own category/property schema
+# and image, without repeating brand fields on every product.
+# How it works: belongs to company and required category/property mapping;
+# products reference the brand. Tags and dynamic search come from concerns.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required); has_many :products (dependent: :nullify).
 class Brand < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

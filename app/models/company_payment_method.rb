@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# CompanyPaymentMethod — Atomic purpose: platform-level B2B payment option used
+# for company credit top-ups (gateway strategy plus display metadata).
+#
+# Why it exists: top-up checkout needs a small, platform-owned catalog of payment
+# options (mock QR, redirect, bank transfer) that is not tied to a tenant; tenant
+# payment methods live in CompanyPaymentMethodAppointment.
+# How it works: no tenant association; seed/credit data services create the rows,
+# and Companies::TopUpsController selects them by business_type/strategy to
+# initiate a top-up.
+# Main associations: none (platform catalog; referenced by top-up controllers and
+# seed services).
 class CompanyPaymentMethod < ApplicationRecord
   # --- Specific Real-World Lifecycle Map ---
   LIFECYCLE_STATUSES = {

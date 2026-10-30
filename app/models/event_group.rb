@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# EventGroup — Atomic purpose: company-scoped grouping of events (general,
+# clinical, hospitality, dining).
+#
+# Why it exists: groups related events and assigns employees as a unit; it
+# carries its own category/property schema.
+# How it works: belongs to company/branch/category/property mapping; employees
+# join through EmployeeEventGroupAppointment; events reference the group.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :branch (optional); has_many :employees through
+# :employee_event_group_appointments (dependent: :destroy).
 class EventGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

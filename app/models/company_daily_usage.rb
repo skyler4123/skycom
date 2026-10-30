@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
-# CompanyDailyUsage — Atomic purpose: persist hourly credit usage (metadata
-# keys h0..h23) for one company/day. Values are credits consumed per hour.
-# Written by CompanyUsageSyncJob draining the Kredis counter; read through the
-# hour_usage/add_hour_usage helpers — never access metadata directly.
-# total_credits is a denormalized sum of the slots, maintained by the helpers
-# as a debug aid.
+# CompanyDailyUsage — Atomic purpose: persist hourly credit usage (metadata keys
+# h0..h23) for one company/day.
+#
+# Why it exists: the hot path increments a Kredis counter; this row is the durable
+# hourly snapshot so today/past usage can be reported without Redis.
+# How it works: written by CompanyUsageSyncJob draining the Kredis counter; read
+# through the hour_usage/add_hour_usage helpers — never access metadata directly.
+# total_credits is a denormalized sum of the slots, maintained by the helpers as a
+# debug aid. find_or_create_for(company, date) is the write entry point.
+# Main associations: belongs_to :company (required).
 class CompanyDailyUsage < ApplicationRecord
   HOURS = (0..23).freeze
 

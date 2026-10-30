@@ -1,9 +1,14 @@
 # frozen_string_literal: true
 
 # PromoCampaign — Atomic purpose: one-shot admin promo-credit giveaway config.
-# System-level (no company_id): Admin matches companies via `conditions`,
-# grants `amount` promo credits each capped at `max_cap`, runs once at
-# `scheduled_at` through PromoCampaignJob. Per-company results live on PromoGrant.
+#
+# Why it exists: promotions are system-level (no company_id) and must run once,
+# with explicit matching conditions, amount, cap, and schedule.
+# How it works: Admin matches companies via `conditions`, grants `amount` promo
+# credits each capped at `max_cap`, and runs once at `scheduled_at` through
+# PromoCampaignJob. Per-company results live on PromoGrant.
+# Main associations: has_many :promo_grants (dependent: :destroy); no company
+# association by design.
 class PromoCampaign < ApplicationRecord
   CONDITION_KEYS = %w[
     country business_type

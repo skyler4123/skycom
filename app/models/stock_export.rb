@@ -1,7 +1,17 @@
+# frozen_string_literal: true
+
 # StockExport — Atomic purpose: the outbound document (sale / transfer_out /
-# return_to_supplier / damaged / expired). Multi-line via
-# StockExportStockAppointment; each line spawns a remove-direction
-# StockTransaction (transaction_type: export).
+# return_to_supplier / damaged / expired).
+#
+# Why it exists: outbound movements need a document header and per-SKU lines before
+# the ledger is written, so multi-line/source documents stay exact.
+# How it works: multi-line via StockExportStockAppointment; each line spawns a
+# remove-direction StockTransaction (transaction_type: export). Transactions are
+# restricted while present.
+# Main associations: belongs_to :company, :warehouse, :category,
+# :property_mapping (required), :branch, :product, and polymorphic appoint_*
+# (optional); has_many :stocks through :stock_export_stock_appointments; has_many
+# :stock_transactions (as: :appoint_for, restrict_with_error).
 class StockExport < ApplicationRecord
   # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
   # settings block runs at include time. See the hook docs in the concern.

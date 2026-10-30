@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# Tag — Atomic purpose: company-scoped key/value label attached to taggable
+# records through atomic tag-appointment tables.
+#
+# Why it exists: tags are the input to the ABAC permission matcher and a shared
+# classification mechanism across the domain; one Tag row is reused by every
+# record that carries the same key/value (see docs/ABAC.md).
+# How it works: TagConcern's attach_tag finds or creates the company-scoped Tag,
+# syncs its value, and writes the matching <Record>TagAppointment row. Reads go
+# through `record.tags`; the model exposes many has_many/through associations for
+# each taggable resource (answers, branches, customers, employees, orders, ...).
+# Main associations: belongs_to :company; has_many :<resource>_tag_appointments
+# (dependent: :destroy) and :<resources> through them for every taggable model.
 class Tag < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

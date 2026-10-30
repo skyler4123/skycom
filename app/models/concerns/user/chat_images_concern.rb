@@ -1,3 +1,14 @@
+# frozen_string_literal: true
+
+# User::ChatImagesConcern — Atomic purpose: shared chat-image attachments for
+# User records.
+#
+# Why it exists: chat images need the same bounded multi-image validation and
+# variants as other user-facing images.
+# How it works: adds has_many_attached :chat_image_attachments with full/thumb
+# variants and validates size/MIME type.
+# Main associations: none directly; adds has_many_attached
+# :chat_image_attachments to User.
 module User::ChatImagesConcern
   extend ActiveSupport::Concern
 

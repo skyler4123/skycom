@@ -1,3 +1,16 @@
+# frozen_string_literal: true
+
+# Facility — Atomic purpose: company-scoped physical space/resource (room,
+# building, wing) that can be grouped, staffed, and booked by events.
+#
+# Why it exists: facilities are shared resources with capacity and availability
+# needs; grouping and many-to-many assignments stay in atomic tables.
+# How it works: belongs to company/branch/category/property mapping; facilities
+# join FacilityGroup through FacilityFacilityGroupAppointment and link to
+# employees/events through their appointments.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :branch (optional); has_many :facility_groups, :employees, :events
+# through appointments (all dependent: :destroy).
 class Facility < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

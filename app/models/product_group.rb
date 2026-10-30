@@ -1,3 +1,18 @@
+# frozen_string_literal: true
+
+# ProductGroup — Atomic purpose: company-scoped grouping of products (category,
+# collection, line) used for merchandising and order lines.
+#
+# Why it exists: groups related products for browsing and pricing, and lets an
+# order reference a group line without expanding every product; it carries its
+# own category/property schema.
+# How it works: belongs to company/branch (optional) and required category/
+# property mapping; products join through ProductProductGroupAppointment, and
+# orders can reference group lines through OrderProductGroupAppointment.
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required), :branch (optional); has_many :products through
+# :product_product_group_appointments; has_many :orders through
+# :order_product_group_appointments (both dependent: :destroy).
 class ProductGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

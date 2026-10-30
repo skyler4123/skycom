@@ -1,3 +1,20 @@
+# frozen_string_literal: true
+
+# Customer — Atomic purpose: tenant-scoped buyer/customer record that anchors
+# orders, memberships, roles, addresses, and service/event links.
+#
+# Why it exists: the customer is the commercial counterparty for orders and
+# service bookings; it can be linked to a login User or exist purely as a
+# company-scoped POS customer, and it carries role/address/tag/membership
+# concerns.
+# How it works: belongs to company/branch/user (all optional) and required
+# category/property mapping; associations go through atomic appointment tables
+# for groups, roles, services, employees, and events. Orders belong directly to
+# the customer.
+# Main associations: belongs_to :company, :branch, :user (optional),
+# :category, :property_mapping (required); has_many :orders, :customer_profiles,
+# :customer_subprofiles (dependent: :destroy); has_many :customer_groups, :roles,
+# :services, :employees, :events through their appointments.
 class Customer < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

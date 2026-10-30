@@ -1,7 +1,18 @@
+# frozen_string_literal: true
+
 # StockTransfer — Atomic purpose: the warehouse-to-warehouse movement document
-# (warehouse → destination_warehouse, initiated_at / received_at). Receive writes
-# a paired remove (source) + add (destination) StockTransaction
-# (transaction_type: transfer); destination must differ from source.
+# (warehouse → destination_warehouse, initiated_at/received_at).
+#
+# Why it exists: transfers must preserve both source and destination truths; the
+# header records the route, and receiving writes paired ledger rows.
+# How it works: receive writes a paired remove (source) + add (destination)
+# StockTransaction (transaction_type: transfer); destination must differ from
+# source. Lines live in StockTransferStockAppointment.
+# Main associations: belongs_to :company, :warehouse, :destination_warehouse,
+# :category, :property_mapping (required), :branch, :product, and polymorphic
+# appoint_* (optional); has_many :stocks through
+# :stock_transfer_stock_appointments; has_many :stock_transactions (as:
+# :appoint_for, restrict_with_error).
 class StockTransfer < ApplicationRecord
   # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
   # settings block runs at include time. See the hook docs in the concern.

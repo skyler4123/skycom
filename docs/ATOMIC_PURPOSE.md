@@ -10,8 +10,9 @@ changes only through relation-business models.**
 
 Two consequences:
 
-1. **One purpose per model** — documented in a header comment. If a model is
-   doing two jobs, split it.
+1. **One purpose per model** — documented in a top-of-file header comment
+   (what / why / how / main associations). If a model is doing two jobs, split
+   it.
 2. **No self-mutation** — business code never calls `record.update!(...)` to
    drive a money flow. State transitions happen through the chain below.
 

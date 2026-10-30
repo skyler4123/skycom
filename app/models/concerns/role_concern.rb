@@ -1,3 +1,17 @@
+# frozen_string_literal: true
+
+# RoleConcern — Atomic purpose: uniform role-granting behavior for any role
+# holder (Employee, Customer, Department, EmployeeGroup, CustomerGroup).
+#
+# Why it exists: each holder owns one atomic <Holder>RoleAppointment table; the
+# concern resolves that table and exposes one attach/read path instead of
+# per-model role code.
+# How it works: attach_role finds-or-creates the company-scoped Role and writes
+# the holder's appointment (owner rows are immutable and clear the permissions
+# cache); readers expose roles/current role.
+# Main associations: none directly; adds has_many :roles through the holder's
+# RoleAppointment table.
+
 # == Purpose:
 # Gives any role-holder record (Employee, Customer, Department, ...) a uniform
 # way to receive roles. Each holder owns exactly one atomic table
@@ -20,6 +34,7 @@
 #   employee.attach_role("Cashier")
 #   employee.has_role?("Cashier") # => true
 #
+
 module RoleConcern
   extend ActiveSupport::Concern
 

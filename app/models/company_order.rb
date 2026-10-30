@@ -1,10 +1,15 @@
 # frozen_string_literal: true
 
-# CompanyOrder — Atomic purpose: capture the credit-purchase deal (money tier
-# → credits) with a rate snapshot. The order's state changes ONLY through the
-# chain: when its CompanyInvoice becomes paid, the invoice calls #complete!,
-# which credits the company wallet. Order never mutates the wallet directly
-# outside that path.
+# CompanyOrder — Atomic purpose: capture the credit-purchase deal (money tier →
+# credits) with a rate snapshot.
+#
+# Why it exists: the order records what the company bought and at what rate, so a
+# later rate change cannot rewrite the deal; it never mutates the wallet directly.
+# How it works: state changes ONLY through the chain — when its CompanyInvoice
+# becomes paid, the invoice calls #complete!, which credits the company wallet.
+# credits_per_cent exposes the derived rate snapshot.
+# Main associations: belongs_to :company, :user (required); has_one
+# :company_invoice (dependent: :destroy).
 class CompanyOrder < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

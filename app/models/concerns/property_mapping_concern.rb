@@ -1,3 +1,15 @@
+# frozen_string_literal: true
+
+# PropertyMappingConcern — Atomic purpose: binds a record to its category's
+# PropertyMapping and applies the mapping's dynamic validations.
+#
+# Why it exists: category-scoped records must use the category's property schema,
+# and the mapping must be assigned before validation rather than by every caller.
+# How it works: before_validation assigns category.default_property_mapping on
+# create, includes DynamicValidationConcern, auto-populates empty property slots,
+# and validates that the mapping belongs to the record's category.
+# Main associations: none directly; requires the includer to belong_to :category
+# and :property_mapping.
 module PropertyMappingConcern
   extend ActiveSupport::Concern
 

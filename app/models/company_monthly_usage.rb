@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
-# CompanyMonthlyUsage — Atomic purpose: persist daily credit usage (metadata
-# keys d1..d31) for one company/month. Values are credits consumed per day.
-# Written by CompanyUsageSyncJob draining the Kredis counter; read through the
-# day_usage/add_day_usage helpers — never access metadata directly.
-# total_credits is a denormalized sum of the slots, maintained by the helpers
-# as a debug aid.
+# CompanyMonthlyUsage — Atomic purpose: persist daily credit usage (metadata keys
+# d1..d31) for one company/month.
+#
+# Why it exists: the hot path increments a Kredis counter; this row is the durable
+# daily snapshot for monthly reporting without Redis.
+# How it works: written by CompanyUsageSyncJob draining the Kredis counter; read
+# through the day_usage/add_day_usage helpers — never access metadata directly.
+# total_credits is a denormalized sum of the slots, maintained by the helpers as a
+# debug aid. find_or_create_for(company, month) is the write entry point.
+# Main associations: belongs_to :company (required).
 class CompanyMonthlyUsage < ApplicationRecord
   DAYS = (1..31).freeze
 

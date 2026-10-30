@@ -1,7 +1,18 @@
+# frozen_string_literal: true
+
 # StockImport — Atomic purpose: the inbound document (purchase / return /
-# transfer_in / adjustment). Multi-line via StockImportStockAppointment rows
-# pointing at Stock records; each line spawns an add-direction StockTransaction
-# (transaction_type: import) whose callback applies the quantity.
+# transfer_in / adjustment).
+#
+# Why it exists: inbound movements need a document header and per-SKU lines before
+# the ledger is written; each line names the exact destination Stock row.
+# How it works: multi-line via StockImportStockAppointment rows pointing at Stock
+# records; each line spawns an add-direction StockTransaction (transaction_type:
+# import) whose callback applies the quantity. Transactions are restricted while
+# present.
+# Main associations: belongs_to :company, :warehouse, :category,
+# :property_mapping (required), :branch, :product, and polymorphic appoint_*
+# (optional); has_many :stocks through :stock_import_stock_appointments; has_many
+# :stock_transactions (as: :appoint_for, restrict_with_error).
 class StockImport < ApplicationRecord
   # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
   # settings block runs at include time. See the hook docs in the concern.

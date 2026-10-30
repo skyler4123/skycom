@@ -1,4 +1,17 @@
-# app/models/membership.rb
+# frozen_string_literal: true
+
+# Membership — Atomic purpose: one company-scoped entitlement definition
+# (loyalty, subscription, segment) that customers can hold.
+#
+# Why it exists: separates the reusable entitlement definition (with its
+# category/property schema, price, and duration) from each customer's attachment;
+# memberships are immutable once created.
+# How it works: belongs to company/category/property mapping; customers attach
+# through CustomerMembershipAppointment, which versions active entitlements by
+# business_type (see MembershipConcern, docs/PROFILE_SUBPROFILE.md).
+# Main associations: belongs_to :company, :category, :property_mapping
+# (required); has_many :customers through :customer_membership_appointments
+# (dependent: :destroy).
 class Membership < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
