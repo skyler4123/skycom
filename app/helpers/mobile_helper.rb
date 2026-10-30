@@ -90,10 +90,12 @@ module MobileHelper
     mobile_duration(seconds.to_i / 60)
   end
 
-  def mobile_time(datetime)
+  def mobile_time(datetime, utc_offset: nil)
     return "—" if datetime.blank? || !datetime.respond_to?(:in_time_zone)
 
-    datetime.in_time_zone.strftime("%I:%M %p")
+    time = datetime.in_time_zone
+    time = time.getlocal(utc_offset) if utc_offset
+    time.strftime("%I:%M %p")
   end
 
   def mobile_date(date)

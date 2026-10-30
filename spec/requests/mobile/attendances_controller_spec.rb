@@ -27,15 +27,16 @@ RSpec.describe "Mobile::Companies::AttendancesController", type: :request do
     expect(response).to redirect_to(mobile_company_home_path(company))
   end
 
-  it "does not create a second check-in on the same day" do
+  it "creates a second check-in on the same day" do
     post mobile_company_attendances_path(company)
 
     expect {
       post mobile_company_attendances_path(company)
-    }.not_to change(AttendanceLog, :count)
+    }.to change(AttendanceLog, :count).by(1)
 
+    expect(AttendanceLog.where(employee: employee, log_type: :check_in).count).to eq(2)
     expect(response).to redirect_to(mobile_company_home_path(company))
-    expect(flash[:alert]).to eq("Already checked in today")
+    expect(flash[:notice]).to eq("Checked in successfully")
   end
 
   it "returns not found when the user has no employee record" do

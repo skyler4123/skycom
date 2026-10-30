@@ -1,0 +1,155 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Raw-color guard.
+#
+# Skycom themes everything through the semantic tokens in
+# app/assets/tailwind/application.css (bg-card, text-muted-foreground,
+# border-line, bg-primary, text-danger, ...). Raw Tailwind palette classes
+# (bg-white, text-slate-500, border-slate-200, text-white, ...) bypass the
+# theme and are exactly what made a rebrand a 246-file edit. This script
+# keeps them out.
+#
+# Usage:
+#   bin/check_colors            # report (always exits 0)
+#   bin/check_colors --strict   # exit 1 when anything is found (CI / pre-commit)
+#   bin/check_colors --all      # list every distinct token, not just the top 40
+#   bin/check_colors --files    # also list per-file counts
+#
+# Allowlisted files are the only places allowed to hold raw palette values.
+# There are none today: workflow colors and chart series both resolve through
+# the semantic tokens. Keep this list for genuine data palettes only.
+
+require "pathname"
+
+ROOT = Pathname.new(File.expand_path("..", __dir__))
+
+SCAN_GLOBS = [
+  "app/javascript/**/*.js",
+  "app/views/**/*.erb"
+].freeze
+
+ALLOWLIST = [].freeze
+
+PALETTE = %w[
+  slate gray zinc neutral stone
+  red orange amber yellow lime green emerald teal cyan sky blue indigo violet purple fuchsia pink rose
+  black white
+].freeze
+
+UTILITIES = %w[
+  bg text border ring divide from via to outline shadow fill stroke
+  placeholder accent caret decoration
+].freeze
+
+SIDES = "(?:-(?:x|y|t|s|e|r|b|offset))?"
+
+# bg-white, text-slate-500, border-x-slate-200, ring-offset-white, divide-y-slate-800, ...
+RAW_CLASS = /
+  (?<![\w-])
+  (?:#{UTILITIES.join("|")})
+  #{SIDES}
+  -(?:#{PALETTE.join("|")})
+  (?:-\d{2,3})?
+  (?![\w-])
+/x
+
+# Arbitrary color values: bg-[#fff], text-[rgb(...)], border-[oklch(...)]
+ARBITRARY_COLOR = /(?<![\w-])(?:bg|text|border|ring|divide|from|via|to|fill|stroke|placeholder|outline|accent|shadow)-(?:\[\#|\[(?:rgb|hsl|oklch)\()/x
+
+# dark: variants on semantic tokens are always wrong — the variable switches itself.
+DARK_ON_SEMANTIC = /
+  \bdark:
+  (?:bg|text|border|ring|divide|outline|fill|stroke|placeholder|accent|caret|decoration|from|via|to)-
+  (?:background|card|muted|line|overlay|foreground|primary|success|warning|danger|info)
+  (?:-foreground)?
+  (?![\w-])
+/x
+
+options = { strict: false, all: false, files: false }
+ARGV.each do |arg|
+  case arg
+  when "--strict" then options[:strict] = true
+  when "--all"    then options[:all] = true
+  when "--files"  then options[:files] = true
+  when "-h", "--help"
+    puts File.read(__FILE__).lines[2..26].map { |l| l.sub(/\A# ?/, "") }.join
+    exit 0
+  else
+    warn "Unknown option: #{arg}"
+    exit 2
+  end
+end
+
+files = SCAN_GLOBS.flat_map { |glob| Dir.glob(ROOT.join(glob)).sort }
+files.reject! { |path| ALLOWLIST.include?(Pathname.new(path).relative_path_from(ROOT).to_s) }
+
+token_counts = Hash.new(0)
+file_counts = Hash.new(0)
+dark_violations = Hash.new(0)
+arbitrary_violations = Hash.new(0)
+
+files.each do |path|
+  relative = Pathname.new(path).relative_path_from(ROOT).to_s
+  source = File.read(path)
+
+  source.scan(RAW_CLASS).each { |match| token_counts[match] += 1 }
+  source.scan(DARK_ON_SEMANTIC).each { |match| dark_violations[match] += 1 }
+  source.scan(ARBITRARY_COLOR).each { |match| arbitrary_violations[match] += 1 }
+
+  occurrences = source.scan(RAW_CLASS).size +
+                source.scan(DARK_ON_SEMANTIC).size +
+                source.scan(ARBITRARY_COLOR).size
+  file_counts[relative] = occurrences if occurrences.positive?
+end
+
+total_raw = token_counts.values.sum
+total_dark = dark_violations.values.sum
+total_arbitrary = arbitrary_violations.values.sum
+total = total_raw + total_dark + total_arbitrary
+
+puts "Raw palette classes:     #{total_raw}  (#{token_counts.size} distinct tokens)"
+puts "dark: on semantic token: #{total_dark}"
+puts "Arbitrary color values:  #{total_arbitrary}"
+puts "Files affected:          #{file_counts.size} / #{files.size}"
+puts
+
+if total_raw.positive?
+  shown = options[:all] ? token_counts.to_a : token_counts.sort_by { |_, count| -count }.first(40)
+  shown = shown.sort_by { |_, count| -count } if options[:all]
+  width = shown.map { |token, _| token.length }.max || 10
+  shown.each { |token, count| puts format("  %-#{width}s  %d", token, count) }
+  puts "  ... (#{token_counts.size - shown.size} more tokens, run --all)" if !options[:all] && token_counts.size > shown.size
+  puts
+end
+
+if total_dark.positive?
+  puts "dark: on semantic tokens (must be removed):"
+  dark_violations.sort_by { |_, count| -count }.each { |token, count| puts format("  %-48s %d", token, count) }
+  puts
+end
+
+if total_arbitrary.positive?
+  puts "Arbitrary color values (must be removed):"
+  arbitrary_violations.sort_by { |_, count| -count }.each { |token, count| puts format("  %-48s %d", token, count) }
+  puts
+end
+
+if options[:files]
+  puts "Per file:"
+  file_counts.sort_by { |_, count| -count }.each { |file, count| puts format("  %5d  %s", count, file) }
+  puts
+end
+
+if total.zero?
+  puts "OK — no raw colors found."
+  exit 0
+end
+
+if options[:strict]
+  puts "FAIL — migrate the files above to semantic tokens (docs/STYLING_GUIDELINES.md)."
+  exit 1
+end
+
+puts "Report only. Run with --strict to fail the build."
+exit 0

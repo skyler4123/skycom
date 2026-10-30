@@ -28,19 +28,19 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
 
   contentHTML() {
     const c = this.company
-    if (!c) return '<div class="p-8 text-center text-slate-500 dark:text-slate-400">Company not found.</div>'
+    if (!c) return '<div class="p-8 text-center text-muted-foreground">Company not found.</div>'
 
     const businessTypeColors = {
-      retail: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-      restaurant: 'bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-      hospital: 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-      education: 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-      hotel: 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-      fitness: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+      retail: 'bg-primary/10 text-primary ',
+      restaurant: 'bg-warning/10 text-warning ',
+      hospital: 'bg-danger/10 text-danger ',
+      education: 'bg-primary/10 text-primary ',
+      hotel: 'bg-warning/10 text-warning ',
+      fitness: 'bg-success/10 text-success '
     }
 
     const detailFields = [
-      { label: "Business Type", value: c.business_type, type: "badge", badgeClass: businessTypeColors[c.business_type] || 'bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-300' },
+      { label: "Business Type", value: c.business_type, type: "badge", badgeClass: businessTypeColors[c.business_type] || 'bg-background text-foreground ' },
       { label: "Email", value: c.email, type: "link", href: `mailto:${c.email}` },
       { label: "Phone", value: c.phone_number, type: "link", href: `tel:${c.phone_number}` },
       { label: "Website", value: c.website, type: "link", href: c.website },
@@ -59,28 +59,28 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
     return `
       <div class="p-6">
         <a href="/admin/companies"
-          class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6 cursor-pointer">
+          class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 cursor-pointer">
           <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
           Back to Companies
         </a>
 
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="bg-card rounded-xl border border-line overflow-hidden">
           <!-- Header -->
-          <div class="px-6 py-5 border-b border-slate-200 dark:border-slate-800">
+          <div class="px-6 py-5 border-b border-line">
             <div class="flex items-start justify-between">
               <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-                  <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[24px]">business</span>
+                <div class="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-success text-[24px]">business</span>
                 </div>
                 <div>
-                  <h2 class="text-xl font-bold text-slate-900 dark:text-white">${c.name || 'Unnamed Company'}</h2>
+                  <h2 class="text-xl font-bold text-foreground">${c.name || 'Unnamed Company'}</h2>
                   <div class="flex items-center gap-2 mt-1">
-                    ${c.code ? `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500 dark:text-slate-400">${c.code}</span>` : ''}
+                    ${c.code ? `<span class="font-mono text-xs bg-muted px-2 py-0.5 rounded text-muted-foreground">${c.code}</span>` : ''}
                     ${Helpers.statusBadge(c.workflow_status)}
                   </div>
                 </div>
               </div>
-              <div class="text-right text-xs text-slate-400">
+              <div class="text-right text-xs text-muted-foreground">
                 <div>Created (UTC) ${c.created_at ? Helpers.timeFormat(c.created_at) : '—'}</div>
                 <div class="mt-0.5">Updated (UTC) ${c.updated_at ? Helpers.timeFormat(c.updated_at) : '—'}</div>
               </div>
@@ -97,26 +97,26 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
                   case 'badge':
                     return `
                       <div>
-                        <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">${field.label}</p>
+                        <p class="text-[10px] font-bold text-muted-foreground uppercase mb-1">${field.label}</p>
                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${field.badgeClass}">${field.value}</span>
                       </div>`
                   case 'link':
                     return `
                       <div>
-                        <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">${field.label}</p>
-                        <a href="${field.href}" class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer">${field.value}</a>
+                        <p class="text-[10px] font-bold text-muted-foreground uppercase mb-1">${field.label}</p>
+                        <a href="${field.href}" class="text-sm text-primary hover:text-primary cursor-pointer">${field.value}</a>
                       </div>`
                   case 'full':
                     return `
                       <div class="sm:col-span-2 lg:col-span-3">
-                        <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">${field.label}</p>
-                        <p class="text-sm text-slate-700 dark:text-slate-300">${field.value}</p>
+                        <p class="text-[10px] font-bold text-muted-foreground uppercase mb-1">${field.label}</p>
+                        <p class="text-sm text-foreground">${field.value}</p>
                       </div>`
                   default:
                     return `
                       <div>
-                        <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">${field.label}</p>
-                        <p class="text-sm font-medium text-slate-900 dark:text-white">${field.value}</p>
+                        <p class="text-[10px] font-bold text-muted-foreground uppercase mb-1">${field.label}</p>
+                        <p class="text-sm font-medium text-foreground">${field.value}</p>
                       </div>`
                 }
               }).join('')}
@@ -125,15 +125,15 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
 
           <!-- Owner Section -->
           ${c.user ? `
-            <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-800">
-              <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-3">Owner</p>
+            <div class="px-6 py-4 border-t border-line">
+              <p class="text-[10px] font-bold text-muted-foreground uppercase mb-3">Owner</p>
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <span class="text-sm font-bold text-blue-600 dark:text-blue-400">${(c.user.name || '?')[0].toUpperCase()}</span>
+                <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span class="text-sm font-bold text-primary">${(c.user.name || '?')[0].toUpperCase()}</span>
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-slate-900 dark:text-white">${c.user.name || 'Unknown'}</p>
-                  <p class="text-sm text-slate-500 dark:text-slate-400">${c.user.email || ''}</p>
+                  <p class="text-sm font-medium text-foreground">${c.user.name || 'Unknown'}</p>
+                  <p class="text-sm text-muted-foreground">${c.user.email || ''}</p>
                 </div>
               </div>
             </div>

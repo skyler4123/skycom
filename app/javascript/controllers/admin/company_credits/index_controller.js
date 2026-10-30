@@ -43,33 +43,33 @@ export default class Admin_CompanyCredits_IndexController extends Admin_LayoutCo
 
     return `
       <div class="p-6">
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
-            <h2 class="text-base font-bold text-slate-900 dark:text-white">${translate("Company Credits")}</h2>
+        <div class="bg-card rounded-xl border border-line">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-line">
+            <h2 class="text-base font-bold text-foreground">${translate("Company Credits")}</h2>
             <a href="${Helpers.admin_promo_campaigns_path()}"
-              class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm cursor-pointer">
+              class="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm cursor-pointer">
               <span class="material-symbols-outlined text-[18px]!">campaign</span>
               ${translate("Promotion")}
             </a>
           </div>
-          <form method="get" action="${pathname()}" class="flex flex-wrap items-end gap-3 px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+          <form method="get" action="${pathname()}" class="flex flex-wrap items-end gap-3 px-6 py-4 border-b border-line">
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Search")}</label>
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Search")}</label>
               <input type="text" name="q" value="${urlParams.get("q") || ""}" placeholder="Name, code, email"
-                class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                class="px-3 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Country</label>
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">Country</label>
               <input type="text" name="country" value="${urlParams.get("country") || ""}" placeholder="us, vn"
-                class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                class="px-3 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Type</label>
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">Type</label>
               <input type="text" name="business_type" value="${urlParams.get("business_type") || ""}" placeholder="retail"
-                class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                class="px-3 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
             </div>
             <div class="flex gap-2">
-              <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer">
+              <button type="submit" class="h-[38px] px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer">
                 <span class="material-symbols-outlined text-[18px]!">search</span>
                 ${translate("Search")}
               </button>
@@ -83,17 +83,17 @@ export default class Admin_CompanyCredits_IndexController extends Admin_LayoutCo
               target: "companyCreditsList",
               mappingLookup: {},
               renderers: {
-                name: (value, record) => `<span class="font-medium text-slate-900 dark:text-white">${value || "Unnamed"}</span>`,
-                code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || "—"}</span>`,
-                main_credit_balance: (value) => `<span class="font-mono text-sm text-slate-900 dark:text-white">${Number(value || 0).toLocaleString()}</span>`,
-                promo_credit_balance: (value) => `<span class="font-mono text-sm font-medium text-emerald-600 dark:text-emerald-400">${Number(value || 0).toLocaleString()}</span>`,
-                debt_credit_balance: (value) => `<span class="font-mono text-sm text-slate-500 dark:text-slate-400">${Number(value || 0).toLocaleString()}</span>`,
-                total_credit_balance: (value) => `<span class="font-mono text-sm font-bold text-slate-900 dark:text-white">${Number(value || 0).toLocaleString()}</span>`,
-                owner_name: (value) => value ? `<span class="text-sm text-slate-600 dark:text-slate-400">${value}</span>` : '<span class="text-slate-300 dark:text-slate-700">—</span>'
+                name: (value, record) => `<span class="font-medium text-foreground">${value || "Unnamed"}</span>`,
+                code: (value) => `<span class="font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium">${value || "—"}</span>`,
+                main_credit_balance: (value) => `<span class="font-mono text-sm text-foreground">${Number(value || 0).toLocaleString()}</span>`,
+                promo_credit_balance: (value) => `<span class="font-mono text-sm font-medium text-success ">${Number(value || 0).toLocaleString()}</span>`,
+                debt_credit_balance: (value) => `<span class="font-mono text-sm text-muted-foreground">${Number(value || 0).toLocaleString()}</span>`,
+                total_credit_balance: (value) => `<span class="font-mono text-sm font-bold text-foreground">${Number(value || 0).toLocaleString()}</span>`,
+                owner_name: (value) => value ? `<span class="text-sm text-muted-foreground">${value}</span>` : '<span class="text-muted-foreground/60">—</span>'
               }
             })}
           </div>
-          <div class="flex justify-center py-4 border-t border-slate-200 dark:border-slate-800">
+          <div class="flex justify-center py-4 border-t border-line">
             ${pagination(this.pagination)}
           </div>
         </div>

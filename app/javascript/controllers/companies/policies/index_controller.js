@@ -19,12 +19,12 @@ export default class Companies_Policies_IndexController extends Companies_Layout
   contentHTML() {
     return `
       <div class="p-8 overflow-y-auto">
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
+        <div class="bg-card rounded-xl border border-line flex flex-col">
 
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
-                <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+                <tr class="text-sm text-muted-foreground bg-muted border-b border-line">
                   <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Policy Name")}</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Resource")}</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Action")}</th>
@@ -32,17 +32,17 @@ export default class Companies_Policies_IndexController extends Companies_Layout
                   <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Status")}</th>
                 </tr>
               </thead>
-              <tbody data-${this.identifier}-target="policiesList" class="divide-y divide-slate-200 dark:divide-slate-800">
+              <tbody data-${this.identifier}-target="policiesList" class="divide-y divide-line">
                 ${this.policiesHTML()}
               </tbody>
             </table>
           </div>
 
-          <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <span class="text-sm text-slate-500 dark:text-slate-400">${translate("Showing")} ${this.policies.length} ${translate("policies")}</span>
+          <div class="p-4 border-t border-line flex items-center justify-between">
+            <span class="text-sm text-muted-foreground">${translate("Showing")} ${this.policies.length} ${translate("policies")}</span>
             <div class="flex items-center gap-2">
-              <button class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-400 cursor-not-allowed" disabled>${translate("Previous")}</button>
-              <button class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">${translate("Next")}</button>
+              <button class="px-3 py-1 text-sm border border-line rounded-lg text-muted-foreground cursor-not-allowed" disabled>${translate("Previous")}</button>
+              <button class="px-3 py-1 text-sm border border-line rounded-lg text-muted-foreground hover:bg-muted transition-colors">${translate("Next")}</button>
             </div>
           </div>
         </div>
@@ -52,20 +52,20 @@ export default class Companies_Policies_IndexController extends Companies_Layout
 
   policiesHTML() {
     if (this.policies.length === 0) {
-      return `<tr><td colspan="5" class="text-center py-4 text-slate-500">${translate("No policies found")}</td></tr>`
+      return `<tr><td colspan="5" class="text-center py-4 text-muted-foreground">${translate("No policies found")}</td></tr>`
     }
     return this.policies.map(policy => `
-      <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+      <tr class="hover:bg-muted/50 transition-colors">
         <td class="py-4 px-6 text-sm">
           <div class="flex flex-col">
-            <p class="font-medium text-slate-900 dark:text-white">${policy.name}</p>
-            <p class="text-xs text-slate-500">${policy.code || translate('No code')}</p>
+            <p class="font-medium text-foreground">${policy.name}</p>
+            <p class="text-xs text-muted-foreground">${policy.code || translate('No code')}</p>
           </div>
         </td>
-        <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${policy.resource}</td>
-        <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${policy.action}</td>
+        <td class="py-4 px-6 text-sm text-muted-foreground">${policy.resource}</td>
+        <td class="py-4 px-6 text-sm text-muted-foreground">${policy.action}</td>
         <td class="py-4 px-6 text-sm">
-          <span class="text-slate-900 dark:text-white">${policy.branch ? policy.branch.name : translate('All branches')}</span>
+          <span class="text-foreground">${policy.branch ? policy.branch.name : translate('All branches')}</span>
         </td>
         <td class="py-4 px-6 text-sm">
           ${Helpers.statusBadge(policy.lifecycle_status)}

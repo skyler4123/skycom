@@ -33,9 +33,9 @@ export default class Companies_EventConfigs_NewController extends Companies_Layo
       <div class="flex items-center gap-3 py-2">
         <input type="hidden" name="event_config[${name}]" value="false">
         <input type="checkbox" name="event_config[${name}]" value="true" ${checked ? 'checked' : ''}
-          class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer">
-        <span class="flex items-center gap-1 text-sm text-slate-900 dark:text-white">${label}
-          <span ${tooltip(translate(hint))} class="inline-flex cursor-pointer text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300">
+          class="h-5 w-5 rounded border-line text-primary cursor-pointer">
+        <span class="flex items-center gap-1 text-sm text-foreground">${label}
+          <span ${tooltip(translate(hint))} class="inline-flex cursor-pointer text-muted-foreground hover:text-muted-foreground ">
             <span class="material-symbols-outlined text-[16px]!">info</span>
           </span>
         </span>
@@ -47,9 +47,9 @@ export default class Companies_EventConfigs_NewController extends Companies_Layo
     const defaultCategoryId = this.categories[0]?.id || ""
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Event Config")}</h2>
+        <h2 class="text-xl font-bold text-foreground">${translate("New Event Config")}</h2>
 
-        ${defaultCategoryId ? `<input type="hidden" name="event_config[category_id]" value="${defaultCategoryId}">` : `<p class="text-sm text-slate-500 dark:text-slate-400">${translate("No event category available.")}</p>`}
+        ${defaultCategoryId ? `<input type="hidden" name="event_config[category_id]" value="${defaultCategoryId}">` : `<p class="text-sm text-muted-foreground">${translate("No event category available.")}</p>`}
 
         <div class="grid grid-cols-2 gap-4">
           ${this.toggleField("create_stock_pending", translate("Hold Stock"), true, "ON reserves required stock as event holds on save. OFF creates no hold.")}
@@ -59,9 +59,9 @@ export default class Companies_EventConfigs_NewController extends Companies_Layo
           ${this.toggleField("warn_on_host_overlap", translate("Host Check"), true, "ON warns on double-booked hosts without blocking. OFF stays silent.")}
         </div>
 
-        <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
+        <div class="flex justify-end pt-6 border-t border-line">
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm transition-colors cursor-pointer">
             ${translate("Save Event Config")}
           </button>
         </div>
@@ -74,7 +74,7 @@ export default class Companies_EventConfigs_NewController extends Companies_Layo
           ${form({
             action: Helpers.create_company_event_configs_path(currentCompany().id),
             method: "POST",
-            attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false"`,
+            attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false"`,
             html: fields
           })}
         </div>

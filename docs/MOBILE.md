@@ -99,7 +99,7 @@ value, and it is always marked.
 | Page | Real | Marked sample |
 |---|---|---|
 | Sign-in | email/password auth, errors | — |
-| Home | greeting, company/branch/code, live clock, check-in state, today's shift/logs, monthly attendance %, worked time, overtime, pending requests, payroll status | paid-leave balance, company notice |
+| Home | greeting, company/branch/code, live clock, multi check-in state/times, today's shift/logs, monthly attendance %, worked time, overtime, pending requests, payroll status | paid-leave balance, company notice |
 | Employee | name/code/type/roles/category, email, phone, company, branch, departments, next shift, monthly attendance | reports-to, contract renewal |
 | Attendance | month summary (worked/present/absent/overtime), daily in/out/duration/status | — |
 | Payroll | month, status/step, period days, worked hours, present days, overtime minutes | all money figures |
@@ -122,8 +122,9 @@ Rules:
 
 **Check-in** — `POST /mobile/companies/:company_id/attendances` writes one
 `AttendanceLog` (`log_type: check_in`) for the employee resolved from the URL
-company. A second check-in on the same local day is rejected. There is no
-checkout, break, or geofence check in this namespace yet.
+company. Every tap creates another check-in; the home punch card lists every
+check-in time for the company-local day, using the company's timezone offset.
+There is no checkout, break, or geofence check in this namespace yet.
 
 **Attendance request** — the form posts `attendance_date`, `business_type`,
 `check_in_time`, `check_out_time`, and `reason` to
@@ -175,12 +176,13 @@ Coverage:
 |---|---|
 | `spec/features/mobile/sign_in_spec.rb` | form, password toggle, invalid/valid auth, company-scoped redirect, sign-out |
 | `spec/features/mobile/home_spec.rb` | dashboard data, check-in, dark toggle, no-employee fallback, company redirect, auth redirect |
-| `spec/features/mobile/check_in_spec.rb` | log creation, employee/company stamping, checked-in state |
+| `spec/features/mobile/check_in_spec.rb` | log creation, employee/company stamping, multiple check-ins, company-local day/timezone |
 | `spec/features/mobile/employee_info_spec.rb` | profile sections, disabled editor, back/sign-out |
 | `spec/features/mobile/attendance_month_spec.rb` | summary, daily rows, prev/next, empty state |
 | `spec/features/mobile/payroll_spec.rb` | status, sample banner, timesheet link, disabled payslip, month switch |
 | `spec/features/mobile/attendance_request_spec.rb` | valid submit, validation errors, future date, auth |
-| `spec/requests/mobile/attendances_controller_spec.rb` | check-in, duplicate guard, cross-tenant 404 |
+| `spec/requests/mobile/attendances_controller_spec.rb` | check-in, multiple check-ins, cross-tenant 404 |
+| `spec/requests/mobile/home_controller_spec.rb` | company-local day/timezone for check-ins |
 | `spec/requests/mobile/attendance_requests_controller_spec.rb` | pending create, permission failure, cross-tenant 404 |
 | `spec/requests/mobile/company_scoping_spec.rb` | member access, cross-tenant 404, malformed company id |
 | `spec/helpers/mobile_helper_spec.rb` | formatting/labels/preview helpers |

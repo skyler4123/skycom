@@ -330,18 +330,19 @@ PROMO_DEFAULT_TITLE = "Skycom gave you %{amount} credits!".freeze
 PROMO_DEFAULT_BODY = "Promo '%{name}' added %{amount} promo credits (cap %{max_cap}). Thank you for using Skycom! Here is our help to grow your business.".freeze
 
 # =============================================================================
-# Workflow Step Colors (Tailwind classes — must be listed literally so Tailwind
-# can scan & compile them). Used by WorkflowStep validation + seed defaults.
+# Workflow Step Colors (semantic Tailwind classes — must be listed literally so
+# Tailwind can scan & compile them). Used by WorkflowStep validation + seed
+# defaults. Order matters: seeds reference these by index — neutral, primary,
+# success, warning, danger, info. Never use raw palette classes here; a rebrand
+# in app/assets/tailwind/application.css must recolor every workflow step.
 # =============================================================================
 WORKFLOW_STEP_COLORS = {
-  slate:   { text: "text-slate-700 dark:text-slate-300",   background: "bg-slate-100 dark:bg-slate-800" },
-  blue:    { text: "text-blue-700 dark:text-blue-300",     background: "bg-blue-100 dark:bg-blue-900/30" },
-  emerald: { text: "text-emerald-700 dark:text-emerald-300", background: "bg-emerald-100 dark:bg-emerald-900/30" },
-  amber:   { text: "text-amber-700 dark:text-amber-300",   background: "bg-amber-100 dark:bg-amber-900/30" },
-  rose:    { text: "text-rose-700 dark:text-rose-300",     background: "bg-rose-100 dark:bg-rose-900/30" },
-  indigo:  { text: "text-indigo-700 dark:text-indigo-300", background: "bg-indigo-100 dark:bg-indigo-900/30" },
-  violet:  { text: "text-violet-700 dark:text-violet-300", background: "bg-violet-100 dark:bg-violet-900/30" },
-  teal:    { text: "text-teal-700 dark:text-teal-300",    background: "bg-teal-100 dark:bg-teal-900/30" }
+  neutral: { text: "text-muted-foreground", background: "bg-muted" },
+  primary: { text: "text-primary",          background: "bg-primary/10" },
+  success: { text: "text-success",          background: "bg-success/10" },
+  warning: { text: "text-warning",          background: "bg-warning/10" },
+  danger:  { text: "text-danger",           background: "bg-danger/10" },
+  info:    { text: "text-info",             background: "bg-info/10" }
 }.freeze
 WORKFLOW_STEP_TEXT_COLORS = WORKFLOW_STEP_COLORS.values.map { |c| c[:text] }.freeze
 WORKFLOW_STEP_BACKGROUND_COLORS = WORKFLOW_STEP_COLORS.values.map { |c| c[:background] }.freeze

@@ -4,12 +4,12 @@ import Companies_Events_NewModalController from "controllers/companies/events/ne
 // Workflow → Tailwind mapping (FE-owned, aligned with Helpers.statusBadge).
 // Full literal class strings so Tailwind JIT can compile them — never interpolate.
 const WORKFLOW_STYLES = {
-  draft: { bg: "bg-slate-400", text: "text-slate-500" },
-  pending: { bg: "bg-yellow-500", text: "text-yellow-600" },
-  confirmed: { bg: "bg-green-500", text: "text-green-600" },
-  in_progress: { bg: "bg-blue-500", text: "text-blue-600" },
-  completed: { bg: "bg-emerald-600", text: "text-emerald-600" },
-  cancelled: { bg: "bg-red-500", text: "text-red-500" }
+  draft: { bg: "bg-muted-foreground", text: "text-muted-foreground" },
+  pending: { bg: "bg-warning/100", text: "text-warning" },
+  confirmed: { bg: "bg-success/100", text: "text-success" },
+  in_progress: { bg: "bg-primary", text: "text-primary" },
+  completed: { bg: "bg-success", text: "text-success" },
+  cancelled: { bg: "bg-danger/100", text: "text-danger" }
 }
 
 const workflowStatusOf = (ev) => ev.workflow_status || ev.extendedProps?.workflow_status || "pending"
@@ -132,12 +132,12 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
     return `
       <div class="p-4 overflow-y-auto">
         <div class="mx-auto">
-          <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-800 relative">
+          <div class="bg-card rounded-2xl shadow-xl overflow-hidden border border-line relative">
             ${this.headerHTML()}
             <div class="p-5 md:p-6 min-h-[500px] relative">
               ${this.isLoading ? `
-                <div class="absolute inset-0 bg-white/60 dark:bg-slate-900/60 flex items-center justify-center z-10 backdrop-blur-[1px]">
-                  <div class="animate-spin h-12 w-12 border-4 border-indigo-500 rounded-full border-t-transparent"></div>
+                <div class="absolute inset-0 bg-card/60 flex items-center justify-center z-10 backdrop-blur-[1px]">
+                  <div class="animate-spin h-12 w-12 border-4 border-primary/40 rounded-full border-t-transparent"></div>
                 </div>
               ` : ''}
               ${this.boardHTML()}
@@ -150,18 +150,18 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
 
   headerHTML() {
     const btnBase = "px-4 py-2 text-sm rounded-lg transition cursor-pointer"
-    const activeBtn = "bg-indigo-600 text-white shadow"
-    const inactiveBtn = "bg-white dark:bg-slate-700 border dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600"
+    const activeBtn = "bg-primary text-primary-foreground shadow"
+    const inactiveBtn = "bg-card border text-foreground hover:bg-background "
 
     return `
-      <div class="px-6 py-5 border-b border-slate-200 dark:border-slate-700">
+      <div class="px-6 py-5 border-b border-line">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div class="flex items-center gap-6">
-            <button data-action="click->${this.identifier}#prev" class="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition text-slate-600 dark:text-slate-400 cursor-pointer">
+            <button data-action="click->${this.identifier}#prev" class="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-muted transition text-muted-foreground cursor-pointer">
               <span class="material-symbols-outlined">arrow_back</span>
             </button>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">${this.getTitle()}</h1>
-            <button data-action="click->${this.identifier}#next" class="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition text-slate-600 dark:text-slate-400 cursor-pointer">
+            <h1 class="text-2xl font-bold text-foreground">${this.getTitle()}</h1>
+            <button data-action="click->${this.identifier}#next" class="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-muted transition text-muted-foreground cursor-pointer">
               <span class="material-symbols-outlined">arrow_forward</span>
             </button>
           </div>
@@ -191,9 +191,9 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
 
   weekdayHeaderHTML() {
     return `
-      <div class="grid grid-cols-7 text-center text-sm font-semibold text-slate-600 dark:text-slate-400 py-3 bg-slate-50 dark:bg-slate-900/50 rounded-t-lg">
+      <div class="grid grid-cols-7 text-center text-sm font-semibold text-muted-foreground py-3 bg-background rounded-t-lg">
         <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div>
-        <div>Fri</div><div>Sat</div><div class="text-red-600 dark:text-red-400">Sun</div>
+        <div>Fri</div><div>Sat</div><div class="text-danger ">Sun</div>
       </div>
     `
   }
@@ -204,13 +204,13 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
     const eventItems = dayEvents.slice(0, 3).map(ev => `<div class="text-xs truncate px-1.5 py-0.5 leading-tight ${workflowText(workflowStatusOf(ev))}"><span class="font-medium">${ev.title}</span></div>`).join("")
 
     return `
-      <div class="h-32 bg-white dark:bg-slate-900 hover:bg-indigo-50/60 dark:hover:bg-indigo-900/30 border border-slate-200 dark:border-slate-700 relative overflow-hidden rounded-lg transition flex flex-col items-start justify-start pt-1.5 text-base cursor-pointer select-none"
+      <div class="h-32 bg-card hover:bg-primary/10 border border-line relative overflow-hidden rounded-lg transition flex flex-col items-start justify-start pt-1.5 text-base cursor-pointer select-none"
         data-date="${dateStr}"
         data-action="click->${this.identifier}#openCreateModal"
         data-${this.identifier}-date-param="${dateStr}">
-        <div class="w-full px-1.5 flex justify-between items-center text-slate-900 dark:text-slate-200">
+        <div class="w-full px-1.5 flex justify-between items-center text-foreground">
           <span class="font-medium">${dayNumber}</span>
-          ${isToday ? '<span class="text-[10px] bg-blue-600 text-white px-1.5 rounded-full uppercase">Today</span>' : ''}
+          ${isToday ? '<span class="text-[10px] bg-primary text-primary-foreground px-1.5 rounded-full uppercase">Today</span>' : ''}
         </div>
         <div class="w-full mt-1 flex flex-col overflow-hidden">${eventItems}</div>
       </div>`
@@ -220,10 +220,10 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
     const d = new Date(this.anchor), y = d.getFullYear(), m = d.getMonth()
     const first = new Date(y, m, 1), daysInMonth = new Date(y, m + 1, 0).getDate(), startWeekday = first.getDay() || 7
     let html = this.weekdayHeaderHTML() + '<div class="grid grid-cols-7 gap-2">'
-    for (let i = 1; i < startWeekday; i++) html += '<div class="h-32 bg-slate-50/30 dark:bg-slate-700/30 rounded-lg"></div>'
+    for (let i = 1; i < startWeekday; i++) html += '<div class="h-32 bg-background/30 rounded-lg"></div>'
     for (let day = 1; day <= daysInMonth; day++) html += this.dayCellHTML(`${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`, day)
     const used = startWeekday - 1 + daysInMonth
-    for (let i = used % 7; i > 0 && i < 7; i++) html += '<div class="h-32 bg-slate-50/30 dark:bg-slate-700/30 rounded-lg"></div>'
+    for (let i = used % 7; i > 0 && i < 7; i++) html += '<div class="h-32 bg-background/30 rounded-lg"></div>'
     return html + '</div>'
   }
 
@@ -237,28 +237,28 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
     const timeSlots = []
     for (let hour = 0; hour < 24; hour++) {
       const timeLabel = `${hour.toString().padStart(2, '0')}:00`
-      let rowHtml = `<div class="text-right text-xs text-slate-500 dark:text-slate-400 pr-3 pt-1 border-t border-slate-200 dark:border-slate-700">${timeLabel}</div>`
+      let rowHtml = `<div class="text-right text-xs text-muted-foreground pr-3 pt-1 border-t border-line">${timeLabel}</div>`
       days.forEach(day => {
         const overlapping = this.events.filter(ev => {
           if (ev.start?.split("T")[0] !== day.dateStr || ev.allDay) return false
           const start = new Date(ev.start), end = new Date(ev.end), sStart = new Date(day.dateStr + 'T' + timeLabel + ':00'), sEnd = new Date(sStart.getTime() + 3600000)
           return start < sEnd && end > sStart
         })
-        rowHtml += `<div class="relative border-l border-slate-200 dark:border-slate-700 min-h-[60px] bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer"
+        rowHtml += `<div class="relative border-l border-line min-h-[60px] bg-card hover:bg-muted transition cursor-pointer"
           data-action="click->${this.identifier}#openCreateModal"
           data-${this.identifier}-date-param="${day.dateStr}"
           data-${this.identifier}-hour-param="${hour}">
-          ${overlapping.map(ev => `<div class="absolute inset-x-1 top-0 rounded-md shadow-sm p-1 text-xs text-white overflow-hidden ${workflowBg(workflowStatusOf(ev))}" style="height: ${Math.min((new Date(ev.end) - new Date(ev.start)) / 600, 100)}%; min-height: 40px;"><div class="font-medium truncate">${ev.title}</div></div>`).join('')}
+          ${overlapping.map(ev => `<div class="absolute inset-x-1 top-0 rounded-md shadow-sm p-1 text-xs text-overlay-foreground overflow-hidden ${workflowBg(workflowStatusOf(ev))}" style="height: ${Math.min((new Date(ev.end) - new Date(ev.start)) / 600, 100)}%; min-height: 40px;"><div class="font-medium truncate">${ev.title}</div></div>`).join('')}
         </div>`
       })
       timeSlots.push(`<div class="grid grid-cols-8 gap-0">${rowHtml}</div>`)
     }
 
     return `
-      <div class="border dark:border-slate-700 rounded-lg overflow-hidden">
-        <div class="grid grid-cols-8 bg-slate-100 dark:bg-slate-900 border-b dark:border-slate-700">
-          <div class="p-3 text-sm font-semibold text-slate-600 dark:text-slate-400 text-right">Time</div>
-          ${days.map(day => `<div class="p-3 text-center text-sm font-semibold ${day.isToday ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 'dark:text-slate-300'}">${new Date(day.dateStr).toLocaleString('en-US', { weekday: 'short' })} ${day.dayNumber}</div>`).join('')}
+      <div class="border rounded-lg overflow-hidden">
+        <div class="grid grid-cols-8 bg-muted border-b ">
+          <div class="p-3 text-sm font-semibold text-muted-foreground text-right">Time</div>
+          ${days.map(day => `<div class="p-3 text-center text-sm font-semibold ${day.isToday ? 'bg-primary/10 text-primary ' : ''}">${new Date(day.dateStr).toLocaleString('en-US', { weekday: 'short' })} ${day.dayNumber}</div>`).join('')}
         </div>
         ${timeSlots.join('')}
       </div>
@@ -272,19 +272,19 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
       const timeLabel = `${hour.toString().padStart(2, '0')}:00`, sStart = new Date(dateStr + 'T' + timeLabel + ':00'), sEnd = new Date(sStart.getTime() + 3600000)
       const overlapping = dayEvents.filter(ev => !ev.allDay && new Date(ev.start) < sEnd && new Date(ev.end) > sStart)
       timeSlots.push(`
-        <div class="grid grid-cols-[80px_1fr] border-t border-slate-200 dark:border-slate-700">
-          <div class="text-right pr-4 pt-2 text-xs text-slate-600 dark:text-slate-400 font-medium bg-slate-50 dark:bg-slate-900/50">${timeLabel}</div>
-          <div class="relative min-h-[60px] bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-700 transition cursor-pointer"
+        <div class="grid grid-cols-[80px_1fr] border-t border-line">
+          <div class="text-right pr-4 pt-2 text-xs text-muted-foreground font-medium bg-background ">${timeLabel}</div>
+          <div class="relative min-h-[60px] bg-card hover:bg-muted transition cursor-pointer"
             data-action="click->${this.identifier}#openCreateModal"
             data-${this.identifier}-date-param="${dateStr}"
             data-${this.identifier}-hour-param="${hour}">
-            ${overlapping.map(ev => `<div class="absolute inset-x-2 top-0 rounded-lg shadow-md p-2 text-sm text-white overflow-hidden ${workflowBg(workflowStatusOf(ev))}" style="height: ${Math.min((new Date(ev.end) - new Date(ev.start)) / 600, 100)}%; min-height: 50px;"><div class="font-semibold truncate">${ev.title}</div></div>`).join('')}
+            ${overlapping.map(ev => `<div class="absolute inset-x-2 top-0 rounded-lg shadow-md p-2 text-sm text-overlay-foreground overflow-hidden ${workflowBg(workflowStatusOf(ev))}" style="height: ${Math.min((new Date(ev.end) - new Date(ev.start)) / 600, 100)}%; min-height: 50px;"><div class="font-semibold truncate">${ev.title}</div></div>`).join('')}
           </div>
         </div>`)
     }
     return `
-      <div class="border dark:border-slate-700 rounded-lg overflow-hidden">
-        <div class="bg-slate-100 dark:bg-slate-900 p-4 border-b dark:border-slate-700 text-center font-bold text-lg ${isToday ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 'dark:text-white'}">
+      <div class="border rounded-lg overflow-hidden">
+        <div class="bg-muted p-4 border-b text-center font-bold text-lg ${isToday ? 'bg-primary/10 text-primary ' : ''}">
           ${new Date(dateStr).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
         </div>
         ${timeSlots.join('')}

@@ -64,31 +64,31 @@ export default class Companies_Workflows_NewController extends Companies_LayoutC
   }
 
   stepRowHTML(step, index) {
-    const baseClass = 'flex-1 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm'
+    const baseClass = 'flex-1 px-3 py-2 border border-line rounded-lg bg-card text-sm'
     const opt = findWorkflowColorOption(step.text_color, step.background_color)
     const colorKey = step.colorKey || opt.key
     const colorSelect = WORKFLOW_STEP_COLOR_OPTIONS.map(o =>
-      `<option value="${o.key}" ${o.key === colorKey ? 'selected' : ''}>${o.label}</option>`
+      `<option value="${o.key}" ${o.key === colorKey ? 'selected' : ''}>${translate(o.label)}</option>`
     ).join('')
     return `
       <tr>
         <td class="py-2 px-2">
           <div class="flex items-center gap-2">
-            <span class="text-xs text-slate-400 font-bold w-5">${index + 1}.</span>
+            <span class="text-xs text-muted-foreground font-bold w-5">${index + 1}.</span>
             <input type="hidden" name="workflow[workflow_steps_attributes][${index}][position]" value="${index + 1}">
             <input type="hidden" name="workflow[workflow_steps_attributes][${index}][text_color]" value="${step.text_color || opt.text}">
             <input type="hidden" name="workflow[workflow_steps_attributes][${index}][background_color]" value="${step.background_color || opt.background}">
             <input type="text" name="workflow[workflow_steps_attributes][${index}][name]" required
               value="${step.name || ''}" placeholder="${translate("e.g. Manager Approval")}" class="${baseClass}">
             <select data-step-color data-index="${index}" data-action="change->${this.identifier}#syncColor"
-              class="px-2 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="px-2 py-2 border border-line rounded-lg bg-card text-sm">
               ${colorSelect}
             </select>
           </div>
         </td>
         <td class="py-2 px-2 text-right">
           <button type="button" data-action="click->${this.identifier}#removeStepRow" data-${this.identifier}-index-param="${index}"
-            class="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg cursor-pointer">
+            class="p-1.5 text-danger hover:bg-danger/10 rounded-lg cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">delete</span>
           </button>
         </td>
@@ -101,17 +101,17 @@ export default class Companies_Workflows_NewController extends Companies_LayoutC
 
   stepsSectionHTML() {
     return `
-      <div class="border-t border-slate-200 dark:border-slate-700 pt-6 mt-6">
+      <div class="border-t border-line pt-6 mt-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${translate("Steps")}</h3>
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider">${translate("Steps")}</h3>
           <button type="button" data-action="click->${this.identifier}#addStepRow"
-            class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium cursor-pointer">
+            class="inline-flex items-center gap-2 px-3 py-1.5 bg-muted text-foreground rounded-lg text-sm font-medium cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">add</span>${translate("Add Step")}
           </button>
         </div>
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="text-xs text-slate-500 border-b border-slate-200 dark:border-slate-700">
+            <tr class="text-xs text-muted-foreground border-b border-line">
               <th class="py-2 px-2 font-medium">${translate("Name")}</th>
               <th class="py-2 px-2"></th>
             </tr>
@@ -133,43 +133,43 @@ export default class Companies_Workflows_NewController extends Companies_LayoutC
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Workflow")}</h2>
+        <h2 class="text-xl font-bold text-foreground">${translate("New Workflow")}</h2>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Name")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Name")}</label>
             <input type="text" name="workflow[name]" required placeholder="${translate("e.g. Standard Purchase Process")}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Process")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Process")}</label>
             <select name="workflow[process_type]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground">
               ${processTypes.map(t => `<option value="${t.value}">${t.name}</option>`).join('')}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Category")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
             <select name="workflow[category_id]" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground">
               ${selectOptionsHTML(cloneNewKey(categories, "id", "value"), categoryValue)}
             </select>
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Description")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Description")}</label>
             <textarea name="workflow[description]" rows="3"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white"></textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground"></textarea>
           </div>
         </div>
 
         ${this.stepsSectionHTML()}
 
-        <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
+        <div class="flex justify-end pt-6 border-t border-line">
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm transition-colors cursor-pointer">
             ${translate("Save Workflow")}
           </button>
         </div>
@@ -181,7 +181,7 @@ export default class Companies_Workflows_NewController extends Companies_LayoutC
           ${form({
             action: Helpers.create_company_workflows_path(currentCompany().id),
             method: "POST",
-            attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false"`,
+            attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false"`,
             html: fields
           })}
         </div>

@@ -48,8 +48,8 @@ export default class Companies_Branches_PaymentMethodAppointmentsModalController
 
   loadingHTML() {
     return `
-      <div class="p-8 bg-white dark:bg-slate-900 rounded-2xl w-[520px] shadow-2xl">
-        <div class="flex items-center justify-center gap-3 py-10 text-slate-400 dark:text-slate-500">
+      <div class="p-8 bg-card rounded-2xl w-[520px] shadow-2xl">
+        <div class="flex items-center justify-center gap-3 py-10 text-muted-foreground">
           <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
           <span class="text-sm">${translate("Loading...")}</span>
         </div>
@@ -61,16 +61,16 @@ export default class Companies_Branches_PaymentMethodAppointmentsModalController
     const rows = this.loadError ? this.errorHTML() : (this.appointments.length === 0 ? this.emptyHTML() : this.rowsHTML())
 
     return `
-      <div class="p-8 bg-white dark:bg-slate-900 rounded-2xl w-[520px] max-h-[80vh] overflow-y-auto shadow-2xl border border-slate-200 dark:border-slate-800">
+      <div class="p-8 bg-card rounded-2xl w-[520px] max-h-[80vh] overflow-y-auto shadow-2xl border border-line">
         <div class="flex items-start justify-between mb-6">
           <div>
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Payment Methods")}</h2>
-            <p class="text-sm text-slate-500 mt-1">${translate("Manage payment methods for this branch")}</p>
+            <h2 class="text-xl font-bold text-foreground">${translate("Payment Methods")}</h2>
+            <p class="text-sm text-muted-foreground mt-1">${translate("Manage payment methods for this branch")}</p>
           </div>
           <button
             type="button"
             data-action="click->${this.identifier}#close"
-            class="rounded-full p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            class="rounded-full p-2 text-muted-foreground hover:text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
           >
             <span class="material-symbols-outlined text-[20px]">close</span>
           </button>
@@ -78,11 +78,11 @@ export default class Companies_Branches_PaymentMethodAppointmentsModalController
 
         ${rows}
 
-        <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700 mt-6">
+        <div class="flex justify-end pt-6 border-t border-line mt-6">
           <button
             type="button"
             data-action="click->${this.identifier}#close"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer"
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer"
           >
             ${translate("Close")}
           </button>
@@ -105,15 +105,15 @@ export default class Companies_Branches_PaymentMethodAppointmentsModalController
     const disabled = companyLevelInactive
 
     return `
-      <div class="flex items-center justify-between gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+      <div class="flex items-center justify-between gap-4 p-4 rounded-xl border border-line bg-muted">
         <div class="min-w-0">
           <div class="flex items-center gap-2">
-            <p class="text-sm font-semibold text-slate-900 dark:text-white truncate">${a.name}</p>
+            <p class="text-sm font-semibold text-foreground truncate">${a.name}</p>
             ${this.modeBadge(a.payment_mode)}
           </div>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${a.code}</p>
+          <p class="text-xs text-muted-foreground mt-1">${a.code}</p>
           ${companyLevelInactive ? `
-            <p class="text-[11px] text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
+            <p class="text-[11px] text-warning mt-1 flex items-center gap-1">
               <span class="material-symbols-outlined text-[12px]">lock</span>
               ${translate("Enable at company level first")}
             </p>
@@ -137,16 +137,16 @@ export default class Companies_Branches_PaymentMethodAppointmentsModalController
           data-action="change->${this.identifier}#toggle"
           data-appointment-id="${id}"
           class="sr-only peer" />
-        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 dark:bg-slate-600 dark:peer-checked:bg-blue-500"></div>
+        <div class="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-overlay-foreground after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-card after:border-line after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary "></div>
       </label>
     `
   }
 
   modeBadge(mode) {
     const labels = {
-      cash: { icon: "payments", classes: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" },
-      qr: { icon: "qr_code_2", classes: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
-      redirect: { icon: "open_in_new", classes: "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400" }
+      cash: { icon: "payments", classes: "bg-success/10 text-success " },
+      qr: { icon: "qr_code_2", classes: "bg-primary/10 text-primary " },
+      redirect: { icon: "open_in_new", classes: "bg-primary/10 text-primary " }
     }
     const cfg = labels[mode] || labels.cash
     return `
@@ -160,18 +160,18 @@ export default class Companies_Branches_PaymentMethodAppointmentsModalController
   emptyHTML() {
     return `
       <div class="py-12 text-center">
-        <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-          <span class="material-symbols-outlined text-slate-400 dark:text-slate-500">payments</span>
+        <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+          <span class="material-symbols-outlined text-muted-foreground">payments</span>
         </div>
-        <p class="text-sm text-slate-500 dark:text-slate-400">${translate("No payment methods available")}</p>
+        <p class="text-sm text-muted-foreground">${translate("No payment methods available")}</p>
       </div>
     `
   }
 
   errorHTML() {
     return `
-      <div class="p-6 text-center rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-        <p class="text-sm text-red-600 dark:text-red-400">${this.loadError}</p>
+      <div class="p-6 text-center rounded-xl bg-danger/10 border border-danger/20 ">
+        <p class="text-sm text-danger ">${this.loadError}</p>
       </div>
     `
   }

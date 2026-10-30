@@ -125,11 +125,11 @@ export default class Companies_LayoutController extends Controller {
 
     return `
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white">
+        <h2 class="text-lg font-bold text-foreground">
           ${resourceName} - ${category.name}
         </h2>
         <a href="${Helpers.edit_company_table_config_path(companyId, config.id)}"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors cursor-pointer"
           ${tooltip(translate("Edit table configuration"))}
         >
           <span class="material-symbols-outlined text-[18px]!">edit</span>
@@ -187,12 +187,12 @@ export default class Companies_LayoutController extends Controller {
 
     return `
       <!-- Layout Wrapper: Font, Background, Colors -->
-      <div class="min-w-0 flex flex-1 font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+      <div class="min-w-0 flex flex-1 font-display bg-card text-foreground">
         <!-- Flex Container: Sidebar + Main -->
         <div class="min-w-0 flex flex-1">
           <!-- Sidebar -->
           <aside
-            class="w-64 hidden open:flex flex-col shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800"
+            class="w-64 hidden open:flex flex-col shrink-0 bg-card border-r border-line"
             ${addOpenListener({group: "sidebar", key: "sidebar", cache: true})}
           >
             <!-- Sidebar Navigation (dedicated controller: favourites + details groups) -->
@@ -206,31 +206,31 @@ export default class Companies_LayoutController extends Controller {
           <main class="min-w-0 flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
             <!-- Header -->
             <header
-              class="shrink-0 flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 px-4 md:px-8 py-4 bg-white dark:bg-gray-900">
+              class="shrink-0 flex flex-wrap items-center justify-between gap-4 border-b border-line px-4 md:px-8 py-4 bg-card">
               <!-- Header Left: Company Name, Toggle, Search -->
               <div class="flex flex-wrap items-center gap-3 md:gap-6">
                 <button
-                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300" id="sidebar-toggle"
+                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 hover:bg-muted text-muted-foreground" id="sidebar-toggle"
                   ${addOpenTrigger({group: "sidebar", key: "sidebar", toggle: true, cache: true})}
                 >
                   <span class="material-symbols-outlined">menu</span>
                 </button>
 
-                <div class="flex items-center gap-3 dark:border-gray-800">
+                <div class="flex items-center gap-3 ">
                   <div class="bg-primary/20 text-primary p-2 rounded-lg">
                     <span class="material-symbols-outlined">storefront</span>
                   </div>
                   <div class="flex flex-col">
                     <h1
-                      class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer"
+                      class="text-foreground text-base font-medium leading-normal cursor-pointer"
                       ${popover({
-                        classes: "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-2xl p-2",
+                        classes: "bg-card border border-line shadow-2xl p-2",
                         html: `
                           <div class="flex flex-col gap-y-1 w-64">
                             ${currentCompanies().map((company) => `
-                              <div class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 ${currentCompany().id === company.id ? 'bg-gray-100 dark:bg-gray-800' : ''}">
+                              <div class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-muted ${currentCompany().id === company.id ? 'bg-muted' : ''}">
                                 <a href="${Helpers.company_dashboards_path(company.id)}"
-                                  class="flex items-center gap-3 flex-1 min-w-0 text-gray-800 dark:text-gray-200 ${currentCompany().id === company.id ? 'font-bold' : ''}">
+                                  class="flex items-center gap-3 flex-1 min-w-0 text-foreground ${currentCompany().id === company.id ? 'font-bold' : ''}">
                                   <span class="text-sm truncate">${company.name}</span>
                                 </a>
                               </div>`).join("")}
@@ -246,11 +246,11 @@ export default class Companies_LayoutController extends Controller {
                 <label class="flex flex-col min-w-40 h-10! w-full md:w-80">
                   <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
                     <div
-                      class="text-gray-500 flex bg-gray-100 dark:bg-gray-800 items-center justify-center pl-4 rounded-l-lg border-r-0">
+                      class="text-muted-foreground flex bg-muted items-center justify-center pl-4 rounded-l-lg border-r-0">
                       <span class="material-symbols-outlined">search</span>
                     </div>
                     <input
-                      class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-gray-100 dark:bg-gray-800 h-full placeholder:text-gray-500 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                      class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-foreground focus:outline-0 focus:ring-0 border-none bg-muted h-full placeholder:text-muted-foreground px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
                       placeholder="${translate("Search for products, customers...")}" value="" />
                   </div>
                 </label>
@@ -258,14 +258,14 @@ export default class Companies_LayoutController extends Controller {
               <!-- Header Right: Actions (Dark Mode, Language, Notifications, Avatar) -->
               <div class="flex flex-wrap justify-end gap-2 md:gap-4 items-center">
                 <button
-                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
+                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 p-2 hover:bg-muted text-muted-foreground"
                   ${Helpers.darkmodeTrigger()}
                 >
                 </button>
                 <button
-                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
+                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-muted text-muted-foreground"
                   ${popover({
-                    classes: "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl overflow-hidden",
+                    classes: "bg-card border border-line shadow-xl overflow-hidden",
                     html: `
                       ${(() => {
                         // Define the display names for each code
@@ -279,7 +279,7 @@ export default class Companies_LayoutController extends Controller {
                             ${["en", "vi"].map(lang => `
                               <a data-language-code-param="${lang}" 
                                 data-action="click->language#changeLanguage" 
-                                class="flex items-center px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                                class="flex items-center px-4 py-2 text-sm text-foreground hover:bg-muted cursor-pointer transition-colors"
                               >
                                 ${languageNames[lang] || lang.toUpperCase()}
                               </a>
@@ -293,20 +293,20 @@ export default class Companies_LayoutController extends Controller {
                   <span>${(localStorage.getItem("languageCode") || "en").toUpperCase()}</span>
                 </button>
                 <a href="${Helpers.company_notifications_path(currentCompany().id)}"
-                  class="relative hidden md:flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
+                  class="relative hidden md:flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-muted text-muted-foreground">
                   <span class="material-symbols-outlined">notifications</span>
-                  <span data-bell-badge class="hidden absolute top-0 right-0 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center">0</span>
+                  <span data-bell-badge class="hidden absolute top-0 right-0 min-w-[18px] h-[18px] px-1 rounded-full bg-danger text-danger-foreground text-[10px] font-bold flex items-center justify-center">0</span>
                 </a>
                 ${_showExport ? `
                   <button type="button" data-action="click->${this.identifier}#exportCSV"
-                    class="hidden md:inline-flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                    class="hidden md:inline-flex items-center gap-2 px-3 py-2 bg-muted text-foreground rounded-lg text-sm font-medium cursor-pointer hover:bg-muted transition-colors"
                     ${tooltip(translate("Export"))}>
                     <span class="material-symbols-outlined text-[18px]!">download</span>
                     ${translate("Export")}
                   </button>
                 ` : ""}
                 <button
-                  class="hidden md:flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
+                  class="hidden md:flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-muted text-muted-foreground">
                   <span class="material-symbols-outlined">settings</span>
                 </button>
                 ${avatar({

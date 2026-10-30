@@ -64,7 +64,7 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
   }
 
   renderField({ key, label, type }) {
-    const baseClass = 'w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500'
+    const baseClass = 'w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground'
 
     switch (type) {
       case 'boolean':
@@ -72,15 +72,15 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
           <div class="flex items-center gap-3 py-2">
             <input type="hidden" name="event[${key}]" value="false">
             <input type="checkbox" name="event[${key}]" value="true"
-              class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer">
-            <span class="text-sm text-slate-900 dark:text-white">${label}</span>
+              class="h-5 w-5 rounded border-line text-primary cursor-pointer">
+            <span class="text-sm text-foreground">${label}</span>
           </div>
         `
       case 'integer':
       case 'decimal':
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${label}</label>
             <input type="number" name="event[${key}]" step="${type === 'decimal' ? '0.01' : '1'}" placeholder="${label}"
               class="${baseClass}">
           </div>
@@ -88,7 +88,7 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
       case 'datetime':
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${label}</label>
             <input type="datetime-local" name="event[${key}]"
               class="${baseClass}">
           </div>
@@ -96,7 +96,7 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
       default:
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${label}</label>
             <input type="text" name="event[${key}]" placeholder="${label}"
               class="${baseClass}">
           </div>
@@ -108,8 +108,8 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
     if (this.propertyMetadata.length === 0) return ''
 
     return `
-      <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
+      <div class="border-t border-line pt-6">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-2 gap-4">
           ${this.propertyMetadata.map(f => this.renderField(f)).join('')}
         </div>
@@ -130,12 +130,12 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
   }
 
   linkCheckboxesHTML(name, items) {
-    if (items.length === 0) return `<p class="text-sm text-slate-400">${translate("N/A")}</p>`
+    if (items.length === 0) return `<p class="text-sm text-muted-foreground">${translate("N/A")}</p>`
     return `
-      <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-lg p-3">
+      <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto border border-line rounded-lg p-3">
         ${items.map(item => `
-          <label class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
-            <input type="checkbox" name="event[${name}][]" value="${item.id}" class="h-4 w-4 rounded border-slate-300 text-blue-600 cursor-pointer">
+          <label class="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+            <input type="checkbox" name="event[${name}][]" value="${item.id}" class="h-4 w-4 rounded border-line text-primary cursor-pointer">
             <span class="truncate">${item.name || item.id}</span>
           </label>
         `).join('')}
@@ -144,7 +144,7 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
   }
 
   stockRowsHTML() {
-    const inputClass = 'w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none'
+    const inputClass = 'w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none'
     return `
       <div class="space-y-2" id="stock-rows">
         ${this.stockRows.map((row, index) => `
@@ -160,7 +160,7 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
               type="button"
               data-action="click->${this.identifier}#removeStockRow"
               data-${this.identifier}-index-param="${index}"
-              class="p-2 text-slate-400 hover:text-red-600 rounded-lg cursor-pointer">
+              class="p-2 text-muted-foreground hover:text-danger rounded-lg cursor-pointer">
               <span class="material-symbols-outlined text-[20px]">delete</span>
             </button>
           </div>
@@ -169,7 +169,7 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
       <button
         type="button"
         data-action="click->${this.identifier}#addStockRow"
-        class="mt-2 inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg cursor-pointer">
+        class="mt-2 inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg cursor-pointer">
         <span class="material-symbols-outlined text-[18px]">add</span>
         ${translate("Add stock")}
       </button>
@@ -213,25 +213,25 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Event")}</h2>
+        <h2 class="text-xl font-bold text-foreground">${translate("New Event")}</h2>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Category")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
             <select
               name="event[category_id]"
               data-action="change->${this.identifier}#onCategoryChange"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none"
             >
               ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), this.categoryId)}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Branch")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Branch")}</label>
             <select
               name="event[branch_id]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none"
             >
               <option value="">—</option>
               ${this.branches().map(b => `<option value="${b.id}">${b.name}</option>`).join('')}
@@ -239,43 +239,43 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Event Name")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Event Name")}</label>
             <input type="text" name="event[name]" required placeholder="${translate("e.g. Root Canal Treatment")}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Type")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Type")}</label>
             <select name="event[business_type]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${typeOptions}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Status")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Status")}</label>
             <select name="event[workflow_status]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${statusOptions}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Start At")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Start At")}</label>
             <input type="datetime-local" name="event[start_at]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("End At")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("End At")}</label>
             <input type="datetime-local" name="event[end_at]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Description")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Description")}</label>
             <textarea name="event[description]" rows="3"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground"></textarea>
           </div>
         </div>
 
@@ -283,36 +283,36 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
           ${this.dynamicFieldsHTML()}
         </div>
 
-        <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-          <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Customers")}</h3>
+        <div class="border-t border-line pt-6">
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Customers")}</h3>
           ${this.linkCheckboxesHTML("customer_ids", this.customers)}
         </div>
 
-        <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-          <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Employees")}</h3>
+        <div class="border-t border-line pt-6">
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Employees")}</h3>
           ${this.linkCheckboxesHTML("employee_ids", this.employees)}
         </div>
 
-        <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-          <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Services")}</h3>
+        <div class="border-t border-line pt-6">
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Services")}</h3>
           ${this.linkCheckboxesHTML("service_ids", this.services)}
         </div>
 
-        <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-          <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Facilities")}</h3>
+        <div class="border-t border-line pt-6">
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Facilities")}</h3>
           ${this.linkCheckboxesHTML("facility_ids", this.facilities)}
         </div>
 
-        <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-          <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Stocks")}</h3>
+        <div class="border-t border-line pt-6">
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Stocks")}</h3>
           <div id="stock-rows-container">
             ${this.stockRowsHTML()}
           </div>
         </div>
 
-        <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
+        <div class="flex justify-end pt-6 border-t border-line">
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm transition-colors cursor-pointer">
             ${translate("Save Event")}
           </button>
         </div>
@@ -325,7 +325,7 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
           ${form({
             action: Helpers.create_company_events_path(currentCompany().id),
             method: "POST",
-            attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false"`,
+            attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false"`,
             html: fields
           })}
         </div>

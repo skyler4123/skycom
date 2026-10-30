@@ -70,58 +70,58 @@ export default class Companies_AttendanceRequests_ShowController extends Compani
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div class="p-6 bg-card rounded-xl border border-line">
           <a href="${Helpers.company_attendance_requests_path(currentCompany().id)}"
-            class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6 cursor-pointer">
+            class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back")}
           </a>
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Attendance Request")}</h2>
+          <h2 class="text-2xl font-black text-foreground mb-6">${translate("Attendance Request")}</h2>
           <div class="grid grid-cols-2 gap-6">
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Employee")}</p>
-              <p class="text-sm font-semibold text-slate-900">${r.employee?.name || '—'}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Employee")}</p>
+              <p class="text-sm font-semibold text-foreground">${r.employee?.name || '—'}</p>
             </div>
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Date")}</p>
-              <p class="text-sm font-semibold text-slate-900">${this.formatDate(r.attendance_date)}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Date")}</p>
+              <p class="text-sm font-semibold text-foreground">${this.formatDate(r.attendance_date)}</p>
             </div>
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Check In")}</p>
-              <p class="text-sm font-semibold text-slate-900">${this.formatTime(r.check_in)}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Check In")}</p>
+              <p class="text-sm font-semibold text-foreground">${this.formatTime(r.check_in)}</p>
             </div>
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Check Out")}</p>
-              <p class="text-sm font-semibold text-slate-900">${this.formatTime(r.check_out)}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Check Out")}</p>
+              <p class="text-sm font-semibold text-foreground">${this.formatTime(r.check_out)}</p>
             </div>
             <div class="col-span-2">
-              <p class="text-xs font-medium text-slate-500">${translate("Reason")}</p>
-              <p class="text-sm font-semibold text-slate-900">${r.reason || '—'}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Reason")}</p>
+              <p class="text-sm font-semibold text-foreground">${r.reason || '—'}</p>
             </div>
             <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Status")}</p>
-              <p class="text-sm font-semibold text-slate-900">${Helpers.capitalize(r.status || '')}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Status")}</p>
+              <p class="text-sm font-semibold text-foreground">${Helpers.capitalize(r.status || '')}</p>
             </div>
             ${this.attendanceDay ? `
               <div>
-                <p class="text-xs font-medium text-slate-500">${translate("Attendance Day")}</p>
-                <p class="text-sm font-semibold text-slate-900">${this.formatDate(this.attendanceDay.attendance_date)} — ${Helpers.capitalize(this.attendanceDay.attendance_status || '')}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Attendance Day")}</p>
+                <p class="text-sm font-semibold text-foreground">${this.formatDate(this.attendanceDay.attendance_date)} — ${Helpers.capitalize(this.attendanceDay.attendance_status || '')}</p>
               </div>
             ` : ''}
           </div>
           ${r.status === 'pending' ? `
-            <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-gray-800">
+            <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-line">
               <button
                 type="button"
                 data-action="click->${this.identifier}#reject"
-                class="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg cursor-pointer"
+                class="px-4 py-2 text-sm font-medium text-danger hover:bg-danger/10 rounded-lg cursor-pointer"
               >
                 ${translate("Reject")}
               </button>
               <button
                 type="button"
                 data-action="click->${this.identifier}#approve"
-                class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold text-sm cursor-pointer"
+                class="px-6 py-2 bg-success hover:bg-success/90 text-success-foreground rounded-lg font-bold text-sm cursor-pointer"
               >
                 ${translate("Approve")}
               </button>

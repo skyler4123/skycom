@@ -31,10 +31,10 @@ export default class Companies_AttendanceConfigLogs_IndexController extends Comp
 
   actionBadge(action) {
     const colors = {
-      created: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-      updated: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+      created: 'bg-success/10 text-success ',
+      updated: 'bg-primary/10 text-primary '
     }
-    const color = colors[action] || 'bg-gray-100 text-gray-800'
+    const color = colors[action] || 'bg-muted text-foreground'
     return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}">${Helpers.capitalize(action || '')}</span>`
   }
 
@@ -53,43 +53,43 @@ export default class Companies_AttendanceConfigLogs_IndexController extends Comp
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6">${translate("Attendance Config Logs")}</h2>
+        <div class="p-4 bg-card rounded-xl border border-line flex flex-col">
+          <h2 class="text-xl font-bold text-foreground mb-6">${translate("Attendance Config Logs")}</h2>
           <form method="get" action="${pathname()}" class="flex flex-col lg:flex-row items-end gap-4 mb-6 w-full">
             <div class="flex flex-wrap items-end gap-3 w-full lg:w-auto">
               <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Config")}</label>
+                <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Config")}</label>
                 <select name="attendance_config_id"
-                  class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
                   ${selectOptionsHTML(cloneNewKey(this.filterOptions.attendance_configs || [], "id", "value"), configValue, translate("All Configs"))}
                 </select>
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Branch")}</label>
+                <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Branch")}</label>
                 <select name="branch_id"
-                  class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
                   ${selectOptionsHTML(cloneNewKey(this.filterOptions.branches || [], "id", "value"), branchValue, translate("All Branches"))}
                 </select>
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Action")}</label>
+                <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Action")}</label>
                 <select name="log_action"
-                  class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
                   ${selectOptionsHTML((this.filterOptions.actions || []).map(a => ({ value: a, name: Helpers.capitalize(a) })), actionValue, translate("All Actions"))}
                 </select>
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("From")}</label>
+                <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("From")}</label>
                 <input type="date" name="from" value="${fromValue}"
-                  class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+                  class="px-3 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground" />
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("To")}</label>
+                <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("To")}</label>
                 <input type="date" name="to" value="${toValue}"
-                  class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+                  class="px-3 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground" />
               </div>
               <div class="flex gap-2 mt-auto">
-                <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
+                <button type="submit" class="h-[38px] px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
                   <span class="material-symbols-outlined text-[18px]!">search</span>
                   ${translate("Search")}
                 </button>
@@ -99,7 +99,7 @@ export default class Companies_AttendanceConfigLogs_IndexController extends Comp
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
-                <tr class="text-sm text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                <tr class="text-sm text-muted-foreground border-b border-line">
                   <th class="py-4 px-6 font-medium">${translate("When")}</th>
                   <th class="py-4 px-6 font-medium">${translate("Branch")}</th>
                   <th class="py-4 px-6 font-medium">${translate("Action")}</th>
@@ -109,18 +109,18 @@ export default class Companies_AttendanceConfigLogs_IndexController extends Comp
                   <th class="py-4 px-6 text-right font-medium">${translate("Actions")}</th>
                 </tr>
               </thead>
-              <tbody data-${this.identifier}-target="logsList" class="divide-y divide-slate-200 dark:divide-slate-800">
+              <tbody data-${this.identifier}-target="logsList" class="divide-y divide-line">
                 ${this.logs.map(l => `
-                  <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td class="py-4 px-6 text-sm text-slate-600">${this.formatDateTime(l.created_at)}</td>
-                    <td class="py-4 px-6 text-sm font-medium text-slate-900 dark:text-white">${l.branch?.name || '—'}</td>
+                  <tr class="hover:bg-muted/50">
+                    <td class="py-4 px-6 text-sm text-muted-foreground">${this.formatDateTime(l.created_at)}</td>
+                    <td class="py-4 px-6 text-sm font-medium text-foreground">${l.branch?.name || '—'}</td>
                     <td class="py-4 px-6 text-sm">${this.actionBadge(l.action)}</td>
-                    <td class="py-4 px-6 text-sm text-slate-600">${l.employee?.name || '—'}</td>
-                    <td class="py-4 px-6 text-sm text-slate-600">${l.allowed_radius_meters ?? '—'}</td>
-                    <td class="py-4 px-6 text-sm text-slate-600">${l.resolution_strategy ?? '—'}</td>
+                    <td class="py-4 px-6 text-sm text-muted-foreground">${l.employee?.name || '—'}</td>
+                    <td class="py-4 px-6 text-sm text-muted-foreground">${l.allowed_radius_meters ?? '—'}</td>
+                    <td class="py-4 px-6 text-sm text-muted-foreground">${l.resolution_strategy ?? '—'}</td>
                     <td class="py-4 px-6 text-sm text-right">
                       <a href="${Helpers.company_attendance_config_log_path(currentCompany().id, l.id)}"
-                        class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
+                        class="inline-flex items-center justify-center p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer">
                         <span class="material-symbols-outlined text-[20px]">visibility</span>
                       </a>
                     </td>

@@ -31,7 +31,7 @@ export default class Companies_DiscountGroups_EditController extends Companies_L
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Campaign not found.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Campaign not found.")}</div>`
           return true
         }
         return false
@@ -40,11 +40,11 @@ export default class Companies_DiscountGroups_EditController extends Companies_L
   }
 
   baseClass() {
-    return "w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+    return "w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none"
   }
 
   labelClass() {
-    return "text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider"
+    return "text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
   }
 
   currencies() {
@@ -94,8 +94,8 @@ export default class Companies_DiscountGroups_EditController extends Companies_L
     // hint — the rich New page converts dollars→cents FE-side instead.
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Campaign")}</h2>
-        <p class="text-sm text-slate-500 dark:text-slate-400">${g.name}</p>
+        <h2 class="text-xl font-bold text-foreground">${translate("Edit Campaign")}</h2>
+        <p class="text-sm text-muted-foreground">${g.name}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
@@ -111,7 +111,7 @@ export default class Companies_DiscountGroups_EditController extends Companies_L
           <div class="space-y-1">
             <label class="${label}">${translate("Type")}</label>
             <input type="text" value="${g.discount_type === "percentage" ? translate("Percentage (%)") : translate("Fixed Amount")}" disabled
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-sm text-slate-400">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-background text-sm text-muted-foreground">
           </div>
 
           ${this.conditionalFieldsHTML()}
@@ -153,11 +153,11 @@ export default class Companies_DiscountGroups_EditController extends Companies_L
 
         <div class="flex justify-end gap-3 pt-2">
           <a href="${Helpers.company_discount_group_path(companyId, g.id)}"
-            class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
+            class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg cursor-pointer">
             ${translate("Cancel")}
           </a>
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer">
             ${translate("Save Changes")}
           </button>
         </div>
@@ -168,7 +168,7 @@ export default class Companies_DiscountGroups_EditController extends Companies_L
         ${form({
           action: Helpers.company_discount_group_path(companyId, g.id),
           method: "PATCH",
-          attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false" novalidate`,
+          attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false" novalidate`,
           html: fields
         })}
       </div>`

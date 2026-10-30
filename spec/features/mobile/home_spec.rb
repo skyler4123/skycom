@@ -45,8 +45,8 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
     click_button "Clock In"
 
     expect(page).to have_content("Checked in successfully")
-    expect(page).to have_content("Checked In")
-    expect(page).not_to have_button("Clock In")
+    expect(page).to have_css("[data-check-in-status='checked_in']")
+    expect(page).to have_button("Check In Again")
   end
 
   scenario "redirects to mobile sign-in for unauthenticated user" do

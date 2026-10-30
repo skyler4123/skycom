@@ -149,12 +149,12 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
     if (a.image) {
       return `
         <a href="${a.url}" target="_blank" class="block shrink-0 cursor-pointer">
-          <img src="${a.url}" alt="${filename}" class="w-24 h-24 object-cover rounded-lg border border-slate-200 dark:border-slate-700">
+          <img src="${a.url}" alt="${filename}" class="w-24 h-24 object-cover rounded-lg border border-line">
         </a>`
     }
     return `
       <a href="${a.url}" target="_blank"
-        class="flex items-center gap-2 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer shrink-0">
+        class="flex items-center gap-2 px-3 py-2 border border-line rounded-lg text-sm text-muted-foreground hover:bg-muted cursor-pointer shrink-0">
         <span class="material-symbols-outlined text-[20px]">description</span>
         <span class="max-w-[160px] truncate">${filename}</span>
       </a>`
@@ -164,7 +164,7 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
     const t = this.ticket
     const btn = (action, label, primary) => `
       <button type="button" data-action="click->${this.identifier}#${action}"
-        class="px-4 py-2 rounded-lg font-medium text-sm cursor-pointer ${primary ? "bg-blue-600 hover:bg-blue-700 text-white" : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"}">
+        class="px-4 py-2 rounded-lg font-medium text-sm cursor-pointer ${primary ? "bg-primary hover:bg-primary/90 text-primary-foreground" : "text-muted-foreground hover:bg-muted"}">
         ${label}
       </button>`
     if (!t.assigned_user) return btn("pickUp", "Pick Up", true)
@@ -175,21 +175,21 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
 
   contentHTML() {
     const t = this.ticket
-    if (!t) return `<div class="p-8 text-center text-slate-500 dark:text-slate-400">Ticket not found.</div>`
+    if (!t) return `<div class="p-8 text-center text-muted-foreground">Ticket not found.</div>`
 
     const comments = (t.comments || []).map((c) => `
-      <div class="flex flex-col gap-1 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0">
+      <div class="flex flex-col gap-1 py-4 border-b border-line last:border-0">
         <div class="flex items-center gap-2">
-          <span class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(c.author_name) || this.humanize(c.author_type)}</span>
-          ${c.author_type === "User" ? `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">Skycom Support</span>` : ""}
-          <span class="text-xs text-slate-400">${c.created_at ? Helpers.timeFormat(c.created_at) : ""}</span>
+          <span class="text-sm font-bold text-foreground">${escapeHtml(c.author_name) || this.humanize(c.author_type)}</span>
+          ${c.author_type === "User" ? `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-primary/10 text-primary ">Skycom Support</span>` : ""}
+          <span class="text-xs text-muted-foreground">${c.created_at ? Helpers.timeFormat(c.created_at) : ""}</span>
         </div>
-        <p class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line">${escapeHtml(c.message)}</p>
+        <p class="text-sm text-foreground whitespace-pre-line">${escapeHtml(c.message)}</p>
         ${(c.attachments || []).length > 0 ? `<div class="flex flex-wrap gap-2 mt-2">${c.attachments.map((a) => this.attachmentHTML(a)).join("")}</div>` : ""}
       </div>`).join("")
 
     const logs = (t.logs || []).map((l) => `
-      <div class="flex items-center gap-2 py-1.5 text-xs text-slate-500 dark:text-slate-400">
+      <div class="flex items-center gap-2 py-1.5 text-xs text-muted-foreground">
         <span class="material-symbols-outlined text-[16px]">history</span>
         <span>${this.humanize(l.action)}${l.from_status ? ` (${l.from_status} → ${l.to_status})` : ""}</span>
         ${l.note ? `<span class="truncate">— ${escapeHtml(l.note)}</span>` : ""}
@@ -198,9 +198,9 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div class="p-6 bg-card rounded-xl border border-line">
           <a href="${Helpers.admin_company_tickets_path()}"
-            class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6 cursor-pointer">
+            class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             Back to Support Pool
           </a>
@@ -208,48 +208,48 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
           <div class="flex items-center gap-2 mb-2">
             ${Helpers.statusBadge(t.status || "open")}
             ${Helpers.statusBadge(t.priority || "medium")}
-            <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${this.humanize(t.ticket_category)}</span>
+            <span class="font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium">${this.humanize(t.ticket_category)}</span>
           </div>
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white">${escapeHtml(t.name)}</h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${escapeHtml(t.company?.name) || ""}</p>
-          <p class="text-sm text-slate-700 dark:text-slate-300 mt-4 whitespace-pre-line">${escapeHtml(t.description)}</p>
+          <h2 class="text-2xl font-black text-foreground">${escapeHtml(t.name)}</h2>
+          <p class="text-xs text-muted-foreground mt-1">${escapeHtml(t.company?.name) || ""}</p>
+          <p class="text-sm text-foreground mt-4 whitespace-pre-line">${escapeHtml(t.description)}</p>
 
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 text-sm">
-            <div><p class="text-xs font-medium text-slate-500 dark:text-slate-400">Assignee</p><p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(t.assigned_user?.name || t.assigned_user?.email) || "—"}</p></div>
-            <div><p class="text-xs font-medium text-slate-500 dark:text-slate-400">Raised by</p><p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(t.employee?.name) || "—"}</p></div>
-            <div><p class="text-xs font-medium text-slate-500 dark:text-slate-400">First response (UTC)</p><p class="font-semibold text-slate-900 dark:text-white">${t.first_responded_at ? Helpers.timeFormat(t.first_responded_at) : "—"}</p></div>
-            <div><p class="text-xs font-medium text-slate-500 dark:text-slate-400">Rating</p><p class="font-semibold text-slate-900 dark:text-white">${t.rate ? `${t.rate} / 5` : "—"}</p></div>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-6 pt-6 border-t border-line text-sm">
+            <div><p class="text-xs font-medium text-muted-foreground">Assignee</p><p class="font-semibold text-foreground">${escapeHtml(t.assigned_user?.name || t.assigned_user?.email) || "—"}</p></div>
+            <div><p class="text-xs font-medium text-muted-foreground">Raised by</p><p class="font-semibold text-foreground">${escapeHtml(t.employee?.name) || "—"}</p></div>
+            <div><p class="text-xs font-medium text-muted-foreground">First response (UTC)</p><p class="font-semibold text-foreground">${t.first_responded_at ? Helpers.timeFormat(t.first_responded_at) : "—"}</p></div>
+            <div><p class="text-xs font-medium text-muted-foreground">Rating</p><p class="font-semibold text-foreground">${t.rate ? `${t.rate} / 5` : "—"}</p></div>
           </div>
 
           <div class="flex gap-2 mt-6">
             ${this.actionButtons()}
             <button type="button" data-action="click->${this.identifier}#refreshView"
-              class="px-4 py-2 rounded-lg font-medium text-sm cursor-pointer text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+              class="px-4 py-2 rounded-lg font-medium text-sm cursor-pointer text-muted-foreground hover:bg-muted">
               Refresh
             </button>
           </div>
 
-          <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Activity</h3>
+          <div class="mt-6 pt-6 border-t border-line">
+            <h3 class="text-sm font-bold text-muted-foreground uppercase mb-2">Activity</h3>
             ${logs}
           </div>
 
-          <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Comments</h3>
-            ${comments || `<p class="text-sm text-slate-400">No comments yet</p>`}
+          <div class="mt-6 pt-6 border-t border-line">
+            <h3 class="text-sm font-bold text-muted-foreground uppercase mb-2">Comments</h3>
+            ${comments || `<p class="text-sm text-muted-foreground">No comments yet</p>`}
           </div>
 
           <form data-action="submit->${this.identifier}#handleCommentSubmit" class="mt-4 space-y-3">
             <textarea name="company_ticket_comment[message]" rows="3" required placeholder="Reply as Skycom support"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground"></textarea>
             <div class="flex items-center justify-between gap-3">
               <div class="flex flex-col gap-1">
                 <input type="file" name="company_ticket_comment[file_attachments][]"
                   accept="image/png,image/jpeg,.xls,.xlsx"
-                  class="text-sm text-slate-500 dark:text-slate-400 cursor-pointer">
-                <span class="text-xs text-slate-400">1 image (PNG/JPEG, up to 2MB) or 1 Excel file (up to 1MB)</span>
+                  class="text-sm text-muted-foreground cursor-pointer">
+                <span class="text-xs text-muted-foreground">1 image (PNG/JPEG, up to 2MB) or 1 Excel file (up to 1MB)</span>
               </div>
-              <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm cursor-pointer">Post Comment</button>
+              <button type="submit" class="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm cursor-pointer">Post Comment</button>
             </div>
           </form>
         </div>

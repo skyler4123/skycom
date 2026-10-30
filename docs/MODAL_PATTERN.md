@@ -85,23 +85,23 @@ export default class Companies_Branches_NewModalController extends Controller {
   modalHTML() {
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">New Branch</h2>
+        <h2 class="text-xl font-bold text-foreground">New Branch</h2>
         
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Branch Name</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">Branch Name</label>
             <input type="text" name="branch[name]" required placeholder="e.g. Main Street Store"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
           </div>
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" data-action="click->modal#close" 
-            class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg">
+            class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg">
             Cancel
           </button>
           <button type="submit" 
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm">
             Save Branch
           </button>
         </div>
@@ -110,7 +110,7 @@ export default class Companies_Branches_NewModalController extends Controller {
 
     return form({
       attributes: `
-        class="p-8 bg-white dark:bg-slate-900 rounded-2xl w-[500px] shadow-2xl"
+        class="p-8 bg-card rounded-2xl w-[500px] shadow-2xl"
         data-action="submit->${this.identifier}#handleSubmit"
       `,
       html: fields
@@ -156,18 +156,18 @@ export default class Companies_Employees_ShowModalController extends Controller 
 
     return `
       <div class="flex items-center justify-center">
-        <div class="relative w-full max-w-[640px] overflow-hidden rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-2xl">
+        <div class="relative w-full max-w-[640px] overflow-hidden rounded-xl bg-card border border-line shadow-2xl">
           
-          <div class="flex items-center justify-between border-b border-slate-200 dark:border-gray-800 px-6 py-4">
-            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Employee Details</h3>
-            <button data-action="click->${this.identifier}#close" class="rounded-full p-2 text-slate-500">
+          <div class="flex items-center justify-between border-b border-line px-6 py-4">
+            <h3 class="text-xl font-bold text-foreground">Employee Details</h3>
+            <button data-action="click->${this.identifier}#close" class="rounded-full p-2 text-muted-foreground">
               <span class="material-symbols-outlined">close</span>
             </button>
           </div>
 
           <div class="p-6">
-            <p class="text-lg font-semibold text-slate-900 dark:text-white">${e.name}</p>
-            <p class="text-sm text-slate-500">${e.email}</p>
+            <p class="text-lg font-semibold text-foreground">${e.name}</p>
+            <p class="text-sm text-muted-foreground">${e.email}</p>
           </div>
           
         </div>
@@ -223,7 +223,7 @@ form({
   action: Helpers.company_employees_path(companyId),
   method: "POST",
   attributes: `
-    class="p-8 bg-white dark:bg-slate-900 rounded-2xl w-[500px] shadow-2xl"
+    class="p-8 bg-card rounded-2xl w-[500px] shadow-2xl"
     data-action="submit->${this.identifier}#handleSubmit"
   `,
   html: fields
@@ -261,7 +261,7 @@ In your index controller's `contentHTML()`, hook the button to the action:
 <button
   type="button"
   data-action="click->${this.identifier}#openNewModal"
-  class="px-4 py-2 bg-blue-600 text-white rounded-lg">
+  class="px-4 py-2 bg-primary text-primary-foreground rounded-lg">
   Add Employee
 </button>
 ```
@@ -272,7 +272,7 @@ For table rows with params:
 <button
   data-action="click->${this.identifier}#openShowModal"
   data-${this.identifier}-employee-id-param="${employee.id}"
-  class="p-2 text-slate-500 hover:text-blue-600">
+  class="p-2 text-muted-foreground hover:text-primary">
   <span class="material-symbols-outlined text-[20px]">edit</span>
 </button>
 ```

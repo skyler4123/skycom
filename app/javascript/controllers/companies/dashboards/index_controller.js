@@ -1,5 +1,6 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import ApexCharts from "apexcharts"
+import { chartPalette, chartGridColor } from "controllers/helpers/chart_colors"
 
 export default class Companies_Dashboards_IndexController extends Companies_LayoutController {
   static targets = ["companyDetails", "chartsContainer"]
@@ -49,7 +50,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
       { key: "employees", label: translate("Employees"), icon: "badge" },
     ]
 
-    const colors = ["#008FFB", "#00E396", "#FEB019", "#FF4560", "#775DD0", "#546E7A", "#26a69a", "#D10CE8"]
+    const colors = chartPalette(8)
 
     resources.forEach(({ key, label }) => {
       const data = this.counts?.[key] || {}
@@ -60,7 +61,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
       if (!container) return
 
       if (categories.length === 0) {
-        container.innerHTML = `<div class="flex items-center justify-center h-[200px] text-slate-400 dark:text-slate-500 text-sm">${translate("No data")}</div>`
+        container.innerHTML = `<div class="flex items-center justify-center h-[200px] text-muted-foreground text-sm">${translate("No data")}</div>`
         return
       }
 
@@ -99,7 +100,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
           tickAmount: 4,
         },
         grid: {
-          borderColor: "#e2e8f0",
+          borderColor: chartGridColor(),
           strokeDashArray: 4,
           xaxis: { lines: { show: false } },
         },
@@ -128,15 +129,15 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
 
     const statusBadge = (status) => {
       const colors = {
-        active: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-        inactive: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
-        suspended: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-        draft: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
-        pending: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-        confirmed: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-        completed: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-        paid: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-        cancelled: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+        active: "bg-success/10 text-success ",
+        inactive: "bg-muted text-muted-foreground ",
+        suspended: "bg-warning/10 text-warning ",
+        draft: "bg-muted text-muted-foreground ",
+        pending: "bg-primary/10 text-primary ",
+        confirmed: "bg-success/10 text-success ",
+        completed: "bg-success/10 text-success ",
+        paid: "bg-success/10 text-success ",
+        cancelled: "bg-danger/10 text-danger ",
       }
       const s = status || "inactive"
       return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${colors[s] || colors.inactive}">${s.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}</span>`
@@ -144,12 +145,12 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
 
     const businessTypeBadge = (type) => {
       const colors = {
-        retail: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-        restaurant: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-        hospital: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400",
-        education: "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
-        hotel: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400",
-        fitness: "bg-lime-100 text-lime-700 dark:bg-lime-900/30 dark:text-lime-400",
+        retail: "bg-primary/10 text-primary ",
+        restaurant: "bg-warning/10 text-warning ",
+        hospital: "bg-danger/10 text-danger ",
+        education: "bg-info/10 text-info ",
+        hotel: "bg-primary/10 text-primary ",
+        fitness: "bg-success/10 text-success ",
       }
       const t = type || "retail"
       return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${colors[t] || colors.retail}">${t.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}</span>`
@@ -158,17 +159,17 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     return `
       <div class="p-4 overflow-y-auto space-y-6">
         <!-- Company Profile Card -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="bg-card rounded-xl border border-line shadow-sm">
           <div class="p-6">
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div class="flex items-center gap-4">
-                <div class="size-14 shrink-0 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <span class="material-symbols-outlined text-3xl text-blue-600 dark:text-blue-400">business</span>
+                <div class="size-14 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-3xl text-primary">business</span>
                 </div>
                 <div>
-                  <h2 class="text-2xl font-black text-slate-900 dark:text-white">${c?.name || translate("Company")}</h2>
+                  <h2 class="text-2xl font-black text-foreground">${c?.name || translate("Company")}</h2>
                   <div class="flex flex-wrap items-center gap-2 mt-1">
-                    ${c?.code ? `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500 dark:text-slate-400">${c.code}</span>` : ""}
+                    ${c?.code ? `<span class="font-mono text-xs bg-muted px-2 py-0.5 rounded text-muted-foreground">${c.code}</span>` : ""}
                     ${businessTypeBadge(c?.business_type)}
                     ${c?.workflow_status ? statusBadge(c.workflow_status) : ""}
                     ${c?.lifecycle_status ? statusBadge(c.lifecycle_status) : ""}
@@ -177,77 +178,77 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 pt-6 border-t border-line">
               <div class="flex items-center gap-3">
-                <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                <div class="size-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                   <span class="material-symbols-outlined text-[18px]!">location_on</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Address")}</p>
-                  <p class="text-sm text-slate-900 dark:text-white truncate">${[c?.address_line_1, c?.city, c?.postal_code].filter(Boolean).join(", ") || "—"}</p>
+                  <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Address")}</p>
+                  <p class="text-sm text-foreground truncate">${[c?.address_line_1, c?.city, c?.postal_code].filter(Boolean).join(", ") || "—"}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
-                <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                <div class="size-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                   <span class="material-symbols-outlined text-[18px]!">call</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Phone")}</p>
-                  <p class="text-sm text-slate-900 dark:text-white">${c?.phone_number || "—"}</p>
+                  <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Phone")}</p>
+                  <p class="text-sm text-foreground">${c?.phone_number || "—"}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
-                <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                <div class="size-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                   <span class="material-symbols-outlined text-[18px]!">mail</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Email")}</p>
-                  <p class="text-sm text-slate-900 dark:text-white truncate">${c?.email || "—"}</p>
+                  <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Email")}</p>
+                  <p class="text-sm text-foreground truncate">${c?.email || "—"}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
-                <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                <div class="size-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                   <span class="material-symbols-outlined text-[18px]!">language</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Website")}</p>
-                  <p class="text-sm text-slate-900 dark:text-white truncate">${c?.website || "—"}</p>
+                  <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Website")}</p>
+                  <p class="text-sm text-foreground truncate">${c?.website || "—"}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
-                <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                <div class="size-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                   <span class="material-symbols-outlined text-[18px]!">currency_exchange</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Currency")}</p>
-                  <p class="text-sm text-slate-900 dark:text-white uppercase">${c?.currency || "—"}</p>
+                  <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Currency")}</p>
+                  <p class="text-sm text-foreground uppercase">${c?.currency || "—"}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
-                <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                <div class="size-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                   <span class="material-symbols-outlined text-[18px]!">schedule</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Timezone")}</p>
-                  <p class="text-sm text-slate-900 dark:text-white">${(() => { if (!c?.timezone) return "—"; const m = c.timezone.match(/minus_(\d+)/); if (m) return `UTC-${m[1]}`; const p = c.timezone.match(/plus_(\d+)/); if (p) return `UTC+${p[1]}`; return c.timezone === "utc" ? "UTC" : c.timezone; })()}</p>
+                  <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Timezone")}</p>
+                  <p class="text-sm text-foreground">${(() => { if (!c?.timezone) return "—"; const m = c.timezone.match(/minus_(\d+)/); if (m) return `UTC-${m[1]}`; const p = c.timezone.match(/plus_(\d+)/); if (p) return `UTC+${p[1]}`; return c.timezone === "utc" ? "UTC" : c.timezone; })()}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
-                <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                <div class="size-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                   <span class="material-symbols-outlined text-[18px]!">person</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Owner")}</p>
-                  <p class="text-sm text-slate-900 dark:text-white truncate">${c?.owner ? `${c.owner.first_name || ""} ${c.owner.last_name || ""}`.trim() || c.owner.email : "—"}</p>
+                  <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Owner")}</p>
+                  <p class="text-sm text-foreground truncate">${c?.owner ? `${c.owner.first_name || ""} ${c.owner.last_name || ""}`.trim() || c.owner.email : "—"}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
-                <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                <div class="size-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
                   <span class="material-symbols-outlined text-[18px]!">calendar_today</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Created")}</p>
-                  <p class="text-sm text-slate-900 dark:text-white">${c?.created_at ? new Date(c.created_at).toLocaleDateString() : "—"}</p>
+                  <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Created")}</p>
+                  <p class="text-sm text-foreground">${c?.created_at ? new Date(c.created_at).toLocaleDateString() : "—"}</p>
                 </div>
               </div>
             </div>
@@ -257,13 +258,13 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
         <!-- Charts Grid -->
         <div data-${this.identifier}-target="chartsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           ${resources.map(({ key, label, icon }) => `
-            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
+            <div class="bg-card rounded-xl border border-line p-4">
               <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 text-[20px]">${icon}</span>
-                  <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">${label}</h3>
+                  <span class="material-symbols-outlined text-muted-foreground text-[20px]">${icon}</span>
+                  <h3 class="text-sm font-bold text-foreground">${label}</h3>
                 </div>
-                <span class="text-xs font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">${total(key)}</span>
+                <span class="text-xs font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-md">${total(key)}</span>
               </div>
               <div data-chart="${key}"></div>
             </div>

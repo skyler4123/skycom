@@ -129,12 +129,12 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
     if (a.image) {
       return `
         <a href="${a.url}" target="_blank" class="block shrink-0 cursor-pointer">
-          <img src="${a.url}" alt="${filename}" class="w-24 h-24 object-cover rounded-lg border border-slate-200 dark:border-slate-700">
+          <img src="${a.url}" alt="${filename}" class="w-24 h-24 object-cover rounded-lg border border-line">
         </a>`
     }
     return `
       <a href="${a.url}" target="_blank"
-        class="flex items-center gap-2 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer shrink-0">
+        class="flex items-center gap-2 px-3 py-2 border border-line rounded-lg text-sm text-muted-foreground hover:bg-muted cursor-pointer shrink-0">
         <span class="material-symbols-outlined text-[20px]">description</span>
         <span class="max-w-[160px] truncate">${filename}</span>
       </a>`
@@ -142,21 +142,21 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
 
   contentHTML() {
     const t = this.ticket
-    if (!t) return `<div class="p-8 text-center text-slate-500">${translate("Ticket not found.")}</div>`
+    if (!t) return `<div class="p-8 text-center text-muted-foreground">${translate("Ticket not found.")}</div>`
 
     const comments = (t.comments || []).map((c) => `
-      <div class="flex flex-col gap-1 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0">
+      <div class="flex flex-col gap-1 py-4 border-b border-line last:border-0">
         <div class="flex items-center gap-2">
-          <span class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(c.author_name) || this.humanize(c.author_type)}</span>
-          ${c.author_type === "User" ? `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">${translate("Skycom Support")}</span>` : ""}
-          <span class="text-xs text-slate-400">${c.created_at ? new Date(c.created_at).toLocaleString() : ""}</span>
+          <span class="text-sm font-bold text-foreground">${escapeHtml(c.author_name) || this.humanize(c.author_type)}</span>
+          ${c.author_type === "User" ? `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-primary/10 text-primary ">${translate("Skycom Support")}</span>` : ""}
+          <span class="text-xs text-muted-foreground">${c.created_at ? new Date(c.created_at).toLocaleString() : ""}</span>
         </div>
-        <p class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line">${escapeHtml(c.message)}</p>
+        <p class="text-sm text-foreground whitespace-pre-line">${escapeHtml(c.message)}</p>
         ${(c.attachments || []).length > 0 ? `<div class="flex flex-wrap gap-2 mt-2">${c.attachments.map((a) => this.attachmentHTML(a)).join("")}</div>` : ""}
       </div>`).join("")
 
     const logs = (t.logs || []).map((l) => `
-      <div class="flex items-center gap-2 py-1.5 text-xs text-slate-500 dark:text-slate-400">
+      <div class="flex items-center gap-2 py-1.5 text-xs text-muted-foreground">
         <span class="material-symbols-outlined text-[16px]">history</span>
         <span>${this.humanize(l.action)}${l.from_status ? ` (${l.from_status} → ${l.to_status})` : ""}</span>
         ${l.note ? `<span class="truncate">— ${escapeHtml(l.note)}</span>` : ""}
@@ -164,23 +164,23 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
       </div>`).join("")
 
     const ratingBlock = t.rate
-      ? `<p class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 text-sm text-slate-600 dark:text-slate-300">${translate("Your rating")}: <span class="font-bold text-slate-900 dark:text-white">${t.rate} / 5</span></p>`
+      ? `<p class="mt-6 pt-6 border-t border-line text-sm text-muted-foreground">${translate("Your rating")}: <span class="font-bold text-foreground">${t.rate} / 5</span></p>`
       : (t.can_rate
         ? `
-        <form data-action="submit->${this.identifier}#handleRateSubmit" class="flex items-center gap-3 mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-          <label class="text-sm font-medium text-slate-600 dark:text-slate-300">${translate("Rate this ticket")}</label>
-          <select name="company_ticket[rate]" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+        <form data-action="submit->${this.identifier}#handleRateSubmit" class="flex items-center gap-3 mt-6 pt-6 border-t border-line">
+          <label class="text-sm font-medium text-muted-foreground">${translate("Rate this ticket")}</label>
+          <select name="company_ticket[rate]" class="px-3 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
             ${[1, 2, 3, 4, 5].map((v) => `<option value="${v}">${v}</option>`).join("")}
           </select>
-          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm cursor-pointer">${translate("Rate")}</button>
+          <button type="submit" class="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm cursor-pointer">${translate("Rate")}</button>
         </form>`
         : "")
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div class="p-6 bg-card rounded-xl border border-line">
           <a href="${Helpers.company_company_tickets_path(currentCompany().id)}"
-            class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6 cursor-pointer">
+            class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back to Support Tickets")}
           </a>
@@ -188,46 +188,46 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
           <div class="flex items-center gap-2 mb-2">
             ${Helpers.statusBadge(t.status || "open")}
             ${Helpers.statusBadge(t.priority || "medium")}
-            <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${this.humanize(t.ticket_category)}</span>
+            <span class="font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium">${this.humanize(t.ticket_category)}</span>
           </div>
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white">${escapeHtml(t.name)}</h2>
-          <p class="text-sm text-slate-700 dark:text-slate-300 mt-4 whitespace-pre-line">${escapeHtml(t.description)}</p>
+          <h2 class="text-2xl font-black text-foreground">${escapeHtml(t.name)}</h2>
+          <p class="text-sm text-foreground mt-4 whitespace-pre-line">${escapeHtml(t.description)}</p>
 
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 text-sm">
-            <div><p class="text-xs font-medium text-slate-500">${translate("Assignee")}</p><p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(t.assigned_user?.name || t.assigned_user?.email) || "—"}</p></div>
-            <div><p class="text-xs font-medium text-slate-500">${translate("Raised by")}</p><p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(t.employee?.name) || "—"}</p></div>
-            <div><p class="text-xs font-medium text-slate-500">${translate("Created")}</p><p class="font-semibold text-slate-900 dark:text-white">${t.created_at ? new Date(t.created_at).toLocaleString() : "—"}</p></div>
-            <div><p class="text-xs font-medium text-slate-500">${translate("First response")}</p><p class="font-semibold text-slate-900 dark:text-white">${t.first_responded_at ? new Date(t.first_responded_at).toLocaleString() : "—"}</p></div>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-6 pt-6 border-t border-line text-sm">
+            <div><p class="text-xs font-medium text-muted-foreground">${translate("Assignee")}</p><p class="font-semibold text-foreground">${escapeHtml(t.assigned_user?.name || t.assigned_user?.email) || "—"}</p></div>
+            <div><p class="text-xs font-medium text-muted-foreground">${translate("Raised by")}</p><p class="font-semibold text-foreground">${escapeHtml(t.employee?.name) || "—"}</p></div>
+            <div><p class="text-xs font-medium text-muted-foreground">${translate("Created")}</p><p class="font-semibold text-foreground">${t.created_at ? new Date(t.created_at).toLocaleString() : "—"}</p></div>
+            <div><p class="text-xs font-medium text-muted-foreground">${translate("First response")}</p><p class="font-semibold text-foreground">${t.first_responded_at ? new Date(t.first_responded_at).toLocaleString() : "—"}</p></div>
           </div>
 
           ${(t.attachments || []).length > 0 ? `
-            <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-              <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-3">${translate("Attachments")}</h3>
+            <div class="mt-6 pt-6 border-t border-line">
+              <h3 class="text-sm font-bold text-muted-foreground uppercase mb-3">${translate("Attachments")}</h3>
               <div class="flex flex-wrap gap-2">${t.attachments.map((a) => this.attachmentHTML(a)).join("")}</div>
             </div>` : ""}
 
-          <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">${translate("Activity")}</h3>
+          <div class="mt-6 pt-6 border-t border-line">
+            <h3 class="text-sm font-bold text-muted-foreground uppercase mb-2">${translate("Activity")}</h3>
             ${logs}
           </div>
 
-          <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">${translate("Comments")}</h3>
-            ${comments || `<p class="text-sm text-slate-400">${translate("No comments yet")}</p>`}
+          <div class="mt-6 pt-6 border-t border-line">
+            <h3 class="text-sm font-bold text-muted-foreground uppercase mb-2">${translate("Comments")}</h3>
+            ${comments || `<p class="text-sm text-muted-foreground">${translate("No comments yet")}</p>`}
           </div>
 
           <form data-action="submit->${this.identifier}#handleCommentSubmit" class="mt-4 space-y-3">
             <input type="hidden" name="company_ticket_comment[company_ticket_id]" value="${t.id}">
             <textarea name="company_ticket_comment[message]" rows="3" required placeholder="${translate("Add a comment")}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground"></textarea>
             <div class="flex items-center justify-between gap-3">
               <div class="flex flex-col gap-1">
                 <input type="file" name="company_ticket_comment[file_attachments][]"
                   accept="image/png,image/jpeg,.xls,.xlsx"
-                  class="text-sm text-slate-500 dark:text-slate-400 cursor-pointer">
-                <span class="text-xs text-slate-400">${translate("1 image (PNG/JPEG, up to 2MB) or 1 Excel file (up to 1MB)")}</span>
+                  class="text-sm text-muted-foreground cursor-pointer">
+                <span class="text-xs text-muted-foreground">${translate("1 image (PNG/JPEG, up to 2MB) or 1 Excel file (up to 1MB)")}</span>
               </div>
-              <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm cursor-pointer">${translate("Post Comment")}</button>
+              <button type="submit" class="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm cursor-pointer">${translate("Post Comment")}</button>
             </div>
           </form>
 

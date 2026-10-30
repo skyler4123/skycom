@@ -33,7 +33,7 @@ export default class Companies_CustomerProfiles_NewController extends Companies_
   }
 
   renderField({ key, label, type }) {
-    const baseClass = 'w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500'
+    const baseClass = 'w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground'
 
     switch (type) {
       case 'boolean':
@@ -41,15 +41,15 @@ export default class Companies_CustomerProfiles_NewController extends Companies_
           <div class="flex items-center gap-3 py-2">
             <input type="hidden" name="customer_profile[${key}]" value="false">
             <input type="checkbox" name="customer_profile[${key}]" value="true"
-              class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer">
-            <span class="text-sm text-slate-900 dark:text-white">${label}</span>
+              class="h-5 w-5 rounded border-line text-primary cursor-pointer">
+            <span class="text-sm text-foreground">${label}</span>
           </div>
         `
       case 'integer':
       case 'decimal':
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${label}</label>
             <input type="number" name="customer_profile[${key}]" step="${type === 'decimal' ? '0.01' : '1'}" placeholder="${label}"
               class="${baseClass}">
           </div>
@@ -57,7 +57,7 @@ export default class Companies_CustomerProfiles_NewController extends Companies_
       case 'datetime':
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${label}</label>
             <input type="datetime-local" name="customer_profile[${key}]"
               class="${baseClass}">
           </div>
@@ -65,7 +65,7 @@ export default class Companies_CustomerProfiles_NewController extends Companies_
       default:
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${label}</label>
             <input type="text" name="customer_profile[${key}]" placeholder="${label}"
               class="${baseClass}">
           </div>
@@ -77,8 +77,8 @@ export default class Companies_CustomerProfiles_NewController extends Companies_
     if (this.propertyMetadata.length === 0) return ''
 
     return `
-      <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
+      <div class="border-t border-line pt-6">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-2 gap-4">
           ${this.propertyMetadata.map(f => this.renderField(f)).join('')}
         </div>
@@ -106,14 +106,14 @@ export default class Companies_CustomerProfiles_NewController extends Companies_
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Customer Profile")}</h2>
+        <h2 class="text-xl font-bold text-foreground">${translate("New Customer Profile")}</h2>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Category")}</label>
+          <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
           <select
             name="customer_profile[category_id]"
             data-action="change->${this.identifier}#onCategoryChange"
-            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+            class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none"
           >
             ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), this.categoryId)}
           </select>
@@ -121,42 +121,42 @@ export default class Companies_CustomerProfiles_NewController extends Companies_
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Customer Profile Name")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Customer Profile Name")}</label>
             <input type="text" name="customer_profile[name]" required placeholder="${translate("e.g. Apple")}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Type")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Type")}</label>
             <select name="customer_profile[business_type]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${typeOptions}
             </select>
           </div>
 
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Customer ID</label>
+          <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Customer ID</label>
           <input type="text" name="customer_profile[customer_id]" value="${new URLSearchParams(window.location.search).get('customer_id') || ''}" placeholder="Customer UUID"
-            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm font-mono">
+            class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm font-mono">
         </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Phone")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Phone")}</label>
             <input type="text" name="customer_profile[phone_number]" placeholder="${translate("+84 123 456 789")}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Email")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Email")}</label>
             <input type="email" name="customer_profile[email]" placeholder="${translate("contact@brand.com")}"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Description")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Description")}</label>
             <textarea name="customer_profile[description]" rows="3"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground"></textarea>
           </div>
         </div>
 
@@ -164,9 +164,9 @@ export default class Companies_CustomerProfiles_NewController extends Companies_
           ${this.dynamicFieldsHTML()}
         </div>
 
-        <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
+        <div class="flex justify-end pt-6 border-t border-line">
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm transition-colors cursor-pointer">
             ${translate("Save Customer Profile")}
           </button>
         </div>
@@ -179,7 +179,7 @@ export default class Companies_CustomerProfiles_NewController extends Companies_
           ${form({
             action: Helpers.create_company_customer_profiles_path(currentCompany().id),
             method: "POST",
-            attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false"`,
+            attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false"`,
             html: fields
           })}
         </div>

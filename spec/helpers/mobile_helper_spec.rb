@@ -52,6 +52,10 @@ RSpec.describe MobileHelper, type: :helper do
       expect(helper.mobile_time(Time.zone.parse("2026-10-26 09:00"))).to eq("09:00 AM")
     end
 
+    it "formats a timestamp in a fixed UTC offset" do
+      expect(helper.mobile_time(Time.zone.parse("2026-10-29 17:30"), utc_offset: 7 * 3600)).to eq("12:30 AM")
+    end
+
     it "returns a dash for a blank timestamp" do
       expect(helper.mobile_time(nil)).to eq("—")
     end

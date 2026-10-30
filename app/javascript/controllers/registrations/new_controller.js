@@ -19,19 +19,19 @@ export default class Registrations_NewController extends Controller {
 
   pageHTML() {
     return `
-      <div class="min-h-screen bg-gray-50 py-12 dark:bg-gray-950">
+      <div class="min-h-screen bg-background py-12 ">
         <div class="mx-auto w-full max-w-[480px] px-4">
           <a
             class="mb-8 flex items-center justify-center gap-2 cursor-pointer"
             href="/"
           >
             <img alt="Skycom Logo" class="h-8 w-auto object-contain" src="/icon.svg">
-            <span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Skycom</span>
+            <span class="text-lg font-bold tracking-tight text-foreground">Skycom</span>
           </a>
-          <div class="rounded-xl bg-white p-6 shadow-2xl md:p-8 dark:bg-slate-800">
+          <div class="rounded-xl bg-card p-6 shadow-2xl md:p-8 ">
             <div class="mb-8 text-center">
-              <h1 class="mb-2 text-2xl font-bold text-slate-900 dark:text-white">Create your account</h1>
-              <p class="text-sm text-slate-600 dark:text-slate-400">Join Skycom to manage your business effectively</p>
+              <h1 class="mb-2 text-2xl font-bold text-foreground">Create your account</h1>
+              <p class="text-sm text-muted-foreground">Join Skycom to manage your business effectively</p>
             </div>
             <div class="flex flex-col gap-4">
               ${form({
@@ -40,7 +40,7 @@ export default class Registrations_NewController extends Controller {
                 attributes: `class="w-full" data-turbo="false"`,
                 html: `
                   <button type="submit"
-                          class="flex w-full items-center justify-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600">
+                          class="flex w-full items-center justify-center gap-3 rounded-lg border border-line bg-card px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-background cursor-pointer ">
                     <svg class="h-5 w-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
                       <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
@@ -52,9 +52,9 @@ export default class Registrations_NewController extends Controller {
                 `
               })}
               <div class="relative flex items-center py-2">
-                <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
-                <span class="flex-shrink-0 px-4 text-xs font-medium uppercase text-slate-500">Or sign up with email</span>
-                <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
+                <div class="flex-grow border-t border-line"></div>
+                <span class="flex-shrink-0 px-4 text-xs font-medium uppercase text-muted-foreground">Or sign up with email</span>
+                <div class="flex-grow border-t border-line"></div>
               </div>
               <form
                 role="sign-up-form"
@@ -65,37 +65,37 @@ export default class Registrations_NewController extends Controller {
                 ${Helpers.formPostSecurityTags()}
                 <div class="space-y-4">
                   <div>
-                    <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"
+                    <label class="mb-1.5 block text-sm font-medium text-foreground text-left"
                       for="email">Email</label>
                     <input
-                      class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
+                      class="block w-full rounded-lg border border-line bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary "
                       id="email" name="email" placeholder="name@branch.com" type="email" />
                   </div>
                   <div>
-                    <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"
+                    <label class="mb-1.5 block text-sm font-medium text-foreground text-left"
                       for="password">Password</label>
                     <input
-                      class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
+                      class="block w-full rounded-lg border border-line bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary "
                       id="password" name="password" placeholder="••••••••" type="password" />
                   </div>
                   <div>
-                    <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"
+                    <label class="mb-1.5 block text-sm font-medium text-foreground text-left"
                       for="confirm-password">Password confirmation</label>
                     <input
-                      class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
+                      class="block w-full rounded-lg border border-line bg-card px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary "
                       id="confirm-password" name="password_confirmation" placeholder="••••••••" type="password" />
                   </div>
                 </div>
                 <button
-                  class="mt-2 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 cursor-pointer">
+                  class="mt-2 w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer">
                   Sign Up
                 </button>
               </form>
-              <p class="text-center text-sm text-slate-600 dark:text-slate-400">
+              <p class="text-center text-sm text-muted-foreground">
                 Already have an account?
                 <a
                   href="/sign_in"
-                  class="font-medium text-indigo-600 hover:underline cursor-pointer">Sign In
+                  class="font-medium text-primary hover:underline cursor-pointer">Sign In
                 </a>
               </p>
             </div>

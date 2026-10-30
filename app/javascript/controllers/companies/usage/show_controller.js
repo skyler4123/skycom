@@ -1,5 +1,6 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import ApexCharts from "apexcharts"
+import { chartPalette, chartGridColor } from "controllers/helpers/chart_colors"
 
 export default class Companies_Usage_ShowController extends Companies_LayoutController {
   static targets = ["usageChart"]
@@ -80,12 +81,12 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
     const options = {
       series: [{ name: translate("Credits"), data: this.dailyUsage.map(d => d.total_credits) }],
       chart: { type: "bar", height: 300, toolbar: { show: false } },
-      colors: ["#008FFB"],
+      colors: chartPalette(1),
       plotOptions: { bar: { columnWidth: "45%", borderRadius: 2 } },
       dataLabels: { enabled: false },
       xaxis: { categories: this.dailyUsage.map(d => d.date), labels: { style: { fontSize: "11px" } } },
       yaxis: { labels: { style: { fontSize: "11px" } } },
-      grid: { borderColor: "#e2e8f0", strokeDashArray: 4 },
+      grid: { borderColor: chartGridColor(), strokeDashArray: 4 },
     }
 
     const chart = new ApexCharts(container, options)
@@ -109,9 +110,9 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
 
   statusBadgeHTML() {
     if (this.loggingActive()) {
-      return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase"><span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>${translate("Recording")} · ${this.remainingLabel()}</span>`
+      return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10 text-success text-xs font-bold uppercase"><span class="size-1.5 rounded-full bg-success/100 animate-pulse"></span>${translate("Recording")} · ${this.remainingLabel()}</span>`
     }
-    return `<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase">${translate("Off")}</span>`
+    return `<span class="inline-flex items-center px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs font-bold uppercase">${translate("Off")}</span>`
   }
 
   toggleButtonHTML() {
@@ -119,7 +120,7 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
       return `<button
   type="button"
   data-action="click->${this.identifier}#disableLogging"
-  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-medium text-xs whitespace-nowrap cursor-pointer dark:bg-rose-500 dark:hover:bg-rose-600"
+  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-danger hover:bg-danger/90 text-danger-foreground rounded-lg font-medium text-xs whitespace-nowrap cursor-pointer "
 >
   <span class="material-symbols-outlined text-[16px]">stop_circle</span>
   ${translate("Stop Logging")}
@@ -128,7 +129,7 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
     return `<button
   type="button"
   data-action="click->${this.identifier}#enableLogging"
-  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-xs whitespace-nowrap cursor-pointer dark:bg-blue-500 dark:hover:bg-blue-600"
+  class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-xs whitespace-nowrap cursor-pointer "
 >
   <span class="material-symbols-outlined text-[16px]">play_circle</span>
   ${translate("Enable Logging")}
@@ -146,12 +147,12 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
 
   usageLogRowsHTML() {
     return this.usageLogs.map(log => `
-      <tr class="border-t border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-        <td class="py-2.5 px-4 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap font-mono">${this.formatLogTime(log.created_at)}</td>
-        <td class="py-2.5 px-4 text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap capitalize">${(log.action_type || "").replace(/_/g, " ")}</td>
-        <td class="py-2.5 px-4 text-sm font-bold whitespace-nowrap ${log.change_amount >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}">${this.formatChange(log.change_amount)}</td>
-        <td class="py-2.5 px-4 text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap font-mono">${this.formatCredits(log.balance_after)}</td>
-        <td class="py-2.5 px-4 text-sm text-slate-500 dark:text-slate-400">${log.description || "—"}</td>
+      <tr class="border-t border-line hover:bg-muted/50">
+        <td class="py-2.5 px-4 text-xs text-muted-foreground whitespace-nowrap font-mono">${this.formatLogTime(log.created_at)}</td>
+        <td class="py-2.5 px-4 text-sm text-foreground whitespace-nowrap capitalize">${(log.action_type || "").replace(/_/g, " ")}</td>
+        <td class="py-2.5 px-4 text-sm font-bold whitespace-nowrap ${log.change_amount >= 0 ? "text-success " : "text-danger "}">${this.formatChange(log.change_amount)}</td>
+        <td class="py-2.5 px-4 text-sm text-foreground whitespace-nowrap font-mono">${this.formatCredits(log.balance_after)}</td>
+        <td class="py-2.5 px-4 text-sm text-muted-foreground">${log.description || "—"}</td>
       </tr>
     `).join("")
   }
@@ -160,16 +161,16 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
     if (!this.loggingActive()) {
       return `
         <div class="py-10 flex flex-col items-center gap-2 text-center">
-          <span class="material-symbols-outlined text-[32px] text-slate-300 dark:text-slate-600">monitor_heart</span>
-          <p class="text-sm text-slate-400 dark:text-slate-500">${translate("Enable logging to capture credit movements")}</p>
+          <span class="material-symbols-outlined text-[32px] text-muted-foreground/60">monitor_heart</span>
+          <p class="text-sm text-muted-foreground">${translate("Enable logging to capture credit movements")}</p>
         </div>
       `
     }
     if (this.usageLogs.length === 0) {
       return `
         <div class="py-10 flex flex-col items-center gap-2 text-center">
-          <span class="material-symbols-outlined text-[32px] text-slate-300 dark:text-slate-600">hourglass_empty</span>
-          <p class="text-sm text-slate-400 dark:text-slate-500">${translate("No activity captured yet")}</p>
+          <span class="material-symbols-outlined text-[32px] text-muted-foreground/60">hourglass_empty</span>
+          <p class="text-sm text-muted-foreground">${translate("No activity captured yet")}</p>
         </div>
       `
     }
@@ -177,7 +178,7 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
       <div class="overflow-x-auto">
         <table class="w-full text-left">
           <thead>
-            <tr class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase border-b border-slate-200 dark:border-slate-700">
+            <tr class="text-[10px] font-bold text-muted-foreground uppercase border-b border-line">
               <th class="py-2 px-4">${translate("Time")}</th>
               <th class="py-2 px-4">${translate("Action")}</th>
               <th class="py-2 px-4">${translate("Change")}</th>
@@ -193,56 +194,56 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
 
   contentHTML() {
     const cards = [
-      { label: translate("Main Credits"), value: this.formatCredits(this.wallet?.main_credit_balance), icon: "savings", color: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400", hint: translate("Credits purchased through top-ups. Used after promotional credits run out.") },
-      { label: translate("Promo Credits"), value: this.formatCredits(this.wallet?.promo_credit_balance), icon: "redeem", color: "bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400", hint: translate("Free promotional credits. Spent first automatically.") },
-      { label: translate("Used Today"), value: this.formatCredits(this.todayTotal), icon: "today", color: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400", hint: translate("Credits consumed since midnight today — already includes the latest-hour amount shown beside it.") },
-      { label: translate("Latest Hour Usage"), value: this.formatCredits(this.liveDelta), icon: "hourglass_top", color: "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400", hint: translate("Credits used since the last hourly system update. Included in Used Today. Resets every hour.") },
-      { label: translate("Used This Month"), value: this.formatCredits(this.monthlyTotal), icon: "calendar_month", color: "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400", hint: translate("Total credits consumed this calendar month.") },
+      { label: translate("Main Credits"), value: this.formatCredits(this.wallet?.main_credit_balance), icon: "savings", color: "bg-success/10 text-success ", hint: translate("Credits purchased through top-ups. Used after promotional credits run out.") },
+      { label: translate("Promo Credits"), value: this.formatCredits(this.wallet?.promo_credit_balance), icon: "redeem", color: "bg-danger/10 text-danger ", hint: translate("Free promotional credits. Spent first automatically.") },
+      { label: translate("Used Today"), value: this.formatCredits(this.todayTotal), icon: "today", color: "bg-primary/10 text-primary", hint: translate("Credits consumed since midnight today — already includes the latest-hour amount shown beside it.") },
+      { label: translate("Latest Hour Usage"), value: this.formatCredits(this.liveDelta), icon: "hourglass_top", color: "bg-warning/10 text-warning ", hint: translate("Credits used since the last hourly system update. Included in Used Today. Resets every hour.") },
+      { label: translate("Used This Month"), value: this.formatCredits(this.monthlyTotal), icon: "calendar_month", color: "bg-primary/10 text-primary ", hint: translate("Total credits consumed this calendar month.") },
     ]
 
     return `
       <div class="p-4 md:p-6 overflow-y-auto space-y-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           ${cards.map(card => `
-            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
+            <div class="bg-card rounded-xl border border-line p-5">
               <div class="flex items-center gap-3">
                 <div class="size-10 rounded-lg ${card.color} flex items-center justify-center shrink-0">
                   <span class="material-symbols-outlined text-[22px]">${card.icon}</span>
                 </div>
                 <div class="min-w-0">
                   <div class="flex items-center gap-1">
-                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase truncate">${card.label}</p>
+                    <p class="text-[10px] font-bold text-muted-foreground uppercase truncate">${card.label}</p>
                     <span
                       ${tooltip(card.hint)}
-                      class="material-symbols-outlined text-[14px]! text-slate-300 dark:text-slate-600 hover:text-slate-400 dark:hover:text-slate-500 cursor-pointer shrink-0"
+                      class="material-symbols-outlined text-[14px]! text-muted-foreground/60 hover:text-muted-foreground cursor-pointer shrink-0"
                     >info</span>
                   </div>
-                  <p class="text-xl font-black text-slate-900 dark:text-white">${card.value}</p>
+                  <p class="text-xl font-black text-foreground">${card.value}</p>
                 </div>
               </div>
             </div>
           `).join("")}
         </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
+        <div class="bg-card rounded-xl border border-line p-5">
           <div class="flex items-center gap-1.5 mb-4">
-            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">${translate("Daily Usage")}</h3>
+            <h3 class="text-sm font-bold text-foreground">${translate("Daily Usage")}</h3>
             <span
               ${tooltip(translate("Credits used per day over the last 7 days."))}
-              class="material-symbols-outlined text-[16px] text-slate-300 dark:text-slate-600 hover:text-slate-400 dark:hover:text-slate-500 cursor-pointer"
+              class="material-symbols-outlined text-[16px] text-muted-foreground/60 hover:text-muted-foreground cursor-pointer"
             >info</span>
           </div>
           <div data-${this.identifier}-target="usageChart"></div>
         </div>
 
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
+        <div class="bg-card rounded-xl border border-line p-5">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div class="flex items-center gap-3">
               <div class="flex items-center gap-1.5">
-                <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">${translate("Usage Logs")}</h3>
+                <h3 class="text-sm font-bold text-foreground">${translate("Usage Logs")}</h3>
                 <span
                   ${tooltip(translate("Per-action record of credit movements. Enable logging to capture them live."))}
-                  class="material-symbols-outlined text-[16px] text-slate-300 dark:text-slate-600 hover:text-slate-400 dark:hover:text-slate-500 cursor-pointer"
+                  class="material-symbols-outlined text-[16px] text-muted-foreground/60 hover:text-muted-foreground cursor-pointer"
                 >info</span>
               </div>
               ${this.statusBadgeHTML()}
@@ -253,7 +254,7 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
                 data-action="click->${this.identifier}#refreshLogs"
                 aria-label="${translate("Refresh")}"
                 ${tooltip(translate("Refresh"))}
-                class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer dark:text-slate-400 dark:hover:text-blue-400"
+                class="inline-flex items-center justify-center p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer "
               >
                 <span class="material-symbols-outlined text-[18px]!">refresh</span>
               </button>

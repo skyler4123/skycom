@@ -93,7 +93,7 @@ export default class extends Controller {
       case "month": return this.monthViewHTML()
       case "week":  return this.weekViewHTML()
       case "day":   return this.dayViewHTML()
-      default:      return "<p class='text-center py-20 text-gray-500 dark:text-gray-400'>Unknown view</p>"
+      default: return "<p class='text-center py-20 text-muted-foreground'>Unknown view</p>"
     }
   }
 
@@ -104,7 +104,7 @@ export default class extends Controller {
   mainContainerHTML() {
     return `
       <div class="mx-auto">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700 relative">
+        <div class="bg-card rounded-2xl shadow-xl overflow-hidden border border-line relative">
           ${this.headerHTML()}
           <div class="p-5 md:p-6 min-h-[500px] relative">
             ${this.loadingSpinnerHTML()}
@@ -118,18 +118,18 @@ export default class extends Controller {
 
   headerHTML() {
     const btnBase = "px-4 py-2 text-sm rounded-lg transition"
-    const activeBtn = "bg-indigo-600 text-white shadow"
-    const inactiveBtn = "bg-white dark:bg-gray-700 border dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600"
+    const activeBtn = "bg-primary text-primary-foreground shadow"
+    const inactiveBtn = "bg-card border text-foreground hover:bg-background "
 
     return `
-      <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+      <div class="px-6 py-5 border-b border-line">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div class="flex items-center gap-6">
-            <button data-action="click->calendar#prev" class="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400">
+            <button data-action="click->calendar#prev" class="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-muted transition text-muted-foreground">
               <svg class="h-6 w-6"><use href="#arrow-left"></use></svg>
             </button>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">${this.getTitle()}</h1>
-            <button data-action="click->calendar#next" class="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition text-gray-600 dark:text-gray-400">
+            <h1 class="text-2xl font-bold text-foreground">${this.getTitle()}</h1>
+            <button data-action="click->calendar#next" class="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-muted transition text-muted-foreground">
               <svg class="h-6 w-6"><use href="#arrow-right"></use></svg>
             </button>
           </div>
@@ -147,16 +147,16 @@ export default class extends Controller {
   loadingSpinnerHTML() {
     if (!this.isLoading) return ''
     return `
-      <div class="absolute inset-0 bg-white/60 dark:bg-gray-800/60 flex items-center justify-center z-10 backdrop-blur-[1px]">
-        <div class="animate-spin h-12 w-12 border-4 border-indigo-500 rounded-full border-t-transparent"></div>
+      <div class="absolute inset-0 bg-card/60 flex items-center justify-center z-10 backdrop-blur-[1px]">
+        <div class="animate-spin h-12 w-12 border-4 border-primary/40 rounded-full border-t-transparent"></div>
       </div>
     `
   }
 
   selectionFeedbackHTML() {
     return `
-      <div class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-        Selected: <strong class="text-indigo-700 dark:text-indigo-400">${this.formatSelection()}</strong>
+      <div class="mt-4 text-center text-sm text-muted-foreground">
+        Selected: <strong class="text-primary ">${this.formatSelection()}</strong>
       </div>
     `
   }
@@ -185,14 +185,14 @@ export default class extends Controller {
       })
 
       let miniGrid = `
-        <div class="grid grid-cols-7 gap-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
-          <div class="text-center">M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div><div class="text-red-500">S</div>
+        <div class="grid grid-cols-7 gap-0.5 text-xs font-medium text-muted-foreground mb-1.5">
+          <div class="text-center">M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div><div class="text-danger">S</div>
         </div>
         <div class="grid grid-cols-7 gap-0.5">
       `
 
       for (let i = 1; i < startWeekday; i++) {
-        miniGrid += '<div class="h-7 bg-gray-50/40 dark:bg-gray-700/40 rounded"></div>'
+        miniGrid += '<div class="h-7 bg-background/40 rounded"></div>'
       }
 
       for (let day = 1; day <= daysInMonth; day++) {
@@ -202,23 +202,23 @@ export default class extends Controller {
         let dotsHtml = dayEvents.slice(0, 3).map(ev => `<div class="w-1.5 h-1.5 rounded-full mx-auto" style="background: ${ev.backgroundColor || ev.color || '#6366f1'}"></div>`).join('')
 
         miniGrid += `
-          <div class="h-7 flex flex-col items-center justify-center text-sm relative ${isToday ? 'font-bold text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'} hover:bg-indigo-50/50 dark:hover:bg-indigo-900/30 rounded transition">
+          <div class="h-7 flex flex-col items-center justify-center text-sm relative ${isToday ? 'font-bold text-primary' : 'text-foreground'} hover:bg-primary/10 rounded transition">
             ${day}
             <div class="flex flex-col gap-0.5 mt-0.5 w-4">${dotsHtml}</div>
-            ${isToday ? '<div class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-blue-600 rounded-full border-2 border-white dark:border-gray-800"></div>' : ''}
+            ${isToday ? '<div class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-primary rounded-full border-2 border-card "></div>' : ''}
           </div>
         `
       }
 
       const totalCells = startWeekday - 1 + daysInMonth
       for (let i = 0; i < (7 - totalCells % 7) % 7; i++) {
-        miniGrid += '<div class="h-7 bg-gray-50/40 dark:bg-gray-700/40 rounded"></div>'
+        miniGrid += '<div class="h-7 bg-background/40 rounded"></div>'
       }
 
       monthCards += `
         <button data-action="click->calendar#jumpToMonth" data-month="${month}"
-                class="border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-500 transition-all duration-200 w-full text-left bg-white dark:bg-gray-800">
-          <div class="font-semibold text-lg mb-3 text-gray-800 dark:text-gray-100">${monthName}</div>
+                class="border border-line rounded-xl p-4 hover:shadow-lg hover:border-primary/30 transition-all duration-200 w-full text-left bg-card">
+          <div class="font-semibold text-lg mb-3 text-foreground ">${monthName}</div>
           ${miniGrid}
         </button>
       `
@@ -230,10 +230,10 @@ export default class extends Controller {
     const d = new Date(this.anchorValue), y = d.getFullYear(), m = d.getMonth()
     const first = new Date(y, m, 1), daysInMonth = new Date(y, m + 1, 0).getDate(), startWeekday = first.getDay() || 7
     let html = this.weekdayHeaderHTML() + '<div class="grid grid-cols-7 gap-2">'
-    for (let i = 1; i < startWeekday; i++) html += '<div class="h-32 bg-gray-50/30 dark:bg-gray-700/30 rounded-lg"></div>'
+    for (let i = 1; i < startWeekday; i++) html += '<div class="h-32 bg-background/30 rounded-lg"></div>'
     for (let day = 1; day <= daysInMonth; day++) html += this.dayCellHTML(`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`, day, "h-32")
     const used = startWeekday - 1 + daysInMonth
-    for (let i = used % 7; i > 0 && i < 7; i++) html += '<div class="h-32 bg-gray-50/30 dark:bg-gray-700/30 rounded-lg"></div>'
+    for (let i = used % 7; i > 0 && i < 7; i++) html += '<div class="h-32 bg-background/30 rounded-lg"></div>'
     return html + '</div>'
   }
 
@@ -247,25 +247,25 @@ export default class extends Controller {
     const timeSlots = []
     for (let hour = 0; hour < 24; hour++) {
       const timeLabel = `${hour.toString().padStart(2, '0')}:00`
-      let rowHtml = `<div class="text-right text-xs text-gray-500 dark:text-gray-400 pr-3 pt-1 border-t border-gray-200 dark:border-gray-700">${timeLabel}</div>`
+      let rowHtml = `<div class="text-right text-xs text-muted-foreground pr-3 pt-1 border-t border-line">${timeLabel}</div>`
       days.forEach(day => {
         const events = this.events.filter(ev => ev.start?.split("T")[0] === day.dateStr && !ev.allDay)
         const overlapping = events.filter(ev => {
           const start = new Date(ev.start), end = new Date(ev.end), sStart = new Date(day.dateStr + 'T' + timeLabel + ':00'), sEnd = new Date(sStart.getTime() + 3600000)
           return start < sEnd && end > sStart
         })
-        rowHtml += `<div class="relative border-l border-gray-200 dark:border-gray-700 min-h-[60px] bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-          ${overlapping.map(ev => `<div class="absolute inset-x-1 top-0 rounded-md shadow-sm p-1 text-xs text-white overflow-hidden" style="background: ${ev.backgroundColor || ev.color || '#6366f1'}; height: ${Math.min((new Date(ev.end)-new Date(ev.start))/600, 100)}%; min-height: 40px;"><div class="font-medium truncate">${ev.title}</div></div>`).join('')}
+        rowHtml += `<div class="relative border-l border-line min-h-[60px] bg-card hover:bg-background transition">
+          ${overlapping.map(ev => `<div class="absolute inset-x-1 top-0 rounded-md shadow-sm p-1 text-xs text-overlay-foreground overflow-hidden" style="background: ${ev.backgroundColor || ev.color || '#6366f1'}; height: ${Math.min((new Date(ev.end)-new Date(ev.start))/600, 100)}%; min-height: 40px;"><div class="font-medium truncate">${ev.title}</div></div>`).join('')}
         </div>`
       })
       timeSlots.push(`<div class="grid grid-cols-8 gap-0">${rowHtml}</div>`)
     }
 
     return `
-      <div class="border dark:border-gray-700 rounded-lg overflow-hidden">
-        <div class="grid grid-cols-8 bg-gray-100 dark:bg-gray-900 border-b dark:border-gray-700">
-          <div class="p-3 text-sm font-semibold text-gray-600 dark:text-gray-400 text-right">Time</div>
-          ${days.map(day => `<div class="p-3 text-center text-sm font-semibold ${day.isToday ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 'dark:text-gray-300'}">${new Date(day.dateStr).toLocaleString('en-US', { weekday: 'short' })} ${day.dayNumber}</div>`).join('')}
+      <div class="border rounded-lg overflow-hidden">
+        <div class="grid grid-cols-8 bg-muted border-b ">
+          <div class="p-3 text-sm font-semibold text-muted-foreground text-right">Time</div>
+          ${days.map(day => `<div class="p-3 text-center text-sm font-semibold ${day.isToday ? 'bg-primary/10 text-primary ' : ''}">${new Date(day.dateStr).toLocaleString('en-US', { weekday: 'short' })} ${day.dayNumber}</div>`).join('')}
         </div>
         ${timeSlots.join('')}
       </div>
@@ -279,16 +279,16 @@ export default class extends Controller {
       const timeLabel = `${hour.toString().padStart(2, '0')}:00`, sStart = new Date(dateStr + 'T' + timeLabel + ':00'), sEnd = new Date(sStart.getTime() + 3600000)
       const overlapping = dayEvents.filter(ev => !ev.allDay && new Date(ev.start) < sEnd && new Date(ev.end) > sStart)
       timeSlots.push(`
-        <div class="grid grid-cols-[80px_1fr] border-t border-gray-200 dark:border-gray-700">
-          <div class="text-right pr-4 pt-2 text-xs text-gray-600 dark:text-gray-400 font-medium bg-gray-50 dark:bg-gray-900/50">${timeLabel}</div>
-          <div class="relative min-h-[60px] bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-            ${overlapping.map(ev => `<div class="absolute inset-x-2 top-0 rounded-lg shadow-md p-2 text-sm text-white overflow-hidden" style="background: ${ev.backgroundColor || ev.color || '#6366f1'}; height: ${Math.min((new Date(ev.end)-new Date(ev.start))/600, 100)}%; min-height: 50px;"><div class="font-semibold truncate">${ev.title}</div></div>`).join('')}
+        <div class="grid grid-cols-[80px_1fr] border-t border-line">
+          <div class="text-right pr-4 pt-2 text-xs text-muted-foreground font-medium bg-background ">${timeLabel}</div>
+          <div class="relative min-h-[60px] bg-card hover:bg-background transition">
+            ${overlapping.map(ev => `<div class="absolute inset-x-2 top-0 rounded-lg shadow-md p-2 text-sm text-overlay-foreground overflow-hidden" style="background: ${ev.backgroundColor || ev.color || '#6366f1'}; height: ${Math.min((new Date(ev.end)-new Date(ev.start))/600, 100)}%; min-height: 50px;"><div class="font-semibold truncate">${ev.title}</div></div>`).join('')}
           </div>
         </div>`)
     }
     return `
-      <div class="border dark:border-gray-700 rounded-lg overflow-hidden">
-        <div class="bg-gray-100 dark:bg-gray-900 p-4 border-b dark:border-gray-700 text-center font-bold text-lg ${isToday ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' : 'dark:text-white'}">
+      <div class="border rounded-lg overflow-hidden">
+        <div class="bg-muted p-4 border-b text-center font-bold text-lg ${isToday ? 'bg-primary/10 text-primary ' : ''}">
           ${new Date(dateStr).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
         </div>
         ${timeSlots.join('')}
@@ -297,9 +297,9 @@ export default class extends Controller {
 
   weekdayHeaderHTML() {
     return `
-      <div class="grid grid-cols-7 text-center text-sm font-semibold text-gray-600 dark:text-gray-400 py-3 bg-gray-50 dark:bg-gray-900/50 rounded-t-lg">
+      <div class="grid grid-cols-7 text-center text-sm font-semibold text-muted-foreground py-3 bg-background rounded-t-lg">
         <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div>
-        <div>Fri</div><div>Sat</div><div class="text-red-600 dark:text-red-400">Sun</div>
+        <div>Fri</div><div>Sat</div><div class="text-danger ">Sun</div>
       </div>
     `
   }
@@ -308,21 +308,21 @@ export default class extends Controller {
     const isToday = dateStr === this.today, selected = this.isSelected(dateStr)
     const isEdge = dateStr === (this.dragStartValue || this.startDateValue) || dateStr === (this.dragEndValue || this.endDateValue)
 
-    let cellStyle = "bg-white dark:bg-gray-800 hover:bg-indigo-50/60 dark:hover:bg-indigo-900/30 border border-gray-200 dark:border-gray-700 relative overflow-hidden rounded-lg transition"
-    if (isToday)   cellStyle += " bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-400 dark:border-blue-500 font-bold"
-    if (selected)  cellStyle += " bg-indigo-100/70 dark:bg-indigo-900/40 border-indigo-200 dark:border-indigo-800"
-    if (isEdge)    cellStyle += " bg-indigo-600 text-white shadow-md hover:bg-indigo-700"
+    let cellStyle = "bg-card hover:bg-primary/10 border border-line relative overflow-hidden rounded-lg transition"
+    if (isToday) cellStyle += " bg-primary/10 border-2 border-primary/30 font-bold"
+    if (selected) cellStyle += " bg-primary/10 /40 border-primary/20 "
+    if (isEdge) cellStyle += " bg-primary text-primary-foreground shadow-md hover:bg-primary/90"
 
     const dayEvents = this.events.filter(ev => ev.start?.split("T")[0] === dateStr)
-    const eventItems = dayEvents.slice(0, 3).map(ev => `<div class="text-xs truncate px-1.5 py-0.5 leading-tight ${isEdge ? 'text-white' : ''}" style="${isEdge ? '' : `color: ${ev.backgroundColor || ev.color || '#6366f1'};`}"><span class="font-medium">${ev.title}</span></div>`).join("")
+    const eventItems = dayEvents.slice(0, 3).map(ev => `<div class="text-xs truncate px-1.5 py-0.5 leading-tight ${isEdge ? 'text-overlay-foreground' : ''}" style="${isEdge ? '' : `color: ${ev.backgroundColor || ev.color || '#6366f1'};`}"><span class="font-medium">${ev.title}</span></div>`).join("")
 
     return `
       <div class="${height} ${extra} ${cellStyle} flex flex-col items-start justify-start pt-1.5 text-base cursor-pointer select-none"
            data-date="${dateStr}"
            data-action="mousedown->calendar#onMouseDown mouseenter->calendar#onMouseEnter mouseup->calendar#onMouseUp click->calendar#onClick">
-        <div class="w-full px-1.5 flex justify-between items-center ${isEdge ? 'text-white' : 'text-gray-900 dark:text-gray-200'}">
+        <div class="w-full px-1.5 flex justify-between items-center ${isEdge ? 'text-overlay-foreground' : 'text-foreground'}">
           <span class="font-medium">${dayNumber}</span>
-          ${isToday ? `<span class="text-[10px] ${isEdge ? 'bg-white text-indigo-600' : 'bg-blue-600 text-white'} px-1.5 rounded-full uppercase">Today</span>` : ''}
+          ${isToday ? `<span class="text-[10px] ${isEdge ? 'bg-card text-primary' : 'bg-primary text-primary-foreground'} px-1.5 rounded-full uppercase">Today</span>` : ''}
         </div>
         <div class="w-full mt-1 flex flex-col overflow-hidden">${eventItems}</div>
       </div>`
@@ -337,14 +337,11 @@ export default class extends Controller {
       const selected = this.isSelected(d)
       const isEdge = d === (this.dragStartValue || this.startDateValue) || d === (this.dragEndValue || this.endDateValue)
 
-      // Light Mode Toggles
-      el.classList.toggle("bg-indigo-100/70", selected && !isEdge)
-      el.classList.toggle("bg-indigo-600", isEdge)
-      el.classList.toggle("text-white", isEdge)
-      
-      // Dark Mode Toggles (Complementing the base classes)
-      el.classList.toggle("dark:bg-indigo-900/40", selected && !isEdge)
-      el.classList.toggle("dark:bg-indigo-500", isEdge)
+      // Selected-range styling. The semantic tokens handle dark mode, so no
+      // separate dark: toggles are needed.
+      el.classList.toggle("bg-primary/10", selected && !isEdge)
+      el.classList.toggle("bg-primary", isEdge)
+      el.classList.toggle("text-overlay-foreground", isEdge)
     })
   }
 

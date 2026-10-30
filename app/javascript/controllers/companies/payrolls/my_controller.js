@@ -41,7 +41,7 @@ export default class Companies_Payrolls_MyController extends Companies_LayoutCon
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load payroll.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load payroll.")}</div>`
           return true
         }
         return false
@@ -64,16 +64,16 @@ export default class Companies_Payrolls_MyController extends Companies_LayoutCon
       return `<option value="${String(x.month).slice(0, 7)}" ${selected}>${this.formatDate(String(x.month).slice(0, 10))}</option>`
     }).join('')
     const dropdown = months.length > 0
-      ? `<select onchange="window.location.href='/companies/${cid}/payroll/my?month='+this.value" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">${options}</select>`
+      ? `<select onchange="window.location.href='/companies/${cid}/payroll/my?month='+this.value" class="w-full px-3 py-2 border border-line rounded-lg bg-card text-foreground text-sm">${options}</select>`
       : ''
 
     if (!payroll) {
       return `
         <div class="p-4 overflow-y-auto">
-          <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Payroll")}</h2>
+          <div class="p-6 bg-card rounded-xl border border-line">
+            <h2 class="text-2xl font-black text-foreground mb-6">${translate("Payroll")}</h2>
             ${dropdown}
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-4">${translate("No payroll data for this month.")}</p>
+            <p class="text-sm text-muted-foreground mt-4">${translate("No payroll data for this month.")}</p>
           </div>
         </div>
       `
@@ -81,21 +81,21 @@ export default class Companies_Payrolls_MyController extends Companies_LayoutCon
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Payroll")}</h2>
+        <div class="p-6 bg-card rounded-xl border border-line">
+          <h2 class="text-2xl font-black text-foreground mb-6">${translate("Payroll")}</h2>
           ${dropdown}
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-            <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
-              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Employee")}</p>
-              <p class="text-sm font-semibold text-slate-900 dark:text-white">${payroll.employee?.name || this.employee?.name || '—'}</p>
+            <div class="p-3 border border-line rounded-lg bg-card">
+              <p class="text-xs font-medium text-muted-foreground">${translate("Employee")}</p>
+              <p class="text-sm font-semibold text-foreground">${payroll.employee?.name || this.employee?.name || '—'}</p>
             </div>
-            <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
-              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Month")}</p>
-              <p class="text-sm font-semibold text-slate-900 dark:text-white">${this.formatDate(payroll.month)}</p>
+            <div class="p-3 border border-line rounded-lg bg-card">
+              <p class="text-xs font-medium text-muted-foreground">${translate("Month")}</p>
+              <p class="text-sm font-semibold text-foreground">${this.formatDate(payroll.month)}</p>
             </div>
-            <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
-              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Status")}</p>
-              <p class="text-sm font-semibold text-slate-900 dark:text-white">${payroll.status || '—'}</p>
+            <div class="p-3 border border-line rounded-lg bg-card">
+              <p class="text-xs font-medium text-muted-foreground">${translate("Status")}</p>
+              <p class="text-sm font-semibold text-foreground">${payroll.status || '—'}</p>
             </div>
           </div>
         </div>

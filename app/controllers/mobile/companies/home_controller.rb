@@ -1,11 +1,15 @@
 class Mobile::Companies::HomeController < Mobile::Companies::BaseController
   def index
-    @attendance_month = @employee.attendance_months.find_by(month: Date.current.beginning_of_month)
-    @today_shift = @employee.scheduled_shifts.find_by(work_date: Date.current)
-    @today_logs = @employee.attendance_logs.includes(:branch).where(logged_at: Date.current.all_day).order(:logged_at)
-    @last_log = @today_logs.last
-    @checked_in = @last_log&.log_type_check_in? || false
+    @company_utc_offset = company_utc_offset
+    company_now = Time.current.getlocal(@company_utc_offset)
+    company_today = company_now.to_date
+
+    @attendance_month = @employee.attendance_months.find_by(month: company_today.beginning_of_month)
+    @today_shift = @employee.scheduled_shifts.find_by(work_date: company_today)
+    @today_logs = @employee.attendance_logs.includes(:branch).where(logged_at: company_now.all_day).order(:logged_at).to_a
+    @check_in_logs = @today_logs.select(&:log_type_check_in?)
+    @checked_in = @check_in_logs.any?
     @pending_requests_count = AttendanceRequest.where(employee: @employee, status: :pending).count
-    @current_payroll = @employee.payrolls.find_by(month: Date.current.beginning_of_month)
+    @current_payroll = @employee.payrolls.find_by(month: company_today.beginning_of_month)
   end
 end

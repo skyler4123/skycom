@@ -39,11 +39,11 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
 
   statusBadge(status) {
     const colors = {
-      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-      approved: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-      rejected: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+      pending: 'bg-warning/10 text-warning ',
+      approved: 'bg-success/10 text-success ',
+      rejected: 'bg-danger/10 text-danger '
     }
-    const color = colors[status] || 'bg-gray-100 text-gray-800'
+    const color = colors[status] || 'bg-muted text-foreground'
     return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}">${Helpers.capitalize(status?.replace('_', ' ') || '')}</span>`
   }
 
@@ -89,11 +89,11 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
+        <div class="p-4 bg-card rounded-xl border border-line flex flex-col">
           <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Attendance Requests")}</h2>
+            <h2 class="text-xl font-bold text-foreground">${translate("Attendance Requests")}</h2>
             <a href="${Helpers.new_company_attendance_request_path(currentCompany().id)}"
-              class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm cursor-pointer">
+              class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm cursor-pointer">
               <span class="material-symbols-outlined text-[20px]">add</span>
               ${translate("Add")}
             </a>
@@ -105,41 +105,41 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
           >
             <div class="flex flex-wrap items-end gap-3 w-full lg:w-auto">
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Employee Name")}</label>
-              <input type="text" name="employee_name" value="${employeeNameValue.replace(/"/g, '&quot;')}" placeholder="${translate("e.g. John Doe")}" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Employee Name")}</label>
+              <input type="text" name="employee_name" value="${employeeNameValue.replace(/"/g, '&quot;')}" placeholder="${translate("e.g. John Doe")}" class="px-3 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground" />
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Status")}</label>
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Status")}</label>
               <select
                 name="status"
-                class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground"
               >
                 <option value="">${translate("All")}</option>
                 ${statusOptions}
               </select>
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Business Type")}</label>
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Business Type")}</label>
               <select
                 name="business_type"
-                class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground"
               >
                 <option value="">${translate("All")}</option>
                 ${businessTypeOptions}
               </select>
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("From")}</label>
-              <input type="date" name="from" value="${fromValue}" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("From")}</label>
+              <input type="date" name="from" value="${fromValue}" class="px-3 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground" />
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("To")}</label>
-              <input type="date" name="to" value="${toValue}" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("To")}</label>
+              <input type="date" name="to" value="${toValue}" class="px-3 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground" />
             </div>
             <div class="flex gap-2 mt-auto">
             <button
               type="submit"
-              class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer"
+              class="h-[38px] px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer"
             >
               <span class="material-symbols-outlined text-[18px]!">search</span>
               ${translate("Search")}
@@ -150,7 +150,7 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
-                <tr class="text-sm text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                <tr class="text-sm text-muted-foreground border-b border-line">
                   <th class="py-4 px-6 font-medium">${translate("Employee")}</th>
                   <th class="py-4 px-6 font-medium">${translate("Date")}</th>
                   <th class="py-4 px-6 font-medium">${translate("Check In")}</th>
@@ -160,19 +160,19 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
                   <th class="py-4 px-6 text-right font-medium">${translate("Actions")}</th>
                 </tr>
               </thead>
-              <tbody data-${this.identifier}-target="requestsList" class="divide-y divide-slate-200 dark:divide-slate-800">
+              <tbody data-${this.identifier}-target="requestsList" class="divide-y divide-line">
                 ${this.attendanceRequests.map(r => `
-                  <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <tr class="hover:bg-muted/50">
                     <td class="py-4 px-6 text-sm font-medium">
                       <a href="${Helpers.company_attendance_request_path(currentCompany().id, r.id)}"
-                        class="text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">
+                        class="text-foreground hover:text-primary cursor-pointer">
                         ${r.employee?.name || '—'}
                       </a>
                     </td>
-                    <td class="py-4 px-6 text-sm text-slate-600">${this.formatDate(r.attendance_date)}</td>
-                    <td class="py-4 px-6 text-sm text-slate-600">${this.formatTime(r.check_in)}</td>
-                    <td class="py-4 px-6 text-sm text-slate-600">${this.formatTime(r.check_out)}</td>
-                    <td class="py-4 px-6 text-sm text-slate-600">${r.reason || '—'}</td>
+                    <td class="py-4 px-6 text-sm text-muted-foreground">${this.formatDate(r.attendance_date)}</td>
+                    <td class="py-4 px-6 text-sm text-muted-foreground">${this.formatTime(r.check_in)}</td>
+                    <td class="py-4 px-6 text-sm text-muted-foreground">${this.formatTime(r.check_out)}</td>
+                    <td class="py-4 px-6 text-sm text-muted-foreground">${r.reason || '—'}</td>
                     <td class="py-4 px-6 text-sm">${this.statusBadge(r.status)}</td>
                     <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                       ${r.status === 'pending' ? `
@@ -180,7 +180,7 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
                           type="button"
                           data-action="click->${this.identifier}#approve"
                           data-${this.identifier}-request-id-param="${r.id}"
-                          class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium text-xs cursor-pointer"
+                          class="px-3 py-1 bg-success hover:bg-success/90 text-success-foreground rounded-lg font-medium text-xs cursor-pointer"
                         >
                           ${translate("Approve")}
                         </button>
@@ -188,13 +188,13 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
                           type="button"
                           data-action="click->${this.identifier}#reject"
                           data-${this.identifier}-request-id-param="${r.id}"
-                          class="px-3 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium text-xs cursor-pointer"
+                          class="px-3 py-1 bg-danger/10 hover:bg-danger/10 text-danger rounded-lg font-medium text-xs cursor-pointer"
                         >
                           ${translate("Reject")}
                         </button>
                       ` : `
                         <a href="${Helpers.company_attendance_request_path(currentCompany().id, r.id)}"
-                          class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
+                          class="inline-flex items-center justify-center p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer">
                           <span class="material-symbols-outlined text-[20px]">visibility</span>
                         </a>
                       `}

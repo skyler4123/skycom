@@ -73,26 +73,26 @@ export default class Admin_CompanyTickets_IndexController extends Admin_LayoutCo
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
+        <div class="p-4 bg-card rounded-xl border border-line flex flex-col">
 
           <div class="flex items-center gap-3 mb-6">
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white">Support Pool</h2>
-            <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">${this.openCount} Open</span>
+            <h2 class="text-lg font-bold text-foreground">Support Pool</h2>
+            <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-primary/10 text-primary ">${this.openCount} Open</span>
           </div>
 
           <form method="get" action="${pathname()}" class="flex flex-wrap items-end gap-3 mb-6">
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Status</label>
-              <select name="status" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">Status</label>
+              <select name="status" class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
                 ${selectOptionsHTML(statuses.map((v) => ({ value: v, name: this.humanize(v) })), urlParams.get("status"), "All")}
               </select>
             </div>
             <div class="flex items-center gap-2 pb-2">
               <input type="checkbox" name="unassigned" value="1" ${urlParams.get("unassigned") ? "checked" : ""}
-                class="h-4 w-4 rounded border-slate-300 text-blue-600 cursor-pointer">
-              <label class="text-sm text-slate-600 dark:text-slate-300">Unassigned only</label>
+                class="h-4 w-4 rounded border-line text-primary cursor-pointer">
+              <label class="text-sm text-muted-foreground">Unassigned only</label>
             </div>
-            <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer">
+            <button type="submit" class="h-[38px] px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer">
               <span class="material-symbols-outlined text-[18px]!">search</span>
               Search
             </button>
@@ -105,19 +105,19 @@ export default class Admin_CompanyTickets_IndexController extends Admin_LayoutCo
               identifier: this.identifier,
               target: "ticketsList",
               renderers: {
-                company: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${escapeHtml(value?.name) || "—"}</span>`,
+                company: (value) => `<span class="text-sm text-muted-foreground">${escapeHtml(value?.name) || "—"}</span>`,
                 name: (value, record) => `
                   <a href="${Helpers.admin_company_ticket_path(record.id)}"
-                    class="font-medium text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                    class="font-medium text-foreground hover:text-primary transition-colors cursor-pointer">
                     ${escapeHtml(value) || "Untitled ticket"}
                   </a>`,
                 priority: (value) => `${Helpers.statusBadge(value || "medium")}`,
                 status: (value) => `${Helpers.statusBadge(value || "open")}`,
-                assigned_user: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${escapeHtml(value?.name || value?.email) || "—"}</span>`,
-                updated_at: (value) => `<span class="text-xs text-slate-500 dark:text-slate-400">${value ? Helpers.timeFormat(value) : "—"}</span>`,
+                assigned_user: (value) => `<span class="text-sm text-muted-foreground">${escapeHtml(value?.name || value?.email) || "—"}</span>`,
+                updated_at: (value) => `<span class="text-xs text-muted-foreground">${value ? Helpers.timeFormat(value) : "—"}</span>`,
                 actions: (value, record) => record.assigned_user
                   ? ""
-                  : `<button type="button" data-action="click->${this.identifier}#pickUp" data-${this.identifier}-ticket-id-param="${record.id}" class="px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer">Pick Up</button>`
+                  : `<button type="button" data-action="click->${this.identifier}#pickUp" data-${this.identifier}-ticket-id-param="${record.id}" class="px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 rounded-lg cursor-pointer">Pick Up</button>`
               }
             })}
           </div>

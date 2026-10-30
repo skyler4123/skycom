@@ -23,8 +23,8 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
     const indicator = this.element.querySelector('[data-status-indicator]')
     if (toggle) {
       toggle.className = this.isActive
-        ? 'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white cursor-pointer'
-        : 'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400 cursor-pointer'
+        ? 'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-primary text-primary-foreground cursor-pointer'
+        : 'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-muted text-muted-foreground cursor-pointer'
       toggle.innerHTML = this.isActive
         ? `<span class="material-symbols-outlined text-[16px] leading-none">toggle_on</span> ${translate("Active")}`
         : `<span class="material-symbols-outlined text-[16px] leading-none">toggle_off</span> ${translate("Inactive")}`
@@ -41,9 +41,9 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
     row.setAttribute('data-tag-row', '')
     row.className = 'flex items-center gap-2'
     row.innerHTML = `
-      <input type="text" data-tag-key placeholder="${translate("Key")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
-      <input type="text" data-tag-value placeholder="${translate("Value")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
-      <button type="button" data-action="click->${this.identifier}#removeTagRow" class="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer">
+      <input type="text" data-tag-key placeholder="${translate("Key")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-line rounded-lg bg-card placeholder:text-muted-foreground">
+      <input type="text" data-tag-value placeholder="${translate("Value")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-line rounded-lg bg-card placeholder:text-muted-foreground">
+      <button type="button" data-action="click->${this.identifier}#removeTagRow" class="p-2 text-muted-foreground hover:text-danger rounded-lg hover:bg-danger/10 cursor-pointer">
         <span class="material-symbols-outlined text-[18px]!">close</span>
       </button>
     `
@@ -88,9 +88,9 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
     if (entries.length === 0) {
       return `
         <div data-tag-row class="flex items-center gap-2">
-          <input type="text" data-tag-key placeholder="${translate("Key")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
-          <input type="text" data-tag-value placeholder="${translate("Value")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
-          <button type="button" data-action="click->${this.identifier}#removeTagRow" class="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer">
+          <input type="text" data-tag-key placeholder="${translate("Key")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-line rounded-lg bg-card placeholder:text-muted-foreground">
+          <input type="text" data-tag-value placeholder="${translate("Value")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-line rounded-lg bg-card placeholder:text-muted-foreground">
+          <button type="button" data-action="click->${this.identifier}#removeTagRow" class="p-2 text-muted-foreground hover:text-danger rounded-lg hover:bg-danger/10 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">close</span>
           </button>
         </div>
@@ -98,9 +98,9 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
     }
     return entries.map(([key, value]) => `
       <div data-tag-row class="flex items-center gap-2">
-        <input type="text" data-tag-key value="${key}" placeholder="${translate("Key")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
-        <input type="text" data-tag-value value="${value ?? ''}" placeholder="${translate("Value")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
-        <button type="button" data-action="click->${this.identifier}#removeTagRow" class="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer">
+        <input type="text" data-tag-key value="${key}" placeholder="${translate("Key")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-line rounded-lg bg-card placeholder:text-muted-foreground">
+        <input type="text" data-tag-value value="${value ?? ''}" placeholder="${translate("Value")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-line rounded-lg bg-card placeholder:text-muted-foreground">
+        <button type="button" data-action="click->${this.identifier}#removeTagRow" class="p-2 text-muted-foreground hover:text-danger rounded-lg hover:bg-danger/10 cursor-pointer">
           <span class="material-symbols-outlined text-[18px]!">close</span>
         </button>
       </div>
@@ -109,20 +109,20 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
 
   contentHTML() {
     return `
-      <div class="p-8 bg-white dark:bg-slate-900 rounded-2xl w-[640px] shadow-2xl">
+      <div class="p-8 bg-card rounded-2xl w-[640px] shadow-2xl">
         <div class="space-y-6">
           <div>
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white capitalize">${this.actionNameValue} ${this.resourceNameValue}</h2>
-            <p class="text-sm text-slate-500 mt-1">${translate("Configure permission and tag conditions")}</p>
+            <h2 class="text-xl font-bold text-foreground capitalize">${this.actionNameValue} ${this.resourceNameValue}</h2>
+            <p class="text-sm text-muted-foreground mt-1">${translate("Configure permission and tag conditions")}</p>
           </div>
 
           <div class="space-y-2">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Status")}</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Status")}</label>
             <button
               type="button"
               data-action="click->${this.identifier}#toggleStatus"
               data-status-toggle
-              class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer ${this.isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'}"
+              class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer ${this.isActive ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground '}"
             >
               <span class="material-symbols-outlined text-[16px] leading-none">${this.isActive ? 'toggle_on' : 'toggle_off'}</span>
               <span data-status-indicator>${this.isActive ? translate('Active') : translate('Inactive')}</span>
@@ -131,27 +131,27 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
 
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Tag Conditions")}</label>
+              <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Tag Conditions")}</label>
               <button
                 type="button"
                 data-action="click->${this.identifier}#addTagRow"
-                class="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer"
+                class="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 rounded-lg cursor-pointer"
               >
                 <span class="material-symbols-outlined text-[14px]!">add</span>
                 ${translate("Add Condition")}
               </button>
             </div>
-            <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700 space-y-2" data-tag-rows>
+            <div class="p-3 bg-muted rounded-lg border border-line space-y-2" data-tag-rows>
               ${this.tagRowsHTML()}
             </div>
-            <p class="text-[11px] text-slate-400">${translate("Tag conditions use AND logic. Leave empty for no tag filtering.")}</p>
+            <p class="text-[11px] text-muted-foreground">${translate("Tag conditions use AND logic. Leave empty for no tag filtering.")}</p>
           </div>
 
           <div class="flex justify-end gap-3 pt-2">
-            <button type="button" data-action="click->modal#close" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
+            <button type="button" data-action="click->modal#close" class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg cursor-pointer">
               ${translate("Cancel")}
             </button>
-            <button type="button" data-action="click->${this.identifier}#handleSubmit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
+            <button type="button" data-action="click->${this.identifier}#handleSubmit" class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer">
               ${translate("Save")}
             </button>
           </div>

@@ -33,20 +33,20 @@ export default class Companies_EventConfigs_IndexController extends Companies_La
 
   flagBadge(value) {
     return value
-      ? `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">${translate("True")}</span>`
-      : `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-400">${translate("False")}</span>`
+      ? `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-success/10 text-success ">${translate("True")}</span>`
+      : `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-background text-foreground ">${translate("False")}</span>`
   }
 
   contentHTML() {
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
+        <div class="p-4 bg-card rounded-xl border border-line flex flex-col">
 
           ${this.renderTableTitle()}
 
           <div class="flex justify-end mb-6">
             <a href="${Helpers.new_company_event_config_path(currentCompany().id)}"
-              class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm whitespace-nowrap cursor-pointer">
+              class="flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors font-medium text-sm whitespace-nowrap cursor-pointer">
               <span class="material-symbols-outlined text-[20px]">add</span>
               ${translate("Add")}
             </a>
@@ -67,7 +67,7 @@ export default class Companies_EventConfigs_IndexController extends Companies_La
               target: "configsList",
               mappingLookup: {},
               renderers: {
-                category: (value, record) => `<span class="font-medium text-slate-900 dark:text-white">${record.category?.name || '—'}</span>`,
+                category: (value, record) => `<span class="font-medium text-foreground">${record.category?.name || '—'}</span>`,
                 create_stock_pending: (value) => this.flagBadge(value),
                 strict_stock_hold: (value) => this.flagBadge(value),
                 create_order_on_complete: (value) => this.flagBadge(value),
@@ -77,7 +77,7 @@ export default class Companies_EventConfigs_IndexController extends Companies_La
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.edit_company_event_config_path(currentCompany().id, record.id)}"
-                    class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg cursor-pointer">
+                    class="inline-flex items-center justify-center p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer">
                     <span class="material-symbols-outlined text-[20px]">edit</span>
                   </a>
                 </td>`

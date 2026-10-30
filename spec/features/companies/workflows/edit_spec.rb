@@ -65,13 +65,13 @@ RSpec.feature "Companies::Workflows Edit", type: :feature, js: true do
     expect(page).to have_selector('input[name="workflow[workflow_steps_attributes][0][name]"]', wait: 10)
 
     color_select = first('select[data-step-color]')
-    color_select.find('option', text: 'Emerald').select_option
+    color_select.find('option', text: 'Success').select_option
 
     click_button "Save Changes"
 
     expect(page).to have_current_path(company_workflow_path(company, workflow), wait: 10)
     step = workflow.reload.workflow_steps.order(:position).first
-    expect(step.text_color).to eq("text-emerald-700 dark:text-emerald-300")
-    expect(step.background_color).to eq("bg-emerald-100 dark:bg-emerald-900/30")
+    expect(step.text_color).to eq("text-success")
+    expect(step.background_color).to eq("bg-success/10")
   end
 end

@@ -56,7 +56,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | Resource dashboard pages | `docs/DASHBOARD_PATTERN.md` — backend implementation, no hardcoded paths |
 | Sidebar items, settings, custom groups | `docs/SIDEBAR.md` |
 | Marketing homepage, sign-in/up, company page | `docs/HOMEPAGE.md` — caching contract + SEO rules, read before touching |
-| Tailwind classes, dark mode, mobile layout | `docs/STYLING_GUIDELINES.md` |
+| Semantic colors, Tailwind classes, dark mode, mobile layout | `docs/STYLING_GUIDELINES.md` |
 | Any `/mobile/*` page, mobile controller, or Android shell work | `docs/MOBILE.md` — implementation contract; `docs/MOBILE_FEATURE_MATRIX.md` — web parity, backlog, native audit |
 | User-facing strings or translations | `docs/LANGUAGE.md` — **mandatory**: `translate()` usage + dictionary entries in `app/javascript/controllers/helpers/dictionary.js` |
 | User avatars | `docs/AVATAR.md` — helper + controller + concerns |
@@ -84,6 +84,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 ## Quick Commands
 - `bin/dev` - Start dev server (web + css + job via foreman)
 - `bin/rubocop` - Lint Ruby code
+- `bin/check_colors --strict` - Reject raw Tailwind palette classes (semantic tokens only)
 - `bin/brakeman` - Security scan
 - `bin/rails` - Standard Rails commands
 - `bundle exec parallel_rspec -n 14 [paths]` - Run tests (parallel, 14 workers). See `docs/PARALLEL_TESTS.md`.
@@ -93,7 +94,8 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - **Constants** — All app-wide constants must be in `config/initializers/constants.rb`, never hardcoded inline. See `docs/CONSTANTS.md`.
 - **Client cache** — If any mutation affects data stored in `currentCompany()` (branches, roles, categories, permissions, features, etc.), call `clearClientCacheAndReload()` after the server confirms the change, OR call `clearClientCache()` followed by a page reload.
 - **Language (mandatory)** — Every new or changed user-facing string must be added to `app/javascript/controllers/helpers/dictionary.js` with a Vietnamese translation. See `docs/LANGUAGE.md`. Missing entries break `translate()` output.
-- **Dark mode & grouping** — Every text must include `dark:` color variants; every UI group (title+value, card, dropdown, table, section) must have a border or distinct background in both light and dark modes. See `docs/STYLING_GUIDELINES.md` §4 and §5.
+- **Semantic colors (mandatory)** — Use only the semantic tokens (`bg-card`, `text-foreground`, `text-muted-foreground`, `border-line`, `bg-primary`, `text-danger`, …). Never raw palette classes (`bg-white`, `text-slate-500`, `border-slate-200`, `text-white`) and never `dark:` on a themed color — the CSS variable switches itself. `bin/check_colors --strict` enforces this. See `docs/STYLING_GUIDELINES.md`.
+- **Dark mode & grouping** — Every UI group (title+value, card, dropdown, table, section) must have a border (`border border-line`) or distinct background (`bg-card` / `bg-muted`). One class covers both modes; do not add `dark:` variants. See `docs/STYLING_GUIDELINES.md` §3 and §5.
 - **BE↔FE link** — When you add, remove, or change an endpoint, update the file-header link comments in **both** the BE controller (`Serves Stimulus:`) and the FE Stimulus controller (`Depends on BE:` / `Endpoints:`). See the template in `V1Controller`, `OrdersController`, `PagesController`, `MockQrGatewayController`, `RetailCashierController`. Links are living — remove stale pairs, add new ones per feature.
 - **Test priority** — Verify feature tests for the touched area are green before declaring work complete; request/model specs alone are insufficient. See `docs/TEST_PRIORITY.md`.
 

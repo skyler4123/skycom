@@ -48,11 +48,11 @@ export default class Companies_DiscountGroups_NewController extends Companies_La
   }
 
   baseClass() {
-    return "w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
+    return "w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground"
   }
 
   labelClass() {
-    return "text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider"
+    return "text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
   }
 
   currencies() {
@@ -170,13 +170,13 @@ export default class Companies_DiscountGroups_NewController extends Companies_La
     const g = this.group
     const value = g.discount_type === "percentage" ? `${g.percentage}%` : this.formatMoney(g.amount_cents)
     return `
-      <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-        <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400">
+      <div class="flex items-center gap-4 p-4 rounded-xl bg-muted border border-line">
+        <div class="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 /40 text-primary">
           <span class="material-symbols-outlined">sell</span>
         </div>
         <div class="min-w-0">
-          <p class="font-bold text-slate-900 dark:text-white">${g.name}</p>
-          <p class="text-sm text-slate-500 dark:text-slate-400">
+          <p class="font-bold text-foreground">${g.name}</p>
+          <p class="text-sm text-muted-foreground">
             ${g.prefix ? `<span class="font-mono">${g.prefix}</span> · ` : ""}${value} · ${this.formatMoney(g.total_budget_cents)} ${translate("Total Budget")}
           </p>
         </div>
@@ -187,8 +187,8 @@ export default class Companies_DiscountGroups_NewController extends Companies_La
     const base = this.baseClass()
     const label = this.labelClass()
     return `
-      <div class="space-y-4 pt-6 border-t border-slate-200 dark:border-slate-700">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${translate("Generate Codes")}</h3>
+      <div class="space-y-4 pt-6 border-t border-line">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider">${translate("Generate Codes")}</h3>
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-1">
             <label class="${label}">${translate("Quantity")}</label>
@@ -201,9 +201,9 @@ export default class Companies_DiscountGroups_NewController extends Companies_La
         </div>
         <div class="flex justify-end gap-3">
           ${this.mode === "create" ? `<a href="${Helpers.company_discount_group_path(currentCompany().id, this.group.id)}"
-            class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">${translate("Skip")}</a>` : ""}
+            class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg cursor-pointer">${translate("Skip")}</a>` : ""}
           <button type="button" data-action="click->${this.identifier}#submitGenerate"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm transition-colors cursor-pointer">
             ${translate("Generate Codes")}
           </button>
         </div>
@@ -276,14 +276,14 @@ export default class Companies_DiscountGroups_NewController extends Companies_La
 
   contentHTML() {
     if (this.mode === "generate" && !this.group) {
-      return `<div class="p-8 text-center text-red-600">${translate("Campaign not found.")}</div>`
+      return `<div class="p-8 text-center text-danger">${translate("Campaign not found.")}</div>`
     }
 
     if (this.phase === "generate" && this.group) {
       return `
         <div class="p-4 overflow-y-auto">
-          <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6">${translate("Campaign")} — ${this.group.name}</h2>
+          <div class="p-6 bg-card rounded-xl border border-line">
+            <h2 class="text-xl font-bold text-foreground mb-6">${translate("Campaign")} — ${this.group.name}</h2>
             ${this.summaryCardHTML()}
             ${this.generatePanelHTML()}
           </div>
@@ -296,14 +296,14 @@ export default class Companies_DiscountGroups_NewController extends Companies_La
           ${form({
             action: "#",
             method: "POST",
-            attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false" data-action="submit->${this.identifier}#submitCampaign"`,
+            attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false" data-action="submit->${this.identifier}#submitCampaign"`,
             html: `
               <div class="space-y-6">
-                <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Campaign")}</h2>
+                <h2 class="text-xl font-bold text-foreground">${translate("New Campaign")}</h2>
                 ${this.configFormHTML()}
-                <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
+                <div class="flex justify-end pt-6 border-t border-line">
                   <button type="submit"
-                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
+                    class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm transition-colors cursor-pointer">
                     ${translate("Save Campaign")}
                   </button>
                 </div>

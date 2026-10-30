@@ -78,7 +78,7 @@ export default class Companies_Sidebars_ShowController extends Controller {
     const href = item.custom ? escapeHtml(item.href(cid)) : item.href(cid)
     return `
       <a
-        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted"
         href="${href}"
         data-sidebar-link
         ${openByPathname()}
@@ -125,12 +125,12 @@ export default class Companies_Sidebars_ShowController extends Controller {
 
     const body = favItems.length > 0
       ? favItems.map(item => this.itemHTML(item)).join("\n")
-      : `<p class="px-3 py-2 text-xs text-slate-400 dark:text-slate-500">${translate("Click the star on any item to pin it here")}</p>`
+      : `<p class="px-3 py-2 text-xs text-muted-foreground">${translate("Click the star on any item to pin it here")}</p>`
 
     return `
-      <div class="flex flex-col gap-1 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700" data-sidebar-favourites>
-        <p class="px-3 pt-1 pb-1 text-sm font-medium leading-normal text-gray-900 dark:text-white flex items-center gap-1">
-          <span class="material-symbols-outlined text-[14px]! text-amber-500" style="font-variation-settings: 'FILL' 1">star</span>
+      <div class="flex flex-col gap-1 pb-2 mb-2 border-b border-line" data-sidebar-favourites>
+        <p class="px-3 pt-1 pb-1 text-sm font-medium leading-normal text-foreground flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px]! text-warning" style="font-variation-settings: 'FILL' 1">star</span>
           ${translate("Favourites")}
         </p>
         ${body}
@@ -143,15 +143,15 @@ export default class Companies_Sidebars_ShowController extends Controller {
   // renders the matches as clickable links.
   searchHTML() {
     return `
-      <div class="flex flex-col gap-1 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700" data-sidebar-search>
+      <div class="flex flex-col gap-1 pb-2 mb-2 border-b border-line" data-sidebar-search>
         <label for="sidebar-search" class="sr-only">${translate("Search sidebar")}</label>
-        <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-          <span class="material-symbols-outlined text-[18px] text-gray-500 dark:text-gray-400">search</span>
+        <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-muted border border-line">
+          <span class="material-symbols-outlined text-[18px] text-muted-foreground">search</span>
           <input
             id="sidebar-search"
             name="sidebar_search"
             type="search"
-            class="flex-1 min-w-0 bg-transparent border-none outline-none text-sm text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
+            class="flex-1 min-w-0 bg-transparent border-none outline-none text-sm text-foreground placeholder:text-muted-foreground"
             placeholder="${translate("Search sidebar items...")}"
             aria-label="${translate("Search sidebar")}"
             data-sidebar-search-input
@@ -177,13 +177,13 @@ export default class Companies_Sidebars_ShowController extends Controller {
         ${isOpen ? "open" : ""}
         data-action="toggle->${this.identifier}#groupToggled"
       >
-        <summary class="flex items-center justify-between gap-2 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 select-none list-none [&::-webkit-details-marker]:hidden">
-          <span class="text-sm font-medium leading-normal text-gray-900 dark:text-white flex items-center gap-1"
+        <summary class="flex items-center justify-between gap-2 px-3 py-2 rounded-lg cursor-pointer hover:bg-muted select-none list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-sm font-medium leading-normal text-foreground flex items-center gap-1"
             ${groupConfig.comingSoon ? tooltip({ html: translate("Coming soon"), position: "right" }) : ""}>
             ${translate(groupConfig.label)}
-            ${groupConfig.comingSoon ? `<span class="material-symbols-outlined text-[14px]! text-amber-500 dark:text-amber-400">error</span>` : ""}
+            ${groupConfig.comingSoon ? `<span class="material-symbols-outlined text-[14px]! text-warning ">error</span>` : ""}
           </span>
-          <span class="text-xs text-slate-500 dark:text-slate-400">${items.length}</span>
+          <span class="text-xs text-muted-foreground">${items.length}</span>
         </summary>
         <div class="flex flex-col gap-1 pt-1">
           ${items.map(item => this.itemHTML(item)).join("\n")}
@@ -204,7 +204,7 @@ export default class Companies_Sidebars_ShowController extends Controller {
           ${tooltip({ html: translate("Coming soon"), position: "right" })}>
           <span class="material-symbols-outlined">${item.icon}</span>
           <p class="text-sm font-medium leading-normal flex items-center gap-1">${translate(item.label)}
-            <span class="material-symbols-outlined text-[14px]! text-amber-500 dark:text-amber-400">error</span>
+            <span class="material-symbols-outlined text-[14px]! text-warning ">error</span>
           </p>
         </span>
       `
@@ -217,7 +217,7 @@ export default class Companies_Sidebars_ShowController extends Controller {
         data-sidebar-star="${item.key}"
         data-sidebar-starred="${starred}"
         data-action="click->${this.identifier}#toggleStar"
-        class="ml-auto flex items-center justify-center p-1 rounded-md shrink-0 cursor-pointer ${starred ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20" : "text-slate-300 dark:text-slate-600 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20"}"
+        class="ml-auto flex items-center justify-center p-1 rounded-md shrink-0 cursor-pointer ${starred ? "text-warning hover:text-warning hover:bg-warning/10 " : "text-muted-foreground/60 hover:text-warning hover:bg-warning/10 "}"
         ${tooltip({ html: translate(starred ? "Click to remove from favourites" : "Click to favourite"), position: "right" })}
       >
         <span class="material-symbols-outlined text-[18px]!" ${starred ? `style="font-variation-settings: 'FILL' 1"` : ""}>star</span>
@@ -230,7 +230,7 @@ export default class Companies_Sidebars_ShowController extends Controller {
     // and the open controller's openByPathname targets).
     return `
       <div
-        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 has-[a[open]]:bg-blue-100 has-[a[open]]:text-blue-600"
+        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted has-[a[open]]:bg-primary/10 has-[a[open]]:text-primary"
       >
         <a
           class="flex min-w-0 flex-1 items-center gap-3"

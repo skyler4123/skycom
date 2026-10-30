@@ -38,10 +38,10 @@ Each resource has 4 JavaScript controllers:
 
 ```
 app/javascript/controllers/companies/{resource}/
-├── index_controller.js    # List view — table with dynamic columns, category filter
-├── new_controller.js      # Creation form — type-aware dynamic property fields
-├── show_controller.js     # Read-only detail — type-aware value display
-└── edit_controller.js     # Edit form — type-aware fields, full-page PATCH
+├── index_controller.js # List view — table with dynamic columns, category filter
+├── new_controller.js # Creation form — type-aware dynamic property fields
+├── show_controller.js # Read-only detail — type-aware value display
+└── edit_controller.js # Edit form — type-aware fields, full-page PATCH
 ```
 
 Controllers are auto-registered via `pin_all_from` in `config/importmap.rb`. Creating a file at the correct path is sufficient — no manual registration needed.
@@ -158,11 +158,11 @@ Every view action needs a corresponding policy method. `edit?` maps to `update` 
 ```ruby
 # app/policies/companies/products_policy.rb
 class Companies::ProductsPolicy < ApplicationPolicy
-  def index?;  record.can?(:read,   Product) end
-  def show?;   record.can?(:read,   Product) end
-  def new?;    record.can?(:create, Product) end
+  def index?; record.can?(:read, Product) end
+  def show?; record.can?(:read, Product) end
+  def new?; record.can?(:create, Product) end
   def create?; record.can?(:create, Product) end
-  def edit?;   record.can?(:update, Product) end
+  def edit?; record.can?(:update, Product) end
   def update?; record.can?(:update, Product) end
 end
 ```
@@ -260,23 +260,23 @@ export default class Companies_Products_IndexController extends Companies_Layout
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
+        <div class="p-4 bg-card rounded-xl border border-line flex flex-col">
 
           <!-- Filter + Add -->
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <form method="get" action="${pathname()}" class="flex flex-col lg:flex-row items-end justify-between gap-4 w-full">
               <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                 <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Category</label>
+                  <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">Category</label>
                   <select
                     name="category_id"
-                    class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                    class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground"
                   >
                     ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
                   </select>
                 </div>
                 <div class="flex gap-2 mt-auto">
-                  <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center gap-2">
+                  <button type="submit" class="h-[38px] px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm flex items-center gap-2">
                     <span class="material-symbols-outlined text-[18px]!">search</span>
                     Search
                   </button>
@@ -284,7 +284,7 @@ export default class Companies_Products_IndexController extends Companies_Layout
               </div>
 
               <a href="${Helpers.new_company_product_path(currentCompany().id)}"
-                class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm whitespace-nowrap cursor-pointer">
+                class="flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm whitespace-nowrap cursor-pointer">
                 <span class="material-symbols-outlined text-[20px]">add</span>
                 Add
               </a>
@@ -302,21 +302,21 @@ export default class Companies_Products_IndexController extends Companies_Layout
               renderers: {
                 name: (value, record) => `
                   <div class="flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-                      <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[18px]!">inventory_2</span>
+                    <div class="w-8 h-8 rounded-lg bg-success/10 dark:bg-success/15/30 flex items-center justify-center shrink-0">
+                      <span class="material-symbols-outlined text-success text-[18px]!">inventory_2</span>
                     </div>
                     <a href="${Helpers.company_product_path(currentCompany().id, record.id)}"
-                      class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                      class="font-medium text-foreground overflow-visible whitespace-normal hover:text-primary transition-colors cursor-pointer">
                       ${value || 'Unnamed Product'}
                     </a>
                   </div>
                 `,
-                code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || '—'}</span>`
+                code: (value) => `<span class="font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium">${value || '—'}</span>`
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.edit_company_product_path(currentCompany().id, record.id)}"
-                    class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
+                    class="inline-flex items-center justify-center p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer">
                     <span class="material-symbols-outlined text-[20px]">edit</span>
                   </a>
                 </td>`
@@ -407,8 +407,8 @@ export default class Companies_Products_NewController extends Companies_LayoutCo
           <div class="flex items-center gap-3 py-2">
             <input type="hidden" name="product[${key}]" value="false">
             <input type="checkbox" name="product[${key}]" value="true"
-              class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer">
-            <span class="text-sm text-slate-900 dark:text-white">${label}</span>
+              class="h-5 w-5 rounded border-line text-primary cursor-pointer">
+            <span class="text-sm text-foreground">${label}</span>
           </div>
         `
       case 'integer':
@@ -425,8 +425,8 @@ export default class Companies_Products_NewController extends Companies_LayoutCo
   dynamicFieldsHTML() {
     if (this.propertyMetadata.length === 0) return ''
     return `
-      <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Properties</h3>
+      <div class="border-t border-line pt-6">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">Properties</h3>
         <div class="grid grid-cols-2 gap-4">
           ${this.propertyMetadata.map(f => this.renderField(f)).join('')}
         </div>
@@ -437,27 +437,27 @@ export default class Companies_Products_NewController extends Companies_LayoutCo
   contentHTML() {
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">New Product</h2>
+        <h2 class="text-xl font-bold text-foreground">New Product</h2>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Category</label>
+          <label class="text-[10px] font-bold text-muted-foreground uppercase">Category</label>
           <select name="product[category_id]" data-action="change->${this.identifier}#onCategoryChange"
-            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+            class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
             ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), this.categoryId)}
           </select>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Name</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">Name</label>
             <input type="text" name="product[name]" required placeholder="e.g. Premium Widget"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Type</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">Type</label>
             <select name="product[business_type]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
               ${(ENUMS?.product?.business_types || []).map(t =>
                 `<option value="${t.value}">${t.name}</option>`
               ).join('')}
@@ -465,17 +465,17 @@ export default class Companies_Products_NewController extends Companies_LayoutCo
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Description</label>
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">Description</label>
             <textarea name="product[description]" rows="3"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm"></textarea>
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm"></textarea>
           </div>
         </div>
 
         <div id="dynamic-fields">${this.dynamicFieldsHTML()}</div>
 
-        <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
+        <div class="flex justify-end pt-6 border-t border-line">
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer">
             Save Product
           </button>
         </div>
@@ -487,7 +487,7 @@ export default class Companies_Products_NewController extends Companies_LayoutCo
         ${form({
           action: Helpers.create_company_products_path(currentCompany().id),
           method: "POST",
-          attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false"`,
+          attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false"`,
           html: fields
         })}
       </div>
@@ -550,7 +550,7 @@ export default class Companies_Products_ShowController extends Companies_LayoutC
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = '<div class="p-8 text-center text-red-600">Failed to load product.</div>'
+          this.contentTarget.innerHTML = '<div class="p-8 text-center text-danger">Failed to load product.</div>'
           return true
         }
         return false
@@ -563,18 +563,18 @@ export default class Companies_Products_ShowController extends Companies_LayoutC
   }
 
   formatDisplayValue(value, type) {
-    if (value === null || value === undefined) return '<span class="text-slate-300 dark:text-slate-700">—</span>'
+    if (value === null || value === undefined) return '<span class="text-muted-foreground/60">—</span>'
     switch (type) {
       case 'boolean':
-        return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${value ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-50 text-slate-700'}">${value ? 'Yes' : 'No'}</span>`
+        return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${value ? 'bg-success/10 text-success' : 'bg-background text-foreground'}">${value ? 'Yes' : 'No'}</span>`
       case 'integer':
-        return `<span class="font-mono text-slate-900 dark:text-slate-100">${Number(value).toLocaleString()}</span>`
+        return `<span class="font-mono text-foreground">${Number(value).toLocaleString()}</span>`
       case 'decimal':
-        return `<span class="font-mono font-medium text-blue-600 dark:text-blue-400">${Number(value).toFixed(2)}</span>`
+        return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
       case 'datetime':
-        return `<span class="text-sm text-slate-900 dark:text-white">${new Date(value).toLocaleString()}</span>`
+        return `<span class="text-sm text-foreground">${new Date(value).toLocaleString()}</span>`
       default:
-        return `<span class="text-sm text-slate-900 dark:text-white">${value}</span>`
+        return `<span class="text-sm text-foreground">${value}</span>`
     }
   }
 
@@ -586,17 +586,17 @@ export default class Companies_Products_ShowController extends Companies_LayoutC
     const category = currentCategories().find(c => c.id === p.category_id)
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
-      <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-4">Properties</h3>
+      <div class="border-t border-line pt-6 mt-6">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase mb-4">Properties</h3>
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           ${this.propertyMetadata.map(field => `
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-emerald-600">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-success">
                 <span class="material-symbols-outlined text-[20px]">${field.type === 'boolean' ? 'check_circle' : field.type === 'datetime' ? 'calendar_month' : 'text_fields'}</span>
               </div>
               <div class="min-w-0 flex-1">
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${field.name}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${this.formatDisplayValue(p[field.key], field.type)}</p>
+                <p class="text-xs font-medium text-muted-foreground">${field.name}</p>
+                <p class="text-sm font-semibold text-foreground">${this.formatDisplayValue(p[field.key], field.type)}</p>
               </div>
             </div>
           `).join('')}
@@ -606,61 +606,61 @@ export default class Companies_Products_ShowController extends Companies_LayoutC
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div class="p-6 bg-card rounded-xl border border-line">
           <a href="${Helpers.company_products_path(companyId)}"
-            class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6">
+            class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             Back to Products
           </a>
 
           <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-start mb-6">
-            <div class="size-24 shrink-0 overflow-hidden rounded-xl bg-emerald-100 dark:bg-gray-800 flex items-center justify-center">
-              <span class="material-symbols-outlined text-4xl text-emerald-600">inventory_2</span>
+            <div class="size-24 shrink-0 overflow-hidden rounded-xl bg-success/10 dark:bg-muted flex items-center justify-center">
+              <span class="material-symbols-outlined text-4xl text-success">inventory_2</span>
             </div>
             <div class="flex flex-1 flex-col text-center sm:text-left">
-              <h2 class="text-2xl font-black text-slate-900 dark:text-white">${p.name}</h2>
-              <p class="font-semibold text-emerald-600">${p.description || ''}</p>
-              <span class="inline-flex items-center rounded-lg bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700 uppercase mt-2">${p.code || 'N/A'}</span>
+              <h2 class="text-2xl font-black text-foreground">${p.name}</h2>
+              <p class="font-semibold text-success">${p.description || ''}</p>
+              <span class="inline-flex items-center rounded-lg bg-success/10 px-3 py-1 text-xs font-bold text-success uppercase mt-2">${p.code || 'N/A'}</span>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 gap-6 border-t border-slate-200 dark:border-gray-800 pt-6 sm:grid-cols-2">
+          <div class="grid grid-cols-1 gap-6 border-t border-line pt-6 sm:grid-cols-2">
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-emerald-600">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-success">
                 <span class="material-symbols-outlined">category</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500">Type</p>
-                <p class="text-sm font-semibold text-slate-900">${Helpers.capitalize(p.business_type || 'physical')}</p>
+                <p class="text-xs font-medium text-muted-foreground">Type</p>
+                <p class="text-sm font-semibold text-foreground">${Helpers.capitalize(p.business_type || 'physical')}</p>
               </div>
             </div>
 
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-emerald-600">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-success">
                 <span class="material-symbols-outlined">toggle_on</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500">Status</p>
+                <p class="text-xs font-medium text-muted-foreground">Status</p>
                 <p class="text-sm font-semibold">${Helpers.statusBadge(p.workflow_status)}</p>
               </div>
             </div>
 
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-emerald-600">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-success">
                 <span class="material-symbols-outlined">folder</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500">Category</p>
-                <p class="text-sm font-semibold text-slate-900">${category?.name || 'N/A'}</p>
+                <p class="text-xs font-medium text-muted-foreground">Category</p>
+                <p class="text-sm font-semibold text-foreground">${category?.name || 'N/A'}</p>
               </div>
             </div>
           </div>
 
           ${dynamicFields}
 
-          <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-gray-800">
+          <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-line">
             <a href="${Helpers.edit_company_product_path(companyId, p.id)}"
-              class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm cursor-pointer">
+              class="inline-flex items-center px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm cursor-pointer">
               Edit Product
             </a>
           </div>
@@ -735,8 +735,8 @@ export default class Companies_Products_EditController extends Companies_LayoutC
 
     // Dynamic property fields — same type-aware rendering as new page
     const dynamicFields = this.propertyMetadata.length > 0 ? `
-      <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-4">Properties</h3>
+      <div class="border-t border-line pt-6 mt-6">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase mb-4">Properties</h3>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           ${this.propertyMetadata.map(field => {
             const value = p[field.key]
@@ -746,7 +746,7 @@ export default class Companies_Products_EditController extends Companies_LayoutC
                 inputHTML = `
                   <input type="hidden" name="product[${field.key}]" value="false">
                   <input type="checkbox" name="product[${field.key}]" value="true" ${value ? 'checked' : ''}
-                    class="rounded border-slate-300 text-blue-600 cursor-pointer">`
+                    class="rounded border-line text-primary cursor-pointer">`
                 break
               case 'integer':
                 inputHTML = `<input type="number" step="1" name="product[${field.key}]" value="${value ?? ''}" class="...">`
@@ -762,7 +762,7 @@ export default class Companies_Products_EditController extends Companies_LayoutC
             }
             return `
               <div>
-                <label class="text-xs font-medium text-slate-500">${field.name}</label>
+                <label class="text-xs font-medium text-muted-foreground">${field.name}</label>
                 ${inputHTML}
               </div>
             `
@@ -773,36 +773,36 @@ export default class Companies_Products_EditController extends Companies_LayoutC
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Edit Product</h2>
-        <p class="text-sm text-slate-500">${p.name}</p>
+        <h2 class="text-xl font-bold text-foreground">Edit Product</h2>
+        <p class="text-sm text-muted-foreground">${p.name}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-xs font-medium text-slate-500">Name</label>
+            <label class="text-xs font-medium text-muted-foreground">Name</label>
             <input type="text" name="product[name]" value="${p.name || ''}" required class="...">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-xs font-medium text-slate-500">Description</label>
+            <label class="text-xs font-medium text-muted-foreground">Description</label>
             <textarea name="product[description]" rows="2" class="...">${p.description || ''}</textarea>
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500">Type</label>
+            <label class="text-xs font-medium text-muted-foreground">Type</label>
             <select name="product[business_type]" class="...">
               ${selectOptionsHTML(businessTypes, p.business_type || 'physical')}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500">Status</label>
+            <label class="text-xs font-medium text-muted-foreground">Status</label>
             <select name="product[workflow_status]" class="...">
               ${selectOptionsHTML(workflowStatuses, p.workflow_status)}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500">Category</label>
+            <label class="text-xs font-medium text-muted-foreground">Category</label>
             <input type="text" value="${currentCategories().find(c => c.id === p.category_id)?.name || ''}" disabled class="...">
             <input type="hidden" name="product[category_id]" value="${p.category_id}">
           </div>
@@ -812,11 +812,11 @@ export default class Companies_Products_EditController extends Companies_LayoutC
 
         <div class="flex justify-end gap-3 pt-2">
           <a href="${Helpers.company_product_path(companyId, p.id)}"
-            class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
+            class="px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted rounded-lg cursor-pointer">
             Cancel
           </a>
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
+            class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer">
             Save Changes
           </button>
         </div>
@@ -828,7 +828,7 @@ export default class Companies_Products_EditController extends Companies_LayoutC
         ${form({
           action: Helpers.company_product_path(companyId, p.id),
           method: "PATCH",
-          attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false" novalidate`,
+          attributes: `class="p-6 bg-card rounded-xl border border-line" data-turbo="false" novalidate`,
           html: fields
         })}
       </div>
@@ -962,10 +962,10 @@ end
 
 ```
 app/javascript/controllers/companies/my_new_resource/
-├── index_controller.js   # extends Companies_LayoutController
-├── new_controller.js     # extends Companies_LayoutController
-├── show_controller.js    # extends Companies_LayoutController
-└── edit_controller.js    # extends Companies_LayoutController
+├── index_controller.js # extends Companies_LayoutController
+├── new_controller.js # extends Companies_LayoutController
+├── show_controller.js # extends Companies_LayoutController
+└── edit_controller.js # extends Companies_LayoutController
 ```
 
 ### Step 3: Add URL Helpers
@@ -1047,11 +1047,11 @@ end
 ```ruby
 # app/policies/companies/my_new_resources_policy.rb
 class Companies::MyNewResourcesPolicy < ApplicationPolicy
-  def index?;  record.can?(:read,   MyNewResource) end
-  def show?;   record.can?(:read,   MyNewResource) end
-  def new?;    record.can?(:create, MyNewResource) end
+  def index?; record.can?(:read, MyNewResource) end
+  def show?; record.can?(:read, MyNewResource) end
+  def new?; record.can?(:create, MyNewResource) end
   def create?; record.can?(:create, MyNewResource) end
-  def edit?;   record.can?(:update, MyNewResource) end
+  def edit?; record.can?(:update, MyNewResource) end
   def update?; record.can?(:update, MyNewResource) end
 end
 ```

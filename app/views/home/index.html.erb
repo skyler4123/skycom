@@ -6,32 +6,32 @@
   <meta property="og:description" content="One account. Infinite multi-tenant businesses. Run all your ventures under one unified platform.">
   <meta property="og:type" content="website">
 <% end %>
-<div class="bg-gray-50 dark:bg-gray-950">
+<div class="bg-background ">
   <div class="relative flex min-h-screen w-full flex-col overflow-x-clip">
-    <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur-xl dark:border-slate-800 dark:bg-gray-950/85">
+    <header class="sticky top-0 z-50 border-b border-line bg-background/85 backdrop-blur-xl ">
       <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-8">
         <a
           class="flex items-center gap-2 cursor-pointer"
           href="/"
         >
           <img alt="Skycom Logo" class="h-8 w-auto object-contain" src="/icon.svg">
-          <span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Skycom</span>
+          <span class="text-lg font-bold tracking-tight text-foreground">Skycom</span>
         </a>
         <nav class="hidden items-center gap-6 lg:flex">
-          <a class="text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" href="#solutions">Solutions</a>
-          <a class="text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" href="#pricing">Pricing</a>
-          <a class="text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" href="#platform">Docs</a>
+          <a class="text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground " href="#solutions">Solutions</a>
+          <a class="text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground " href="#pricing">Pricing</a>
+          <a class="text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground " href="#platform">Docs</a>
         </nav>
         <div class="flex items-center gap-2" id="header-guest">
           <a
-            class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+            class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground cursor-pointer "
             href="/sign_in"
             role="sign-in-button"
           >
             Sign In
           </a>
           <a
-            class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 cursor-pointer"
+            class="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 cursor-pointer"
             href="/sign_up"
             role="sign-up-button"
           >
@@ -39,16 +39,16 @@
           </a>
         </div>
         <div class="hidden items-center gap-2" id="header-signedin">
-          <a class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white" href="/redirect/companies" id="header-dashboard-link">Go to Dashboard</a>
+          <a class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground cursor-pointer " href="/redirect/companies" id="header-dashboard-link">Go to Dashboard</a>
           <a
-            class="hidden rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+            class="hidden rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground cursor-pointer "
             href="/admin/companies"
             id="header-admin-link"
           >
             Admin Dashboard
           </a>
           <a
-            class="hidden rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+            class="hidden rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground cursor-pointer "
             href="/companies/new"
             id="header-new-company-link"
           >
@@ -61,78 +61,78 @@
     <main class="w-full">
       <!-- HERO SECTION -->
       <section class="relative overflow-hidden px-4 pb-16 pt-10 md:px-8 md:pt-16">
-        <div class="pointer-events-none absolute -top-32 left-1/2 h-96 w-full max-w-4xl -translate-x-1/2 rounded-full bg-gradient-to-tr from-indigo-200/50 via-slate-200/60 to-emerald-100/50 blur-3xl dark:from-indigo-950/60 dark:via-slate-900/60 dark:to-emerald-950/40"></div>
+        <div class="pointer-events-none absolute -top-32 left-1/2 h-96 w-full max-w-4xl -translate-x-1/2 rounded-full bg-gradient-to-tr from-primary/20 via-background/60 to-success/20 blur-3xl "></div>
         <div class="relative mx-auto flex max-w-7xl flex-col items-center text-center">
-          <div class="mb-6 inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 shadow-sm dark:bg-slate-900">
+          <div class="mb-6 inline-flex items-center gap-2 rounded-full bg-card px-4 py-1.5 shadow-sm ">
             <span class="relative flex h-2 w-2">
-              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
-              <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-600"></span>
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-success/100 opacity-75"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-success"></span>
             </span>
-            <span class="text-xs font-bold text-emerald-700 dark:text-emerald-300">One Master Account • Infinite Multi-Tenant Businesses</span>
-            <span class="text-slate-300 dark:text-slate-600">•</span>
+            <span class="text-xs font-bold text-success ">One Master Account • Infinite Multi-Tenant Businesses</span>
+            <span class="text-muted-foreground/60">•</span>
             <a
-              class="flex items-center gap-1 text-xs font-semibold text-indigo-600 cursor-pointer dark:text-indigo-400"
+              class="flex items-center gap-1 text-xs font-semibold text-primary cursor-pointer "
               href="/sign_up"
             >
               <span class="material-symbols-outlined text-base">bolt</span> $0 Base Fee
             </a>
           </div>
-          <h1 class="max-w-5xl text-4xl font-black leading-tight tracking-tight text-slate-900 md:text-5xl dark:text-white">One Account. Infinite Multi-Tenant Businesses. <span class="mt-1 block text-indigo-600 dark:text-indigo-400">Run All Your Ventures Under One Unified Platform.</span></h1>
-          <p class="mb-8 mt-4 max-w-3xl text-lg leading-relaxed text-slate-600 dark:text-slate-400">Entrepreneurs, holding groups, and franchise operators can now spin up and manage entirely distinct businesses in seconds — a fashion boutique today, a hotel tomorrow, a bistro or dental clinic next. All managed under <strong>one single account</strong> with instant business switching, zero per-business base fees, and an action-based credit pool that shares or caps spend across your entire portfolio.</p>
+          <h1 class="max-w-5xl text-4xl font-black leading-tight tracking-tight text-foreground md:text-5xl ">One Account. Infinite Multi-Tenant Businesses. <span class="mt-1 block text-primary">Run All Your Ventures Under One Unified Platform.</span></h1>
+          <p class="mb-8 mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">Entrepreneurs, holding groups, and franchise operators can now spin up and manage entirely distinct businesses in seconds — a fashion boutique today, a hotel tomorrow, a bistro or dental clinic next. All managed under <strong>one single account</strong> with instant business switching, zero per-business base fees, and an action-based credit pool that shares or caps spend across your entire portfolio.</p>
           <div class="flex w-full max-w-md flex-wrap items-center justify-center gap-3">
             <a
-              class="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-6 text-base font-bold text-white shadow-md transition-all hover:bg-indigo-700 cursor-pointer sm:flex-none"
+              class="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-6 text-base font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 cursor-pointer sm:flex-none"
               href="/sign_up"
             >
               <span>Claim Free Starter Credits</span>
               <span class="material-symbols-outlined text-lg">arrow_forward</span>
             </a>
-            <a class="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-white px-6 text-base font-bold text-slate-900 shadow-sm transition-all hover:bg-slate-100 sm:flex-none dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800" href="#interactive-preview">
-              <span class="material-symbols-outlined text-lg text-indigo-600 dark:text-indigo-400">play_circle</span>
+            <a class="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-card px-6 text-base font-bold text-foreground shadow-sm transition-all hover:bg-muted sm:flex-none " href="#interactive-preview">
+              <span class="material-symbols-outlined text-lg text-primary">play_circle</span>
               <span>Explore Interactive Demo</span>
             </a>
           </div>
-          <div class="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-600 dark:text-slate-400">
-            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">card_giftcard</span> Free Refill Credits Every Month</span>
-            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">timelapse</span> Pay-As-You-Go Overages</span>
-            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">block</span> No Fixed Monthly Subscriptions</span>
+          <div class="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-success ">card_giftcard</span> Free Refill Credits Every Month</span>
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-success ">timelapse</span> Pay-As-You-Go Overages</span>
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-success ">block</span> No Fixed Monthly Subscriptions</span>
           </div>
           <!-- Live Dynamic Enterprise Console Mockup -->
-          <div class="mt-10 w-full max-w-6xl scroll-mt-24 rounded-2xl bg-white p-2 text-left shadow-xl dark:bg-slate-900" id="interactive-preview">
-            <div class="flex flex-col gap-3 rounded-xl bg-slate-100 p-4 dark:bg-slate-800">
-              <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3 dark:border-slate-700">
+          <div class="mt-10 w-full max-w-6xl scroll-mt-24 rounded-2xl bg-card p-2 text-left shadow-xl " id="interactive-preview">
+            <div class="flex flex-col gap-3 rounded-xl bg-muted p-4 ">
+              <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3 ">
                 <div class="flex items-center gap-2.5">
-                  <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm">
+                  <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
                     <span class="material-symbols-outlined text-lg">account_tree</span>
                   </div>
                   <div class="text-left">
                     <div class="flex items-center gap-2">
-                      <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Master Account</span>
-                      <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"><span class="h-1.5 w-1.5 rounded-full bg-emerald-600"></span> 3 Isolated Tenants</span>
+                      <span class="text-xs font-bold uppercase tracking-wider text-muted-foreground">Master Account</span>
+                      <span class="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-xs font-semibold text-success "><span class="h-1.5 w-1.5 rounded-full bg-success"></span> 3 Isolated Tenants</span>
                     </div>
-                    <p class="text-sm font-bold leading-tight text-slate-900 dark:text-white">Apex Multi-Venture Group Holdings</p>
+                    <p class="text-sm font-bold leading-tight text-foreground">Apex Multi-Venture Group Holdings</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-3">
-                  <div class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-left shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                    <span class="material-symbols-outlined text-xl text-indigo-600 dark:text-indigo-400">account_balance_wallet</span>
+                  <div class="flex items-center gap-2 rounded-lg border border-line bg-card px-3 py-1.5 text-left shadow-sm ">
+                    <span class="material-symbols-outlined text-xl text-primary">account_balance_wallet</span>
                     <div>
-                      <p class="text-xs font-semibold uppercase leading-none text-slate-500 dark:text-slate-400">Master Credit Pool</p>
-                      <p class="text-sm font-bold leading-tight text-slate-900 dark:text-white"><span data-live="pool">9,420</span> <span class="text-xs font-normal text-slate-500 dark:text-slate-400">/ 10,000 Credits</span></p>
+                      <p class="text-xs font-semibold uppercase leading-none text-muted-foreground">Master Credit Pool</p>
+                      <p class="text-sm font-bold leading-tight text-foreground"><span data-live="pool">9,420</span> <span class="text-xs font-normal text-muted-foreground">/ 10,000 Credits</span></p>
                     </div>
                   </div>
-                  <div class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-2.5 py-1.5 text-sm font-semibold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
-                    <span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">autorenew</span>
+                  <div class="inline-flex items-center gap-1.5 rounded-lg border border-success/30 bg-success/10 px-2.5 py-1.5 text-sm font-semibold text-success ">
+                    <span class="material-symbols-outlined text-base text-success ">autorenew</span>
                     <span>Refill in 18d</span>
                   </div>
                 </div>
               </div>
               <div class="flex flex-wrap items-center justify-between gap-2 pt-0.5">
                 <div class="flex flex-wrap items-center gap-2">
-                  <span class="mr-1 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Active Space:</span>
+                  <span class="mr-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Active Space:</span>
                   <button
                     aria-pressed="true"
-                    class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-bold text-slate-600 transition-colors aria-pressed:bg-white aria-pressed:text-indigo-600 aria-pressed:shadow-sm hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:aria-pressed:bg-slate-900 dark:aria-pressed:text-indigo-300 dark:hover:text-white"
+                    class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-bold text-muted-foreground transition-colors aria-pressed:bg-card aria-pressed:text-primary aria-pressed:shadow-sm hover:text-foreground cursor-pointer "
                     data-action="click->home--index#switchTenant"
                     data-home--index-tenant-name-param="Apex Retail Flagship"
                     data-home--index-base-sales-param="18450"
@@ -143,11 +143,11 @@
                   >
                     <span class="material-symbols-outlined text-lg">storefront</span>
                     <span>Apex Retail Flagship POS</span>
-                    <span class="rounded bg-indigo-600 px-1.5 py-0.5 text-xs font-bold text-white">Active Space</span>
+                    <span class="rounded bg-primary px-1.5 py-0.5 text-xs font-bold text-primary-foreground">Active Space</span>
                   </button>
                   <button
                     aria-pressed="false"
-                    class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors aria-pressed:bg-white aria-pressed:text-indigo-600 aria-pressed:shadow-sm hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:aria-pressed:bg-slate-900 dark:aria-pressed:text-indigo-300 dark:hover:text-white"
+                    class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-muted-foreground transition-colors aria-pressed:bg-card aria-pressed:text-primary aria-pressed:shadow-sm hover:text-foreground cursor-pointer "
                     data-action="click->home--index#switchTenant"
                     data-home--index-tenant-name-param="Grand Azalea Hotel"
                     data-home--index-base-sales-param="9650"
@@ -158,11 +158,11 @@
                   >
                     <span class="material-symbols-outlined text-lg">hotel</span>
                     <span>Grand Azalea Hotel PMS</span>
-                    <span class="rounded bg-slate-200 px-1.5 py-0.5 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300">Isolated</span>
+                    <span class="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground ">Isolated</span>
                   </button>
                   <button
                     aria-pressed="false"
-                    class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors aria-pressed:bg-white aria-pressed:text-indigo-600 aria-pressed:shadow-sm hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:aria-pressed:bg-slate-900 dark:aria-pressed:text-indigo-300 dark:hover:text-white"
+                    class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-muted-foreground transition-colors aria-pressed:bg-card aria-pressed:text-primary aria-pressed:shadow-sm hover:text-foreground cursor-pointer "
                     data-action="click->home--index#switchTenant"
                     data-home--index-tenant-name-param="Bistro 88 Bar & Grill"
                     data-home--index-base-sales-param="5230"
@@ -173,11 +173,11 @@
                   >
                     <span class="material-symbols-outlined text-lg">restaurant</span>
                     <span>Bistro 88 Bar &amp; Grill</span>
-                    <span class="rounded bg-slate-200 px-1.5 py-0.5 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300">Isolated</span>
+                    <span class="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground ">Isolated</span>
                   </button>
                 </div>
                 <a
-                  class="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-white px-3 py-1.5 text-sm font-semibold text-emerald-700 shadow-sm transition-colors hover:bg-emerald-600 hover:text-white cursor-pointer dark:border-emerald-800 dark:bg-slate-900 dark:text-emerald-300 dark:hover:bg-emerald-600 dark:hover:text-white"
+                  class="flex items-center gap-1.5 rounded-lg border border-success/30 bg-card px-3 py-1.5 text-sm font-semibold text-success shadow-sm transition-colors hover:bg-success/90 hover:text-success-foreground cursor-pointer "
                   href="/sign_up"
                 >
                   <span class="material-symbols-outlined text-base">add_business</span>
@@ -186,50 +186,50 @@
               </div>
             </div>
             <div class="grid grid-cols-1 gap-4 p-4 text-left md:grid-cols-3 md:p-6">
-              <div class="rounded-xl border border-slate-200 bg-gray-50 p-4 transition-colors hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800">
+              <div class="rounded-xl border border-line bg-background p-4 transition-colors hover:border-line ">
                 <div class="flex items-start justify-between">
                   <div>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Today's Gross Sales</span>
-                    <p class="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white" data-live="sales">$18,450.00</p>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Today's Gross Sales</span>
+                    <p class="mt-1 text-2xl font-bold tracking-tight text-foreground" data-live="sales">$18,450.00</p>
                   </div>
-                  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary /50 ">
                     <span class="material-symbols-outlined text-xl">point_of_sale</span>
                   </div>
                 </div>
-                <div class="mt-2.5 flex items-center justify-between border-t border-slate-200 pt-2 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                  <span class="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400"><span class="material-symbols-outlined text-base">trending_up</span> <span data-live="txns">248 transactions</span></span>
+                <div class="mt-2.5 flex items-center justify-between border-t border-line pt-2 text-xs text-muted-foreground ">
+                  <span class="flex items-center gap-1 font-semibold text-success "><span class="material-symbols-outlined text-base">trending_up</span> <span data-live="txns">248 transactions</span></span>
                   <span>Across 3 active registers</span>
                 </div>
               </div>
-              <div class="rounded-xl border border-slate-200 bg-gray-50 p-4 transition-colors hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800">
+              <div class="rounded-xl border border-line bg-background p-4 transition-colors hover:border-line ">
                 <div class="flex items-start justify-between">
                   <div>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Live Inventory Sync</span>
-                    <p class="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">194,204 SKUs</p>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Live Inventory Sync</span>
+                    <p class="mt-1 text-2xl font-bold tracking-tight text-foreground">194,204 SKUs</p>
                   </div>
-                  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10 text-success ">
                     <span class="material-symbols-outlined text-xl">sync_alt</span>
                   </div>
                 </div>
-                <div class="mt-2.5 flex items-center justify-between border-t border-slate-200 pt-2 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                  <span class="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400"><span class="material-symbols-outlined text-base">verified</span> Real-time barcode &amp; POS sync</span>
+                <div class="mt-2.5 flex items-center justify-between border-t border-line pt-2 text-xs text-muted-foreground ">
+                  <span class="flex items-center gap-1 font-semibold text-success "><span class="material-symbols-outlined text-base">verified</span> Real-time barcode &amp; POS sync</span>
                   <span>0 sync lag</span>
                 </div>
               </div>
-              <div class="rounded-xl border border-slate-200 bg-gray-50 p-4 transition-colors hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800">
+              <div class="rounded-xl border border-line bg-background p-4 transition-colors hover:border-line ">
                 <div class="flex items-start justify-between">
                   <div>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Today's Action Cost</span>
-                    <p class="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white"><span data-live="credits">34.2</span> <span class="text-base font-normal text-slate-500 dark:text-slate-400">Credits</span></p>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Today's Action Cost</span>
+                    <p class="mt-1 text-2xl font-bold tracking-tight text-foreground"><span data-live="credits">34.2</span> <span class="text-base font-normal text-muted-foreground">Credits</span></p>
                   </div>
-                  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-warning/10 text-warning ">
                     <span class="material-symbols-outlined text-xl">toll</span>
                   </div>
                 </div>
-                <div class="mt-2.5 flex items-center justify-between border-t border-slate-200 pt-2 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                  <span class="flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400"><span class="material-symbols-outlined text-base">hub</span> From 10,000 pooled pool</span>
+                <div class="mt-2.5 flex items-center justify-between border-t border-line pt-2 text-xs text-muted-foreground ">
+                  <span class="flex items-center gap-1 font-semibold text-primary"><span class="material-symbols-outlined text-base">hub</span> From 10,000 pooled pool</span>
                   <a
-                    class="font-bold text-emerald-600 cursor-pointer dark:text-emerald-400"
+                    class="font-bold text-success cursor-pointer "
                     href="/sign_up"
                   >
                     $0 base fee
@@ -238,97 +238,97 @@
               </div>
             </div>
             <div class="grid grid-cols-1 gap-4 px-4 pb-4 text-left md:p-6 lg:grid-cols-12">
-              <div class="flex flex-col justify-between rounded-xl border border-slate-200 bg-gray-50 p-4 lg:col-span-7 dark:border-slate-700 dark:bg-slate-800">
+              <div class="flex flex-col justify-between rounded-xl border border-line bg-background p-4 lg:col-span-7 ">
                 <div>
                   <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <div class="flex items-center gap-2">
-                        <h3 class="text-base font-bold text-slate-900 dark:text-white" id="tenant-title">Apex Retail Flagship</h3>
-                        <span class="rounded bg-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">POS Operational View</span>
+                        <h3 class="text-base font-bold text-foreground" id="tenant-title">Apex Retail Flagship</h3>
+                        <span class="rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary /50 ">POS Operational View</span>
                       </div>
-                      <p class="mt-0.5 text-sm text-slate-600 dark:text-slate-400">Hourly transaction velocity &amp; register throughput (08:00 - 20:00)</p>
+                      <p class="mt-0.5 text-sm text-muted-foreground">Hourly transaction velocity &amp; register throughput (08:00 - 20:00)</p>
                     </div>
-                    <div class="flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-sm font-semibold text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white">
-                      <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-600"></span>
+                    <div class="flex items-center gap-1.5 rounded-md border border-line bg-card px-2.5 py-1 text-sm font-semibold text-foreground shadow-sm ">
+                      <span class="h-2 w-2 animate-pulse rounded-full bg-success"></span>
                       <span>Online High-Availability Sync</span>
                     </div>
                   </div>
                   <div class="my-3 grid grid-cols-3 gap-2">
-                    <div class="rounded-lg border border-slate-200 bg-white p-2 text-center dark:border-slate-700 dark:bg-slate-900">
-                      <p class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Peak Hourly Pace</p>
-                      <p class="text-sm font-bold text-indigo-600 dark:text-indigo-400">42 tx/hr (14:00)</p>
+                    <div class="rounded-lg border border-line bg-card p-2 text-center ">
+                      <p class="text-xs font-semibold uppercase text-muted-foreground">Peak Hourly Pace</p>
+                      <p class="text-sm font-bold text-primary">42 tx/hr (14:00)</p>
                     </div>
-                    <div class="rounded-lg border border-slate-200 bg-white p-2 text-center dark:border-slate-700 dark:bg-slate-900">
-                      <p class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Average Basket</p>
-                      <p class="text-sm font-bold text-slate-900 dark:text-white">$74.40</p>
+                    <div class="rounded-lg border border-line bg-card p-2 text-center ">
+                      <p class="text-xs font-semibold uppercase text-muted-foreground">Average Basket</p>
+                      <p class="text-sm font-bold text-foreground">$74.40</p>
                     </div>
-                    <div class="rounded-lg border border-slate-200 bg-white p-2 text-center dark:border-slate-700 dark:bg-slate-900">
-                      <p class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Cloud Scan Latency</p>
-                      <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400" data-live="latency">110ms</p>
+                    <div class="rounded-lg border border-line bg-card p-2 text-center ">
+                      <p class="text-xs font-semibold uppercase text-muted-foreground">Cloud Scan Latency</p>
+                      <p class="text-sm font-bold text-success " data-live="latency">110ms</p>
                     </div>
                   </div>
                 </div>
                 <div class="pt-3">
                   <div data-home--index-target="velocityChart" class="h-44"></div>
-                  <div class="flex items-center justify-between border-t border-slate-200 pt-2 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
-                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded bg-indigo-600"></span> Peak Traffic: 14:00 - 15:30</span>
-                    <span class="font-semibold text-emerald-600 dark:text-emerald-400">100% Real-Time Cloud Audit Stream</span>
+                  <div class="flex items-center justify-between border-t border-line pt-2 text-xs text-muted-foreground ">
+                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded bg-primary"></span> Peak Traffic: 14:00 - 15:30</span>
+                    <span class="font-semibold text-success ">100% Real-Time Cloud Audit Stream</span>
                   </div>
                 </div>
               </div>
-              <div class="flex flex-col justify-between rounded-xl border border-slate-200 bg-gray-50 p-4 lg:col-span-5 dark:border-slate-700 dark:bg-slate-800">
+              <div class="flex flex-col justify-between rounded-xl border border-line bg-background p-4 lg:col-span-5 ">
                 <div>
                   <div class="mb-3 flex items-center justify-between">
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Active Tenant Action Ledger</h3>
-                    <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">Action Micropayments</span>
+                    <h3 class="text-base font-bold text-foreground">Active Tenant Action Ledger</h3>
+                    <span class="rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-bold text-success ">Action Micropayments</span>
                   </div>
-                  <p class="mb-3 text-xs text-slate-600 dark:text-slate-400">Live fractional credit burn for the active tenant space only.</p>
+                  <p class="mb-3 text-xs text-muted-foreground">Live fractional credit burn for the active tenant space only.</p>
                   <div class="space-y-2.5">
-                    <div class="flex items-center justify-between gap-2.5 rounded-lg border border-slate-200 bg-white p-2.5 dark:border-slate-700 dark:bg-slate-900">
+                    <div class="flex items-center justify-between gap-2.5 rounded-lg border border-line bg-card p-2.5 ">
                       <div class="flex min-w-0 items-center gap-2.5">
-                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"><span class="material-symbols-outlined text-base">receipt</span></span>
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-success/10 text-success "><span class="material-symbols-outlined text-base">receipt</span></span>
                         <div class="min-w-0">
-                          <p class="truncate text-sm font-bold leading-tight text-slate-900 dark:text-white">Retail Checkout #1042</p>
-                          <p class="truncate text-xs text-slate-500 dark:text-slate-400">Register 02 • $142.50 order</p>
+                          <p class="truncate text-sm font-bold leading-tight text-foreground">Retail Checkout #1042</p>
+                          <p class="truncate text-xs text-muted-foreground">Register 02 • $142.50 order</p>
                         </div>
                       </div>
-                      <span class="whitespace-nowrap rounded bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">-0.10 Credits</span>
+                      <span class="whitespace-nowrap rounded bg-success/10 px-2 py-0.5 text-xs font-bold text-success ">-0.10 Credits</span>
                     </div>
-                    <div class="flex items-center justify-between gap-2.5 rounded-lg border border-slate-200 bg-white p-2.5 dark:border-slate-700 dark:bg-slate-900">
+                    <div class="flex items-center justify-between gap-2.5 rounded-lg border border-line bg-card p-2.5 ">
                       <div class="flex min-w-0 items-center gap-2.5">
-                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300"><span class="material-symbols-outlined text-base">local_shipping</span></span>
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary /50 "><span class="material-symbols-outlined text-base">local_shipping</span></span>
                         <div class="min-w-0">
-                          <p class="truncate text-sm font-bold leading-tight text-slate-900 dark:text-white">Auto-PO Vendor Dispatch</p>
-                          <p class="truncate text-xs text-slate-500 dark:text-slate-400">Safety stock replenishment trigger</p>
+                          <p class="truncate text-sm font-bold leading-tight text-foreground">Auto-PO Vendor Dispatch</p>
+                          <p class="truncate text-xs text-muted-foreground">Safety stock replenishment trigger</p>
                         </div>
                       </div>
-                      <span class="whitespace-nowrap rounded bg-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">-0.05 Credits</span>
+                      <span class="whitespace-nowrap rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary /50 ">-0.05 Credits</span>
                     </div>
-                    <div class="flex items-center justify-between gap-2.5 rounded-lg border border-slate-200 bg-white p-2.5 dark:border-slate-700 dark:bg-slate-900">
+                    <div class="flex items-center justify-between gap-2.5 rounded-lg border border-line bg-card p-2.5 ">
                       <div class="flex min-w-0 items-center gap-2.5">
-                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"><span class="material-symbols-outlined text-base">sms</span></span>
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground "><span class="material-symbols-outlined text-base">sms</span></span>
                         <div class="min-w-0">
-                          <p class="truncate text-sm font-bold leading-tight text-slate-900 dark:text-white">Customer SMS Receipt Sync</p>
-                          <p class="truncate text-xs text-slate-500 dark:text-slate-400">Direct carrier gateway delivery</p>
+                          <p class="truncate text-sm font-bold leading-tight text-foreground">Customer SMS Receipt Sync</p>
+                          <p class="truncate text-xs text-muted-foreground">Direct carrier gateway delivery</p>
                         </div>
                       </div>
-                      <span class="whitespace-nowrap rounded bg-slate-200 px-2 py-0.5 text-xs font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-300">-0.02 Credits</span>
+                      <span class="whitespace-nowrap rounded bg-muted px-2 py-0.5 text-xs font-bold text-muted-foreground ">-0.02 Credits</span>
                     </div>
-                    <div class="flex items-center justify-between gap-2.5 rounded-lg border border-slate-200 bg-white p-2.5 dark:border-slate-700 dark:bg-slate-900">
+                    <div class="flex items-center justify-between gap-2.5 rounded-lg border border-line bg-card p-2.5 ">
                       <div class="flex min-w-0 items-center gap-2.5">
-                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300"><span class="material-symbols-outlined text-base">swap_horiz</span></span>
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-warning/10 text-warning "><span class="material-symbols-outlined text-base">swap_horiz</span></span>
                         <div class="min-w-0">
-                          <p class="truncate text-sm font-bold leading-tight text-slate-900 dark:text-white">Inter-Store Stock Transfer</p>
-                          <p class="truncate text-xs text-slate-500 dark:text-slate-400">To Westside Mall Hub • 24 items</p>
+                          <p class="truncate text-sm font-bold leading-tight text-foreground">Inter-Store Stock Transfer</p>
+                          <p class="truncate text-xs text-muted-foreground">To Westside Mall Hub • 24 items</p>
                         </div>
                       </div>
-                      <span class="whitespace-nowrap rounded bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">-0.10 Credits</span>
+                      <span class="whitespace-nowrap rounded bg-warning/10 px-2 py-0.5 text-xs font-bold text-warning ">-0.10 Credits</span>
                     </div>
                   </div>
                 </div>
-                <div class="-mx-4 -mb-4 mt-3 flex flex-col items-start justify-between gap-1 rounded-b-xl border-t border-slate-200 bg-slate-100 p-4 sm:flex-row sm:items-center dark:border-slate-700 dark:bg-slate-900/60">
-                  <span class="text-xs text-slate-500 dark:text-slate-400">Tenant Burn: <strong class="text-slate-900 dark:text-white" data-live="burn">34.2 cr today</strong></span>
-                  <span class="flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400"><span class="material-symbols-outlined text-base">verified_user</span> <span data-live="pool2">Master Balance: 9,420 / 10,000 cr remaining</span></span>
+                <div class="-mx-4 -mb-4 mt-3 flex flex-col items-start justify-between gap-1 rounded-b-xl border-t border-line bg-muted p-4 sm:flex-row sm:items-center ">
+                  <span class="text-xs text-muted-foreground">Tenant Burn: <strong class="text-foreground" data-live="burn">34.2 cr today</strong></span>
+                  <span class="flex items-center gap-1 text-xs font-bold text-success "><span class="material-symbols-outlined text-base">verified_user</span> <span data-live="pool2">Master Balance: 9,420 / 10,000 cr remaining</span></span>
                 </div>
               </div>
             </div>
@@ -336,214 +336,214 @@
         </div>
       </section>
       <!-- VERTICAL-SPECIFIC SOLUTIONS -->
-      <section class="scroll-mt-20 bg-slate-100 px-4 py-16 dark:bg-slate-900/40 md:px-8 md:py-24" id="solutions">
+      <section class="scroll-mt-20 bg-muted px-4 py-16 md:px-8 md:py-24" id="solutions">
         <div class="mx-auto max-w-7xl">
           <div class="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <span class="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">One universal platform core • Infinite industry adaptations</span>
-              <h2 class="mt-1 text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Any Domain, Any Workflow. One Universal Platform Core.</h2>
-              <p class="mt-1 max-w-2xl text-base text-slate-600 dark:text-slate-400">Why pay for 4 different platforms with 4 different logins? A single Skycom account lets you launch and operate completely distinct industry ventures — Retail POS, Hotel PMS, Restaurant KDS, and Dental Clinic — running on one atomic platform engine with unified credentials and shared credit billing.</p>
+              <span class="text-sm font-bold uppercase tracking-wider text-primary">One universal platform core • Infinite industry adaptations</span>
+              <h2 class="mt-1 text-3xl font-bold text-foreground md:text-4xl ">Any Domain, Any Workflow. One Universal Platform Core.</h2>
+              <p class="mt-1 max-w-2xl text-base text-muted-foreground">Why pay for 4 different platforms with 4 different logins? A single Skycom account lets you launch and operate completely distinct industry ventures — Retail POS, Hotel PMS, Restaurant KDS, and Dental Clinic — running on one atomic platform engine with unified credentials and shared credit billing.</p>
             </div>
-            <div class="inline-flex items-center gap-2 self-start rounded-xl bg-white px-4 py-2 shadow-sm md:self-auto dark:bg-slate-900">
-              <span class="material-symbols-outlined text-xl text-emerald-600 dark:text-emerald-400">token</span>
-              <span class="text-sm font-semibold text-slate-900 dark:text-white">Universal Atomic Engine • Instant UI Schemas for Any Industry</span>
+            <div class="inline-flex items-center gap-2 self-start rounded-xl bg-card px-4 py-2 shadow-sm md:self-auto ">
+              <span class="material-symbols-outlined text-xl text-success ">token</span>
+              <span class="text-sm font-semibold text-foreground">Universal Atomic Engine • Instant UI Schemas for Any Industry</span>
             </div>
           </div>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+            <div class="group flex flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-all hover:shadow-md ">
               <div class="relative h-64 overflow-hidden">
                 <img alt="A modern high-tech retail boutique interior" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?q=80&w=1470&auto=format&fit=crop">
-                <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 shadow-sm backdrop-blur-md dark:bg-slate-900/90">
-                  <span class="h-2 w-2 rounded-full bg-emerald-600"></span>
-                  <span class="text-sm font-bold text-emerald-700 dark:text-emerald-300">Retail &amp; Omnichannel</span>
+                <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-card/90 px-3 py-1 shadow-sm backdrop-blur-md ">
+                  <span class="h-2 w-2 rounded-full bg-success"></span>
+                  <span class="text-sm font-bold text-success ">Retail &amp; Omnichannel</span>
                 </div>
               </div>
               <div class="flex flex-1 flex-col justify-between p-6">
                 <div>
-                  <h3 class="text-xl font-bold text-slate-900 dark:text-white">End-to-End Multi-Store Retail Engine</h3>
-                  <p class="mt-2 text-base text-slate-600 dark:text-slate-400">Unify high-speed cloud-connected POS checkouts, matrix variant tracking (size/color/batch), and inter-branch inventory transfers with real-time auto re-ordering.</p>
+                  <h3 class="text-xl font-bold text-foreground">End-to-End Multi-Store Retail Engine</h3>
+                  <p class="mt-2 text-base text-muted-foreground">Unify high-speed cloud-connected POS checkouts, matrix variant tracking (size/color/batch), and inter-branch inventory transfers with real-time auto re-ordering.</p>
                   <div class="mt-4 grid grid-cols-2 gap-2">
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Matrix Variant SKUs</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Automated barcode generator</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Matrix Variant SKUs</p>
+                      <p class="text-xs text-muted-foreground">Automated barcode generator</p>
                     </div>
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Inter-Branch Transit</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Live stock requisition slips</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Inter-Branch Transit</p>
+                      <p class="text-xs text-muted-foreground">Live stock requisition slips</p>
                     </div>
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Omnichannel Sync</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Shopify, WooCommerce, Amazon</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Omnichannel Sync</p>
+                      <p class="text-xs text-muted-foreground">Shopify, WooCommerce, Amazon</p>
                     </div>
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Loss Prevention</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Blind count cycle audits</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Loss Prevention</p>
+                      <p class="text-xs text-muted-foreground">Blind count cycle audits</p>
                     </div>
                   </div>
                 </div>
                 <div class="mt-6 flex items-center justify-between pt-4">
-                  <a class="inline-flex items-center gap-1 text-sm font-bold text-indigo-600 hover:gap-2 dark:text-indigo-400" href="#">View Retail POS Specifications <span class="material-symbols-outlined text-base">arrow_forward</span></a>
-                  <span class="text-sm text-slate-500 dark:text-slate-400">0% Gateway Commission</span>
+                  <a class="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 " href="#">View Retail POS Specifications <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+                  <span class="text-sm text-muted-foreground">0% Gateway Commission</span>
                 </div>
               </div>
             </div>
-            <div class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+            <div class="group flex flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-all hover:shadow-md ">
               <div class="relative h-64 overflow-hidden">
                 <img alt="A modern dental clinic operatory room" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=1470&auto=format&fit=crop">
-                <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 shadow-sm backdrop-blur-md dark:bg-slate-900/90">
-                  <span class="h-2 w-2 rounded-full bg-indigo-600"></span>
-                  <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">Dental &amp; Clinics</span>
+                <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-card/90 px-3 py-1 shadow-sm backdrop-blur-md ">
+                  <span class="h-2 w-2 rounded-full bg-primary"></span>
+                  <span class="text-sm font-bold text-primary">Dental &amp; Clinics</span>
                 </div>
               </div>
               <div class="flex flex-1 flex-col justify-between p-6">
                 <div>
-                  <h3 class="text-xl font-bold text-slate-900 dark:text-white">Clinical Care &amp; Operatory Orchestration</h3>
-                  <p class="mt-2 text-base text-slate-600 dark:text-slate-400">Designed alongside dentists and clinic managers. Visual odontograms, multi-chair operatory calendars, digital treatment estimate signatures, and HIPAA-compliant charting.</p>
+                  <h3 class="text-xl font-bold text-foreground">Clinical Care &amp; Operatory Orchestration</h3>
+                  <p class="mt-2 text-base text-muted-foreground">Designed alongside dentists and clinic managers. Visual odontograms, multi-chair operatory calendars, digital treatment estimate signatures, and HIPAA-compliant charting.</p>
                   <div class="mt-4 grid grid-cols-2 gap-2">
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Visual Odontogram</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Adult &amp; child interactive tooth chart</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Visual Odontogram</p>
+                      <p class="text-xs text-muted-foreground">Adult &amp; child interactive tooth chart</p>
                     </div>
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Multi-Chair Calendar</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Color-coded doctor &amp; room slots</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Multi-Chair Calendar</p>
+                      <p class="text-xs text-muted-foreground">Color-coded doctor &amp; room slots</p>
                     </div>
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Insurance &amp; Pre-Auth</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Automated co-pay breakdowns</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Insurance &amp; Pre-Auth</p>
+                      <p class="text-xs text-muted-foreground">Automated co-pay breakdowns</p>
                     </div>
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Patient Portal</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">SMS/WhatsApp appointment booking</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Patient Portal</p>
+                      <p class="text-xs text-muted-foreground">SMS/WhatsApp appointment booking</p>
                     </div>
                   </div>
                 </div>
                 <div class="mt-6 flex items-center justify-between pt-4">
-                  <a class="inline-flex items-center gap-1 text-sm font-bold text-indigo-600 hover:gap-2 dark:text-indigo-400" href="#">Explore Dental Practice Suite <span class="material-symbols-outlined text-base">arrow_forward</span></a>
-                  <span class="text-sm text-slate-500 dark:text-slate-400">HIPAA Architecture</span>
+                  <a class="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 " href="#">Explore Dental Practice Suite <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+                  <span class="text-sm text-muted-foreground">HIPAA Architecture</span>
                 </div>
               </div>
             </div>
-            <div class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+            <div class="group flex flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-all hover:shadow-md ">
               <div class="relative h-64 overflow-hidden">
                 <img alt="A luxury boutique hotel reception and lobby lounge" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=1470&auto=format&fit=crop">
-                <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 shadow-sm backdrop-blur-md dark:bg-slate-900/90">
-                  <span class="h-2 w-2 rounded-full bg-amber-600"></span>
-                  <span class="text-sm font-bold text-amber-700 dark:text-amber-300">Hotels &amp; Hospitality</span>
+                <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-card/90 px-3 py-1 shadow-sm backdrop-blur-md ">
+                  <span class="h-2 w-2 rounded-full bg-warning"></span>
+                  <span class="text-sm font-bold text-warning ">Hotels &amp; Hospitality</span>
                 </div>
               </div>
               <div class="flex flex-1 flex-col justify-between p-6">
                 <div>
-                  <h3 class="text-xl font-bold text-slate-900 dark:text-white">Property Management &amp; Front Desk Engine</h3>
-                  <p class="mt-2 text-base text-slate-600 dark:text-slate-400">Unified reservation tape chart, mobile housekeeping dispatch, automated keycard encoding, split folios, and direct 2-way OTA synchronization.</p>
+                  <h3 class="text-xl font-bold text-foreground">Property Management &amp; Front Desk Engine</h3>
+                  <p class="mt-2 text-base text-muted-foreground">Unified reservation tape chart, mobile housekeeping dispatch, automated keycard encoding, split folios, and direct 2-way OTA synchronization.</p>
                   <div class="mt-4 grid grid-cols-2 gap-2">
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Interactive Tape Chart</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Drag-and-drop room assignments</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Interactive Tape Chart</p>
+                      <p class="text-xs text-muted-foreground">Drag-and-drop room assignments</p>
                     </div>
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Live Housekeeping</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Real-time dirty / inspected status</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Live Housekeeping</p>
+                      <p class="text-xs text-muted-foreground">Real-time dirty / inspected status</p>
                     </div>
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Channel Manager</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Booking.com, Airbnb, Expedia sync</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Channel Manager</p>
+                      <p class="text-xs text-muted-foreground">Booking.com, Airbnb, Expedia sync</p>
                     </div>
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Multi-Folio Invoicing</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Split personal vs corporate bills</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Multi-Folio Invoicing</p>
+                      <p class="text-xs text-muted-foreground">Split personal vs corporate bills</p>
                     </div>
                   </div>
                 </div>
                 <div class="mt-6 flex items-center justify-between pt-4">
-                  <a class="inline-flex items-center gap-1 text-sm font-bold text-indigo-600 hover:gap-2 dark:text-indigo-400" href="#">View Hospitality PMS Features <span class="material-symbols-outlined text-base">arrow_forward</span></a>
-                  <span class="text-sm text-slate-500 dark:text-slate-400">Zero Booking Cut</span>
+                  <a class="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 " href="#">View Hospitality PMS Features <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+                  <span class="text-sm text-muted-foreground">Zero Booking Cut</span>
                 </div>
               </div>
             </div>
-            <div class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+            <div class="group flex flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-all hover:shadow-md ">
               <div class="relative h-64 overflow-hidden">
                 <img alt="A bustling upscale restaurant kitchen and dining hall" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1470&auto=format&fit=crop">
-                <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 shadow-sm backdrop-blur-md dark:bg-slate-900/90">
-                  <span class="h-2 w-2 rounded-full bg-rose-600"></span>
-                  <span class="text-sm font-bold text-rose-600 dark:text-rose-400">Restaurants &amp; Cafes</span>
+                <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-card/90 px-3 py-1 shadow-sm backdrop-blur-md ">
+                  <span class="h-2 w-2 rounded-full bg-danger"></span>
+                  <span class="text-sm font-bold text-danger ">Restaurants &amp; Cafes</span>
                 </div>
               </div>
               <div class="flex flex-1 flex-col justify-between p-6">
                 <div>
-                  <h3 class="text-xl font-bold text-slate-900 dark:text-white">Table Management &amp; Kitchen Display (KDS)</h3>
-                  <p class="mt-2 text-base text-slate-600 dark:text-slate-400">Sub-second table ordering, visual floorplan layout, ingredient-level recipe costing, automated modifier flows, and split-ticket routing directly to prep stations.</p>
+                  <h3 class="text-xl font-bold text-foreground">Table Management &amp; Kitchen Display (KDS)</h3>
+                  <p class="mt-2 text-base text-muted-foreground">Sub-second table ordering, visual floorplan layout, ingredient-level recipe costing, automated modifier flows, and split-ticket routing directly to prep stations.</p>
                   <div class="mt-4 grid grid-cols-2 gap-2">
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Digital Floorplan Editor</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Live table timer &amp; section turnover</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Digital Floorplan Editor</p>
+                      <p class="text-xs text-muted-foreground">Live table timer &amp; section turnover</p>
                     </div>
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Station-Routing KDS</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Hot line, cold bar, expeditor tickets</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Station-Routing KDS</p>
+                      <p class="text-xs text-muted-foreground">Hot line, cold bar, expeditor tickets</p>
                     </div>
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Gram-Level Recipe Costing</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Auto ingredient inventory deduction</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Gram-Level Recipe Costing</p>
+                      <p class="text-xs text-muted-foreground">Auto ingredient inventory deduction</p>
                     </div>
-                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
-                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Tableside Mobile QR</p>
-                      <p class="text-xs text-slate-600 dark:text-slate-400">Instant ordering and split payments</p>
+                    <div class="rounded-lg bg-background p-2.5 ">
+                      <p class="text-sm font-semibold text-foreground">Tableside Mobile QR</p>
+                      <p class="text-xs text-muted-foreground">Instant ordering and split payments</p>
                     </div>
                   </div>
                 </div>
                 <div class="mt-6 flex items-center justify-between pt-4">
-                  <a class="inline-flex items-center gap-1 text-sm font-bold text-indigo-600 hover:gap-2 dark:text-indigo-400" href="#">View F&amp;B Restaurant Tools <span class="material-symbols-outlined text-base">arrow_forward</span></a>
-                  <span class="text-sm text-slate-500 dark:text-slate-400">Sub-Second Kitchen Sync</span>
+                  <a class="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 " href="#">View F&amp;B Restaurant Tools <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+                  <span class="text-sm text-muted-foreground">Sub-Second Kitchen Sync</span>
                 </div>
               </div>
             </div>
           </div>
-          <div class="mt-6 border-t border-slate-200 pt-6 dark:border-slate-700">
+          <div class="mt-6 border-t border-line pt-6 ">
             <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-              <span class="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Ready Out-of-the-Box &amp; Generatable for Any Industry:</span>
-              <span class="flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400"><span class="material-symbols-outlined text-base">auto_awesome</span> Dynamic Schema Generator</span>
+              <span class="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Ready Out-of-the-Box &amp; Generatable for Any Industry:</span>
+              <span class="flex items-center gap-1 text-xs font-bold text-success "><span class="material-symbols-outlined text-base">auto_awesome</span> Dynamic Schema Generator</span>
             </div>
             <div class="flex flex-wrap gap-2">
-              <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-indigo-600 dark:text-indigo-400">fitness_center</span> Gyms &amp; Fitness Studios</span>
-              <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">car_repair</span> Automotive &amp; Fleet Repair</span>
-              <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-amber-600 dark:text-amber-400">school</span> Education &amp; Academies</span>
-              <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-indigo-600 dark:text-indigo-400">local_shipping</span> Logistics &amp; Field Services</span>
-              <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">gavel</span> Professional &amp; Legal Services</span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-primary">fitness_center</span> Gyms &amp; Fitness Studios</span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-success ">car_repair</span> Automotive &amp; Fleet Repair</span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-warning ">school</span> Education &amp; Academies</span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-primary">local_shipping</span> Logistics &amp; Field Services</span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-success ">gavel</span> Professional &amp; Legal Services</span>
               <a
-                class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm cursor-pointer"
+                class="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground shadow-sm cursor-pointer"
                 href="/sign_up"
               >
                 <span class="material-symbols-outlined text-base">add_circle</span> + Build Custom Domain UI in Minutes
               </a>
             </div>
-            <div class="mt-4 flex flex-col items-center justify-between gap-4 rounded-xl border-l-2 border-emerald-500 bg-white p-4 shadow-sm sm:flex-row dark:bg-slate-900">
+            <div class="mt-4 flex flex-col items-center justify-between gap-4 rounded-xl border-l-2 border-success/40 bg-card p-4 shadow-sm sm:flex-row ">
               <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10 text-success ">
                   <span class="material-symbols-outlined text-xl">schema</span>
                 </div>
                 <div>
-                  <p class="text-base font-bold text-slate-900 dark:text-white">Need a custom industry UI or proprietary operational layout?</p>
-                  <p class="text-sm text-slate-600 dark:text-slate-400">The universal schema engine creates tailored odontograms, booking matrices, flight bays, dispatch boards, or KDS workflows without touching complex setup or code.</p>
+                  <p class="text-base font-bold text-foreground">Need a custom industry UI or proprietary operational layout?</p>
+                  <p class="text-sm text-muted-foreground">The universal schema engine creates tailored odontograms, booking matrices, flight bays, dispatch boards, or KDS workflows without touching complex setup or code.</p>
                 </div>
               </div>
-              <a class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-indigo-600 transition-all hover:bg-slate-200 dark:bg-slate-800 dark:text-indigo-300 dark:hover:bg-slate-700" href="#">Explore Schema Engine <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+              <a class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-muted " href="#">Explore Schema Engine <span class="material-symbols-outlined text-base">arrow_forward</span></a>
             </div>
           </div>
         </div>
       </section>
       <!-- UNIFIED MULTI-TENANT CORE -->
-      <section class="border-y border-slate-200 bg-indigo-50/60 px-4 py-16 dark:border-slate-800 dark:bg-indigo-950/20 md:px-8 md:py-20">
+      <section class="border-y border-line bg-primary/10 px-4 py-16 md:px-8 md:py-20">
         <div class="mx-auto max-w-7xl">
           <div class="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <span class="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400"><span class="material-symbols-outlined text-lg">domain_add</span> One Login, Unlimited Distinct Ventures</span>
-              <h2 class="mt-1 text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Single Master Account. Infinite Multi-Tenant Businesses.</h2>
-              <p class="mt-1 max-w-2xl text-base text-slate-600 dark:text-slate-400">Designed for serial entrepreneurs, family holding offices, hotel-and-restaurant operators, and franchise owners. Stop wrestling with fragmented accounts, passwords, and duplicate monthly base retainers.</p>
+              <span class="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-success "><span class="material-symbols-outlined text-lg">domain_add</span> One Login, Unlimited Distinct Ventures</span>
+              <h2 class="mt-1 text-3xl font-bold text-foreground md:text-4xl ">Single Master Account. Infinite Multi-Tenant Businesses.</h2>
+              <p class="mt-1 max-w-2xl text-base text-muted-foreground">Designed for serial entrepreneurs, family holding offices, hotel-and-restaurant operators, and franchise owners. Stop wrestling with fragmented accounts, passwords, and duplicate monthly base retainers.</p>
             </div>
             <div class="flex items-center gap-2">
               <a
-                class="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm cursor-pointer"
+                class="flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground shadow-sm cursor-pointer"
                 href="/sign_up"
               >
                 <span class="material-symbols-outlined text-lg">verified</span> $0 Base Fee Per Tenant
@@ -551,58 +551,58 @@
             </div>
           </div>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <div class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-900">
+            <div class="flex flex-col justify-between rounded-2xl border border-line bg-card p-6 shadow-sm transition-all hover:shadow-md ">
               <div>
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary /50 ">
                   <span class="material-symbols-outlined text-2xl">switch_account</span>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white">One Master Login, Diverse Holdings</h3>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Run an apparel boutique, an 80-room resort, and a craft cocktail kitchen from the same master dashboard. Seamlessly switch contexts with one click — no logging out, no multiple tabs, no separate apps.</p>
-                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Complete tenant isolation &amp; separate branch ledgers</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Granular staff permissions scoped per business</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Consolidated multi-business executive rollups</li>
+                <h3 class="text-xl font-bold text-foreground">One Master Login, Diverse Holdings</h3>
+                <p class="mt-2 text-sm text-muted-foreground">Run an apparel boutique, an 80-room resort, and a craft cocktail kitchen from the same master dashboard. Seamlessly switch contexts with one click — no logging out, no multiple tabs, no separate apps.</p>
+                <ul class="mt-4 space-y-2 text-sm text-foreground">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Complete tenant isolation &amp; separate branch ledgers</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Granular staff permissions scoped per business</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Consolidated multi-business executive rollups</li>
                 </ul>
               </div>
-              <div class="mt-6 flex items-center justify-between border-t border-slate-200 pt-3 dark:border-slate-700">
-                <span class="text-sm font-semibold text-indigo-600 dark:text-indigo-400">1-Click Business Switcher</span>
-                <span class="rounded bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">Zero Context Switch Lag</span>
+              <div class="mt-6 flex items-center justify-between border-t border-line pt-3 ">
+                <span class="text-sm font-semibold text-primary">1-Click Business Switcher</span>
+                <span class="rounded bg-success/10 px-2 py-0.5 text-xs font-bold text-success ">Zero Context Switch Lag</span>
               </div>
             </div>
-            <div class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-900">
+            <div class="flex flex-col justify-between rounded-2xl border border-line bg-card p-6 shadow-sm transition-all hover:shadow-md ">
               <div>
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-success/10 text-success ">
                   <span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Unified Credit Pool or Dedicated Caps</h3>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Your complimentary monthly refill credits are pooled across all your businesses, or you can assign individual hard spend limits per tenant to keep subsidiaries strictly accountable.</p>
-                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Shared wallet eliminates wasted orphan credits</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Configurable hard spend caps ($0 to unlimited) per store</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> One consolidated credit statement for your accountant</li>
+                <h3 class="text-xl font-bold text-foreground">Unified Credit Pool or Dedicated Caps</h3>
+                <p class="mt-2 text-sm text-muted-foreground">Your complimentary monthly refill credits are pooled across all your businesses, or you can assign individual hard spend limits per tenant to keep subsidiaries strictly accountable.</p>
+                <ul class="mt-4 space-y-2 text-sm text-foreground">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Shared wallet eliminates wasted orphan credits</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Configurable hard spend caps ($0 to unlimited) per store</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> One consolidated credit statement for your accountant</li>
                 </ul>
               </div>
-              <div class="mt-6 flex items-center justify-between border-t border-slate-200 pt-3 dark:border-slate-700">
-                <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Flexible Tenant Spend Guard</span>
-                <span class="rounded bg-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">No Surprise Bills</span>
+              <div class="mt-6 flex items-center justify-between border-t border-line pt-3 ">
+                <span class="text-sm font-semibold text-success ">Flexible Tenant Spend Guard</span>
+                <span class="rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary /50 ">No Surprise Bills</span>
               </div>
             </div>
-            <div class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-900">
+            <div class="flex flex-col justify-between rounded-2xl border border-line bg-card p-6 shadow-sm transition-all hover:shadow-md ">
               <div>
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-warning/10 text-warning ">
                   <span class="material-symbols-outlined text-2xl">bolt</span>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Instant Multi-Domain Provisioning</h3>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Launching a new concept or opening a pop-up branch? Spin up an industry-tailored tenant in under 60 seconds with pre-baked schemas for POS, tables, folios, or medical charts.</p>
-                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Instant schema templates: Retail, Dining, Hotel, Clinic</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Zero setup fees and zero idle monthly tenant tax</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Clone product catalogs or keep branches fully distinct</li>
+                <h3 class="text-xl font-bold text-foreground">Instant Multi-Domain Provisioning</h3>
+                <p class="mt-2 text-sm text-muted-foreground">Launching a new concept or opening a pop-up branch? Spin up an industry-tailored tenant in under 60 seconds with pre-baked schemas for POS, tables, folios, or medical charts.</p>
+                <ul class="mt-4 space-y-2 text-sm text-foreground">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Instant schema templates: Retail, Dining, Hotel, Clinic</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Zero setup fees and zero idle monthly tenant tax</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Clone product catalogs or keep branches fully distinct</li>
                 </ul>
               </div>
-              <div class="mt-6 flex items-center justify-between border-t border-slate-200 pt-3 dark:border-slate-700">
-                <span class="text-sm font-semibold text-amber-700 dark:text-amber-300">&lt; 60 Sec Provisioning</span>
-                <span class="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300">Instant Onboarding</span>
+              <div class="mt-6 flex items-center justify-between border-t border-line pt-3 ">
+                <span class="text-sm font-semibold text-warning ">&lt; 60 Sec Provisioning</span>
+                <span class="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground ">Instant Onboarding</span>
               </div>
             </div>
           </div>
@@ -612,193 +612,193 @@
       <section class="scroll-mt-20 px-4 py-16 md:px-8 md:py-24" id="platform">
         <div class="mx-auto max-w-7xl">
           <div class="mx-auto mb-10 max-w-3xl text-center">
-            <span class="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">The Core Platform</span>
-            <h2 class="mt-1 text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Core Operational Pillars Built For Scale</h2>
-            <p class="mt-2 text-base text-slate-600 dark:text-slate-400">Dozens of built-in atomic operational primitives. Whether you're running a boutique store, dental clinic, luxury hotel, flight academy, or automotive repair chain — every tenant operates on the same rock-solid platform primitives.</p>
+            <span class="text-sm font-bold uppercase tracking-wider text-primary">The Core Platform</span>
+            <h2 class="mt-1 text-3xl font-bold text-foreground md:text-4xl ">Core Operational Pillars Built For Scale</h2>
+            <p class="mt-2 text-base text-muted-foreground">Dozens of built-in atomic operational primitives. Whether you're running a boutique store, dental clinic, luxury hotel, flight academy, or automotive repair chain — every tenant operates on the same rock-solid platform primitives.</p>
           </div>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <div class="flex flex-col justify-between rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+            <div class="flex flex-col justify-between rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md ">
               <div>
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary /50 ">
                   <span class="material-symbols-outlined text-2xl">cloud_done</span>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Cloud-Native Real-Time POS</h3>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Pure cloud architecture with sub-second real-time sync, instant WebSocket updates across all registers, and zero local software maintenance. Currently online-only for high-availability cloud tenants.</p>
-                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Sub-second barcode scanner cloud response</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Split payments (Cash, Card, QR, Gift vouchers)</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Cloud-connected thermal and network receipt printers</li>
+                <h3 class="text-xl font-bold text-foreground">Cloud-Native Real-Time POS</h3>
+                <p class="mt-2 text-sm text-muted-foreground">Pure cloud architecture with sub-second real-time sync, instant WebSocket updates across all registers, and zero local software maintenance. Currently online-only for high-availability cloud tenants.</p>
+                <ul class="mt-4 space-y-2 text-sm text-foreground">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Sub-second barcode scanner cloud response</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Split payments (Cash, Card, QR, Gift vouchers)</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Cloud-connected thermal and network receipt printers</li>
                 </ul>
               </div>
-              <div class="mt-6 flex items-center justify-between rounded-b-2xl bg-gray-50 p-4 dark:bg-slate-800">
-                <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">0.12s Cloud WebSocket Sync</span>
-                <span class="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300">Online-Only</span>
+              <div class="mt-6 flex items-center justify-between rounded-b-2xl bg-background p-4 ">
+                <span class="text-sm font-bold text-primary">0.12s Cloud WebSocket Sync</span>
+                <span class="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground ">Online-Only</span>
               </div>
             </div>
-            <div class="flex flex-col justify-between rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+            <div class="flex flex-col justify-between rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md ">
               <div>
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-success/10 text-success ">
                   <span class="material-symbols-outlined text-2xl">inventory_2</span>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Multi-Warehouse Inventory</h3>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Full lot, batch, and expiry tracking across multiple branches, regional hubs, and mobile truck storage with automated replenishment points.</p>
-                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Automated PO creation on safety-stock trigger</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> FIFO, LIFO &amp; Weighted Average valuation</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Stock variance reconciliation &amp; loss logs</li>
+                <h3 class="text-xl font-bold text-foreground">Multi-Warehouse Inventory</h3>
+                <p class="mt-2 text-sm text-muted-foreground">Full lot, batch, and expiry tracking across multiple branches, regional hubs, and mobile truck storage with automated replenishment points.</p>
+                <ul class="mt-4 space-y-2 text-sm text-foreground">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Automated PO creation on safety-stock trigger</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> FIFO, LIFO &amp; Weighted Average valuation</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Stock variance reconciliation &amp; loss logs</li>
                 </ul>
               </div>
-              <div class="mt-6 rounded-b-2xl bg-gray-50 p-4 dark:bg-slate-800">
-                <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">Automated Re-order Algorithms</span>
+              <div class="mt-6 rounded-b-2xl bg-background p-4 ">
+                <span class="text-sm font-bold text-success ">Automated Re-order Algorithms</span>
               </div>
             </div>
-            <div class="flex flex-col justify-between rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+            <div class="flex flex-col justify-between rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md ">
               <div>
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-warning/10 text-warning ">
                   <span class="material-symbols-outlined text-2xl">groups</span>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white">HR &amp; Automated Payroll</h3>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Complete workforce lifecycle orchestration: multi-state tax withholding, automated overtime calculations, commission models, and direct PDF pay slips.</p>
-                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Multi-tier role permissions and salary ladders</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Digital employee document vault &amp; contracts</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> One-click direct bank disbursement files</li>
+                <h3 class="text-xl font-bold text-foreground">HR &amp; Automated Payroll</h3>
+                <p class="mt-2 text-sm text-muted-foreground">Complete workforce lifecycle orchestration: multi-state tax withholding, automated overtime calculations, commission models, and direct PDF pay slips.</p>
+                <ul class="mt-4 space-y-2 text-sm text-foreground">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Multi-tier role permissions and salary ladders</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Digital employee document vault &amp; contracts</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> One-click direct bank disbursement files</li>
                 </ul>
               </div>
-              <div class="mt-6 rounded-b-2xl bg-gray-50 p-4 dark:bg-slate-800">
-                <span class="text-sm font-bold text-amber-700 dark:text-amber-300">Tax Compliance Built-In</span>
+              <div class="mt-6 rounded-b-2xl bg-background p-4 ">
+                <span class="text-sm font-bold text-warning ">Tax Compliance Built-In</span>
               </div>
             </div>
-            <div class="flex flex-col justify-between rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+            <div class="flex flex-col justify-between rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md ">
               <div>
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary /50 ">
                   <span class="material-symbols-outlined text-2xl">location_on</span>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Geofenced Attendance</h3>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Eliminate buddy punching and time theft. Enforce check-ins only when staff are physically located within geofenced branch boundaries or on local Wi-Fi.</p>
-                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> GPS radius boundary verification (50m precision)</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Biometric facial selfie verification trigger</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Self-service shift swapping and manager sign-off</li>
+                <h3 class="text-xl font-bold text-foreground">Geofenced Attendance</h3>
+                <p class="mt-2 text-sm text-muted-foreground">Eliminate buddy punching and time theft. Enforce check-ins only when staff are physically located within geofenced branch boundaries or on local Wi-Fi.</p>
+                <ul class="mt-4 space-y-2 text-sm text-foreground">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> GPS radius boundary verification (50m precision)</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Biometric facial selfie verification trigger</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Self-service shift swapping and manager sign-off</li>
                 </ul>
               </div>
-              <div class="mt-6 rounded-b-2xl bg-gray-50 p-4 dark:bg-slate-800">
-                <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">GPS &amp; Face Audit Trail</span>
+              <div class="mt-6 rounded-b-2xl bg-background p-4 ">
+                <span class="text-sm font-bold text-primary">GPS &amp; Face Audit Trail</span>
               </div>
             </div>
-            <div class="flex flex-col justify-between rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+            <div class="flex flex-col justify-between rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md ">
               <div>
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-success/10 text-success ">
                   <span class="material-symbols-outlined text-2xl">calendar_month</span>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Operations Calendar</h3>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">One central cockpit uniting doctor appointments, hotel banquet room bookings, restaurant party reservations, and recurring employee rosters.</p>
-                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Automated WhatsApp &amp; SMS 24hr reminders</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Multi-resource blocking (Staff + Operatory/Room)</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Google Calendar &amp; Apple iCal bi-directional sync</li>
+                <h3 class="text-xl font-bold text-foreground">Operations Calendar</h3>
+                <p class="mt-2 text-sm text-muted-foreground">One central cockpit uniting doctor appointments, hotel banquet room bookings, restaurant party reservations, and recurring employee rosters.</p>
+                <ul class="mt-4 space-y-2 text-sm text-foreground">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Automated WhatsApp &amp; SMS 24hr reminders</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Multi-resource blocking (Staff + Operatory/Room)</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Google Calendar &amp; Apple iCal bi-directional sync</li>
                 </ul>
               </div>
-              <div class="mt-6 rounded-b-2xl bg-gray-50 p-4 dark:bg-slate-800">
-                <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">Zero Double-Booking Guarantee</span>
+              <div class="mt-6 rounded-b-2xl bg-background p-4 ">
+                <span class="text-sm font-bold text-success ">Zero Double-Booking Guarantee</span>
               </div>
             </div>
-            <div class="flex flex-col justify-between rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+            <div class="flex flex-col justify-between rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md ">
               <div>
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary /50 ">
                   <span class="material-symbols-outlined text-2xl">receipt_long</span>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Consolidated Billing Hub</h3>
-                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Issue compliant tax invoices per individual branch tax IDs while rolling up executive consolidated P&amp;L statements to headquarters effortlessly.</p>
-                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Multi-currency conversion with live ECB rates</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Automated recurring SaaS/Retainer invoices</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Custom legal numbering sequences per store</li>
+                <h3 class="text-xl font-bold text-foreground">Consolidated Billing Hub</h3>
+                <p class="mt-2 text-sm text-muted-foreground">Issue compliant tax invoices per individual branch tax IDs while rolling up executive consolidated P&amp;L statements to headquarters effortlessly.</p>
+                <ul class="mt-4 space-y-2 text-sm text-foreground">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Multi-currency conversion with live ECB rates</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Automated recurring SaaS/Retainer invoices</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Custom legal numbering sequences per store</li>
                 </ul>
               </div>
-              <div class="mt-6 rounded-b-2xl bg-gray-50 p-4 dark:bg-slate-800">
-                <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">Audit-Ready Tax Engines</span>
+              <div class="mt-6 rounded-b-2xl bg-background p-4 ">
+                <span class="text-sm font-bold text-primary">Audit-Ready Tax Engines</span>
               </div>
             </div>
           </div>
         </div>
       </section>
       <!-- PRICING TRANSPARENCY BANNER -->
-      <section class="scroll-mt-20 bg-slate-100 px-4 py-16 dark:bg-slate-900/40 md:px-8 md:py-20" id="pricing">
-        <div class="mx-auto max-w-7xl rounded-3xl bg-white p-6 shadow-lg md:p-10 dark:bg-slate-900">
+      <section class="scroll-mt-20 bg-muted px-4 py-16 md:px-8 md:py-20" id="pricing">
+        <div class="mx-auto max-w-7xl rounded-3xl bg-card p-6 shadow-lg md:p-10 ">
           <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
             <div class="lg:col-span-7">
-              <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-sm text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+              <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-sm text-success ">
                 <span class="material-symbols-outlined text-base">toll</span> Pure Action-Based Pricing: You Grow, We Grow
               </div>
-              <h2 class="text-3xl font-extrabold leading-tight text-slate-900 md:text-4xl dark:text-white">Why Credits &amp; Pay-As-You-Go Beat Bloated ERP Subscriptions</h2>
-              <p class="mt-4 text-base text-slate-600 dark:text-slate-400">No per-seat fees, no per-tenant base subscriptions, and zero charge for idle businesses. A single account can hold 1, 5, or 20 distinct businesses across retail, lodging, and dining. When an idle store or seasonal hotel has 0 transactions or bookings, it costs exactly $0. Credits only deduct when real transactions occur across your entire portfolio.</p>
-              <div class="mt-6 space-y-3 text-base text-slate-900 dark:text-white">
+              <h2 class="text-3xl font-extrabold leading-tight text-foreground md:text-4xl ">Why Credits &amp; Pay-As-You-Go Beat Bloated ERP Subscriptions</h2>
+              <p class="mt-4 text-base text-muted-foreground">No per-seat fees, no per-tenant base subscriptions, and zero charge for idle businesses. A single account can hold 1, 5, or 20 distinct businesses across retail, lodging, and dining. When an idle store or seasonal hotel has 0 transactions or bookings, it costs exactly $0. Credits only deduct when real transactions occur across your entire portfolio.</p>
+              <div class="mt-6 space-y-3 text-base text-foreground">
                 <div class="flex items-start gap-3">
-                  <span class="material-symbols-outlined mt-0.5 text-emerald-600 dark:text-emerald-400">card_giftcard</span>
+                  <span class="material-symbols-outlined mt-0.5 text-success ">card_giftcard</span>
                   <p><strong>When You're Small, It's Free:</strong> Monthly free refill covers boutique shops, solo dentists, independent cafes, and small hotels with $0 spend. Zero credit card needed.</p>
                 </div>
                 <div class="flex items-start gap-3">
-                  <span class="material-symbols-outlined mt-0.5 text-emerald-600 dark:text-emerald-400">receipt_long</span>
+                  <span class="material-symbols-outlined mt-0.5 text-success ">receipt_long</span>
                   <p><strong>Action-Based Deductions (No Idle Tax):</strong> Never pay $150/user for employees who log in twice a week. Only pay fractional credits per checkout, reservation, or dispatch.</p>
                 </div>
                 <div class="flex items-start gap-3">
-                  <span class="material-symbols-outlined mt-0.5 text-emerald-600 dark:text-emerald-400">trending_up</span>
+                  <span class="material-symbols-outlined mt-0.5 text-success ">trending_up</span>
                   <p><strong>Aligned Incentives (You Grow, We Grow):</strong> We only earn when your business thrives and processes high transaction volume — pure alignment with your bottom line.</p>
                 </div>
                 <div class="flex items-start gap-3">
-                  <span class="material-symbols-outlined mt-0.5 text-emerald-600 dark:text-emerald-400">shield</span>
+                  <span class="material-symbols-outlined mt-0.5 text-success ">shield</span>
                   <p><strong>Configurable Hard Limits: You're Never Overcharged:</strong> Set exact monthly spending caps down to a $0 hard stop. Receive proactive threshold alerts at 80% and 95%, with absolute zero risk of runaway invoices or unexpected bills.</p>
                 </div>
               </div>
               <div class="mt-8 flex flex-wrap items-center gap-4">
                 <a
-                  class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-base font-bold text-white shadow-md transition-all hover:bg-indigo-700 cursor-pointer"
+                  class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 cursor-pointer"
                   href="/sign_up"
                 >
                   <span>Get Started with Free Credits</span>
                   <span class="material-symbols-outlined text-lg">launch</span>
                 </a>
-                <a class="text-sm text-slate-600 underline transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">View Detailed Credit Consumption Calculator</a>
+                <a class="text-sm text-muted-foreground underline transition-colors hover:text-foreground " href="#">View Detailed Credit Consumption Calculator</a>
               </div>
             </div>
-            <div class="rounded-2xl bg-gray-50 p-6 lg:col-span-5 dark:bg-slate-800">
+            <div class="rounded-2xl bg-background p-6 lg:col-span-5 ">
               <div class="flex items-center justify-between pb-4">
                 <div class="text-left">
-                  <h4 class="text-base font-bold text-slate-900 dark:text-white">Monthly Free Credit Tier</h4>
-                  <p class="text-xs text-slate-600 dark:text-slate-400">Complimentary credits refreshed each month</p>
+                  <h4 class="text-base font-bold text-foreground">Monthly Free Credit Tier</h4>
+                  <p class="text-xs text-muted-foreground">Complimentary credits refreshed each month</p>
                 </div>
-                <span class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">$0 / mo</span>
+                <span class="text-xl font-extrabold text-success ">$0 / mo</span>
               </div>
-              <div class="space-y-3 text-sm text-slate-600 dark:text-slate-400">
-                <div class="flex items-center justify-between rounded-lg bg-white px-3 py-1.5 dark:bg-slate-900">
+              <div class="space-y-3 text-sm text-muted-foreground">
+                <div class="flex items-center justify-between rounded-lg bg-card px-3 py-1.5 ">
                   <span>Multi-Tenant Account Base</span>
                   <a
-                    class="font-bold text-emerald-600 cursor-pointer dark:text-emerald-400"
+                    class="font-bold text-success cursor-pointer "
                     href="/sign_up"
                   >
                     Unlimited Businesses ($0 Base)
                   </a>
                 </div>
-                <div class="flex items-center justify-between rounded-lg bg-white px-3 py-1.5 dark:bg-slate-900">
+                <div class="flex items-center justify-between rounded-lg bg-card px-3 py-1.5 ">
                   <span>Pay-As-You-Go Extra Rate</span>
-                  <span class="font-bold text-slate-900 dark:text-white">$0.012 per credit</span>
+                  <span class="font-bold text-foreground">$0.012 per credit</span>
                 </div>
-                <div class="flex items-center justify-between rounded-lg border-l-2 border-emerald-500 bg-white px-3 py-1.5 dark:bg-slate-900">
-                  <span class="flex items-center gap-1 text-xs"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">lock</span> Spend Cap &amp; Overcharge Guard</span>
-                  <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">Configurable Hard Stop</span>
+                <div class="flex items-center justify-between rounded-lg border-l-2 border-success/40 bg-card px-3 py-1.5 ">
+                  <span class="flex items-center gap-1 text-xs"><span class="material-symbols-outlined text-base text-success ">lock</span> Spend Cap &amp; Overcharge Guard</span>
+                  <span class="text-xs font-bold text-success ">Configurable Hard Stop</span>
                 </div>
-                <div class="rounded-lg bg-white p-3 dark:bg-slate-900">
-                  <span class="material-symbols-outlined mt-0.5 text-emerald-600 dark:text-emerald-400">lock_open</span>
+                <div class="rounded-lg bg-card p-3 ">
+                  <span class="material-symbols-outlined mt-0.5 text-success ">lock_open</span>
                   <p><strong>Unused Credits Never Lock Your Data:</strong> Even if credits reach zero, your tenant remains 100% accessible via cloud login with read-only record retrieval. Online-only architecture ensures your data is always backed up.</p>
                 </div>
-                <div class="flex items-center justify-between rounded-lg bg-white px-3 py-1 dark:bg-slate-900">
+                <div class="flex items-center justify-between rounded-lg bg-card px-3 py-1 ">
                   <span>Data Retention</span>
-                  <span class="font-bold text-slate-900 dark:text-white">Infinite History</span>
+                  <span class="font-bold text-foreground">Infinite History</span>
                 </div>
               </div>
-              <div class="mt-6 border-t border-slate-200 pt-4 text-center dark:border-slate-700">
-                <div class="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+              <div class="mt-6 border-t border-line pt-4 text-center ">
+                <div class="inline-flex items-center gap-1.5 text-sm font-semibold text-success ">
                   <span class="material-symbols-outlined text-base">verified</span> Auto-refills each calendar month • No credit card required
                 </div>
               </div>
@@ -810,115 +810,115 @@
       <section class="px-4 py-16 md:px-8 md:py-24">
         <div class="mx-auto max-w-7xl">
           <div class="mb-10 max-w-3xl">
-            <span class="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Architected for Massive Scale</span>
-            <h2 class="mt-1 text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Built to Handle What Traditional Software Breaks On</h2>
-            <p class="mt-2 text-base text-slate-600 dark:text-slate-400">Single Unified Platform, Tailored Business Experiences. Engineered for international holdings, multi-franchise groups, and regulated health institutions — eliminating software sprawl with dynamic tenant-level UI schemas and zero data contamination.</p>
+            <span class="text-sm font-bold uppercase tracking-wider text-primary">Architected for Massive Scale</span>
+            <h2 class="mt-1 text-3xl font-bold text-foreground md:text-4xl ">Built to Handle What Traditional Software Breaks On</h2>
+            <p class="mt-2 text-base text-muted-foreground">Single Unified Platform, Tailored Business Experiences. Engineered for international holdings, multi-franchise groups, and regulated health institutions — eliminating software sprawl with dynamic tenant-level UI schemas and zero data contamination.</p>
           </div>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900">
-              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+            <div class="rounded-2xl bg-card p-6 shadow-sm ">
+              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary /50 ">
                 <span class="material-symbols-outlined text-xl">hub</span>
               </div>
-              <h3 class="text-base font-bold text-slate-900 dark:text-white">Single Unified Platform, Specialized UIs</h3>
-              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">No fragmented software or separate subscriptions. One unified platform powers tailored workflows across every business you run.</p>
+              <h3 class="text-base font-bold text-foreground">Single Unified Platform, Specialized UIs</h3>
+              <p class="mt-2 text-sm text-muted-foreground">No fragmented software or separate subscriptions. One unified platform powers tailored workflows across every business you run.</p>
             </div>
-            <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900">
-              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+            <div class="rounded-2xl bg-card p-6 shadow-sm ">
+              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-success/10 text-success ">
                 <span class="material-symbols-outlined text-xl">dashboard_customize</span>
               </div>
-              <h3 class="text-base font-bold text-slate-900 dark:text-white">Dynamic Tenant-Level UI Schemas</h3>
-              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Workspaces dynamically render odontograms, room tape charts, or kitchen display lines on demand while retaining strict SOC2-compliant schema-level isolation.</p>
+              <h3 class="text-base font-bold text-foreground">Dynamic Tenant-Level UI Schemas</h3>
+              <p class="mt-2 text-sm text-muted-foreground">Workspaces dynamically render odontograms, room tape charts, or kitchen display lines on demand while retaining strict SOC2-compliant schema-level isolation.</p>
             </div>
-            <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900">
-              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+            <div class="rounded-2xl bg-card p-6 shadow-sm ">
+              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-warning/10 text-warning ">
                 <span class="material-symbols-outlined text-xl">device_hub</span>
               </div>
-              <h3 class="text-base font-bold text-slate-900 dark:text-white">Zero Software Sprawl</h3>
-              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Say goodbye to multi-app synchronization headaches. One unified platform handles multi-branch inventory, consolidated P&amp;L, and cross-venture automated workflows.</p>
+              <h3 class="text-base font-bold text-foreground">Zero Software Sprawl</h3>
+              <p class="mt-2 text-sm text-muted-foreground">Say goodbye to multi-app synchronization headaches. One unified platform handles multi-branch inventory, consolidated P&amp;L, and cross-venture automated workflows.</p>
             </div>
-            <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900">
-              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+            <div class="rounded-2xl bg-card p-6 shadow-sm ">
+              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary /50 ">
                 <span class="material-symbols-outlined text-xl">fingerprint</span>
               </div>
-              <h3 class="text-base font-bold text-slate-900 dark:text-white">Granular RBAC &amp; Tamper-Proof Logs</h3>
-              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Assign field-level viewing permissions. Every receipt void, patient record access, or price override is indelibly timestamped with IP and user ID.</p>
+              <h3 class="text-base font-bold text-foreground">Granular RBAC &amp; Tamper-Proof Logs</h3>
+              <p class="mt-2 text-sm text-muted-foreground">Assign field-level viewing permissions. Every receipt void, patient record access, or price override is indelibly timestamped with IP and user ID.</p>
             </div>
-            <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900">
-              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+            <div class="rounded-2xl bg-card p-6 shadow-sm ">
+              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-success/10 text-success ">
                 <span class="material-symbols-outlined text-xl">api</span>
               </div>
-              <h3 class="text-base font-bold text-slate-900 dark:text-white">Open REST/GraphQL &amp; Webhooks</h3>
-              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Full programmatic access directly to unified platform data. Connect custom apps, BI dashboards, or logistics networks without paying API toll gates.</p>
+              <h3 class="text-base font-bold text-foreground">Open REST/GraphQL &amp; Webhooks</h3>
+              <p class="mt-2 text-sm text-muted-foreground">Full programmatic access directly to unified platform data. Connect custom apps, BI dashboards, or logistics networks without paying API toll gates.</p>
             </div>
-            <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900">
-              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+            <div class="rounded-2xl bg-card p-6 shadow-sm ">
+              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary /50 ">
                 <span class="material-symbols-outlined text-xl">health_and_safety</span>
               </div>
-              <h3 class="text-base font-bold text-slate-900 dark:text-white">99.99% Global High-Availability SLA</h3>
-              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Multi-region active-active database clusters with real-time replication. Automatic instant failover guarantees cash registers and clinic portals never stall.</p>
+              <h3 class="text-base font-bold text-foreground">99.99% Global High-Availability SLA</h3>
+              <p class="mt-2 text-sm text-muted-foreground">Multi-region active-active database clusters with real-time replication. Automatic instant failover guarantees cash registers and clinic portals never stall.</p>
             </div>
           </div>
         </div>
       </section>
       <!-- SOCIAL PROOF & STATS BANNER -->
-      <section class="bg-slate-100 px-4 py-16 dark:bg-slate-900/40 md:px-8 md:py-20">
+      <section class="bg-muted px-4 py-16 md:px-8 md:py-20">
         <div class="mx-auto max-w-7xl">
           <div class="grid grid-cols-2 gap-6 pb-10 text-center lg:grid-cols-4">
             <div>
-              <p class="text-4xl font-extrabold leading-none text-indigo-600 dark:text-indigo-400">$1.4B+</p>
-              <p class="mt-2 text-sm font-semibold uppercase text-slate-500 dark:text-slate-400">Annual GMV Processed</p>
+              <p class="text-4xl font-extrabold leading-none text-primary">$1.4B+</p>
+              <p class="mt-2 text-sm font-semibold uppercase text-muted-foreground">Annual GMV Processed</p>
             </div>
             <div>
-              <p class="text-4xl font-extrabold leading-none text-emerald-600 dark:text-emerald-400">99.99%</p>
-              <p class="mt-2 text-sm font-semibold uppercase text-slate-500 dark:text-slate-400">Multi-Region Uptime</p>
+              <p class="text-4xl font-extrabold leading-none text-success ">99.99%</p>
+              <p class="mt-2 text-sm font-semibold uppercase text-muted-foreground">Multi-Region Uptime</p>
             </div>
             <div>
-              <p class="text-4xl font-extrabold leading-none text-indigo-600 dark:text-indigo-400">45%</p>
-              <p class="mt-2 text-sm font-semibold uppercase text-slate-500 dark:text-slate-400">Admin Time Saved</p>
+              <p class="text-4xl font-extrabold leading-none text-primary">45%</p>
+              <p class="mt-2 text-sm font-semibold uppercase text-muted-foreground">Admin Time Saved</p>
             </div>
             <div>
-              <p class="text-4xl font-extrabold leading-none text-amber-600 dark:text-amber-400">&lt;15 Min</p>
-              <p class="mt-2 text-sm font-semibold uppercase text-slate-500 dark:text-slate-400">Average Store Setup</p>
+              <p class="text-4xl font-extrabold leading-none text-warning ">&lt;15 Min</p>
+              <p class="mt-2 text-sm font-semibold uppercase text-muted-foreground">Average Store Setup</p>
             </div>
           </div>
           <div class="grid grid-cols-1 gap-4 pt-6 md:grid-cols-2 lg:grid-cols-4">
-            <div class="flex flex-col justify-between rounded-xl bg-white p-4 shadow-sm dark:bg-slate-900">
-              <p class="text-sm italic text-slate-900 dark:text-white">"We run 8 boutique apparel shops across 3 states. Moving from legacy software saved us $1,800/month in licensing fees, and inter-store stock transfers are now instant."</p>
+            <div class="flex flex-col justify-between rounded-xl bg-card p-4 shadow-sm ">
+              <p class="text-sm italic text-foreground">"We run 8 boutique apparel shops across 3 states. Moving from legacy software saved us $1,800/month in licensing fees, and inter-store stock transfers are now instant."</p>
               <div class="mt-4 flex items-center gap-3 pt-3">
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">ML</div>
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-success/10 text-sm font-bold text-success ">ML</div>
                 <div>
-                  <p class="text-sm font-bold leading-tight text-slate-900 dark:text-white">Maria Lopez</p>
-                  <p class="text-xs text-slate-500 dark:text-slate-400">Founder, Vela Clothiers</p>
+                  <p class="text-sm font-bold leading-tight text-foreground">Maria Lopez</p>
+                  <p class="text-xs text-muted-foreground">Founder, Vela Clothiers</p>
                 </div>
               </div>
             </div>
-            <div class="flex flex-col justify-between rounded-xl bg-white p-4 shadow-sm dark:bg-slate-900">
-              <p class="text-sm italic text-slate-900 dark:text-white">"Our 6-chair dental clinic replaced two separate softwares for patient charting and billing with Skycom. The visual tooth chart and automated SMS reminders cut no-shows by 38%."</p>
+            <div class="flex flex-col justify-between rounded-xl bg-card p-4 shadow-sm ">
+              <p class="text-sm italic text-foreground">"Our 6-chair dental clinic replaced two separate softwares for patient charting and billing with Skycom. The visual tooth chart and automated SMS reminders cut no-shows by 38%."</p>
               <div class="mt-4 flex items-center gap-3 pt-3">
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">Dr</div>
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary /50 ">Dr</div>
                 <div>
-                  <p class="text-sm font-bold leading-tight text-slate-900 dark:text-white">Dr. Julian Scott, DDS</p>
-                  <p class="text-xs text-slate-500 dark:text-slate-400">Scott Family Dental Care</p>
+                  <p class="text-sm font-bold leading-tight text-foreground">Dr. Julian Scott, DDS</p>
+                  <p class="text-xs text-muted-foreground">Scott Family Dental Care</p>
                 </div>
               </div>
             </div>
-            <div class="flex flex-col justify-between rounded-xl bg-white p-4 shadow-sm dark:bg-slate-900">
-              <p class="text-sm italic text-slate-900 dark:text-white">"The tape chart calendar is snappy and housekeeping dispatch works seamlessly on maids' phones. Skycom didn't take a single dollar from our direct web reservations."</p>
+            <div class="flex flex-col justify-between rounded-xl bg-card p-4 shadow-sm ">
+              <p class="text-sm italic text-foreground">"The tape chart calendar is snappy and housekeeping dispatch works seamlessly on maids' phones. Skycom didn't take a single dollar from our direct web reservations."</p>
               <div class="mt-4 flex items-center gap-3 pt-3">
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-sm font-bold text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">EK</div>
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-warning/10 text-sm font-bold text-warning ">EK</div>
                 <div>
-                  <p class="text-sm font-bold leading-tight text-slate-900 dark:text-white">Elena Koslov</p>
-                  <p class="text-xs text-slate-500 dark:text-slate-400">GM, The Grand Aspen Suites</p>
+                  <p class="text-sm font-bold leading-tight text-foreground">Elena Koslov</p>
+                  <p class="text-xs text-muted-foreground">GM, The Grand Aspen Suites</p>
                 </div>
               </div>
             </div>
-            <div class="flex flex-col justify-between rounded-xl bg-white p-4 shadow-sm dark:bg-slate-900">
-              <p class="text-sm italic text-slate-900 dark:text-white">"During Friday night rushes, zero latency on table ordering and kitchen display routing is everything. We track our steak cuts down to the ounce. Best ERP on the market."</p>
+            <div class="flex flex-col justify-between rounded-xl bg-card p-4 shadow-sm ">
+              <p class="text-sm italic text-foreground">"During Friday night rushes, zero latency on table ordering and kitchen display routing is everything. We track our steak cuts down to the ounce. Best ERP on the market."</p>
               <div class="mt-4 flex items-center gap-3 pt-3">
-                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-sm font-bold text-rose-600 dark:bg-rose-900/50 dark:text-rose-300">AC</div>
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-danger/10 text-sm font-bold text-danger ">AC</div>
                 <div>
-                  <p class="text-sm font-bold leading-tight text-slate-900 dark:text-white">Chef Antoine Chen</p>
-                  <p class="text-xs text-slate-500 dark:text-slate-400">Owner, Bistro Moderne Group</p>
+                  <p class="text-sm font-bold leading-tight text-foreground">Chef Antoine Chen</p>
+                  <p class="text-xs text-muted-foreground">Owner, Bistro Moderne Group</p>
                 </div>
               </div>
             </div>
@@ -927,13 +927,13 @@
       </section>
       <!-- FINAL CTA / ONBOARDING BANNER -->
       <section class="px-4 py-16 md:px-8 md:py-24">
-        <div class="relative mx-auto max-w-5xl overflow-hidden rounded-3xl bg-indigo-600 p-6 text-center text-white shadow-xl md:p-10">
-          <div class="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-indigo-500 opacity-50 blur-3xl"></div>
-          <div class="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-emerald-500 opacity-40 blur-3xl"></div>
+        <div class="relative mx-auto max-w-5xl overflow-hidden rounded-3xl bg-primary p-6 text-center text-primary-foreground shadow-xl md:p-10">
+          <div class="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-primary opacity-50 blur-3xl"></div>
+          <div class="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-success/100 opacity-40 blur-3xl"></div>
           <div class="relative z-10">
-            <span class="mb-4 inline-block rounded-full bg-white/10 px-4 py-1.5 text-sm uppercase tracking-wider text-emerald-200 backdrop-blur-md font-bold">Zero Barriers • Zero Credit Card • Custom Spend Limits &amp; Zero Overcharge Protection</span>
+            <span class="mb-4 inline-block rounded-full bg-overlay-foreground/10 px-4 py-1.5 text-sm uppercase tracking-wider text-success backdrop-blur-md font-bold">Zero Barriers • Zero Credit Card • Custom Spend Limits &amp; Zero Overcharge Protection</span>
             <h2 class="mx-auto max-w-2xl text-3xl font-extrabold leading-tight md:text-4xl">When You're Small, We're Free. When You Grow, We Grow Together.</h2>
-            <p class="mx-auto mb-8 mt-3 max-w-xl text-lg text-indigo-200">No credit cards, zero seat fees. Get your monthly free refill credits and only pay tiny micropayments as your transaction volume soars.</p>
+            <p class="mx-auto mb-8 mt-3 max-w-xl text-lg text-primary">No credit cards, zero seat fees. Get your monthly free refill credits and only pay tiny micropayments as your transaction volume soars.</p>
             <form
               action="/sign_up"
               class="mx-auto flex max-w-xl flex-col gap-2.5 sm:flex-row"
@@ -941,86 +941,86 @@
               method="get"
             >
               <input
-                class="h-12 flex-1 rounded-xl bg-white px-4 text-base text-slate-900 shadow-sm outline-none placeholder:text-slate-400"
+                class="h-12 flex-1 rounded-xl bg-card px-4 text-base text-foreground shadow-sm outline-none placeholder:text-muted-foreground"
                 name="email"
                 placeholder="Enter your business email"
                 required=""
                 type="email"
               >
               <button
-                class="flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-600 px-6 text-base font-bold text-white shadow-md transition-all hover:bg-emerald-500 cursor-pointer"
+                class="flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-success px-6 text-base font-bold text-success-foreground shadow-md transition-all hover:bg-success/90 cursor-pointer"
                 type="submit"
               >
                 <span>Claim Free Monthly Credits</span>
                 <span class="material-symbols-outlined text-xl">bolt</span>
               </button>
             </form>
-            <p class="mt-4 text-xs text-indigo-200/80">Compliant with SOC2 Type II, HIPAA and GDPR regulations. Automated daily encrypted backups included.</p>
+            <p class="mt-4 text-xs text-primary/80">Compliant with SOC2 Type II, HIPAA and GDPR regulations. Automated daily encrypted backups included.</p>
           </div>
         </div>
       </section>
     </main>
-    <footer class="w-full bg-slate-100 dark:bg-slate-900/60">
+    <footer class="w-full bg-muted ">
       <div class="mx-auto max-w-7xl px-4 py-10 md:px-8">
         <div class="grid grid-cols-1 gap-10 pb-10 md:grid-cols-2 lg:grid-cols-5">
           <div class="lg:col-span-1">
             <div class="mb-4 flex items-center gap-2">
               <img alt="Skycom Logo" class="h-7 w-auto object-contain" src="/icon.svg">
-              <span class="text-base font-bold text-slate-900 dark:text-white">Skycom</span>
+              <span class="text-base font-bold text-foreground">Skycom</span>
             </div>
-            <p class="mb-4 text-sm text-slate-600 dark:text-slate-400">Unified multi-tenant enterprise orchestration for retail, clinical healthcare, hospitality, and dining chains.</p>
-            <div class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 dark:bg-slate-900">
-              <span class="h-2 w-2 rounded-full bg-emerald-600"></span>
-              <span class="text-sm text-slate-900 dark:text-white">Global SLA: 99.99% Uptime</span>
+            <p class="mb-4 text-sm text-muted-foreground">Unified multi-tenant enterprise orchestration for retail, clinical healthcare, hospitality, and dining chains.</p>
+            <div class="inline-flex items-center gap-2 rounded-full bg-card px-3 py-1 ">
+              <span class="h-2 w-2 rounded-full bg-success"></span>
+              <span class="text-sm text-foreground">Global SLA: 99.99% Uptime</span>
             </div>
           </div>
           <div>
-            <h4 class="mb-4 text-base font-bold text-slate-900 dark:text-white">Solutions</h4>
+            <h4 class="mb-4 text-base font-bold text-foreground">Solutions</h4>
             <ul class="space-y-2">
-              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-600"></span><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#solutions">Retail &amp; Multi-store</a></li>
-              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#solutions">Dental &amp; Clinics</a></li>
-              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#solutions">Hotels &amp; Hospitality</a></li>
-              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-rose-300"></span><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#solutions">Restaurants &amp; Cafes</a></li>
+              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-success"></span><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions">Retail &amp; Multi-store</a></li>
+              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-success"></span><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions">Dental &amp; Clinics</a></li>
+              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-warning/100"></span><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions">Hotels &amp; Hospitality</a></li>
+              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-danger/50"></span><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions">Restaurants &amp; Cafes</a></li>
             </ul>
           </div>
           <div>
-            <h4 class="mb-4 text-base font-bold text-slate-900 dark:text-white">Platform Features</h4>
+            <h4 class="mb-4 text-base font-bold text-foreground">Platform Features</h4>
             <ul class="space-y-2">
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">POS Engine</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">Inventory Engine</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">Automated Attendance</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">HR &amp; Payroll</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">Smart Calendar</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">Multi-Branch Billing</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">POS Engine</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Inventory Engine</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Automated Attendance</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">HR &amp; Payroll</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Smart Calendar</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Multi-Branch Billing</a></li>
             </ul>
           </div>
           <div>
-            <h4 class="mb-4 text-base font-bold text-slate-900 dark:text-white">Security &amp; Trust</h4>
+            <h4 class="mb-4 text-base font-bold text-foreground">Security &amp; Trust</h4>
             <ul class="space-y-2">
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">Tenant Data Isolation</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">SOC2 Type II</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">HIPAA-Ready Arch</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">GDPR Compliance</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">99.99% Enterprise SLA</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">Tenant Data Isolation</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">SOC2 Type II</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">HIPAA-Ready Arch</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">GDPR Compliance</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">99.99% Enterprise SLA</a></li>
             </ul>
           </div>
           <div>
-            <h4 class="mb-4 text-base font-bold text-slate-900 dark:text-white">Resources</h4>
+            <h4 class="mb-4 text-base font-bold text-foreground">Resources</h4>
             <ul class="space-y-2">
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">Documentation &amp; APIs</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">Enterprise Scaling</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">System Status</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">24/7 Priority Support</a></li>
-              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">Terms &amp; Master Agreement</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Documentation &amp; APIs</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Enterprise Scaling</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">System Status</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">24/7 Priority Support</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">Terms &amp; Master Agreement</a></li>
             </ul>
           </div>
         </div>
         <div class="flex flex-col items-center justify-between gap-4 pt-6 md:flex-row">
-          <p class="text-sm text-slate-600 dark:text-slate-400">© 2025 Skycom Technologies Inc. All rights reserved.</p>
+          <p class="text-sm text-muted-foreground">© 2025 Skycom Technologies Inc. All rights reserved.</p>
           <div class="flex items-center gap-4">
-            <a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">Privacy Policy</a>
-            <a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">Security Center</a>
-            <a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">Trust Center</a>
+            <a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">Privacy Policy</a>
+            <a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">Security Center</a>
+            <a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">Trust Center</a>
           </div>
         </div>
       </div>

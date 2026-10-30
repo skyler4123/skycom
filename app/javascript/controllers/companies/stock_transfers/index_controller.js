@@ -91,7 +91,7 @@ export default class Companies_StockTransfers_IndexController extends Companies_
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
+        <div class="p-4 bg-card rounded-xl border border-line flex flex-col">
 
           ${this.renderTableTitle()}
 
@@ -100,26 +100,26 @@ export default class Companies_StockTransfers_IndexController extends Companies_
               <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                 ${searchHTML}
                 <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Category")}</label>
+                  <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Category")}</label>
                   <select
                     name="category_id"
-                    class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                    class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground"
                   >
                     ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
                   </select>
                 </div>
                 <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Branch")}</label>
+                  <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Branch")}</label>
                   <select
                     name="branch_id"
-                    class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                    class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground"
                   >
                     ${selectOptionsHTML(cloneNewKey(currentBranches(), "id", "value"), branchValue, translate("All Branches"))}
                   </select>
                 </div>
                 ${filtersHTML}
                 <div class="flex gap-2 mt-auto">
-                  <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
+                  <button type="submit" class="h-[38px] px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
                     <span class="material-symbols-outlined text-[18px]!">search</span>
                     ${translate("Search")}
                   </button>
@@ -127,7 +127,7 @@ export default class Companies_StockTransfers_IndexController extends Companies_
               </div>
 
               <a href="${Helpers.new_company_stock_transfer_path(currentCompany().id)}"
-                class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm whitespace-nowrap cursor-pointer">
+                class="flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors font-medium text-sm whitespace-nowrap cursor-pointer">
                 <span class="material-symbols-outlined text-[20px]">add</span>
                 ${translate("Add")}
               </a>
@@ -144,18 +144,18 @@ export default class Companies_StockTransfers_IndexController extends Companies_
               renderers: {
                 name: (value, record) => `
                   <a href="${Helpers.company_stock_transfer_path(currentCompany().id, record.id)}"
-                    class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                    class="font-medium text-foreground overflow-visible whitespace-normal hover:text-primary transition-colors cursor-pointer">
                     ${value || translate("Unnamed Stock Transfer")}
                   </a>`,
-                code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || '—'}</span>`,
-                quantity: (value) => `<span class="font-medium text-slate-900 dark:text-white">${value ?? 0}</span>`,
-                business_type: (value) => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">${Helpers.capitalize((value || 'transfer').replace(/_/g, ' '))}</span>`,
+                code: (value) => `<span class="font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium">${value || '—'}</span>`,
+                quantity: (value) => `<span class="font-medium text-foreground">${value ?? 0}</span>`,
+                business_type: (value) => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary /50 ">${Helpers.capitalize((value || 'transfer').replace(/_/g, ' '))}</span>`,
                 workflow_status: (value) => `${Helpers.statusBadge(value)}`,
               },
               renderActions: (record) => (record.workflow_status === "draft" || record.workflow_status === "pending") ? `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.edit_company_stock_transfer_path(currentCompany().id, record.id)}"
-                    class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
+                    class="inline-flex items-center justify-center p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer">
                     <span class="material-symbols-outlined text-[20px]">edit</span>
                   </a>
                 </td>` : `<td class="py-4 px-6 text-sm text-right whitespace-nowrap"></td>`

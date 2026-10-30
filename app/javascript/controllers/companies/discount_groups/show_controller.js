@@ -49,7 +49,7 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Campaign not found.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Campaign not found.")}</div>`
           return true
         }
         return false
@@ -80,17 +80,17 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
     if (!g.total_budget_cents) {
       return `
         <div>
-          <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Total Budget")}</p>
-          <p class="text-sm font-semibold text-slate-900 dark:text-white">—</p>
+          <p class="text-xs font-medium text-muted-foreground">${translate("Total Budget")}</p>
+          <p class="text-sm font-semibold text-foreground">—</p>
         </div>`
     }
     const pct = Math.min(100, Math.round((g.current_spent_cents / g.total_budget_cents) * 100))
     return `
       <div class="min-w-[160px] flex-1">
-        <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Budget")}</p>
-        <p class="text-sm font-semibold text-slate-900 dark:text-white">${this.formatMoney(g.current_spent_cents)} / ${this.formatMoney(g.total_budget_cents)} (${pct}%)</p>
-        <div class="mt-1 h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800">
-          <div class="h-1.5 rounded-full ${pct >= 100 ? "bg-rose-500" : "bg-blue-500"}" style="width:${pct}%"></div>
+        <p class="text-xs font-medium text-muted-foreground">${translate("Budget")}</p>
+        <p class="text-sm font-semibold text-foreground">${this.formatMoney(g.current_spent_cents)} / ${this.formatMoney(g.total_budget_cents)} (${pct}%)</p>
+        <div class="mt-1 h-1.5 w-full rounded-full bg-muted">
+          <div class="h-1.5 rounded-full ${pct >= 100 ? "bg-danger/100" : "bg-primary"}" style="width:${pct}%"></div>
         </div>
       </div>`
   }
@@ -153,25 +153,25 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
     if (!p.last || p.last <= 1) return ""
     return `
       <div class="flex items-center justify-center gap-2 pt-4">
-        ${p.previous ? `<a href="${this.ledgerPageLink(p.previous)}" class="px-3 py-1 text-sm border rounded-lg text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer">‹</a>` : ""}
-        <span class="text-sm text-slate-500 dark:text-slate-400">${p.page} / ${p.last}</span>
-        ${p.next ? `<a href="${this.ledgerPageLink(p.next)}" class="px-3 py-1 text-sm border rounded-lg text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer">›</a>` : ""}
+        ${p.previous ? `<a href="${this.ledgerPageLink(p.previous)}" class="px-3 py-1 text-sm border rounded-lg text-muted-foreground border-line hover:bg-muted cursor-pointer">‹</a>` : ""}
+        <span class="text-sm text-muted-foreground">${p.page} / ${p.last}</span>
+        ${p.next ? `<a href="${this.ledgerPageLink(p.next)}" class="px-3 py-1 text-sm border rounded-lg text-muted-foreground border-line hover:bg-muted cursor-pointer">›</a>` : ""}
       </div>`
   }
 
   statusBadge(status) {
     const styles = {
-      unused: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-      pending: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-      used: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
-      expired: "bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
+      unused: "bg-success/10 text-success ",
+      pending: "bg-warning/10 text-warning ",
+      used: "bg-muted text-muted-foreground ",
+      expired: "bg-danger/10 text-danger "
     }
     const label = { unused: translate("Unused"), pending: translate("Pending"), used: translate("Used"), expired: translate("Expired") }[status] || status
     return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${styles[status] || styles.unused}">${label}</span>`
   }
 
   ledgerHTML() {
-    const base = "pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer"
+    const base = "pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground cursor-pointer"
     const statusOptions = [
       { value: "", label: translate("All") },
       { value: "unused", label: translate("Unused") },
@@ -181,33 +181,33 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
     ]
 
     const rows = this.discounts.map(d => `
-      <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+      <tr class="hover:bg-muted/50 transition-colors">
         <td class="py-3 px-6">
-          <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${d.code}</span>
+          <span class="font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium">${d.code}</span>
         </td>
         <td class="py-3 px-6">${this.statusBadge(d.status)}</td>
-        <td class="py-3 px-6 text-sm text-slate-900 dark:text-white">${d.amount_cents != null ? this.formatMoney(d.amount_cents) : "—"}</td>
-        <td class="py-3 px-6 text-sm text-slate-500 dark:text-slate-400">${d.used_at ? new Date(d.used_at).toLocaleString() : "—"}</td>
-        <td class="py-3 px-6 text-sm text-slate-500 dark:text-slate-400">${d.customer?.name || "—"}</td>
+        <td class="py-3 px-6 text-sm text-foreground">${d.amount_cents != null ? this.formatMoney(d.amount_cents) : "—"}</td>
+        <td class="py-3 px-6 text-sm text-muted-foreground">${d.used_at ? new Date(d.used_at).toLocaleString() : "—"}</td>
+        <td class="py-3 px-6 text-sm text-muted-foreground">${d.customer?.name || "—"}</td>
         <td class="py-3 px-6 text-right">
           <button type="button" data-action="click->${this.identifier}#copyCode" data-${this.identifier}-code-param="${d.code}"
             ${tooltip(translate("Copy Code"))}
-            class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
+            class="inline-flex items-center justify-center p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer">
             <span class="material-symbols-outlined text-[18px]!">content_copy</span>
           </button>
         </td>
       </tr>`).join('')
 
     return `
-      <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
+      <div class="border-t border-line pt-6 mt-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${translate("Codes")} (${this.discounts.length})</h3>
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider">${translate("Codes")} (${this.discounts.length})</h3>
           <div class="flex items-center gap-3">
             <select id="ledger-status" name="ledger-status" data-action="change->${this.identifier}#onStatusChange" class="${base}">
               ${statusOptions.map(o => `<option value="${o.value}" ${this.statusFilter === o.value ? "selected" : ""}>${o.label}</option>`).join('')}
             </select>
             <button type="button" data-action="click->${this.identifier}#exportCsv"
-              class="inline-flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium cursor-pointer">
+              class="inline-flex items-center gap-2 px-3 py-2 bg-muted text-foreground rounded-lg text-sm font-medium cursor-pointer">
               <span class="material-symbols-outlined text-[18px]!">download</span>${translate("Export CSV")}
             </button>
           </div>
@@ -215,7 +215,7 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="text-xs text-slate-500 border-b border-slate-200 dark:border-slate-700">
+              <tr class="text-xs text-muted-foreground border-b border-line">
                 <th class="py-2 px-6 font-medium">${translate("Code")}</th>
                 <th class="py-2 px-6 font-medium">${translate("Status")}</th>
                 <th class="py-2 px-6 font-medium">${translate("Amount")}</th>
@@ -224,8 +224,8 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
                 <th class="py-2 px-6"></th>
               </tr>
             </thead>
-            <tbody data-${this.identifier}-target="ledgerBody" class="divide-y divide-slate-200 dark:divide-slate-800">
-              ${rows || `<tr><td colspan="6" class="py-8 text-center text-sm text-slate-400">${translate("None")}</td></tr>`}
+            <tbody data-${this.identifier}-target="ledgerBody" class="divide-y divide-line">
+              ${rows || `<tr><td colspan="6" class="py-8 text-center text-sm text-muted-foreground">${translate("None")}</td></tr>`}
             </tbody>
           </table>
         </div>
@@ -240,55 +240,55 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
     const lifecycleControls = `
       <div class="mt-6 flex gap-3">
         ${g.campaign_status !== "active" ? `<button type="button" data-action="click->${this.identifier}#activate"
-          class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">${translate("Activate")}</button>` : ""}
+          class="px-4 py-2 bg-success hover:bg-success/90 text-success-foreground rounded-lg font-bold text-sm transition-colors cursor-pointer">${translate("Activate")}</button>` : ""}
         ${g.campaign_status === "active" ? `<button type="button" data-action="click->${this.identifier}#pause"
-          class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">${translate("Pause")}</button>` : ""}
+          class="px-4 py-2 bg-warning/100 hover:bg-warning/90 text-warning-foreground rounded-lg font-bold text-sm transition-colors cursor-pointer">${translate("Pause")}</button>` : ""}
       </div>`
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-          <a href="${Helpers.company_discount_groups_path(this.companyId)}" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6">
+        <div class="p-6 bg-card rounded-xl border border-line">
+          <a href="${Helpers.company_discount_groups_path(this.companyId)}" class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back to Discounts")}
           </a>
 
           <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-start mb-6">
-            <div class="size-24 shrink-0 overflow-hidden rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
-              <span class="material-symbols-outlined text-4xl text-blue-600 dark:text-blue-400">sell</span>
+            <div class="size-24 shrink-0 overflow-hidden rounded-xl bg-primary/10 /40 flex items-center justify-center">
+              <span class="material-symbols-outlined text-4xl text-primary">sell</span>
             </div>
             <div class="flex flex-1 flex-col text-center sm:text-left">
-              <h2 class="text-2xl font-black text-slate-900 dark:text-white">${g.name}</h2>
-              <p class="font-semibold text-blue-600 dark:text-blue-400">${g.description || ""}</p>
+              <h2 class="text-2xl font-black text-foreground">${g.name}</h2>
+              <p class="font-semibold text-primary">${g.description || ""}</p>
               <div class="mt-2 flex flex-wrap justify-center gap-2 sm:justify-start">
-                <span class="inline-flex items-center rounded-lg bg-blue-100 dark:bg-blue-900/40 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300 uppercase">${g.prefix || g.code || "N/A"}</span>
+                <span class="inline-flex items-center rounded-lg bg-primary/10 /40 px-3 py-1 text-xs font-bold text-primary uppercase">${g.prefix || g.code || "N/A"}</span>
                 ${Helpers.statusBadge(g.campaign_status)}
               </div>
             </div>
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-6 border-t border-slate-200 dark:border-gray-800 pt-6">
+          <div class="flex flex-col sm:flex-row gap-6 border-t border-line pt-6">
             ${this.budgetProgressHTML()}
             <div>
-              <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Used")}</p>
-              <p class="text-sm font-semibold text-slate-900 dark:text-white">${this.usedCount} ${translate("Codes")}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Used")}</p>
+              <p class="text-sm font-semibold text-foreground">${this.usedCount} ${translate("Codes")}</p>
             </div>
             <div>
-              <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Validity")}</p>
-              <p class="text-sm font-semibold text-slate-900 dark:text-white">${g.start_at ? new Date(g.start_at).toLocaleDateString() : "—"} → ${g.end_at ? new Date(g.end_at).toLocaleDateString() : "—"}</p>
+              <p class="text-xs font-medium text-muted-foreground">${translate("Validity")}</p>
+              <p class="text-sm font-semibold text-foreground">${g.start_at ? new Date(g.start_at).toLocaleDateString() : "—"} → ${g.end_at ? new Date(g.end_at).toLocaleDateString() : "—"}</p>
             </div>
           </div>
 
           ${lifecycleControls}
 
-          <div class="mt-8 flex flex-wrap justify-end gap-3 pt-6 border-t border-slate-200 dark:border-gray-800">
+          <div class="mt-8 flex flex-wrap justify-end gap-3 pt-6 border-t border-line">
             <a href="${Helpers.new_company_discount_group_path(this.companyId)}?generate_for=${g.id}"
-              class="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors cursor-pointer">
+              class="inline-flex items-center gap-2 px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm transition-colors cursor-pointer">
               <span class="material-symbols-outlined text-[18px]!">add</span>
               ${translate("Generate More Codes")}
             </a>
             <a href="${Helpers.edit_company_discount_group_path(this.companyId, g.id)}"
-              class="inline-flex items-center px-6 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg font-medium text-sm transition-colors cursor-pointer">
+              class="inline-flex items-center px-6 py-2 bg-muted hover:bg-muted text-foreground rounded-lg font-medium text-sm transition-colors cursor-pointer">
               ${translate("Edit Campaign")}
             </a>
           </div>

@@ -40,7 +40,7 @@ export default class Companies_Events_ShowController extends Companies_LayoutCon
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load event.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load event.")}</div>`
           return true
         }
         return false
@@ -53,31 +53,31 @@ export default class Companies_Events_ShowController extends Companies_LayoutCon
   }
 
   formatDisplayValue(value, type) {
-    if (value === null || value === undefined) return '<span class="text-slate-300 dark:text-slate-700">—</span>'
+    if (value === null || value === undefined) return '<span class="text-muted-foreground/60">—</span>'
     switch (type) {
       case 'boolean':
-        return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${value ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-400'}">${value ? translate("True") : translate("False")}</span>`
+        return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${value ? 'bg-success/10 text-success ' : 'bg-background text-foreground '}">${value ? translate("True") : translate("False")}</span>`
       case 'integer':
-        return `<span class="font-mono text-slate-900 dark:text-slate-100">${Number(value).toLocaleString()}</span>`
+        return `<span class="font-mono text-foreground">${Number(value).toLocaleString()}</span>`
       case 'decimal':
-        return `<span class="font-mono font-medium text-blue-600 dark:text-blue-400">${Number(value).toFixed(2)}</span>`
+        return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
       case 'datetime': {
         const d = new Date(value)
-        return `<span class="text-sm text-slate-900 dark:text-white">${d.toLocaleString()}</span>`
+        return `<span class="text-sm text-foreground">${d.toLocaleString()}</span>`
       }
       default:
-        return `<span class="text-sm text-slate-900 dark:text-white">${value}</span>`
+        return `<span class="text-sm text-foreground">${value}</span>`
     }
   }
 
   linkListHTML(title, icon, items, nameKey = "name") {
     if (!items || items.length === 0) return ''
     return `
-      <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate(title)}</h3>
+      <div class="border-t border-line pt-6 mt-6">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate(title)}</h3>
         <div class="flex flex-wrap gap-2">
           ${items.map(item => `
-            <span class="inline-flex items-center gap-1 px-3 py-1 text-sm rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+            <span class="inline-flex items-center gap-1 px-3 py-1 text-sm rounded-lg bg-muted text-foreground">
               <span class="material-symbols-outlined text-[16px]">${icon}</span>
               ${item[nameKey] || item.id}${item.quantity ? ` × ${item.quantity}` : ''}
             </span>
@@ -95,26 +95,26 @@ export default class Companies_Events_ShowController extends Companies_LayoutCon
     const category = currentCategories().find(c => c.id === e.category_id)
 
     const warningsHTML = this.warnings.length > 0 ? `
-      <div class="mb-6 p-4 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20">
-        <p class="text-sm font-bold text-amber-700 dark:text-amber-300 mb-2">${translate("Warnings")}</p>
-        <ul class="list-disc list-inside text-sm text-amber-700 dark:text-amber-300 space-y-1">
+      <div class="mb-6 p-4 rounded-xl border border-warning/20 bg-warning/10 ">
+        <p class="text-sm font-bold text-warning mb-2">${translate("Warnings")}</p>
+        <ul class="list-disc list-inside text-sm text-warning space-y-1">
           ${this.warnings.map(w => `<li>${w}</li>`).join('')}
         </ul>
       </div>
     ` : ''
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
-      <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
+      <div class="border-t border-line pt-6 mt-6">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           ${this.propertyMetadata.map(field => `
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-indigo-600 dark:text-indigo-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-primary">
                 <span class="material-symbols-outlined text-[20px]">${field.type === 'boolean' ? 'check_circle' : field.type === 'datetime' ? 'calendar_month' : 'text_fields'}</span>
               </div>
               <div class="min-w-0 flex-1">
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${field.name}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${this.formatDisplayValue(e[field.key], field.type)}</p>
+                <p class="text-xs font-medium text-muted-foreground">${field.name}</p>
+                <p class="text-sm font-semibold text-foreground">${this.formatDisplayValue(e[field.key], field.type)}</p>
               </div>
             </div>
           `).join('')}
@@ -124,8 +124,8 @@ export default class Companies_Events_ShowController extends Companies_LayoutCon
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-          <a href="${Helpers.company_events_path(companyId)}" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6">
+        <div class="p-6 bg-card rounded-xl border border-line">
+          <a href="${Helpers.company_events_path(companyId)}" class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back to Events")}
           </a>
@@ -133,57 +133,57 @@ export default class Companies_Events_ShowController extends Companies_LayoutCon
           ${warningsHTML}
 
           <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-start mb-6">
-            <div class="size-24 shrink-0 overflow-hidden rounded-xl border-4 border-indigo-100 dark:border-indigo-900/30 bg-indigo-100 dark:bg-gray-800 shadow-lg flex items-center justify-center">
-              <span class="material-symbols-outlined text-4xl text-indigo-600 dark:text-indigo-400">event</span>
+            <div class="size-24 shrink-0 overflow-hidden rounded-xl border-4 border-primary/20 /30 bg-primary/10 shadow-lg flex items-center justify-center">
+              <span class="material-symbols-outlined text-4xl text-primary">event</span>
             </div>
             <div class="flex flex-1 flex-col text-center sm:text-left">
-              <h2 class="text-2xl font-black text-slate-900 dark:text-white">${e.name}</h2>
-              <p class="font-semibold text-indigo-600 dark:text-indigo-400">${e.description || ''}</p>
+              <h2 class="text-2xl font-black text-foreground">${e.name}</h2>
+              <p class="font-semibold text-primary">${e.description || ''}</p>
               <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
-                <span class="inline-flex items-center rounded-lg bg-indigo-100 dark:bg-indigo-900/40 px-3 py-1 text-xs font-bold text-indigo-700 dark:text-indigo-300 uppercase">${e.code || translate("N/A")}</span>
+                <span class="inline-flex items-center rounded-lg bg-primary/10 /40 px-3 py-1 text-xs font-bold text-primary uppercase">${e.code || translate("N/A")}</span>
                 ${Helpers.statusBadge(e.workflow_status)}
               </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 gap-6 border-t border-slate-200 dark:border-gray-800 pt-6 sm:grid-cols-2">
+          <div class="grid grid-cols-1 gap-6 border-t border-line pt-6 sm:grid-cols-2">
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-indigo-600 dark:text-indigo-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-primary">
                 <span class="material-symbols-outlined">schedule</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Start At")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${e.start_at ? new Date(e.start_at).toLocaleString() : translate("N/A")}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Start At")}</p>
+                <p class="text-sm font-semibold text-foreground">${e.start_at ? new Date(e.start_at).toLocaleString() : translate("N/A")}</p>
               </div>
             </div>
 
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-indigo-600 dark:text-indigo-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-primary">
                 <span class="material-symbols-outlined">schedule</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("End At")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${e.end_at ? new Date(e.end_at).toLocaleString() : translate("N/A")}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("End At")}</p>
+                <p class="text-sm font-semibold text-foreground">${e.end_at ? new Date(e.end_at).toLocaleString() : translate("N/A")}</p>
               </div>
             </div>
 
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-indigo-600 dark:text-indigo-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-primary">
                 <span class="material-symbols-outlined">folder</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Category")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${category?.name || e.category?.name || translate("N/A")}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Category")}</p>
+                <p class="text-sm font-semibold text-foreground">${category?.name || e.category?.name || translate("N/A")}</p>
               </div>
             </div>
 
             <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-indigo-600 dark:text-indigo-400">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-primary">
                 <span class="material-symbols-outlined">category</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Type")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${Helpers.capitalize(e.business_type?.replace('_', ' ') || 'appointment')}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Type")}</p>
+                <p class="text-sm font-semibold text-foreground">${Helpers.capitalize(e.business_type?.replace('_', ' ') || 'appointment')}</p>
               </div>
             </div>
           </div>
@@ -196,13 +196,13 @@ export default class Companies_Events_ShowController extends Companies_LayoutCon
           ${this.linkListHTML("Stocks", "inventory", e.stocks)}
           ${this.linkListHTML("Orders", "order_approve", e.orders)}
 
-          <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-gray-800">
+          <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-line">
             <a href="${Helpers.company_calendar_path(companyId)}"
-              class="inline-flex items-center px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg font-medium text-sm cursor-pointer">
+              class="inline-flex items-center px-6 py-2 border border-line text-foreground rounded-lg font-medium text-sm cursor-pointer">
               ${translate("Calendar")}
             </a>
             <a href="${Helpers.edit_company_event_path(companyId, e.id)}"
-              class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors cursor-pointer">
+              class="inline-flex items-center px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm transition-colors cursor-pointer">
               ${translate("Edit Event")}
             </a>
           </div>

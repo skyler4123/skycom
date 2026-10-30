@@ -48,7 +48,7 @@ export default class extends Controller {
     this.tooltip = document.createElement("div")
     
     const defaultClasses = "fixed z-[9999] px-3 py-2 text-sm font-medium rounded-lg shadow-xl transition-all duration-300 opacity-0 translate-y-2 pointer-events-none"
-    const themeClasses = "bg-slate-900 text-slate-100 border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-200"
+    const themeClasses = "bg-foreground text-background border border-foreground/20 "
     const interactionClass = this.actionValue === "click" ? "pointer-events-auto" : "pointer-events-none"
     
     this.tooltip.className = `${defaultClasses} ${interactionClass} ${this.classesValue || themeClasses}`

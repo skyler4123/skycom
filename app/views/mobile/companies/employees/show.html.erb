@@ -4,36 +4,36 @@
 
 <main class="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl px-4 pb-8 pt-4">
   <div class="flex flex-col gap-4">
-    <section class="relative overflow-hidden rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div class="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-blue-50/80 dark:bg-blue-900/20"></div>
+    <section class="relative overflow-hidden rounded-xl border border-line bg-card p-6 text-center shadow-sm ">
+      <div class="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-primary/10 "></div>
       <div class="relative flex flex-col items-center">
         <div class="relative">
           <%= render "mobile/shared/avatar", name: @employee.name, size: "h-20 w-20 text-2xl" %>
-          <span class="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-green-600 text-white shadow-sm">
+          <span class="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-success text-success-foreground shadow-sm">
             <span class="material-symbols-outlined text-base">check</span>
           </span>
         </div>
         <div class="mt-3 flex flex-wrap items-center justify-center gap-2">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white"><%= @employee.name %></h2>
+          <h2 class="text-xl font-bold text-foreground"><%= @employee.name %></h2>
           <% if @employee.code.present? %>
-            <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300"><%= @employee.code %></span>
+            <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground "><%= @employee.code %></span>
           <% end %>
         </div>
-        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= @employee.category&.name || @company.name %></p>
+        <p class="mt-1 text-sm text-muted-foreground"><%= @employee.category&.name || @company.name %></p>
 
         <div class="mt-3 flex flex-wrap items-center justify-center gap-1.5">
-          <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+          <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary /40 ">
             <span class="material-symbols-outlined text-base">verified_user</span>
             <%= mobile_employee_type_label(@employee.business_type) %>
           </span>
           <% @employee.roles.each do |role| %>
-            <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+            <span class="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground ">
               <span class="material-symbols-outlined text-base">workspace_premium</span>
               <%= role.name %>
             </span>
           <% end %>
           <% if @employee.category.present? %>
-            <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+            <span class="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground ">
               <span class="material-symbols-outlined text-base">category</span>
               <%= @employee.category.name %>
             </span>
@@ -42,99 +42,99 @@
       </div>
     </section>
 
-    <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <section class="rounded-xl border border-line bg-card p-4 shadow-sm ">
       <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-xl text-blue-600 dark:text-blue-400">badge</span>
-        <h2 class="text-base font-semibold text-slate-900 dark:text-white">Account &amp; Contact</h2>
+        <span class="material-symbols-outlined text-xl text-primary">badge</span>
+        <h2 class="text-base font-semibold text-foreground">Account &amp; Contact</h2>
       </div>
 
       <div class="mt-3 flex flex-col gap-2">
-        <div data-controller="mobile--copy" class="flex items-center justify-between gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
+        <div data-controller="mobile--copy" class="flex items-center justify-between gap-2 rounded-lg border border-line bg-background p-3 ">
           <div class="flex min-w-0 items-center gap-2">
-            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500 dark:bg-slate-900 dark:text-slate-300">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card text-muted-foreground ">
               <span class="material-symbols-outlined text-lg">alternate_email</span>
             </span>
             <div class="min-w-0">
-              <p class="text-xs text-slate-500 dark:text-slate-400">Work Email</p>
-              <p data-mobile--copy-target="source" class="truncate text-sm text-slate-900 dark:text-white"><%= @employee.email.presence || "—" %></p>
+              <p class="text-xs text-muted-foreground">Work Email</p>
+              <p data-mobile--copy-target="source" class="truncate text-sm text-foreground"><%= @employee.email.presence || "—" %></p>
             </div>
           </div>
-          <button type="button" data-action="click->mobile--copy#copy" class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-white text-blue-600 transition-colors hover:bg-blue-600 hover:text-white dark:bg-slate-900 dark:text-blue-300 dark:hover:bg-blue-500" aria-label="Copy email">
+          <button type="button" data-action="click->mobile--copy#copy" class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-card text-primary transition-colors hover:bg-primary/90 hover:text-primary-foreground " aria-label="Copy email">
             <span class="material-symbols-outlined text-lg">content_copy</span>
           </button>
         </div>
 
-        <div class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
-          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500 dark:bg-slate-900 dark:text-slate-300">
+        <div class="flex items-center gap-2 rounded-lg border border-line bg-background p-3 ">
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card text-muted-foreground ">
             <span class="material-symbols-outlined text-lg">call</span>
           </span>
           <div class="min-w-0">
-            <p class="text-xs text-slate-500 dark:text-slate-400">Phone Number</p>
-            <p class="truncate text-sm font-medium text-slate-900 dark:text-white"><%= @employee.phone_number.presence || "—" %></p>
+            <p class="text-xs text-muted-foreground">Phone Number</p>
+            <p class="truncate text-sm font-medium text-foreground"><%= @employee.phone_number.presence || "—" %></p>
           </div>
         </div>
 
-        <div class="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
-          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500 dark:bg-slate-900 dark:text-slate-300">
+        <div class="flex items-center gap-2 rounded-lg border border-line bg-background p-3 ">
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card text-muted-foreground ">
             <span class="material-symbols-outlined text-lg">fingerprint</span>
           </span>
           <div class="min-w-0">
-            <p class="text-xs text-slate-500 dark:text-slate-400">System Staff ID</p>
-            <p class="truncate text-sm font-medium text-slate-900 dark:text-white"><%= @employee.code.presence || "—" %></p>
+            <p class="text-xs text-muted-foreground">System Staff ID</p>
+            <p class="truncate text-sm font-medium text-foreground"><%= @employee.code.presence || "—" %></p>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <section class="rounded-xl border border-line bg-card p-4 shadow-sm ">
       <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-xl text-blue-600 dark:text-blue-400">corporate_fare</span>
-        <h2 class="text-base font-semibold text-slate-900 dark:text-white">Organization &amp; Assignment</h2>
+        <span class="material-symbols-outlined text-xl text-primary">corporate_fare</span>
+        <h2 class="text-base font-semibold text-foreground">Organization &amp; Assignment</h2>
       </div>
 
       <div class="mt-3 grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4">
-        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
-          <div class="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+        <div class="rounded-lg border border-line bg-background p-3 ">
+          <div class="flex items-center gap-1 text-muted-foreground">
             <span class="material-symbols-outlined text-base">domain</span>
             <span class="text-xs">Company</span>
           </div>
-          <p class="mt-1 text-sm font-semibold leading-tight text-slate-900 dark:text-white"><%= @company.name %></p>
+          <p class="mt-1 text-sm font-semibold leading-tight text-foreground"><%= @company.name %></p>
         </div>
-        <div class="rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
-          <div class="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+        <div class="rounded-lg border border-line bg-background p-3 ">
+          <div class="flex items-center gap-1 text-muted-foreground">
             <span class="material-symbols-outlined text-base">storefront</span>
             <span class="text-xs">Branch</span>
           </div>
-          <p class="mt-1 text-sm font-semibold leading-tight text-slate-900 dark:text-white"><%= @employee.branch&.name || "—" %></p>
+          <p class="mt-1 text-sm font-semibold leading-tight text-foreground"><%= @employee.branch&.name || "—" %></p>
         </div>
       </div>
 
-      <div class="mt-2 flex flex-col gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
+      <div class="mt-2 flex flex-col gap-2 rounded-lg border border-line bg-background p-3 ">
         <div class="flex items-center justify-between gap-2">
-          <span class="text-xs text-slate-500 dark:text-slate-400">Department</span>
-          <span class="truncate text-sm font-medium text-slate-900 dark:text-white"><%= @employee.departments.map(&:name).join(", ").presence || "—" %></span>
+          <span class="text-xs text-muted-foreground">Department</span>
+          <span class="truncate text-sm font-medium text-foreground"><%= @employee.departments.map(&:name).join(", ").presence || "—" %></span>
         </div>
-        <div class="h-px w-full bg-slate-200 dark:bg-slate-700"></div>
+        <div class="h-px w-full bg-muted"></div>
         <div class="flex items-center justify-between gap-2">
-          <span class="text-xs text-slate-500 dark:text-slate-400">Reports To</span>
+          <span class="text-xs text-muted-foreground">Reports To</span>
           <span class="flex items-center gap-1.5">
-            <span class="text-sm font-medium text-slate-900 dark:text-white"><%= mobile_preview(:supervisor) %></span>
+            <span class="text-sm font-medium text-foreground"><%= mobile_preview(:supervisor) %></span>
             <%= mobile_sample_badge %>
           </span>
         </div>
       </div>
     </section>
 
-    <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <section class="rounded-xl border border-line bg-card p-4 shadow-sm ">
       <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-xl text-blue-600 dark:text-blue-400">calendar_month</span>
-        <h2 class="text-base font-semibold text-slate-900 dark:text-white">Work &amp; Attendance</h2>
+        <span class="material-symbols-outlined text-xl text-primary">calendar_month</span>
+        <h2 class="text-base font-semibold text-foreground">Work &amp; Attendance</h2>
       </div>
 
-      <div class="mt-3 flex flex-col gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
+      <div class="mt-3 flex flex-col gap-2 rounded-lg border border-line bg-background p-3 ">
         <div class="flex items-center justify-between gap-2">
-          <span class="text-xs text-slate-500 dark:text-slate-400">Next Shift</span>
-          <span class="truncate text-sm font-medium text-slate-900 dark:text-white">
+          <span class="text-xs text-muted-foreground">Next Shift</span>
+          <span class="truncate text-sm font-medium text-foreground">
             <% if @next_shift %>
               <%= @next_shift.work_date.strftime("%d %b") %> · <%= mobile_time(@next_shift.expected_start_at) %> – <%= mobile_time(@next_shift.expected_end_at) %>
             <% else %>
@@ -142,24 +142,24 @@
             <% end %>
           </span>
         </div>
-        <div class="h-px w-full bg-slate-200 dark:bg-slate-700"></div>
+        <div class="h-px w-full bg-muted"></div>
         <div class="flex items-center justify-between gap-2">
-          <span class="text-xs text-slate-500 dark:text-slate-400">This Month</span>
-          <span class="text-sm font-medium text-slate-900 dark:text-white"><%= mobile_duration(@attendance_month&.total_work_minutes) %></span>
+          <span class="text-xs text-muted-foreground">This Month</span>
+          <span class="text-sm font-medium text-foreground"><%= mobile_duration(@attendance_month&.total_work_minutes) %></span>
         </div>
         <div class="flex items-center justify-between gap-2">
-          <span class="text-xs text-slate-500 dark:text-slate-400">Present</span>
-          <span class="text-sm font-medium text-slate-900 dark:text-white"><%= @attendance_month&.total_present_days.to_i %> Days</span>
+          <span class="text-xs text-muted-foreground">Present</span>
+          <span class="text-sm font-medium text-foreground"><%= @attendance_month&.total_present_days.to_i %> Days</span>
         </div>
         <div class="flex items-center justify-between gap-2">
-          <span class="text-xs text-slate-500 dark:text-slate-400">Overtime</span>
-          <span class="text-sm font-medium text-slate-900 dark:text-white"><%= mobile_duration(@attendance_month&.total_overtime_minutes) %></span>
+          <span class="text-xs text-muted-foreground">Overtime</span>
+          <span class="text-sm font-medium text-foreground"><%= mobile_duration(@attendance_month&.total_overtime_minutes) %></span>
         </div>
-        <div class="h-px w-full bg-slate-200 dark:bg-slate-700"></div>
+        <div class="h-px w-full bg-muted"></div>
         <div class="flex items-center justify-between gap-2">
-          <span class="text-xs text-slate-500 dark:text-slate-400">Contract Renewal</span>
+          <span class="text-xs text-muted-foreground">Contract Renewal</span>
           <span class="flex items-center gap-1.5">
-            <span class="text-sm font-medium text-slate-900 dark:text-white"><%= mobile_preview(:contract_renewal) %></span>
+            <span class="text-sm font-medium text-foreground"><%= mobile_preview(:contract_renewal) %></span>
             <%= mobile_sample_badge %>
           </span>
         </div>
@@ -167,16 +167,16 @@
     </section>
 
     <div class="flex flex-col gap-2 pt-1">
-      <button type="button" disabled class="flex h-11 w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-slate-100 text-sm font-semibold text-slate-400 dark:bg-slate-800 dark:text-slate-500">
+      <button type="button" disabled class="flex h-11 w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-muted text-sm font-semibold text-muted-foreground ">
         Edit Profile Details
       </button>
-      <p class="text-center text-xs text-slate-400 dark:text-slate-500">Available on desktop</p>
+      <p class="text-center text-xs text-muted-foreground">Available on desktop</p>
 
-      <%= link_to mobile_company_home_path(@company), class: "flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-white text-sm font-semibold text-slate-900 shadow-sm ring-1 ring-slate-200 transition-colors hover:bg-slate-50 dark:bg-slate-900 dark:text-white dark:ring-slate-700 dark:hover:bg-slate-800" do %>
+      <%= link_to mobile_company_home_path(@company), class: "flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-card text-sm font-semibold text-foreground shadow-sm ring-1 ring-line transition-colors hover:bg-background " do %>
         Back to Home
       <% end %>
 
-      <%= button_to mobile_sign_out_path, method: :delete, class: "flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-red-50 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50" do %>
+      <%= button_to mobile_sign_out_path, method: :delete, class: "flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-danger/10 text-sm font-semibold text-danger transition-colors hover:bg-danger/10 " do %>
         Sign Out
       <% end %>
     </div>
