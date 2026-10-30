@@ -24,7 +24,7 @@ module Notifications
         config.update!(last_read_all_at: Time.current)
         EmployeeNotificationRead.where(employee: @employee).delete_all
       end
-      Rails.sync_cache.delete(Notifications::UnreadQuery.cache_key(@employee.id))
+      Rails.sync_cache.delete(CacheKeyService.employee_unread_notifications(@employee.id))
       { success: true, marked: marked }
     rescue ActiveRecord::RecordInvalid => e
       { success: false, errors: e.record.errors.full_messages }

@@ -135,10 +135,19 @@ RSpec.describe CompanyTicket do
     end
   end
 
-  describe ".open_count_key / .admin_open_count_key" do
-    it "builds deterministic sync-cache keys" do
-      expect(CompanyTicket.open_count_key(company.id)).to eq("company_tickets/#{company.id}/open_count")
-      expect(CompanyTicket.admin_open_count_key).to eq("company_tickets/admin/open_count")
+  describe "count cache invalidation" do
+    it "deletes both open-count keys" do
+      ticket = build_ticket
+      ticket.save!
+      company_key = CacheKeyService.company_open_ticket_count(company.id)
+      admin_key = CacheKeyService.admin_open_ticket_count
+      Rails.sync_cache.write(company_key, 1)
+      Rails.sync_cache.write(admin_key, 1)
+
+      ticket.send(:invalidate_count_caches)
+
+      expect(Rails.sync_cache.read(company_key)).to be_nil
+      expect(Rails.sync_cache.read(admin_key)).to be_nil
     end
   end
 

@@ -7,10 +7,6 @@
 # Unread = subscribed AND created_at > last_read_all_at AND id NOT IN reads.
 module Notifications
   class UnreadQuery
-    def self.cache_key(employee_id)
-      "notifications:unread:#{employee_id}"
-    end
-
     def initialize(company:, employee:)
       @company = company
       @employee = employee
@@ -30,12 +26,12 @@ module Notifications
     end
 
     def count
-      key = self.class.cache_key(@employee.id)
+      key = CacheKeyService.employee_unread_notifications(@employee.id)
       cached = Rails.sync_cache.read(key)
       return cached.to_i unless cached.nil?
 
       value = scope.count
-      Rails.sync_cache.write(key, value, expires_in: 10.minutes)
+      Rails.sync_cache.write(key, value, expires_in: CACHE_DEFAULT_EXPIRY)
       value
     end
 

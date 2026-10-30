@@ -16,7 +16,7 @@ module Notifications
       ).distinct.pluck(:employee_id)
       pruned = stale.destroy_all.size
       (employee_ids + subscriber_ids).uniq.each do |employee_id|
-        Rails.sync_cache.delete(Notifications::UnreadQuery.cache_key(employee_id))
+        Rails.sync_cache.delete(CacheKeyService.employee_unread_notifications(employee_id))
       end
       Rails.logger.info("[Notifications::PruneJob] pruned #{pruned} notifications")
     end
