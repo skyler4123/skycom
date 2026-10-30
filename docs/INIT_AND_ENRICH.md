@@ -48,7 +48,7 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Departments | 4 |
 | Employees | ~76 (across 2 branches) |
 | Compensation / reporting lines | Every employee: `manager_id`, salary, allowance, contract `expiration_date`; owner attached to the first branch |
-| Leave balances + requests | 1 paid-leave balance per employee (14 days) + approved/pending `LeaveRequest` rows |
+| Leave balances + requests | 1 paid-leave balance per employee (14 days) + approved/pending `AttendanceLeave` rows |
 | Company announcement | 1 published `Document` (`business_type: announcement`) linked to every employee |
 | Customers | 100 (50 per branch) |
 | Products | 28 (14 per branch) |

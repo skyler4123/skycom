@@ -74,7 +74,7 @@ month, payroll). The web has **69 sidebar items** across 16 active groups plus
 | # | Screen | Route | Controller | Reads | Writes | Limits |
 |---|---|---|---|---|---|---|
 | 1 | Sign in | `GET/POST /mobile/sign_in` | `Mobile::SessionsController#new/create` | `User`, session | Sign in | No forgot password or biometrics; sign-in activity has no tabs |
-| 2 | Home | `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `Employee`, `AttendanceMonth`, `ScheduledShift`, `AttendanceLog`, `AttendanceRequest`, `Payroll`, `LeaveBalance`, `Document` | Check-in via `POST /mobile/companies/:company_id/attendances` | No checkout or break |
+| 2 | Home | `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `Employee`, `AttendanceMonth`, `ScheduledShift`, `AttendanceLog`, `AttendanceRequest`, `Payroll`, `AttendanceBalance`, `Document` | Check-in via `POST /mobile/companies/:company_id/attendances` | No checkout or break |
 | 3 | Employee | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `Employee` (manager), roles, departments, category, next shift, month totals | — | Read-only; no edit or dynamic profiles |
 | 4 | Attendance month | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `AttendanceMonth`, `AttendanceDay` | — | Read-only; no PDF, collect, or request list |
 | 5 | Payroll | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `Payroll` (money), `AttendanceMonth` | — | No payslip download |
@@ -129,7 +129,7 @@ Cross-cutting mobile behavior:
 | Payroll hours/day totals | ✅ admin | ✅ | From `AttendanceMonth` |
 | Payroll money | ✅ admin | ✅ | `payrolls` money columns + `Payrolls::GenerateService` |
 | Payslip/PDF | ❓ route only | ⛔ | `payslips` route has no controller/model |
-| Leave balance | — | ✅ | `LeaveBalance` + approved/pending `LeaveRequest` rows on Home |
+| Leave balance | — | ✅ | `AttendanceBalance` + approved/pending `AttendanceLeave` rows on Home |
 | Leave request/history | — | ⛔ | No mobile leave form or history yet |
 | Notifications inbox | ✅ | ⛔ | Web controller exists |
 | Unread badge | ✅ | ⛔ | Header has no bell |

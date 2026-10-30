@@ -138,8 +138,8 @@ class Company < ApplicationRecord
   has_many :tax_configs, dependent: :destroy
   has_many :payroll_configs, dependent: :destroy
   has_many :payrolls, dependent: :destroy
-  has_many :leave_balances, dependent: :destroy
-  has_many :leave_requests, dependent: :destroy
+  has_many :attendance_balances, dependent: :destroy
+  has_many :attendance_leaves, dependent: :destroy
   has_many :suppliers, dependent: :destroy
   has_many :customers, dependent: :destroy
   has_many :customer_profiles, dependent: :destroy

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-class CreateLeaveBalances < ActiveRecord::Migration[8.1]
+class CreateAttendanceBalances < ActiveRecord::Migration[8.1]
   def change
-    create_table :leave_balances, id: :uuid, default: -> { "uuidv7()" } do |t|
+    create_table :attendance_balances, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.uuid :company_id, null: false
       t.uuid :employee_id, null: false
       t.integer :year, null: false
@@ -15,7 +15,7 @@ class CreateLeaveBalances < ActiveRecord::Migration[8.1]
       t.index [ :employee_id, :year ], unique: true
     end
 
-    add_foreign_key :leave_balances, :companies
-    add_foreign_key :leave_balances, :employees
+    add_foreign_key :attendance_balances, :companies
+    add_foreign_key :attendance_balances, :employees
   end
 end

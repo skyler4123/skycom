@@ -60,8 +60,8 @@ class Employee < ApplicationRecord
 
   has_many :direct_reports, class_name: "Employee", foreign_key: :manager_id,
            dependent: :nullify, inverse_of: :manager
-  has_many :leave_balances, dependent: :destroy
-  has_many :leave_requests, dependent: :destroy
+  has_many :attendance_balances, dependent: :destroy
+  has_many :attendance_leaves, dependent: :destroy
   has_many :employee_role_appointments, dependent: :destroy
   has_many :roles, through: :employee_role_appointments
   has_many :scheduled_shifts, dependent: :destroy

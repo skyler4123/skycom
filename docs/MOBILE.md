@@ -112,7 +112,7 @@ Rules:
 - Payroll money is computed by `Payrolls::GenerateService` from the employee's
   monthly salary/allowance and the attendance month, then persisted on
   `payrolls`.
-- Paid leave is read from `LeaveBalance` + approved/pending `LeaveRequest`
+- Paid leave is read from `AttendanceBalance` + approved/pending `AttendanceLeave`
   rows. The mobile app only displays it today; there is no leave form.
 - Company notices are published `Document` records (`business_type:
   announcement`) linked to the employee through

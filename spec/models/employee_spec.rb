@@ -18,8 +18,8 @@ RSpec.describe Employee, type: :model do
     it { should have_many(:tags).through(:employee_tag_appointments) }
     it { should belong_to(:manager).class_name("Employee").optional }
     it { should have_many(:direct_reports).class_name("Employee").with_foreign_key(:manager_id).dependent(:nullify) }
-    it { should have_many(:leave_balances).dependent(:destroy) }
-    it { should have_many(:leave_requests).dependent(:destroy) }
+    it { should have_many(:attendance_balances).dependent(:destroy) }
+    it { should have_many(:attendance_leaves).dependent(:destroy) }
   end
 
   describe "validations" do

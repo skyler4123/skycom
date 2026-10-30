@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-class CreateLeaveRequests < ActiveRecord::Migration[8.1]
+class CreateAttendanceLeaves < ActiveRecord::Migration[8.1]
   def change
-    create_table :leave_requests, id: :uuid, default: -> { "uuidv7()" } do |t|
+    create_table :attendance_leaves, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.uuid :company_id, null: false
       t.uuid :branch_id
       t.uuid :employee_id, null: false
@@ -26,9 +26,9 @@ class CreateLeaveRequests < ActiveRecord::Migration[8.1]
       t.index [ :employee_id, :start_date ]
     end
 
-    add_foreign_key :leave_requests, :companies
-    add_foreign_key :leave_requests, :branches
-    add_foreign_key :leave_requests, :employees
-    add_foreign_key :leave_requests, :employees, column: :decided_by_id, on_delete: :nullify
+    add_foreign_key :attendance_leaves, :companies
+    add_foreign_key :attendance_leaves, :branches
+    add_foreign_key :attendance_leaves, :employees
+    add_foreign_key :attendance_leaves, :employees, column: :decided_by_id, on_delete: :nullify
   end
 end
