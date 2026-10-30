@@ -79,8 +79,9 @@ RSpec.describe CacheKeyService do
         .to eq("company:3:analytics:this_month")
     end
 
-    it "falls back to unknown for a blank analytics period" do
-      expect(described_class.company_analytics(3, "")).to eq("company:3:analytics:unknown")
+    it "falls back to this_month for an unknown analytics period" do
+      expect(described_class.company_analytics(3, "")).to eq("company:3:analytics:this_month")
+      expect(described_class.company_analytics(3, "next_century")).to eq("company:3:analytics:this_month")
     end
 
     it "builds the storage statistics key" do

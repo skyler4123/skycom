@@ -35,6 +35,11 @@
 #   # Written by:
 #   # Cleared by:
 class CacheKeyService
+  # Analytics periods accepted by Analytics::DashboardService (its `case`
+  # falls back to this_month for anything else). Keeping the same fallback
+  # here means a malformed param can never alias a real period's cache entry.
+  ANALYTICS_PERIODS = %w[this_month last_month last_6_months this_year].freeze
+
   # Pattern: session:<session_id>
   # Purpose: the authentication hot-path hash for one browser session.
   # Store: Rails.sync_cache
@@ -135,7 +140,9 @@ class CacheKeyService
   # Written by: Companies::AnalyticsController#index
   # Cleared by: TTL only — clear this key if a dashboard must reflect a change immediately
   def self.company_analytics(company_id, period)
-    "company:#{company_id}:analytics:#{segment(period)}"
+    normalized = period.to_s
+    normalized = "this_month" unless ANALYTICS_PERIODS.include?(normalized)
+    "company:#{company_id}:analytics:#{normalized}"
   end
 
   # Pattern: company:<company_id>:storage_statistics

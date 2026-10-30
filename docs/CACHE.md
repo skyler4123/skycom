@@ -392,8 +392,9 @@ Notes:
 - `<cache_version>` comes from `cache_version`, so it changes on every `touch`.
   Deleting a versioned key is impossible (the old version is unreachable); use
   `touch` or `clear_permissions_cache` instead.
-- `period` is sanitized with `parameterize`; blank values become `unknown`, so
-  request params cannot inject separators into the key.
+- `period` is whitelisted (`ANALYTICS_PERIODS`); a malformed or blank value
+  falls back to `this_month`, the same default `Analytics::DashboardService`
+  uses, so it cannot alias a real period's entry.
 - Kredis keys hold unsynced data. Changing their format requires a migration,
   otherwise live counters are orphaned.
 - To add a key: add a `def self.` builder with the six-line comment contract

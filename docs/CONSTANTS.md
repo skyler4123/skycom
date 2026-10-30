@@ -6,7 +6,8 @@ Never hardcode values inline in models, controllers, jobs, services, or concerns
 
 **Single-file exception**: Any constant used by exactly **one** file should be declared
 directly in that file (model, controller, concern, service, job) instead of globally.
-See `docs/CACHE.md` §6 for examples (e.g., `CACHE_DEFAULT_EXPIRY` lives in
+See `docs/CACHE.md` §6 for examples (e.g., `COOKIE_EXPIRY` lives in
+`cookie_concern.rb`; `CACHE_DEFAULT_EXPIRY` is multi-file and lives in
 `config/initializers/constants.rb`).
 
 ## Why
