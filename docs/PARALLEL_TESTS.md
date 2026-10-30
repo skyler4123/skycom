@@ -42,6 +42,7 @@ under parallel. Exception: §7 allowlist files verify with single-process
 Only when worker DBs are missing (e.g. `skycom_test2` does not exist):
 
 ```bash
+RAILS_ENV=test bundle exec rake "parallel:drop"
 RAILS_ENV=test bundle exec rake "parallel:create"
 RAILS_ENV=test bundle exec rake "parallel:load_schema"
 RAILS_ENV=test bundle exec rake "parallel:migrate"
