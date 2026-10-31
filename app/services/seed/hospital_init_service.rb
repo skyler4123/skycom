@@ -352,6 +352,7 @@ class Seed::HospitalInitService
   def assign_policies_to_roles
     role_definitions = {
       Receptionist: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -371,6 +372,7 @@ class Seed::HospitalInitService
         "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Dentist: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -388,6 +390,7 @@ class Seed::HospitalInitService
         "Appointment" => { read: true, update: true }
       },
       DentalAssistant: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -403,6 +406,7 @@ class Seed::HospitalInitService
         "Appointment" => { read: true }
       },
       Hygienist: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },

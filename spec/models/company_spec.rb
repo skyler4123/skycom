@@ -313,6 +313,13 @@ RSpec.describe Company, type: :model do
       expect(company.employees.where(business_type: :owner)).to exist
     end
 
+    it "still grants the signup promo when system_owned" do
+      company = build_company(company_user).tap { |c| c.system_owned = true }.tap(&:save!)
+
+      expect(company.company_wallet.promo_credit_balance).to eq(SIGNUP_PROMO_CREDITS)
+      expect(company.company_wallet.main_credit_balance).to eq(0)
+    end
+
     it "seeds business-type init for normal companies (control)" do
       company = build_company(company_user).tap(&:save!)
       expect(company.categories.where(resource_name: "products")).not_to be_empty

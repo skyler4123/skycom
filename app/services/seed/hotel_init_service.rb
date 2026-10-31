@@ -362,6 +362,7 @@ class Seed::HotelInitService
     full_crud = { create: true, read: true, update: true, delete: true }
     role_definitions = {
       Receptionist: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "Customer" => { create: true, read: true, update: true, delete: false },
@@ -377,6 +378,7 @@ class Seed::HotelInitService
         "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Housekeeper: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "Facility" => { read: true, update: true },
@@ -385,6 +387,7 @@ class Seed::HotelInitService
         "Event" => { read: true }
       },
       Concierge: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "Customer" => { create: true, read: true, update: true },
@@ -394,6 +397,7 @@ class Seed::HotelInitService
         "Event" => { create: true, read: true }
       },
       Chef: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "Order" => { read: true },

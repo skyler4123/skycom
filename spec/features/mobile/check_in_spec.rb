@@ -69,19 +69,18 @@ RSpec.feature "Mobile Check In", type: :feature, js: true do
     expect(page).to have_content("12:00 AM")
   end
 
-  scenario "redirects an unauthorized employee's check-in attempt" do
-    unauthorized_user = create(:user)
-    create(:employee, user: unauthorized_user, company: company)
+  scenario "lets any company member check themselves in" do
+    member_user = create(:user)
+    member = create(:employee, user: member_user, company: company, name: "Member Check In")
 
-    sign_in(unauthorized_user)
+    sign_in(member_user)
     visit mobile_company_home_path(company)
 
-    if page.has_button?("Clock In")
-      click_button "Clock In"
-    end
+    click_button "Clock In"
 
-    expect(AttendanceLog.count).to eq(0)
-    expect(page).to have_content("not authorized")
+    expect(page).to have_content("Checked in successfully")
+    expect(AttendanceLog.last.employee).to eq(member)
+    expect(AttendanceLog.last.company).to eq(company)
   end
 
   scenario "redirects to sign-in for unauthenticated user" do

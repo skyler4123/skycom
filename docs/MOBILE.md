@@ -34,6 +34,20 @@ authentication.
 the user does not belong to returns `404`; the stored company id on the device
 is never treated as authorization.
 
+### Authorization
+
+Company-level screens use ABAC: Operations requires `Page` read, Notifications
+requires `Notification` read, and attendance requests require
+`AttendanceRequest` create. Self-service screens (Home, Profile, Attendance
+month, Payroll/unlock, check-in) are membership-scoped instead: the controller
+always resolves `@employee` from `current_user` + `company_id`, so they can only
+reach the signed-in employee's own records. Payroll still requires the password
+unlock before its data is rendered.
+
+Existing companies seeded before the `Page` grant was added need a re-seed (or
+a policy-appointment backfill) before staff roles can open the Operations tab;
+new companies receive it from their init service.
+
 ### Suspended company block
 
 `Mobile::Companies::SuspendedCompanyConcern` runs after mobile authorization on

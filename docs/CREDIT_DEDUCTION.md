@@ -110,6 +110,10 @@ app/services/company_credit_deduction/
 | `/companies/:company_id/dashboards` + `index` | `CompanyCreditDeduction::Companies::Dashboards::IndexService` |
 | `/companies/:company_id/orders` + `create` | `CompanyCreditDeduction::Companies::Orders::CreateService` (future) |
 
+> The dashboard JSON payload is cached for 5 minutes (`DASHBOARD_CACHE_EXPIRY`,
+> `docs/CACHE.md` §7), but deduction still runs **per request** through the
+> `after_action` filter. A cache hit is still a dashboard access and is billed.
+
 ### 3.1 `CompanyCreditDeduction::BaseService` — The Epic
 
 One purpose: **move credits out of the wallet for one action and meter the usage.**
@@ -168,7 +172,8 @@ The wallet stores credit balance **numbers only** (atomic-purpose pattern — no
 | `promo_credit_balance` | Promotional credits (signup bonus, campaigns) | ❌ No | **1st** |
 
 - New companies get `SIGNUP_PROMO_CREDITS` (1,000) in the **promo** balance at
-  creation, so they start active.
+  creation, so they start active. System-owned companies receive the same grant;
+  only their suspension exemption is special.
 - Both columns are BIGINT and may be **negative**. A negative total is allowed
   and derives `workflow_status: suspend`.
 
@@ -327,7 +332,23 @@ If the same action also runs in a job, deduct only at the controller entry point
 
 New companies start with `SIGNUP_PROMO_CREDITS` (1,000) in the promo balance.
 Credit-focused tests should use the `:without_signup_promo` company factory trait
-or the `seed_random_wallet!` helper so exact balance assertions stay deterministic.
+or the `seed_random_wallet!` helper so exact balance assertions stay
+deterministic. The trait is not a shortcut for the state machine: it gives a
+known zero baseline, and the wallet/service specs must still exercise every
+transition.
+
+### Required state transitions
+
+| State transition | Expected status | Covered by |
+|---|---|---|
+| Signup init (promo 1,000) | `active` | `company_credit_status_spec` |
+| `0` | `suspend` | `company_credit_status_spec`, `company_wallet_spec` |
+| `0` → positive (`SIGNUP_PROMO_CREDITS`) | `active` | `company_credit_status_spec` |
+| positive → `0` (deduction reaches zero) | `suspend` | `company_credit_status_spec`, `company_wallet_spec` |
+| positive → negative (overdraw) | `suspend` | `company_credit_status_spec`, `company_wallet_spec`, `base_service_spec` |
+| negative → positive (top-up/grant) | `active` | `company_credit_status_spec`, `company_wallet_spec` |
+| `disabled` → positive | `active` | `company_credit_status_spec` |
+| System company at `0` or negative | stays `active` | `company_credit_status_spec` |
 
 ### Reusable Helper
 

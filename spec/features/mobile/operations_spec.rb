@@ -60,6 +60,17 @@ RSpec.feature "Mobile Operations", type: :feature, js: true do
     expect(page).to have_content("Pages created for this company will appear here.")
   end
 
+  scenario "redirects an employee without Page read to home" do
+    member_user = create(:user)
+    create(:employee, user: member_user, company: company)
+
+    sign_in(member_user)
+    visit mobile_company_operations_path(company)
+
+    expect(page).to have_current_path(mobile_company_home_path(company))
+    expect(page).to have_content("not authorized")
+  end
+
   scenario "redirects to sign-in for unauthenticated user" do
     visit mobile_company_operations_path(company)
 

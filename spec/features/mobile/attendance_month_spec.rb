@@ -81,14 +81,15 @@ RSpec.feature "Mobile Attendance Month", type: :feature, js: true do
     expect(page).to have_current_path(mobile_sign_in_path)
   end
 
-  scenario "redirects an unauthorized employee to home" do
-    unauthorized_user = create(:user)
-    create(:employee, user: unauthorized_user, company: company)
+  scenario "lets any company member view their own attendance month" do
+    member_user = create(:user)
+    create(:employee, user: member_user, company: company, name: "Member Attendance")
 
-    sign_in(unauthorized_user)
+    sign_in(member_user)
     visit mobile_company_attendance_month_path(company)
 
-    expect(page).to have_current_path(mobile_company_home_path(company))
-    expect(page).to have_content("not authorized")
+    expect(page).to have_current_path(mobile_company_attendance_month_path(company))
+    expect(page).to have_content("Member Attendance")
+    expect(page).to have_content("No summary for this month")
   end
 end

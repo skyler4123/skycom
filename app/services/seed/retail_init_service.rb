@@ -809,6 +809,7 @@ class Seed::RetailInitService
         "Student" => { create: true, read: true, update: true, delete: true }
       },
       Cashier: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -827,6 +828,7 @@ class Seed::RetailInitService
         "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Seller: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -845,6 +847,7 @@ class Seed::RetailInitService
         "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Security: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -857,6 +860,7 @@ class Seed::RetailInitService
         "Order" => { create: false, read: true, update: false, delete: false }
       },
       Doctor: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -872,6 +876,7 @@ class Seed::RetailInitService
         "Facility" => { create: true, read: true, update: true, delete: false }
       },
       Therapist: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -884,6 +889,7 @@ class Seed::RetailInitService
         "Facility" => { create: false, read: true, update: false, delete: false }
       },
       Consultant: {
+        "Page" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },

@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.feature "Companies::Usage", type: :feature, js: true do
-  let(:company) { create(:company, :without_signup_promo) }
+  let(:company) { create(:company) }
   let(:branch) { create(:branch, company: company) }
   let(:owner) { company.user }
   let(:today) { Time.current.to_date }

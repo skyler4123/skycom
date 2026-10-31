@@ -92,6 +92,13 @@ RSpec.describe CacheKeyService do
       expect(described_class.company_storage_statistics(3))
         .to eq("company:3:storage_statistics")
     end
+
+    it "builds a dashboard key per financial visibility" do
+      expect(described_class.company_dashboard(3, can_view_financials: true))
+        .to eq("company:3:dashboards:financial")
+      expect(described_class.company_dashboard(3, can_view_financials: false))
+        .to eq("company:3:dashboards:operational")
+    end
   end
 
   describe "versioned caches" do

@@ -3,6 +3,8 @@
 require "rails_helper"
 
 RSpec.describe "Companies::Dashboards", type: :request do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:company) { create(:company, business_type: :retail, name: "Dashboard Spec Co") }
   let(:owner_user) { company.user }
 
@@ -58,6 +60,57 @@ RSpec.describe "Companies::Dashboards", type: :request do
         expect(json["attention"]["overdue_invoices"]).to eq([])
         expect(json["recent_orders"].first&.fetch("total_cents", nil)).to be_nil
       end
+    end
+  end
+
+  describe "caching" do
+    before { get sign_in_for_test_path(email: owner_user.email) }
+
+    it "reuses the payload for repeat requests within five minutes" do
+      allow(Dashboards::OverviewService).to receive(:call).and_call_original
+
+      get company_dashboards_path(company, format: :json)
+      get company_dashboards_path(company, format: :json)
+
+      expect(Dashboards::OverviewService).to have_received(:call).once
+    end
+
+    it "keeps financial and operational payloads in separate cache entries" do
+      employee_user = create(:user, :company_employee)
+      create(:employee, company: company, user: employee_user, lifecycle_status: :active)
+      allow(Dashboards::OverviewService).to receive(:call).and_call_original
+
+      get company_dashboards_path(company, format: :json)
+
+      get sign_in_for_test_path(email: employee_user.email)
+      get company_dashboards_path(company, format: :json)
+
+      expect(Dashboards::OverviewService).to have_received(:call).twice
+    end
+
+    it "recomputes after the five-minute cache expires" do
+      allow(Dashboards::OverviewService).to receive(:call).and_call_original
+
+      travel_to(Time.zone.local(2026, 10, 31, 9, 0, 0)) do
+        get company_dashboards_path(company, format: :json)
+      end
+
+      travel_to(Time.zone.local(2026, 10, 31, 9, 6, 0)) do
+        get company_dashboards_path(company, format: :json)
+      end
+
+      expect(Dashboards::OverviewService).to have_received(:call).twice
+    end
+
+    it "still deducts dashboard credits on a cache hit" do
+      company.company_wallet.update_columns(promo_credit_balance: 0)
+      company.company_wallet.add_credits!(amount: 100)
+
+      get company_dashboards_path(company, format: :json)
+      get company_dashboards_path(company, format: :json)
+
+      expect(company.company_wallet.reload.main_credit_balance).to eq(96)
+      expect(company.credit_usage_delta).to eq(4)
     end
   end
 end

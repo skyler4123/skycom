@@ -369,11 +369,12 @@ class Company < ApplicationRecord
     wallet = create_company_wallet!(
       walletable: self,
       main_credit_balance: 0,
-      promo_credit_balance: system_owned ? 0 : SIGNUP_PROMO_CREDITS
+      promo_credit_balance: SIGNUP_PROMO_CREDITS
     )
     # New companies start active when the signup promo is positive. If the
     # constant is ever set to 0, this still derives the correct suspend status.
-    sync_credit_status!(total_credit_balance: wallet.total_credit_balance) unless system_owned
+    # System companies keep their suspension exemption inside sync_credit_status!.
+    sync_credit_status!(total_credit_balance: wallet.total_credit_balance)
 
     Companies::WelcomeNotificationJob.set(wait: WELCOME_NOTIFICATION_DELAY).perform_later(id)
   end
