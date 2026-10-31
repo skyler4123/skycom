@@ -284,6 +284,24 @@ art (icon/logo SVG fills) is not class-based.
 
 ---
 
+## 11. Typography
+
+Two Google Fonts families are loaded in every HTML layout (`application`,
+`admin`, `mobile`):
+
+| Role | Family | Utility |
+|---|---|---|
+| Body, labels, controls | Inter | default / `font-sans` |
+| Headings, display text | Plus Jakarta Sans | `font-display` |
+
+- `--font-sans` in `app/assets/tailwind/application.css` is Inter, so all
+  unstyled text and every `font-sans` utility use it.
+- `h1`–`h6` use `--font-display` via a base-layer rule. Use `font-display`
+  explicitly for non-heading display text.
+- Do not reintroduce Lexend or per-component font stacks.
+
+---
+
 ## Quick Reference
 
 | Guideline | Rule |
@@ -298,6 +316,7 @@ art (icon/logo SVG fills) is not class-based.
 | Responsive | Mobile first, then `md:` / `lg:` |
 | Classes | Single line only |
 | Attributes | Multi-line when many |
+| Fonts | Inter body; Plus Jakarta Sans headings (`font-display`) |
 | Check | `bin/check_colors --strict` |
 
 ---

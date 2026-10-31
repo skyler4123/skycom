@@ -67,7 +67,7 @@ Native activities:
 
 - `viewport-fit=cover` + `pt-[env(safe-area-inset-top)]` on the sticky header.
 - Dark-mode pre-paint from `localStorage["darkmode"]` (same key as desktop).
-- Material Symbols Outlined font.
+- Inter (body) / Plus Jakarta Sans (headings) and Material Symbols Outlined, loaded from Google Fonts.
 - Global flash rendering (`mobile/shared/_flash`) before `yield`.
 
 Shared partials in `app/views/mobile/shared/`:
