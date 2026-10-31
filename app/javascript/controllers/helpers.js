@@ -1,4 +1,5 @@
 export * from "controllers/helpers/data_helpers"
+export * from "controllers/helpers/money_helpers"
 export * from "controllers/helpers/ui_helpers"
 export * from "controllers/helpers/auth_helpers"
 export * from "controllers/helpers/enums"

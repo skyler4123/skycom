@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# Companies::AnalyticsController — executive analysis shell + JSON.
+# Serves Stimulus: companies/analytics/index_controller.js
+#   GET /companies/:company_id/analytics(.json)?period=this_month|last_month|last_6_months|this_year
 class Companies::AnalyticsController < Companies::ApplicationController
   def index
     respond_to do |format|
