@@ -83,7 +83,7 @@ module Notifications
         .where(company: @company, notification_tag_id: @tag_ids)
         .distinct.pluck(:employee_id)
       employee_ids.each do |employee_id|
-        Rails.sync_cache.delete(Notifications::UnreadQuery.cache_key(employee_id))
+        Rails.sync_cache.delete(CacheKeyService.employee_unread_notifications(employee_id))
       end
     end
 

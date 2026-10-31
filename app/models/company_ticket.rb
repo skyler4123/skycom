@@ -71,14 +71,6 @@ class CompanyTicket < ApplicationRecord
   after_create :log_created
   after_create :invalidate_count_caches
 
-  def self.open_count_key(company_id)
-    "company_tickets/#{company_id}/open_count"
-  end
-
-  def self.admin_open_count_key
-    "company_tickets/admin/open_count"
-  end
-
   def assign_to!(user, actor: nil)
     with_lock do
       if assigned_user_id.present? && assigned_user_id != user.id
@@ -140,8 +132,8 @@ class CompanyTicket < ApplicationRecord
   end
 
   def invalidate_count_caches
-    Rails.sync_cache.delete(self.class.open_count_key(company_id))
-    Rails.sync_cache.delete(self.class.admin_open_count_key)
+    Rails.sync_cache.delete(CacheKeyService.company_open_ticket_count(company_id))
+    Rails.sync_cache.delete(CacheKeyService.admin_open_ticket_count)
   end
 
   def rate_only_after_resolution

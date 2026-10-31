@@ -50,8 +50,8 @@ Callbacks defined directly in the model file (not inherited from a concern).
 | `before_validation :assign_currency_from_country` | — | `assign_currency_from_country` | Maps `country` to `currency` via `COUNTRY_CURRENCY_MAP` (`us → usd`, `vn → vnd`) whenever the country has a mapping. Keeps currency in step with the user-chosen country on the New Company page (`company[country]`); `currency` is never permittable. |
 | `after_create :setup_owner_records` | 104 | `setup_owner_records` | Creates owner infrastructure: (1) Owner `Role` with `business_type: :owner`, (2) "Owner All Access" `Policy` with `resource: "all"` / `action: "all"`, (3) Owner `Employee` linked to the creating user, (4) Both `PolicyAppointment` and `RoleAppointment` with `business_type: :owner`, (5) Sets `user.system_role` to `company_owner` so `accessible_companies` returns the new company. |
 | `after_create :initialize_company` | 126 | `initialize_company` | Also creates the company's `CompanyWallet` (`credit_balance: 0`, `walletable: company`) — unconditional, like the owner records. The wallet is the chain's bottom node: `CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`. (Sidebar config seeding was removed 2026-09-22 — sidebar control is FE-only, see `docs/SIDEBAR.md`.) Finally enqueues `Companies::WelcomeNotificationJob` with `WELCOME_NOTIFICATION_DELAY` (10 min, ID only — no-ops if the company/owner is gone; throttled idempotent). Applies to system companies too. When the company is marked `system_owned` (created by `System#ensure_company!`), business-type seeding and payment-method setup are skipped and the owner user's `system_role` is left untouched (owner records, wallet, and welcome enqueue still run). |
-| `after_commit :refresh_cache, on: [:create, :update]` | — | `refresh_cache` | Writes a compact hash (`id`, `name`) to `Rails.sync_cache` under `companies_#{id}:v#{updated_at.to_i}` (TTL `Company::COMPANY_CACHE_EXPIRY` = 5 min). |
-| `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `companies_#{id}:v#{updated_at.to_i}` from `Rails.sync_cache` (pub/sub evicts other instances). |
+| `after_commit :refresh_cache, on: [:create, :update]` | — | `refresh_cache` | Writes the company attributes hash to `Rails.sync_cache` under `CacheKeyService.company(id)` (TTL `CACHE_DEFAULT_EXPIRY` = 1 hour) and deletes `CacheKeyService.user_companies_max_updated_at(user_id)`. |
+| `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `CacheKeyService.company(id)` and `CacheKeyService.user_companies_max_updated_at(user_id)` from `Rails.sync_cache` (pub/sub evicts other instances). |
 
 ---
 
@@ -125,8 +125,27 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 | `before_discard :prevent_discard_if_owner` | 54 | `prevent_discard_if_owner` | Blocks soft-delete (Discard) if `business_type == "owner"`. Adds error and `throw(:abort)`. Owner employees cannot be discarded to prevent orphaned companies. |
 | `before_destroy :prevent_destroy_if_owner` | 55 | `prevent_destroy_if_owner` | Blocks hard-delete if `business_type == "owner"`. Adds error and `throw(:abort)`. Owner employees cannot be destroyed. |
 | `after_create :subscribe_to_all_employees_tag` | — | `subscribe_to_all_employees_tag` | Subscribes the new employee to the company's `All Employees` system `NotificationTag` (no-op when the tag is missing, e.g. legacy companies). Idempotent via `find_or_create_by!`; rescues `RecordNotUnique`. |
-| `after_commit :refresh_cache, on: [:create, :update]` | — | `refresh_cache` | Writes a compact hash (`id`, `user_id`, `company_id`) to `Rails.sync_cache` under `employees_#{user_id}_#{company_id}:v#{updated_at.to_i}` (TTL `Employee::EMPLOYEE_CACHE_EXPIRY` = 5 min). |
-| `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `employees_#{user_id}_#{company_id}:v#{updated_at.to_i}` from `Rails.sync_cache` (pub/sub evicts other instances). |
+| `after_commit :refresh_cache, on: [:create, :update]` | — | `refresh_cache` | Writes the employee attributes hash to `Rails.sync_cache` under `CacheKeyService.employee_record(user_id:, company_id:)` (TTL `CACHE_DEFAULT_EXPIRY` = 1 hour). |
+| `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `CacheKeyService.employee_record(user_id:, company_id:)` from `Rails.sync_cache` (pub/sub evicts other instances). |
+
+> `Employee#managers` (see `docs/CACHE.md`) caches the employee's group-manager ids in `Rails.sync_cache` for 1 hour. The appointment and group callbacks below evict it.
+
+---
+
+### EmployeeGroup (`app/models/employee_group.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `after_save :clear_members_managers_cache, if: :saved_change_to_manager_id?` | — | `clear_members_managers_cache` | Deletes each member's `CacheKeyService.employee_manager_ids(id)` sync-cache key when the team's manager changes. |
+
+---
+
+### EmployeeEmployeeGroupAppointment (`app/models/employee_employee_group_appointment.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `after_save :clear_employee_managers_cache` | — | `clear_employee_managers_cache` | Deletes the member's `CacheKeyService.employee_manager_ids(id)` sync-cache key after the membership row is created or updated. |
+| `after_destroy :clear_employee_managers_cache` | — | `clear_employee_managers_cache` | Same eviction after the membership row is removed. |
 
 ---
 
@@ -182,7 +201,7 @@ never through model callbacks, mirroring the no-callback rule for direct day wri
 | `before_validation :mirror_workflow_status` | — | `mirror_workflow_status` | Mirrors the dedicated ticket `status` into generic `workflow_status` (`open→pending`, `in_progress→in_progress`, `waiting_customer→confirmed`, `resolved`/`closed→completed`, `cancelled→cancelled`). The ticket `status` is the source of truth; `workflow_status` exists only for the System Fields convention. |
 | `before_update :stamp_sla_timestamps` | — | `stamp_sla_timestamps` | Sets `resolved_at` (once, `||=`) when `status` becomes `resolved`/`closed`; clears it when the ticket leaves those states (reopen). `first_responded_at` is never touched here — only `CompanyTicketComment` stamps it. |
 | `after_create :log_created` | — | `log_created` | Writes the audit `CompanyTicketLog` (`action: :created`, actor = creator employee). |
-| `after_create :invalidate_count_caches` | — | `invalidate_count_caches` | Deletes the `open_count_key` / `admin_open_count_key` sync-cache aggregates (DB stays the source of truth). Also called by `assign_to!` / `transition_to!` / `rate!`. |
+| `after_create :invalidate_count_caches` | — | `invalidate_count_caches` | Deletes `CacheKeyService.company_open_ticket_count(company_id)` and `CacheKeyService.admin_open_ticket_count` (DB stays the source of truth). Also called by `assign_to!` / `transition_to!`. |
 
 ---
 
@@ -252,8 +271,8 @@ never through model callbacks, mirroring the no-callback rule for direct day wri
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
 | `before_create :set_request_details` | 8 | `set_request_details` | Sets `user_agent` and `ip_address` from `Current` attributes (`Current.user_agent`, `Current.ip_address`) before creating the session record. |
-| `after_commit :refresh_cache, on: [:create, :update]` | — | `refresh_cache` | Writes a compact hash (`id`, `user_id`) to `Rails.sync_cache` under `sessions_#{id}` (TTL `Session::SESSION_CACHE_EXPIRY` = 1 hour) for the per-request auth hot path. |
-| `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `sessions_#{id}` from `Rails.sync_cache` (pub/sub evicts other instances). |
+| `after_commit :refresh_cache, on: [:create, :update]` | — | `refresh_cache` | Writes a compact hash (`id`, `user_id`) to `Rails.sync_cache` under `CacheKeyService.session(id)` (TTL `CACHE_DEFAULT_EXPIRY` = 1 hour) for the per-request auth hot path. |
+| `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `CacheKeyService.session(id)` from `Rails.sync_cache` (pub/sub evicts other instances). |
 
 ---
 
@@ -341,8 +360,8 @@ now matches a stock by `company_id + warehouse_id + product_id` only.
 | `after_update if: :password_digest_previously_changed? do` | 27 | Block | Invalidates all other sessions (except current session) when the password changes. Uses `sessions.where.not(id: current_session).delete_all` for security. |
 | `after_commit :ms_perform_index_tasks` (via `Meilisearch::Rails`, declared in `User::SearchConcern`) | — | gem-internal | Enqueues `MeilisearchIndexJob("User", id, false)` on create/update — async indexing, same pipeline as `DynamicSearchConcern` models. |
 | `after_commit(on: :destroy) :ms_enqueue_remove_from_index!` (via `Meilisearch::Rails`) | — | gem-internal | Enqueues `MeilisearchIndexJob("User", id, true)` to remove the document from the `User` index. |
-| `after_commit :refresh_cache, on: [:create, :update]` | — | `refresh_cache` | Writes a compact hash (`id`, `name`, `email`, `avatar`) to `Rails.sync_cache` under `users_#{id}:v#{updated_at.to_i}` (TTL `User::USER_CACHE_EXPIRY` = 5 min). |
-| `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `users_#{id}:v#{updated_at.to_i}` from `Rails.sync_cache` (pub/sub evicts other instances). |
+| `after_commit :refresh_cache, on: [:create, :update]` | — | `refresh_cache` | Writes the user attributes hash to `Rails.sync_cache` under `CacheKeyService.user(id)` (TTL `CACHE_DEFAULT_EXPIRY` = 1 hour). |
+| `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `CacheKeyService.user(id)` from `Rails.sync_cache` (pub/sub evicts other instances). |
 
 ---
 

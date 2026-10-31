@@ -34,7 +34,7 @@ class Companies::ApplicationController < ApplicationController
     company_id = params[:company_id]
     return unless company_id.present?
 
-    cached_company = Rails.sync_cache.fetch("companies_#{company_id}:v2", expires_in: Company::COMPANY_CACHE_EXPIRY) do
+    cached_company = Rails.sync_cache.fetch(CacheKeyService.company(company_id), expires_in: CACHE_DEFAULT_EXPIRY) do
       c = Company.find_by(id: company_id)
       next nil unless c
       attrs = c.attributes
@@ -63,8 +63,8 @@ class Companies::ApplicationController < ApplicationController
   def set_employee
     return unless current_user && current_company
 
-    cache_key = "employees_#{current_user.id}_#{current_company.id}:v2"
-    cached_employee = Rails.sync_cache.fetch(cache_key, expires_in: Employee::EMPLOYEE_CACHE_EXPIRY) do
+    cache_key = CacheKeyService.employee_record(user_id: current_user.id, company_id: current_company.id)
+    cached_employee = Rails.sync_cache.fetch(cache_key, expires_in: CACHE_DEFAULT_EXPIRY) do
       e = Employee.find_by(user: current_user, company: current_company)
       next nil unless e
       attrs = e.attributes

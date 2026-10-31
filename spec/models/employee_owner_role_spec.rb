@@ -9,24 +9,27 @@ RSpec.describe Employee, type: :model do
 
     it "returns true for owner employee and caches in ram_cache" do
       expect(owner_employee.owner_role?).to be(true)
-      expect(Rails.ram_cache.read("#{owner_employee.cache_key_with_version}/owner_role")).to be(true)
+      expect(Rails.ram_cache.read(CacheKeyService.employee_owner_role(owner_employee))).to be(true)
     end
 
     it "returns false for non-owner employee and caches in ram_cache" do
       expect(regular_employee.owner_role?).to be(false)
-      expect(Rails.ram_cache.read("#{regular_employee.cache_key_with_version}/owner_role")).to be(false)
+      expect(Rails.ram_cache.read(CacheKeyService.employee_owner_role(regular_employee))).to be(false)
     end
 
     it "does not write owner_role key to local_cache" do
       owner_employee.owner_role?
-      expect(Rails.local_cache.read("#{owner_employee.cache_key_with_version}/owner_role")).to be_nil
+      expect(Rails.local_cache.read(CacheKeyService.employee_owner_role(owner_employee))).to be_nil
     end
 
     it "evicts ram_cache entry on clear_permissions_cache" do
       owner_employee.owner_role?
-      expect(Rails.ram_cache.read("#{owner_employee.cache_key_with_version}/owner_role")).to be(true)
+      key = CacheKeyService.employee_owner_role(owner_employee)
+      expect(Rails.ram_cache.read(key)).to be(true)
+
       owner_employee.clear_permissions_cache
-      expect(Rails.ram_cache.read("#{owner_employee.cache_key_with_version}/owner_role")).to be_nil
+
+      expect(Rails.ram_cache.read(key)).to be_nil
     end
   end
 end

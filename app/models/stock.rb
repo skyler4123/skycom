@@ -44,7 +44,7 @@ class Stock < ApplicationRecord
   # Hot-path availability counter. Business code must go through the wrapper
   # methods below (available_count / reserve_stock! / release_reserved!) —
   # never the kredis proxy directly. See docs/KREDIS.md.
-  kredis_counter :available_counter, key: ->(s) { "stock:#{s.id}:available" }
+  kredis_counter :available_counter, key: ->(s) { CacheKeyService.stock_available(s.id) }
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true

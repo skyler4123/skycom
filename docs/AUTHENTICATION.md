@@ -72,7 +72,7 @@ authenticate
 |----------|-----------|
 | No per-request Redis calls | All reads hit local SQLite. Redis pub/sub only on session create/destroy. |
 | Normal DB lookups | Session/User records loaded via `find_by` (no custom cached_* layer) |
-| TTL via local cache expiry | `SESSION_CACHE_EXPIRY` (1 hour) — stale entries are evicted automatically by Solid Cache |
+| TTL via local cache expiry | `CACHE_DEFAULT_EXPIRY` (1 hour) — stale entries are evicted automatically by Solid Cache |
 
 ---
 
@@ -160,7 +160,7 @@ When sync_cache was introduced, existing session cache entries in `Rails.local_c
 - (Cache::RecordsConcern removed; records are loaded via normal DB queries)
 - `docs/ABAC.md` — Permission-based authorization (Pundit on top of auth)
 - `config/initializers/cache.rb` — Cache store definitions
-- `config/initializers/constants.rb` — `PERMISSIONS_CACHE_EXPIRY`
+- `config/initializers/constants.rb` — `CACHE_DEFAULT_EXPIRY`
 
 ---
 

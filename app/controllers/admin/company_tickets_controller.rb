@@ -26,7 +26,7 @@ class Admin::CompanyTicketsController < Admin::ApplicationController
         scope = scope.where(assigned_user_id: nil) if params[:unassigned] == "1"
 
         @pagy, @results = pagy(:offset, scope, jsonapi: true)
-        open_count = Rails.sync_cache.fetch(CompanyTicket.admin_open_count_key, expires_in: 1.minute) do
+        open_count = Rails.sync_cache.fetch(CacheKeyService.admin_open_ticket_count, expires_in: CACHE_DEFAULT_EXPIRY) do
           CompanyTicket.open_tickets.count
         end
         render json: {

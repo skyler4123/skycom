@@ -6,7 +6,7 @@ class Seed::RoleService
     business_type: nil,
     discarded_at: nil
   )
-    business_type ||= Role.business_types.keys.reject { |k| k == :owner }.sample
+    business_type ||= (Role.business_types.keys - [ OWNER_BUSINESS_TYPE ]).sample
 
     Role.new(
       company: company,

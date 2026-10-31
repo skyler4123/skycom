@@ -6,7 +6,11 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:user) { company.user }
   let!(:manager) { create(:employee, company: company, name: "Alex Approver") }
-  let!(:employee) { company.employees.find_by(user: user).tap { |record| record.update!(manager: manager) } }
+  let!(:employee) { company.employees.find_by(user: user) }
+  let!(:employee_group) { create(:employee_group, company: company, manager: manager, name: "Support Team") }
+  let!(:appointment) do
+    create(:employee_employee_group_appointment, company: company, employee: employee, employee_group: employee_group)
+  end
 
   # Native date/time inputs are unreliable through send_keys in headless
   # Chrome; set them through the DOM the way the picker would.
@@ -38,14 +42,31 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
     expect(AttendanceRequest.last.business_type).to eq("remote_work")
   end
 
-  scenario "shows the assigned approver from the manager chain" do
+  scenario "shows the employee's group managers" do
     sign_in(user)
     visit new_mobile_company_attendance_request_path(company)
 
-    expect(page).to have_content("Assigned Approver")
+    expect(page).to have_content("Your Managers")
     expect(page).to have_content("Alex Approver")
     expect(page).to have_content("AA")
     expect(page).not_to have_content("Sample")
+  end
+
+  scenario "shows every group manager" do
+    second_manager = create(:employee, company: company, name: "Blair Approver")
+    second_group = create(:employee_group, company: company, manager: second_manager, name: "Field Team")
+    create(
+      :employee_employee_group_appointment,
+      company: company,
+      employee: employee,
+      employee_group: second_group
+    )
+
+    sign_in(user)
+    visit new_mobile_company_attendance_request_path(company)
+
+    expect(page).to have_content("Alex Approver")
+    expect(page).to have_content("Blair Approver")
   end
 
   scenario "shows validation errors and does not create a request" do

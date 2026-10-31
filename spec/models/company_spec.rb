@@ -29,6 +29,12 @@ RSpec.describe Company, type: :model do
     it { should have_many(:departments).dependent(:destroy) }
   end
 
+  describe "default resource names" do
+    it "includes EmployeeGroup so CRUD policies are seeded" do
+      expect(Company::DEFAULT_RESOURCE_NAMES).to include("EmployeeGroup")
+    end
+  end
+
   describe "validations" do
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:business_type) }
@@ -324,6 +330,28 @@ RSpec.describe Company, type: :model do
 
     it "defines the system business type" do
       expect(Company.new(business_type: :system)).to be_business_type_system
+    end
+  end
+
+  describe "cache keys" do
+    it "writes the company record under the service key" do
+      company = create(:company)
+
+      company.send(:refresh_cache)
+
+      expect(Rails.sync_cache.read(CacheKeyService.company(company.id))).to be_present
+    end
+
+    it "removes the company record and version keys" do
+      company = create(:company)
+      company.send(:refresh_cache)
+      key = CacheKeyService.company(company.id)
+      expect(Rails.sync_cache.read(key)).to be_present
+
+      company.send(:remove_cache)
+
+      expect(Rails.sync_cache.read(key)).to be_nil
+      expect(Rails.sync_cache.read(CacheKeyService.user_companies_max_updated_at(company.user_id))).to be_nil
     end
   end
 end

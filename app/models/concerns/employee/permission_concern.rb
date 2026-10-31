@@ -8,14 +8,11 @@
 # the employee rather than in each caller.
 # How it works: can? collects active policies for the resource/action,
 # short-circuits owner/class checks, evaluates tag conditions against the target,
-# and caches the owner role for OWNER_ROLE_CACHE_EXPIRY (see docs/ABAC.md).
+# and caches the owner role for CACHE_DEFAULT_EXPIRY (see docs/ABAC.md).
 # Main associations: none directly; reads Employee#roles,
 # PolicyRoleAppointment, Policy, and Tag.
 module Employee::PermissionConcern
   extend ActiveSupport::Concern
-
-  # Single-file constant: only used here (see docs/CONSTANTS.md).
-  OWNER_ROLE_CACHE_EXPIRY = 1.day
 
   included do
     # =========================================================================
@@ -50,13 +47,16 @@ module Employee::PermissionConcern
     end
 
     # Check if employee has owner role (business_type = :owner).
-    # Cached 1 day in ram_cache: boolean is tiny (bytes), read on every
-    # can? check (hot path), and owner assignment is immutable
+    # Cached for CACHE_DEFAULT_EXPIRY in ram_cache: boolean is tiny (bytes), read
+    # on every can? check (hot path), and owner assignment is immutable
     # (creation-time only, update/destroy blocked) so per-worker isolation
-    # is harmless; employee touch (role assignment) bumps
-    # cache_key_with_version anyway.
+    # is harmless; employee touch (role assignment) bumps the version segment
+    # in CacheKeyService.employee_owner_role anyway.
     def owner_role?
-      Rails.ram_cache.fetch("#{cache_key_with_version}/owner_role", expires_in: OWNER_ROLE_CACHE_EXPIRY) do
+      Rails.ram_cache.fetch(
+        CacheKeyService.employee_owner_role(self),
+        expires_in: CACHE_DEFAULT_EXPIRY
+      ) do
         EmployeeRoleAppointment.where(employee_id: id).any? { |ra| ra.business_type == OWNER_BUSINESS_TYPE }
       end
     end
@@ -87,8 +87,10 @@ module Employee::PermissionConcern
     # Each policy includes policy_appointment (if exists) with workflow_status
     # Used for Permissions UI page
     def permissions
-      cache_key = "#{cache_key_with_version}/permissions"
-      Rails.sync_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
+      Rails.sync_cache.fetch(
+        CacheKeyService.employee_permissions(self),
+        expires_in: CACHE_DEFAULT_EXPIRY
+      ) do
         load_permissions_from_db
       end
     end
@@ -128,8 +130,10 @@ module Employee::PermissionConcern
 
     # 5. Only active PolicyRoleAppointments - used for can? checks
     def permissions_by_role
-      cache_key = "#{cache_key_with_version}/permissions_by_role"
-      Rails.sync_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
+      Rails.sync_cache.fetch(
+        CacheKeyService.employee_permissions_by_role(self),
+        expires_in: CACHE_DEFAULT_EXPIRY
+      ) do
         roles.includes(:policy_role_appointments).each_with_object({}) do |role, hash|
           active_appointments = role.policy_role_appointments.active.includes(:policy)
 
@@ -153,10 +157,9 @@ module Employee::PermissionConcern
     end
 
     def clear_permissions_cache
-      Rails.ram_cache.delete("#{cache_key_with_version}/owner_role")
-      Rails.sync_cache.delete("#{cache_key_with_version}/permissions")
-      Rails.sync_cache.delete("#{cache_key_with_version}/permissions_by_role")
-      Rails.sync_cache.delete("#{cache_key_with_version}/owner_role")
+      Rails.ram_cache.delete(CacheKeyService.employee_owner_role(self))
+      Rails.sync_cache.delete(CacheKeyService.employee_permissions(self))
+      Rails.sync_cache.delete(CacheKeyService.employee_permissions_by_role(self))
       touch
     end
   end

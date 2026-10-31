@@ -21,7 +21,7 @@ module Notifications
       record, created = EmployeeNotificationRead.find_or_create_by!(
         company: @employee.company, employee: @employee, notification: @notification
       ).then { |r| [ r, r.previously_new_record? ] }
-      Rails.sync_cache.delete(Notifications::UnreadQuery.cache_key(@employee.id)) if created
+      Rails.sync_cache.delete(CacheKeyService.employee_unread_notifications(@employee.id)) if created
       { success: true, created: created }
     rescue ActiveRecord::RecordInvalid => e
       { success: false, errors: e.record.errors.full_messages }

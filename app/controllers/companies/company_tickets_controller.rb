@@ -34,7 +34,8 @@ class Companies::CompanyTicketsController < Companies::ApplicationController
 
         @pagy, @results = pagy(:offset, scope, jsonapi: true)
         open_count = Rails.sync_cache.fetch(
-          CompanyTicket.open_count_key(current_company.id), expires_in: 1.minute
+          CacheKeyService.company_open_ticket_count(current_company.id),
+          expires_in: CACHE_DEFAULT_EXPIRY
         ) do
           current_company.company_tickets.open_tickets.count
         end

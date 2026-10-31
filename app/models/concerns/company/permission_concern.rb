@@ -7,7 +7,7 @@
 # role-to-policy projections; caching them on the company avoids N+1 queries and
 # repeated assembly.
 # How it works: #permissions, #permissions_by_role, and #permissions_by_resource
-# read through Rails.sync_cache (PERMISSIONS_CACHE_EXPIRY) and are cleared by
+# read through Rails.sync_cache (CACHE_DEFAULT_EXPIRY) and are cleared by
 # #clear_permissions_cache, which also touches the company.
 # Main associations: none directly; reads Company#roles and Company#policies,
 # and uses PolicyRoleAppointment.
@@ -24,9 +24,10 @@ module Company::PermissionConcern
     # Used for Permissions UI page - shows all policies with their assignment status
     # Excludes owner role (business_type = :owner)
     def permissions
-      cache_key = "#{cache_key_with_version}/permissions"
-
-      Rails.sync_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
+      Rails.sync_cache.fetch(
+        CacheKeyService.company_permissions(self),
+        expires_in: CACHE_DEFAULT_EXPIRY
+      ) do
         all_policies = policies.where.not(business_type: :owner).to_a
 
         roles.where.not(business_type: :owner).map do |role|
@@ -61,9 +62,10 @@ module Company::PermissionConcern
 
     # Only active PolicyRoleAppointments - used for actual permission checks (can?)
     def permissions_by_role
-      cache_key = "#{cache_key_with_version}/permissions_by_role"
-
-      Rails.sync_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
+      Rails.sync_cache.fetch(
+        CacheKeyService.company_permissions_by_role(self),
+        expires_in: CACHE_DEFAULT_EXPIRY
+      ) do
         roles.includes(:policy_role_appointments).each_with_object({}) do |role, hash|
           active_appointments = role.policy_role_appointments.active.includes(:policy)
 
@@ -86,9 +88,10 @@ module Company::PermissionConcern
     end
 
     def permissions_by_resource
-      cache_key = "#{cache_key_with_version}/permissions_by_resource"
-
-      Rails.sync_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
+      Rails.sync_cache.fetch(
+        CacheKeyService.company_permissions_by_resource(self),
+        expires_in: CACHE_DEFAULT_EXPIRY
+      ) do
         roles.includes(:policy_role_appointments).each_with_object({}) do |role, hash|
           active_appointments = role.policy_role_appointments.active.includes(:policy)
           role_permissions = active_appointments.group_by { |a| a.policy.resource }.transform_values do |appointments|
@@ -101,9 +104,9 @@ module Company::PermissionConcern
     end
 
     def clear_permissions_cache
-      Rails.sync_cache.delete("#{cache_key_with_version}/permissions")
-      Rails.sync_cache.delete("#{cache_key_with_version}/permissions_by_role")
-      Rails.sync_cache.delete("#{cache_key_with_version}/permissions_by_resource")
+      Rails.sync_cache.delete(CacheKeyService.company_permissions(self))
+      Rails.sync_cache.delete(CacheKeyService.company_permissions_by_role(self))
+      Rails.sync_cache.delete(CacheKeyService.company_permissions_by_resource(self))
 
       touch
     end

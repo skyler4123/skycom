@@ -92,4 +92,24 @@ describe "name uniqueness" do
       expect(customer_user.can_create_company?).to be false
     end
   end
+
+  describe "cache keys" do
+    it "writes the user record under the service key" do
+      user = create(:user)
+      user.send(:refresh_cache)
+
+      expect(Rails.sync_cache.read(CacheKeyService.user(user.id))).to be_present
+    end
+
+    it "removes the user record key on destroy" do
+      user = create(:user)
+      key = CacheKeyService.user(user.id)
+      user.send(:refresh_cache)
+      expect(Rails.sync_cache.read(key)).to be_present
+
+      user.send(:remove_cache)
+
+      expect(Rails.sync_cache.read(key)).to be_nil
+    end
+  end
 end

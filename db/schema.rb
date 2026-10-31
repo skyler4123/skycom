@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_29_000005) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_30_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -2714,6 +2714,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_000005) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "manager_id"
     t.index ["branch_id"], name: "index_employee_groups_on_branch_id"
     t.index ["business_type"], name: "index_employee_groups_on_business_type"
     t.index ["category_id"], name: "index_employee_groups_on_category_id"
@@ -2723,6 +2724,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_000005) do
     t.index ["email"], name: "index_employee_groups_on_email", unique: true
     t.index ["external_id"], name: "index_employee_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_groups_on_lifecycle_status"
+    t.index ["manager_id"], name: "index_employee_groups_on_manager_id"
     t.index ["property_mapping_id"], name: "index_employee_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_employee_groups_on_workflow_status"
   end
@@ -3194,7 +3196,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_000005) do
     t.integer "currency"
     t.integer "country"
     t.integer "timezone"
-    t.uuid "manager_id"
     t.bigint "monthly_salary_cents", default: 0, null: false
     t.bigint "monthly_allowance_cents", default: 0, null: false
     t.string "external_id"
@@ -3246,7 +3247,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_000005) do
     t.index ["email"], name: "index_employees_on_email", unique: true
     t.index ["external_id"], name: "index_employees_on_external_id"
     t.index ["lifecycle_status"], name: "index_employees_on_lifecycle_status"
-    t.index ["manager_id"], name: "index_employees_on_manager_id"
     t.index ["property_mapping_id"], name: "index_employees_on_property_mapping_id"
     t.index ["user_id"], name: "index_employees_on_user_id"
     t.index ["workflow_status"], name: "index_employees_on_workflow_status"
@@ -7877,6 +7877,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_000005) do
   add_foreign_key "employee_groups", "branches"
   add_foreign_key "employee_groups", "categories"
   add_foreign_key "employee_groups", "companies"
+  add_foreign_key "employee_groups", "employees", column: "manager_id", on_delete: :nullify
   add_foreign_key "employee_groups", "property_mappings"
   add_foreign_key "employee_notification_reads", "companies"
   add_foreign_key "employee_notification_reads", "employees"
@@ -7925,7 +7926,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_29_000005) do
   add_foreign_key "employees", "branches"
   add_foreign_key "employees", "categories"
   add_foreign_key "employees", "companies"
-  add_foreign_key "employees", "employees", column: "manager_id", on_delete: :nullify
   add_foreign_key "employees", "property_mappings"
   add_foreign_key "employees", "users"
   add_foreign_key "event_config_logs", "categories"

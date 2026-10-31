@@ -43,7 +43,7 @@ module ApplicationController::CookieConcern
 
     latest_update = [
       user.updated_at,
-      Rails.sync_cache.fetch("user_#{user.id}:companies_max_updated_at", expires_in: 5.minutes) do
+      Rails.sync_cache.fetch(CacheKeyService.user_companies_max_updated_at(user.id), expires_in: CACHE_DEFAULT_EXPIRY) do
         Company.where(user_id: user.id).maximum(:updated_at)
       end
     ].compact.max

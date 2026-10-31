@@ -6,13 +6,11 @@
 # (or letting its cache entry expire) invalidates that browser without touching
 # the user's password.
 # How it works: before_create copies Current.user_agent/ip_address, and
-# after_commit writes or removes a short-lived `sessions_<id>` entry in
-# Rails.sync_cache (SESSION_CACHE_EXPIRY). The authentication concern reads that
-# cache before falling back to the database.
+# after_commit writes or removes a short-lived session entry in
+# Rails.sync_cache for CACHE_DEFAULT_EXPIRY. The authentication concern reads
+# that cache before falling back to the database.
 # Main associations: belongs_to :user (required).
 class Session < ApplicationRecord
-  SESSION_CACHE_EXPIRY = 1.hour
-
   belongs_to :user
 
   # Callbacks
@@ -25,14 +23,14 @@ class Session < ApplicationRecord
 
   def refresh_cache
     Rails.sync_cache.write(
-      "sessions_#{id}",
+      CacheKeyService.session(id),
       { "id" => id, "user_id" => user_id },
-      expires_in: SESSION_CACHE_EXPIRY
+      expires_in: CACHE_DEFAULT_EXPIRY
     )
   end
 
   def remove_cache
-    Rails.sync_cache.delete("sessions_#{id}")
+    Rails.sync_cache.delete(CacheKeyService.session(id))
   end
 
   def set_request_details

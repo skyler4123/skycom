@@ -132,6 +132,12 @@ export const new_company_employee_path = (companyId) => `/companies/${companyId}
 export const edit_company_employee_path = (companyId, employeeId) => `/companies/${companyId}/employees/${employeeId}/edit`
 export const delete_company_employee_path = (companyId, employeeId) => `/companies/${companyId}/employees/${employeeId}`
 
+export const company_employee_groups_path = (companyId) => `/companies/${companyId}/employee_groups`
+export const create_company_employee_groups_path = (companyId) => `/companies/${companyId}/employee_groups`
+export const company_employee_group_path = (companyId, employeeGroupId) => `/companies/${companyId}/employee_groups/${employeeGroupId}`
+export const new_company_employee_group_path = (companyId) => `/companies/${companyId}/employee_groups/new`
+export const edit_company_employee_group_path = (companyId, employeeGroupId) => `/companies/${companyId}/employee_groups/${employeeGroupId}/edit`
+
 export const company_orders_path = (companyId) => `/companies/${companyId}/orders`
 export const create_company_orders_path = (companyId) => `/companies/${companyId}/orders`
 export const company_order_path = (companyId, orderId) => `/companies/${companyId}/orders/${orderId}`

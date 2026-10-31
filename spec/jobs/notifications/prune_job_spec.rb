@@ -26,6 +26,6 @@ RSpec.describe Notifications::PruneJob, type: :job do
     expect(Notifications::UnreadQuery.new(company: company, employee: employee).count).to eq(1)
     described_class.perform_now
 
-    expect(Rails.sync_cache.read(Notifications::UnreadQuery.cache_key(employee.id))).to be_nil
+    expect(Rails.sync_cache.read(CacheKeyService.employee_unread_notifications(employee.id))).to be_nil
   end
 end

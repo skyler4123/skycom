@@ -60,7 +60,7 @@ RSpec.feature "Companies::StorageStatistics Index", type: :feature, js: true do
     expect(find('[data-statistic="total_files"]')).to have_text("1")
 
     create_file(name: "doc.pdf", content_type: "application/pdf", body: "b" * 2048)
-    Rails.sync_cache.delete("storage_statistics/#{company.id}")
+    Rails.sync_cache.delete(CacheKeyService.company_storage_statistics(company.id))
 
     visit company_storage_statistics_path(company)
 

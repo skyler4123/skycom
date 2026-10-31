@@ -12,7 +12,8 @@
 # notification subscriptions attach through atomic appointments. Addresses,
 # avatars, tags, and permission helpers come from concerns; discard is supported.
 # Main associations: belongs_to :company, :category, :property_mapping (required),
-# :branch and :user (optional); has_many :roles, :employee_groups, :departments,
+# :branch and :user (optional); has_many :roles, :employee_groups,
+# :managed_employee_groups, :departments,
 # :services, :customers, :documents, :events, :event_groups, :exams, :facilities,
 # :order_groups, :products, :projects, :project_groups, :tasks, :task_groups,
 # :related_employees, :employee_profiles, :employee_subprofiles,
@@ -27,13 +28,11 @@ class Employee < ApplicationRecord
   include Employee::ImageConcern
   include RoleConcern
   include Employee::PermissionConcern
+  include Employee::ManagerConcern
   include TagConcern
   include Discard::Model
 
-  EMPLOYEE_CACHE_EXPIRY = 5.minutes
-
   attribute :permission_resource_name, :string, default: -> { self.name }
-
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
@@ -54,12 +53,9 @@ class Employee < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :user, optional: true
-  belongs_to :manager, class_name: "Employee", optional: true, inverse_of: :direct_reports
   belongs_to :category
   belongs_to :property_mapping
 
-  has_many :direct_reports, class_name: "Employee", foreign_key: :manager_id,
-           dependent: :nullify, inverse_of: :manager
   has_many :attendance_balances, dependent: :destroy
   has_many :attendance_leaves, dependent: :destroy
   has_many :employee_role_appointments, dependent: :destroy
@@ -72,6 +68,8 @@ class Employee < ApplicationRecord
 
   has_many :employee_employee_group_appointments, dependent: :destroy
   has_many :employee_groups, through: :employee_employee_group_appointments
+  has_many :managed_employee_groups, class_name: "EmployeeGroup", foreign_key: :manager_id,
+           dependent: :nullify, inverse_of: :manager
 
   has_many :department_employee_appointments, dependent: :destroy
   has_many :departments, through: :department_employee_appointments
@@ -136,8 +134,6 @@ class Employee < ApplicationRecord
   validates :name, presence: true, uniqueness: { scope: :company_id }
   validates :business_type, presence: true
   validate :only_one_owner_per_company, on: :create
-  validate :manager_belongs_to_same_company
-  validate :manager_is_not_self
 
   before_discard :prevent_discard_if_owner
   before_destroy :prevent_destroy_if_owner
@@ -152,20 +148,6 @@ class Employee < ApplicationRecord
 
   private
 
-  def manager_belongs_to_same_company
-    return if manager.blank? || company_id.blank?
-    return if manager.company_id == company_id
-
-    errors.add(:manager, "must belong to the same company")
-  end
-
-  def manager_is_not_self
-    return if manager_id.blank? || id.blank?
-    return unless manager_id == id
-
-    errors.add(:manager, "cannot be yourself")
-  end
-
   def refresh_cache
     attrs = attributes
     self.class.defined_enums.each do |enum_name, mapping|
@@ -173,14 +155,14 @@ class Employee < ApplicationRecord
       attrs[enum_name] = mapping[value] if value.is_a?(String) && mapping.key?(value)
     end
     Rails.sync_cache.write(
-      "employees_#{user_id}_#{company_id}:v2",
+      CacheKeyService.employee_record(user_id: user_id, company_id: company_id),
       attrs,
-      expires_in: EMPLOYEE_CACHE_EXPIRY
+      expires_in: CACHE_DEFAULT_EXPIRY
     )
   end
 
   def remove_cache
-    Rails.sync_cache.delete("employees_#{user_id}_#{company_id}:v2")
+    Rails.sync_cache.delete(CacheKeyService.employee_record(user_id: user_id, company_id: company_id))
   end
 
   def subscribe_to_all_employees_tag

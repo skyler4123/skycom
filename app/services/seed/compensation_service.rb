@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
-# Seed-only HR setup: reporting lines, salary/allowance, and contract renewal
-# dates for every employee of a company. Called from the enrich services.
+# Seed-only HR setup: branch teams, reporting lines, salary/allowance, and
+# contract renewal dates for every employee of a company. Called from the enrich
+# services.
 class Seed::CompensationService
+  LEADERSHIP_GROUP_NAME = "Leadership"
+
   # Monthly salary in cents by currency and role tier.
   SALARY_TIERS = {
     usd: {
@@ -35,10 +38,9 @@ class Seed::CompensationService
 
   def call
     attach_owner_to_first_branch
-    managers_by_branch = branch_managers
+    assign_teams
 
     @company.employees.find_each do |employee|
-      assign_manager(employee, managers_by_branch)
       assign_compensation(employee)
     end
 
@@ -54,20 +56,52 @@ class Seed::CompensationService
     @owner.update!(branch: branch) if branch
   end
 
+  def assign_teams
+    managers_by_branch = branch_managers
+    covered_employee_ids = []
+
+    @company.branches.order(:created_at).find_each do |branch|
+      members = @company.employees.where(branch: branch).where.not(id: @owner&.id).to_a
+      next if members.empty?
+
+      manager = managers_by_branch[branch.id]&.first || @owner
+      team = Seed::EmployeeGroupService.find_or_create!(
+        company: @company,
+        name: "#{branch.name} Team",
+        branch: branch,
+        manager: manager
+      )
+      enroll(team, members + [ manager ])
+      covered_employee_ids.concat(members.map(&:id))
+      covered_employee_ids << manager.id if manager
+    end
+
+    leadership = Seed::EmployeeGroupService.find_or_create!(
+      company: @company,
+      name: LEADERSHIP_GROUP_NAME,
+      branch: @owner&.branch,
+      manager: @owner
+    )
+    leaders = managers_by_branch.values.map(&:first)
+    leftovers = @company.employees.where.not(id: covered_employee_ids.uniq)
+    enroll(leadership, leaders + [ @owner ] + leftovers.to_a)
+  end
+
+  def enroll(employee_group, employees)
+    employees.compact.uniq.each do |employee|
+      EmployeeEmployeeGroupAppointment.find_or_create_by!(
+        company: @company,
+        employee: employee,
+        employee_group: employee_group
+      )
+    end
+  end
+
   def branch_managers
     @company.employees
       .joins(:roles)
       .where(roles: { name: "Manager" })
       .group_by(&:branch_id)
-  end
-
-  def assign_manager(employee, managers_by_branch)
-    return if employee.owner?
-    return if employee.manager_id.present?
-
-    manager = managers_by_branch[employee.branch_id]&.first
-    manager = @owner if manager.nil? || manager.id == employee.id
-    employee.update!(manager: manager) if manager
   end
 
   def assign_compensation(employee)

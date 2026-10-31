@@ -87,14 +87,6 @@ class Role < ApplicationRecord
   # This fires whenever the Role is touched (e.g., by a PolicyRoleAppointment change)
   after_touch :invalidate_employee_caches
 
-  # --- Soft Deletion (Discard) ---
-  # If you are using a gem like 'Discard' or similar for soft deletion:
-  # include Discard::Model
-  # default_scope -> { kept }
-
-  # This fires whenever the Role is touched (e.g., by a PolicyRoleAppointment change)
-  after_touch :invalidate_employee_caches
-
   after_create :ensure_paired_notification_tag
   after_update :rename_paired_notification_tag, if: :saved_change_to_name?
   before_destroy :destroy_paired_notification_tag
@@ -172,8 +164,20 @@ class Role < ApplicationRecord
   end
 
   def invalidate_employee_caches
-    # Efficiently update the timestamp of all associated employees
-    # without loading them into memory or running their callbacks.
-    employees.update_all(updated_at: Time.current)
+    # Bump every holder's version and drop the cached employee hash: touch_all
+    # updates updated_at in one query, but update_all/touch_all do not run the
+    # after_commit refresh, so the sync_cache entry would keep the old
+    # timestamp and the versioned permission keys would stay stale.
+    employee_rows = employees.pluck(:user_id, :company_id)
+
+    employee_rows.each do |user_id, company_id|
+      next if user_id.blank?
+
+      Rails.sync_cache.delete(
+        CacheKeyService.employee_record(user_id: user_id, company_id: company_id)
+      )
+    end
+
+    employees.touch_all
   end
 end
