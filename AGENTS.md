@@ -90,6 +90,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - `bundle exec parallel_rspec -n 14 [paths]` - Run tests (parallel, 14 workers). See `docs/PARALLEL_TESTS.md`.
 
 ## Pre-Commit Checklist
+- **Credit deduction is controller-only** — never call `CompanyCreditDeduction::*`, `CompanyWallet#deduct_from!`, or `Company#record_credit_usage!` from a background job, import, seed, or migration. Background jobs are free-credit and may still process suspended companies. See `docs/CREDIT_DEDUCTION.md`.
 - **Update** `docs/MODEL_CALLBACKS.md` if model/concern callbacks were added or modified
 - **Constants** — All app-wide constants must be in `config/initializers/constants.rb`, never hardcoded inline. See `docs/CONSTANTS.md`.
 - **Client cache** — If any mutation affects data stored in `currentCompany()` (branches, roles, categories, permissions, features, etc.), call `clearClientCacheAndReload()` after the server confirms the change, OR call `clearClientCache()` followed by a page reload.

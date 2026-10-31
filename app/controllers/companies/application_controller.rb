@@ -4,6 +4,8 @@ class Companies::ApplicationController < ApplicationController
 
   # Order reason: Companies::Authorizable need current_employee
   include Companies::Authorizable
+  # Registration order matters: suspension is checked after authorization.
+  include Companies::SuspendedCompanyConcern
   include ApplicationController::WebsocketConcern
   include Companies::CreditDeductionConcern
 

@@ -15,6 +15,10 @@
 # (CompanyWallet#enable_usage_logging!), POST .../usage/disable_logging closes it.
 # While active, show also returns that window's CompanyUsageLog rows.
 class Companies::UsageController < Companies::ApplicationController
+  # Read-only usage stays available so a suspended company can see what drained
+  # its balance while recovering.
+  skip_before_action :block_suspended_company
+
   # Single-file constant: max detail rows returned for the active window.
   USAGE_LOGS_LIMIT = 50
 
@@ -39,7 +43,6 @@ class Companies::UsageController < Companies::ApplicationController
           wallet: {
             main_credit_balance: wallet&.main_credit_balance || 0,
             promo_credit_balance: wallet&.promo_credit_balance || 0,
-            debt_credit_balance: wallet&.debt_credit_balance || 0,
             currency: current_company.currency
           },
           daily_usage: daily_usage,

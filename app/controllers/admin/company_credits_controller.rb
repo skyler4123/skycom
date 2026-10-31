@@ -40,7 +40,6 @@ class Admin::CompanyCreditsController < Admin::ApplicationController
     ]).merge(
       main_credit_balance: wallet&.main_credit_balance || 0,
       promo_credit_balance: wallet&.promo_credit_balance || 0,
-      debt_credit_balance: wallet&.debt_credit_balance || 0,
       total_credit_balance: wallet ? wallet.main_credit_balance + wallet.promo_credit_balance : 0,
       owner_name: company.employees.find { |e| e.business_type == "owner" }&.name || company.user&.name
     )

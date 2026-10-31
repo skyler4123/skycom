@@ -4,6 +4,9 @@
 # and the company's payment options (b2b CompanyPaymentMethod catalog), and
 # initiates the selected gateway flow (Mock QR / Mock Redirect).
 class Companies::TopUpsController < Companies::ApplicationController
+  # A suspended company must be able to reach the recovery flow.
+  skip_before_action :block_suspended_company
+
   def new
     respond_to do |format|
       format.html { render html: "", layout: true }

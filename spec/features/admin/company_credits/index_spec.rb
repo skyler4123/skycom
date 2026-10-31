@@ -22,7 +22,7 @@ RSpec.feature "Admin::CompanyCredits", type: :feature, js: true do
     expect(page).to have_selector("th", text: "Company")
     expect(page).to have_selector("th", text: "Main")
     expect(page).to have_selector("th", text: "Promo")
-    expect(page).to have_selector("th", text: "Debt")
+    expect(page).not_to have_selector("th", text: "Debt")
     expect(page).to have_selector("th", text: "Total")
   end
 

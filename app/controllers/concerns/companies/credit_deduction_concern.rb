@@ -8,6 +8,10 @@
 #     deduct_company_credits_for :index, with: CompanyCreditDeduction::Companies::Dashboards::IndexService
 #   end
 #
+# DEDUCTION BOUNDARY: this concern is the only entry point for credit
+# deduction. Background jobs, imports, seeds, and migrations are free-credit and
+# must never call CompanyCreditDeduction::* or record_credit_usage! directly.
+#
 # The filter:
 #   - runs only after a SUCCESSFUL JSON response (no HTML, no 4xx/5xx)
 #   - delegates the whole deduction to the declared service class

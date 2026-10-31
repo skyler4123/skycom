@@ -178,7 +178,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     cards.push(this.kpiCard("approvals", translate("Pending approvals"), k.pending_approvals_count ?? 0, "pending_actions", translate("Open inbox"), k.pending_approvals_count > 0 ? "warning" : "default"))
 
     if (financial) {
-      cards.push(this.kpiCard("credits", translate("Credits remaining"), this.number(k.credits_total), "account_balance_wallet", `${translate("Debt")}: ${this.number(k.credits_debt)}`))
+      cards.push(this.kpiCard("credits", translate("Credits remaining"), this.number(k.credits_total), "account_balance_wallet"))
     }
 
     return `<div class="grid grid-cols-2 xl:grid-cols-4 gap-3" data-dashboard-section="kpis">${cards.join("")}</div>`
@@ -498,10 +498,9 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
         <div class="p-3 rounded-lg bg-muted">
           <p class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">${translate("Available credits")}</p>
           <p class="text-3xl font-black text-primary mt-1">${this.number(wallet.total_credit_balance)}</p>
-          <div class="grid grid-cols-3 gap-2 mt-3 text-center">
+          <div class="grid grid-cols-2 gap-2 mt-3 text-center">
             <div><p class="text-xs font-bold text-foreground">${this.number(wallet.main_credit_balance)}</p><p class="text-[10px] text-muted-foreground">${translate("Main")}</p></div>
             <div><p class="text-xs font-bold text-foreground">${this.number(wallet.promo_credit_balance)}</p><p class="text-[10px] text-muted-foreground">${translate("Promo")}</p></div>
-            <div><p class="text-xs font-bold ${wallet.debt_credit_balance > 0 ? "text-danger" : "text-foreground"}">${this.number(wallet.debt_credit_balance)}</p><p class="text-[10px] text-muted-foreground">${translate("Debt")}</p></div>
           </div>
         </div>
         <div class="flex items-center justify-between mt-3 text-[11px] text-muted-foreground">

@@ -5,7 +5,7 @@ class Seed::CompanyService
     name: Faker::Name.name,
     description: Faker::Company.catch_phrase,
     lifecycle_status: :active,
-    workflow_status: Company.workflow_statuses.keys.sample,
+    workflow_status: :active,
     ownership_type: Company.ownership_types.keys.sample,
     business_type: (Company.business_types.keys - %w[system]).sample,
     currency: Company.currencies.keys.sample,

@@ -313,6 +313,7 @@ status.
 | Usage | ⛔ | Billing/admin |
 | Top Up | ⛔ | Billing/admin |
 | Billing | ⛔ | Billing/admin |
+| Suspended company gate | ✅ web redirect/403 | 🟡 403 notice | Recovery/top-up is web-only |
 | Help Center | ⛔ | Future candidate (employee support tickets) |
 
 ### Web surfaces outside the sidebar

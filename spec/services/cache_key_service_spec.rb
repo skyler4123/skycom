@@ -47,6 +47,10 @@ RSpec.describe CacheKeyService do
       expect(described_class.user_companies_max_updated_at(7))
         .to eq("user:7:companies_max_updated_at")
     end
+
+    it "builds the company suspended key" do
+      expect(described_class.company_suspended(3)).to eq("company:3:suspended")
+    end
   end
 
   describe "aggregate caches" do

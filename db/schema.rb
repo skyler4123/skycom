@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_30_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_31_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1516,7 +1516,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_30_000002) do
     t.uuid "walletable_id", null: false
     t.bigint "main_credit_balance", default: 0, null: false
     t.bigint "promo_credit_balance", default: 0, null: false
-    t.bigint "debt_credit_balance", default: 0, null: false
     t.datetime "usage_logging_until"
     t.string "external_id"
     t.integer "lifecycle_status"

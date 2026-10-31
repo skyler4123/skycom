@@ -76,6 +76,18 @@ RSpec.describe Attendance::CheckInSimulatorJob do
       expect(employee.scheduled_shifts.where(work_date: Date.current).count).to eq(1)
     end
 
+    it "skips disabled companies" do
+      company = create(:company)
+      branch = create(:branch, company: company)
+      create(:employee, company: company, branch: branch)
+      create(:attendance_config, company: company, branch: branch)
+      company.update!(workflow_status: :disabled)
+
+      expect {
+        described_class.perform_now
+      }.not_to change(AttendanceLog, :count)
+    end
+
     it "skips when the picked employee has no branch and the company has none" do
       company = create(:company)
       # Company init creates only an owner employee (branch-less) and no branches.

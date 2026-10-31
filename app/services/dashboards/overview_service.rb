@@ -127,8 +127,7 @@ module Dashboards
         avg_order_value_delta_pct: percentage_change(current_aov, previous_aov),
         gross_margin_pct: revenue_calculator.margin_pct,
         cost_coverage_pct: revenue_calculator.coverage_pct,
-        credits_total: wallet&.total_credit_balance || 0,
-        credits_debt: wallet&.debt_credit_balance || 0
+        credits_total: wallet&.total_credit_balance || 0
       }
     end
 
@@ -321,7 +320,6 @@ module Dashboards
       {
         main_credit_balance: wallet&.main_credit_balance || 0,
         promo_credit_balance: wallet&.promo_credit_balance || 0,
-        debt_credit_balance: wallet&.debt_credit_balance || 0,
         total_credit_balance: wallet&.total_credit_balance || 0,
         used_this_month: company.company_wallet_logs
           .where(change_type: :debit, created_at: current_range)
