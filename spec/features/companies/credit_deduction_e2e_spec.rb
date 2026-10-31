@@ -48,7 +48,7 @@ RSpec.feature "Credit deduction E2E", type: :feature, js: true do
       expect(page).to have_content(company.name, wait: 10)
 
       # Wait for after_action deduct (JS fetch → JSON) to complete — mirror dashboards/index_spec wait
-      expect(page).to have_selector('[data-chart="products"]', wait: 10)
+      expect(page).to have_selector('[data-dashboard-section="kpis"]', wait: 10)
 
       # Step 2: Redis delta (kredis_counter :credit_usage, app/models/company.rb:146)
       # Poll for delta; Puma thread may still be processing after have_content.
@@ -97,11 +97,11 @@ RSpec.feature "Credit deduction E2E", type: :feature, js: true do
     begin
       visit company_dashboards_path(company)
       expect(page).to have_content(company.name, wait: 10)
-      expect(page).to have_selector('[data-chart="products"]', wait: 10)
+      expect(page).to have_selector('[data-dashboard-section="kpis"]', wait: 10)
 
       visit company_dashboards_path(company)
       expect(page).to have_content(company.name, wait: 10)
-      expect(page).to have_selector('[data-chart="products"]', wait: 10)
+      expect(page).to have_selector('[data-dashboard-section="kpis"]', wait: 10)
 
       delta = nil
       10.times do
@@ -128,7 +128,7 @@ RSpec.feature "Credit deduction E2E", type: :feature, js: true do
       travel_to(Time.zone.local(2026, 8, 18, 15, 5))
       visit company_dashboards_path(company)
       expect(page).to have_content(company.name, wait: 10)
-      expect(page).to have_selector('[data-chart="products"]', wait: 10)
+      expect(page).to have_selector('[data-dashboard-section="kpis"]', wait: 10)
 
       delta2 = nil
       10.times do
