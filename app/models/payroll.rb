@@ -2,11 +2,18 @@
 
 # Payroll — Atomic purpose: one employee's payroll result for one month.
 #
-# Why it exists: stores the approved/paid salary outcome per employee/month and
-# links it to the attendance rollup and payroll configuration used to compute it.
+# Contract: Skycom is NOT the payroll calculator. It exposes raw input
+# (attendance totals, salary/allowance bases) for the company to calculate
+# outside Skycom, then stores the finished figures so they can be reviewed,
+# approved, paid, and shown in the mobile payroll view.
 # How it works: belongs to company/branch/employee and optional
 # attendance_month/payroll_config; status is draft/approved/paid; employee +
-# company + month is unique.
+# company + month is unique. The money columns are the client's submitted
+# result snapshot, not values derived by Skycom; only drafts should accept
+# edits, while approved/paid rows stay frozen history.
+# Legacy: Payrolls::GenerateService still derives provisional amounts from
+# attendance and the PAYROLL_* rates. That calculation path is scheduled to
+# become a skeleton builder only — see docs/TODO.md.
 # Main associations: belongs_to :company, :employee (required), :branch,
 # :attendance_month, :payroll_config (optional).
 class Payroll < ApplicationRecord

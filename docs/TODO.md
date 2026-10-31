@@ -1,11 +1,12 @@
-# Skycom Performance Backlog
+# Skycom TODO / Backlog
 
-> **Status**: Backlog — not scheduled work. An item leaves this doc only
-> when its trigger is hit and the switch is implemented.
+> **Status**: Backlog — not scheduled work. A performance item leaves this doc
+> only when its trigger is hit and the switch is implemented. A feature item
+> leaves when its checklist is complete.
 
 ## Convention
 
-Every item has the same four lines:
+Every performance item has the same four lines:
 
 | Line | Meaning |
 |------|---------|
@@ -13,6 +14,47 @@ Every item has the same four lines:
 | **Current cost** | What we pay today by not doing it |
 | **Switch to** | The target design |
 | **Cost of switching** | What the migration itself costs (code, data, ops) |
+
+---
+
+## Payroll — client-calculated results (feature backlog)
+
+**Idea**: Skycom exposes raw payroll input (`AttendanceMonth` / `AttendanceDay`,
+employee salary/allowance, `PayrollConfig`). The client calculates payroll
+outside Skycom with its own formula, then posts the finished figures back.
+Skycom only stores and displays the result; it never applies rates or formulas.
+
+- [ ] **Raw-data export** — expose attendance months/days + employee
+  compensation for download (today the payroll CSV exports only
+  employee/status/month).
+- [ ] **Skeleton-only generation** — `Payrolls::GenerateService` creates or
+  finds the employee+month row and snapshots raw attendance facts; remove its
+  `PAYROLL_TAX_RATE` / `PAYROLL_SOCIAL_INSURANCE_RATE` /
+  `PAYROLL_OVERTIME_MULTIPLIER` calculations.
+- [ ] **Result intake path** — accept client-submitted money fields (currently
+  `payroll_params` permits only `status` and `notes`), either via `update` or a
+  dedicated results endpoint/service.
+- [ ] **Fixed columns vs line items** — decide whether every client shares the
+  same breakdown, or arbitrary earning/deduction categories need
+  `payroll_lines` / jsonb.
+- [ ] **Draft-only edits** — money fields editable only while `draft`;
+  `approved` / `paid` rows frozen; explicit adjustment path after approval.
+- [ ] **Provenance + audit** — record source (`external`), formula/version,
+  `uploaded_by`, `calculated_at`, import batch; before/after history for money
+  changes.
+- [ ] **Validation policy** — revisit non-negative-only validation (negative
+  adjustments); decide whether `net = gross - tax - deduction` should be
+  enforced when client formulas may differ.
+- [ ] **Total deductions** — decide whether `total_deductions_cents` stays
+  derived (`tax + deduction`) or becomes a stored/client-submitted value once
+  arbitrary lines exist.
+- [ ] **Remove hardcoded rate label** —
+  `mobile_helper.rb#mobile_payroll_tax_label` prints "Statutory (18.4%)" from
+  `PAYROLL_*` constants.
+- [ ] **Intake shape** — single-employee update vs bulk month upload/CSV, with
+  idempotent upsert on `(company, employee, month)`.
+- [ ] **Specs** — feature first, then model, then request: intake, draft-only
+  immutability, bulk upsert idempotency, mobile display.
 
 ---
 

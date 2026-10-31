@@ -74,7 +74,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | Realtime updates | `docs/WEBSOCKET.md` — channel naming + event protocol + add-new-event recipe |
 | Search | `docs/MEILISEARCH.md` — sync architecture + making a model searchable |
 | External API integration (dev/test) | `docs/MOCK_API.md` — mock server routes + add-new-API template |
-| Performance work | `docs/PERFORMANCE.md` — backlog conventions (async preprocessing, pagination, fan-out) |
+| Backlog / future work | `docs/TODO.md` — performance backlog conventions + payroll client-calculation tasks |
 | Dev environment on an immutable OS | `docs/IMMUTABLE_OS_SETUP.md` — distrobox + docker + VS Code |
 | URL/controller structure, Stimulus naming, mandatory table fields | `docs/ARCHITECTURE_GUIDES.md` — technical standards incl. system-fields block |
 | A new resource type or pairwise join | `docs/RESOURCES.md` — gem/system/managed/appointment catalog + atomic-pair recipe |
