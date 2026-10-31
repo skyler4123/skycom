@@ -10,7 +10,9 @@ class CompanyUsageSyncJob < ApplicationJob
   queue_as :default
 
   def perform
-    Company.find_each(batch_size: 50) do |company|
+    # Free-credit job: drains counters for active + suspended companies, skips
+    # disabled ones. It never deducts or records usage.
+    Company.for_background_jobs.find_each(batch_size: 50) do |company|
       sync_company(company)
     rescue StandardError => e
       Rails.logger.error("[CompanyUsageSync] company #{company.id}: #{e.message}")

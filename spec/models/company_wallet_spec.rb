@@ -13,7 +13,7 @@ RSpec.describe CompanyWallet, type: :model do
   end
 
   describe "balance mutations" do
-    let(:company) { create(:company) }
+    let(:company) { create(:company, :without_signup_promo) }
     let(:wallet) { company.company_wallet }
 
     it "adds credits to the main balance and records an audit log with before/after snapshots" do
@@ -46,30 +46,29 @@ RSpec.describe CompanyWallet, type: :model do
       expect(log.balance_type).to eq("main")
     end
 
-    it "raises InsufficientCreditsError and leaves the balance unchanged" do
+    it "allows the balance to go negative" do
       wallet.add_credits!(amount: 10)
 
       expect {
         wallet.deduct_from!(balance: :main, amount: 20)
-      }.to raise_error(CompanyWallet::InsufficientCreditsError)
+      }.to change(wallet, :main_credit_balance).by(-20)
 
-      expect(wallet.reload.main_credit_balance).to eq(10)
-      expect(CompanyWalletLog.count).to eq(1)
+      expect(wallet.reload.main_credit_balance).to eq(-10)
+      expect(CompanyWalletLog.count).to eq(2)
+      expect(CompanyWalletLog.last.balance_after).to eq(-10)
     end
 
     it "keeps each balance independent" do
       wallet.add_to!(balance: :promo, amount: 50)
-      wallet.add_to!(balance: :debt, amount: 5)
 
       expect(wallet.main_credit_balance).to eq(0)
       expect(wallet.promo_credit_balance).to eq(50)
-      expect(wallet.debt_credit_balance).to eq(5)
 
       wallet.deduct_from!(balance: :promo, amount: 10)
       expect(wallet.promo_credit_balance).to eq(40)
       expect(wallet.main_credit_balance).to eq(0)
 
-      expect(CompanyWalletLog.pluck(:balance_type)).to eq(%w[promo debt promo])
+      expect(CompanyWalletLog.pluck(:balance_type)).to eq(%w[promo promo])
     end
 
     it "rejects non-positive amounts" do
@@ -83,8 +82,37 @@ RSpec.describe CompanyWallet, type: :model do
     end
   end
 
+  describe "company credit status" do
+    let(:company) { create(:company, :without_signup_promo) }
+    let(:wallet) { company.company_wallet }
+
+    it "suspends the company when a deduction reaches zero" do
+      wallet.add_credits!(amount: 10)
+
+      wallet.deduct_from!(balance: :main, amount: 10)
+
+      expect(company.reload.workflow_status).to eq("suspend")
+    end
+
+    it "keeps the company active while the total balance is positive" do
+      wallet.add_credits!(amount: 10)
+
+      wallet.deduct_from!(balance: :main, amount: 4)
+
+      expect(company.reload.workflow_status).to eq("active")
+    end
+
+    it "reactivates a suspended company when credits are added" do
+      company.update!(workflow_status: :suspend)
+
+      wallet.add_credits!(amount: 10)
+
+      expect(company.reload.workflow_status).to eq("active")
+    end
+  end
+
   describe "usage logging toggle" do
-    let(:company) { create(:company) }
+    let(:company) { create(:company, :without_signup_promo) }
     let(:wallet) { company.company_wallet }
 
     it "is inactive by default" do

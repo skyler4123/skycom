@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe CompanyCreditDeduction::Companies::Dashboards::IndexService do
-  let(:company) { create(:company) }
+  let(:company) { create(:company, :without_signup_promo) }
   let(:wallet) { company.company_wallet }
 
   it "resolves the dashboard action cost from CREDIT_USAGE_RATES" do

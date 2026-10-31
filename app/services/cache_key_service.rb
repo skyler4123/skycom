@@ -70,6 +70,17 @@ class CacheKeyService
     "company:#{company_id}:record:v2"
   end
 
+  # Pattern: company:<company_id>:suspended
+  # Purpose: hot boolean behind Company#suspended? (web/API suspension gate).
+  # Store: Rails.ram_cache
+  # TTL: CACHE_DEFAULT_EXPIRY (1 hour)
+  # Written by: Company#suspended?, Company#write_suspended_cache
+  # Cleared by: Company#write_suspended_cache / #broadcast_suspended_cache /
+  #   #remove_cache; sync_cache pub/sub evicts every instance
+  def self.company_suspended(company_id)
+    "company:#{company_id}:suspended"
+  end
+
   # Pattern: employee:user:<user_id>:company:<company_id>:record:v2
   # Purpose: the current Employee attributes hash, keyed by the lookup pair used
   #   during authentication (a user has at most one employee per company).

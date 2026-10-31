@@ -31,7 +31,7 @@ CompanyInvoice      (the bill — payment_status DERIVED from transaction sum, n
 CompanyOrder        (the deal — money tier → credits; complete! guarded/idempotent)
         │  wallet.update!(walletable:) + wallet.add_credits!(...)
         ▼
-CompanyWallet       (stores balance NUMBERS only — main/promo/debt — no business logic)
+CompanyWallet       (stores balance NUMBERS only — main/promo, may be negative — no business logic)
 ```
 
 Rules:
@@ -44,9 +44,14 @@ Rules:
   row-level `FOR UPDATE`) so concurrent deductions serialize on the wallet row
   and can never overdraw — Rails' own locking, no manual version bookkeeping.
 - **Usage deduction flows through `CompanyCreditDeduction::*` services** (see `docs/CREDIT_DEDUCTION.md`).
-  The chain above handles money IN; the `CompanyCreditDeduction::BaseService` hierarchy handles
-  credit OUT (deduct promo → main → debt), triggered by an `after_action` filter
-  at the controller action level — never inline in actions.
+  The chain above handles money IN; the `CompanyCreditDeduction::BaseService`
+  hierarchy handles credit OUT (deduct promo → main, allowing a negative main
+  balance), triggered by an `after_action` filter at the controller action level
+  — never inline in actions.
+- **Deduction is controller-only.** Background jobs, imports, seeds, and
+  migrations are free-credit. They may grant credits (money IN) and drain usage
+  counters, but they must never deduct or record usage. Suspended companies may
+  still be processed by those jobs; that must remain free.
 
 ## The Hot Path Rule (usage tracking)
 

@@ -11,7 +11,7 @@ module Attendance
     def perform
       return unless Rails.env.development?
 
-      Company.find_each(batch_size: 50) do |company|
+      Company.for_background_jobs.find_each(batch_size: 50) do |company|
         simulate_company(company)
       rescue StandardError => e
         Rails.logger.warn("[CheckInSimulator] company #{company.id}: #{e.message}")

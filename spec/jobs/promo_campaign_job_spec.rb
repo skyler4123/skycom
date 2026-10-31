@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe PromoCampaignJob, type: :job do
   it "executes a due campaign" do
-    company = create(:company)
+    company = create(:company, :without_signup_promo)
     campaign = create(:promo_campaign, amount: 300, max_cap: 1000,
       conditions: {}, status: :scheduled, scheduled_at: 1.hour.ago)
 

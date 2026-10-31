@@ -162,6 +162,7 @@ export const statusBadge = (status) => {
     case "in_progress":
       color = "info"; break
     case "pending":
+    case "suspend":
     case "suspended":
       color = "warning"; break
     case "deleted":

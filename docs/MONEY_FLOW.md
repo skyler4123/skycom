@@ -30,7 +30,7 @@ Models prefixed with `Company*` form the **pay-as-you-go credit chain**. They ar
 | `CompanyOrder` | The deal — money tier → credits (`CREDIT_RATES[country]`), rate snapshot; `complete!` idempotently credits the wallet |
 | `CompanyInvoice` | The bill — `payment_status` **derived** from transaction sum, never set directly |
 | `CompanyTransaction` | The ledger entry + **sole gateway interface** — created pending, completed by webhook |
-| `CompanyWallet` | Stores balance **numbers only** (main/promo/debt) — no business logic |
+| `CompanyWallet` | Stores balance **numbers only** (main/promo, may be negative) — no business logic |
 | `CompanyPaymentMethod` | B2B payment method used by `CompanyTransaction` (Mock QR / Mock Redirect / cash) |
 | `CompanyWalletLog` | Audit trail — every balance mutation with before/after snapshots + `balance_type` |
 | `CompanyUsageLog` | Opt-in per-action detail rows (why a balance moved) |
@@ -73,10 +73,10 @@ The two chains never cross. A `CompanyOrder` is not a thing the company sells �
   Top-up (money in)                     Deduction (credits out)
   ─────────────────                     ─────────────────────
 CompanyOrder (money tier → credits)     CompanyCreditDeduction::* after_action
-      │                                        │  deduct promo → main → debt
+      │                                        │  deduct promo → main (may go negative)
       ▼                                        │  company.record_credit_usage!(cost)
 CompanyInvoice (the bill)                      ▼
-      │  payment_status DERIVED           CompanyWallet (main/promo/debt)
+      │  payment_status DERIVED           CompanyWallet (main/promo)
       ▼                                        │  company_wallet_logs (audit)
 CompanyTransaction (gateway entry)             │  company_usage_logs (opt-in detail)
       │  status: pending → completed           │
@@ -227,35 +227,39 @@ CompanyCreditDeduction::BaseService#call
   ├── should_run? ── no ──► return
   ├── cost = CREDIT_USAGE_RATES[action_type] ── zero ──► return
   ├── wallet = company.company_wallet ── missing ──► return
-  ├── deduct promo balance first     (drain as much as possible)
-  ├── deduct main balance second     (drain the remainder)
-  ├── absorb remainder into debt     (only when promo + main are exhausted)
+  ├── deduct promo balance first     (while positive)
+  ├── deduct main balance second     (absorbs the remainder, even below zero)
+  ├── if the pre-deduction balance was negative: log + recheck workflow_status
   └── company.record_credit_usage!(cost)   ← Kredis counter, always
 ```
 
-See `docs/CREDIT_DEDUCTION.md` for the full service hierarchy contract.
+Deduction is **controller-only**; background jobs are free-credit and never call
+this service. See `docs/CREDIT_DEDUCTION.md` for the full service hierarchy and
+the background-job boundary.
 
-### 5.3 The Multi-Balance Wallet
+### 5.3 The Two-Balance Wallet
 
 **File**: `app/models/company_wallet.rb`
 
 | Column | Purpose | Deduct order |
 |--------|---------|--------------|
 | `main_credit_balance` | Purchased credits (top-ups land here) | 2nd |
-| `promo_credit_balance` | Promotional credits | **1st** |
-| `debt_credit_balance` | Absorbed shortfall when promo + main are 0 | 3rd (accumulates) |
+| `promo_credit_balance` | Promotional credits (incl. the 1,000-credit signup bonus) | **1st** |
 
-Low-level mutation entry points (the only wallet mutation paths — called by the deduction services and the chain):
+Both balances may be negative. There is no debt column; a negative total derives
+`workflow_status: suspend`.
+
+Low-level mutation entry points:
 
 ```ruby
-wallet.add_credits!(amount:, source:, description:)                   # top-up → main only
-wallet.add_to!(balance: :promo, amount:, source:, description:)       # grant promo credits
-wallet.deduct_from!(balance: :main, amount:, source:, description:)   # atomic per-balance deduct
+wallet.add_credits!(amount:, source:, description:)                   # top-up → main only (jobs allowed)
+wallet.add_to!(balance: :promo, amount:, source:, description:)       # grant promo credits (jobs allowed)
+wallet.deduct_from!(balance: :main, amount:, source:, description:)   # controller-only deduction
 ```
 
-- Every mutation runs inside `with_lock` (transaction + row-level `FOR UPDATE`) — concurrent deductions serialize on the wallet row, no overdraw.
-- Every mutation writes a `CompanyWalletLog` audit row (`balance_type` main/promo/debt + before/after snapshots).
-- `CompanyWallet#total_credit_balance` = `main + promo` (debt is not spendable).
+- Every mutation runs inside `with_lock` (transaction + row-level `FOR UPDATE`) — concurrent deductions serialize on the wallet row.
+- Every mutation writes a `CompanyWalletLog` audit row (`balance_type` main/promo + before/after snapshots) and syncs the company status from the new total.
+- `CompanyWallet#total_credit_balance` = `main + promo`.
 
 ### 5.4 Usage Metering (the hot path)
 
@@ -473,15 +477,15 @@ expect(invoice.transactions.sum(:price_cents)).to be >= invoice.price_cents
 | Component | Status | Notes |
 |-----------|--------|-------|
 | **Credit chain** (`CompanyOrder → CompanyInvoice → CompanyTransaction → CompanyWallet`) | ✅ Complete | `docs/ATOMIC_PURPOSE.md` |
-| **Multi-balance wallet** (`main`/`promo`/`debt`, `with_lock` atomicity, wallet logs) | ✅ Complete | `app/models/company_wallet.rb` |
+| **Two-balance wallet** (`main`/`promo`, negative allowed, `with_lock` atomicity, wallet logs) | ✅ Complete | `app/models/company_wallet.rb` |
 | **Top-up** (Mock QR + Mock Redirect gateways, webhooks, WS `top_up_completed`) | ✅ Complete | `app/services/top_ups/create_service.rb` |
-| **Deduction** (`CompanyCreditDeduction::*` after_action, promo→main→debt) | ⚠️ Partial | Only `access_dashboard` wired (`Dashboards#index`); `create_order`/`create_customer` rates defined but no service classes yet |
+| **Deduction** (`CompanyCreditDeduction::*` after_action, promo→main) | ⚠️ Partial | Controller-only. Only `access_dashboard` wired (`Dashboards#index`); `create_order`/`create_customer` rates defined but no service classes yet |
+| **Company suspension** (derived `workflow_status`, hard web/API/mobile block, ram_cache boolean) | ✅ Complete | `docs/CREDIT_DEDUCTION.md` §4–5 |
 | **Usage metering** (Kredis delta → `CompanyUsageSyncJob` → Daily/Monthly) | ✅ Complete | `docs/ATOMIC_PURPOSE.md` Hot Path Rule |
 | **Opt-in usage logging** (`CompanyUsageLog`, 5-min window) | ✅ Complete | Usage page toggle |
 | **POS Order Processing V1** (checkout → pay → finalize, cash + Mock QR) | ✅ Complete | `docs/ORDER_PROCESSING_V1.md` |
 | **PaymentMethod / PaymentMethodAppointment** (global catalog + merchant identity) | ✅ Complete | `docs/PAYMENT_METHODS.md` |
 | **Commerce Invoice/Transaction derivation** | ✅ Complete | `Transaction` `status` enum + completion-gated `sync_invoice_payment_status` |
-| **Debt enforcement** (what happens when `debt_credit_balance > 0`) | ⬜ TBD | Not yet scheduled |
 | **Real gateways** (MoMo / ZaloPay / VNPay / Stripe) | ⬜ Future | Mock strategies (`mock_qr_gateway`, `mock_redirect_gateway`) stand in |
 
 ---
@@ -491,8 +495,8 @@ expect(invoice.transactions.sum(:price_cents)).to be >= invoice.price_cents
 This example traces a company through a full credit cycle — from consuming actions through top-up.
 
 ```
-Day 1:  Company active, wallet promo_balance $500, main_balance $0
-        (signup bonus promo credits)
+Day 1:  Company active, wallet promo_balance 1,000, main_balance 0
+        (SIGNUP_PROMO_CREDITS)
 
 09:00   Dashboard visit
         → Dashboards#index JSON
@@ -508,21 +512,25 @@ Day 1:  Company active, wallet promo_balance $500, main_balance $0
         → (future) create_order deduction (10)
         → promo -10, main unchanged, record_credit_usage!(10)
 
-Wallet now: promo 481, main 0, debt 0
+Wallet now: promo 981, main 0
 
 Usage sync runs → CompanyDailyUsage[09:00] += 2, [09:05] += 7, [09:10] += 10 (total 19)
 
 Week 2:  Company consumes aggressively; promo drains to 0; main 0
-         → next deduction: promo 0, main 0 → debt absorbs the shortfall
-         → debt_credit_balance > 0 (behavior TBD — Phase 1.3)
+         → the next deduction subtracts the full cost from main: 0 - 2 = -2
+         → no warning on this first overdraw; workflow_status derives suspend
+         → web requests now redirect to Top Up; JSON/mobile return 403
 
-Owner sees low balance warning on Usage page
-  → navigates to Top Up
+If a deduction somehow reaches the service while the balance is already negative:
+  → Rails.logger.warn("[CompanyCreditDeduction] deduction while negative ...")
+  → workflow_status is rechecked → suspend
+
+Owner recovers from the Top Up page
   → selects CREDIT_RATES tier (e.g. $5.00 → 500,000 credits)
   → selects Mock QR method
   → scans QR with banking app → mock bank webhook
   → CompanyTransaction completed → invoice paid → order complete! → wallet.add_credits!(500,000)
-  → main balance +500,000; debt still 0 (TBD)
+  → main balance becomes positive; workflow_status returns to active
   → top_up_completed WS event → redirected to Usage
 ```
 
@@ -542,7 +550,7 @@ Owner sees low balance warning on Usage page
 | `app/models/payment_method.rb` | Global payment gateway registry (`payment_mode`, `strategy`) |
 | `app/models/payment_method_appointment.rb` | Company/branch link + merchant identity + lifecycle cascade |
 | `app/services/top_ups/create_service.rb` | Creates the top-up chain + initiates gateway |
-| `app/services/company_credit_deduction/base_service.rb` | Deduction core (promo → main → debt + metering) |
+| `app/services/company_credit_deduction/base_service.rb` | Deduction core (promo → main, negative allowed + metering) |
 | `app/services/order_processing_v1/*` | POS pipeline services (checkout → pay → finalize) |
 | `app/services/payments/*` | `InitiateService` + gateway strategies |
 | `app/controllers/concerns/companies/credit_deduction_concern.rb` | `after_action` deduction DSL |

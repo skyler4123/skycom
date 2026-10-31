@@ -14,7 +14,9 @@ module PromoCampaigns
     end
 
     def call
-      scope = Company.where.not(business_type: :system)
+      # Background-job rule: suspended companies stay eligible (a promo can
+      # reactivate them); disabled companies are skipped.
+      scope = Company.where.not(business_type: :system).for_background_jobs
       if @conds["company_ids"].present?
         ids = Array(@conds["company_ids"]).map(&:to_s).select { |v|
           v.match?(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i)

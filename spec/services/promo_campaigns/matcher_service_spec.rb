@@ -2,12 +2,12 @@ require "rails_helper"
 
 RSpec.describe PromoCampaigns::MatcherService, type: :model do
   let!(:retail_us) do
-    c = create(:company)
+    c = create(:company, :without_signup_promo)
     c.update!(business_type: :retail, country: :us, employee_count: 50)
     c
   end
   let!(:retail_vn) do
-    c = create(:company)
+    c = create(:company, :without_signup_promo)
     c.update!(business_type: :retail, country: :vn, employee_count: 50)
     c
   end
@@ -24,6 +24,17 @@ RSpec.describe PromoCampaigns::MatcherService, type: :model do
     retail_vn.company_wallet.add_to!(balance: :promo, amount: 900)
     campaign = create(:promo_campaign, conditions: { "promo_balance_max" => 500 })
     ids = described_class.call(campaign: campaign).pluck(:id)
+    expect(ids).to include(retail_us.id)
+    expect(ids).not_to include(retail_vn.id)
+  end
+
+  it "includes suspended companies but excludes disabled companies" do
+    retail_us.update!(workflow_status: :suspend)
+    retail_vn.update!(workflow_status: :disabled)
+    campaign = create(:promo_campaign, conditions: {})
+
+    ids = described_class.call(campaign: campaign).pluck(:id)
+
     expect(ids).to include(retail_us.id)
     expect(ids).not_to include(retail_vn.id)
   end

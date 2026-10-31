@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe CompanyCreditDeduction::BaseService do
-  let(:company) { create(:company) }
+  let(:company) { create(:company, :without_signup_promo) }
   let(:wallet) { company.company_wallet }
 
   # Concrete subclass — the epic base is exercised through a real implementation.
@@ -23,7 +23,6 @@ RSpec.describe CompanyCreditDeduction::BaseService do
 
       expect(wallet.reload.promo_credit_balance).to eq(48)
       expect(wallet.main_credit_balance).to eq(100)
-      expect(wallet.debt_credit_balance).to eq(0)
     end
 
     it "deducts the remainder from main when promo cannot cover the cost" do
@@ -34,7 +33,6 @@ RSpec.describe CompanyCreditDeduction::BaseService do
 
       expect(wallet.reload.promo_credit_balance).to eq(0)
       expect(wallet.main_credit_balance).to eq(99)
-      expect(wallet.debt_credit_balance).to eq(0)
     end
 
     it "deducts fully from main when promo is empty" do
@@ -44,16 +42,29 @@ RSpec.describe CompanyCreditDeduction::BaseService do
 
       expect(wallet.reload.promo_credit_balance).to eq(0)
       expect(wallet.main_credit_balance).to eq(98)
-      expect(wallet.debt_credit_balance).to eq(0)
     end
 
-    it "absorbs the uncovered remainder into debt when promo and main are exhausted" do
-      wallet.add_to!(balance: :main, amount: 1)
+    it "allows main to go negative when the total balance cannot cover the cost" do
+      allow(Rails.logger).to receive(:warn)
 
       service_class.call(company: company)
 
-      expect(wallet.reload.main_credit_balance).to eq(0)
-      expect(wallet.debt_credit_balance).to eq(1)
+      expect(wallet.reload.main_credit_balance).to eq(-2)
+      expect(company.reload.workflow_status).to eq("suspend")
+      expect(Rails.logger).not_to have_received(:warn).with(/deduction while negative/)
+    end
+
+    it "logs and rechecks the status when a deduction starts from a negative balance" do
+      wallet.update_columns(main_credit_balance: -2)
+      allow(Rails.logger).to receive(:warn)
+
+      service_class.call(company: company)
+
+      expect(wallet.reload.main_credit_balance).to eq(-4)
+      expect(company.reload.workflow_status).to eq("suspend")
+      expect(Rails.logger).to have_received(:warn).with(
+        /deduction while negative.*company=#{company.id}.*action=access_dashboard.*balance_before=-2.*cost=2.*balance_after=-4/
+      )
     end
 
     it "records credit usage via the Kredis counter" do

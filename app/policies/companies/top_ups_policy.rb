@@ -6,8 +6,10 @@
 # Companies::TopUpsPolicy instead of returning "Security Policy not found".
 # Refine permissions when the token top-up flow is implemented.
 class Companies::TopUpsPolicy < ApplicationPolicy
+  # Any employee may see the recovery page. Starting a payment remains
+  # permission-gated below.
   def new?
-    record.can?(:read, CompanyPaymentMethod)
+    true
   end
 
   def mock_qr_gateway?

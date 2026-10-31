@@ -7,10 +7,12 @@
 # data boundary, and its business_type (retail, restaurant, hospital, education,
 # hotel, fitness) selects the seed and feature profile.
 # How it works: belongs to the owner User; creating a company initializes its
-# owner records, wallet, settings, and business-type seed data (initialize_company,
-# skipped via `system_owned` for the platform system company). Cache clearing and
-# permission scoping hang off the company (see docs/SYSTEM_COMPANY.md,
-# docs/ABAC.md).
+# owner records, wallet (with SIGNUP_PROMO_CREDITS in promo), settings, and
+# business-type seed data (initialize_company, skipped via `system_owned` for the
+# platform system company). workflow_status is derived from the wallet balance
+# (active / suspend) and gates web, JSON, and mobile access; see
+# docs/CREDIT_DEDUCTION.md. Cache clearing and permission scoping hang off the
+# company (see docs/SYSTEM_COMPANY.md, docs/ABAC.md).
 # Main associations: belongs_to :user; has_one :company_wallet; has_many
 # :branches, :employees, :roles, :policies, :customers, :products, :services,
 # :orders, :invoices, :stocks, :company_settings,
@@ -74,11 +76,15 @@ class Company < ApplicationRecord
     fitness: 5000,
     system: 9000
   }, prefix: true
+  # Legacy schema field. Kept for compatibility; access control and background
+  # job filtering use workflow_status (COMPANY_WORKFLOW_STATUS) instead.
   enum :lifecycle_status, {
     active: 0,
     disabled: 30
   }, prefix: true, default: :active
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  # active / disabled / suspend — see COMPANY_WORKFLOW_STATUS for the purpose of
+  # each value. This is intentionally NOT the shared order/payment WORKFLOW_STATUS.
+  enum :workflow_status, COMPANY_WORKFLOW_STATUS, prefix: true, default: :active
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
   enum :ownership_type, {
@@ -192,6 +198,9 @@ class Company < ApplicationRecord
 
   # --- Scopes ---
   scope :system_companies, -> { where(id: System.select(:company_id)) }
+  # Companies that company-wide background jobs may process. Suspended companies
+  # stay in (jobs are free-credit); disabled companies are skipped.
+  scope :for_background_jobs, -> { where.not(workflow_status: workflow_statuses[:disabled]) }
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :user_id }, length: { maximum: 255 }
@@ -223,11 +232,42 @@ class Company < ApplicationRecord
 
   after_commit :refresh_cache, on: [ :create, :update ]
   after_commit :remove_cache, on: :destroy
+  # Keep the hot suspension boolean fresh. Local write happens immediately (tests
+  # and same-process reads); pub/sub invalidation happens after commit so every
+  # worker evicts its copy.
+  after_update :write_suspended_cache, if: :saved_change_to_workflow_status?
+  after_commit :broadcast_suspended_cache, on: :update, if: :saved_change_to_workflow_status?
+  after_rollback :delete_suspended_cache
 
   # True when a System record points at this company (systems.company_id FK).
   # Derived from the FK — the single source of truth; no memoization.
   def system_company?
     System.where(company_id: id).exists?
+  end
+
+  # Hot web/API suspension gate. Stored as a tiny boolean in ram_cache; a status
+  # change writes the new value locally and broadcasts a sync_cache invalidation
+  # so every worker evicts and rebuilds it.
+  def suspended?
+    Rails.ram_cache.fetch(
+      CacheKeyService.company_suspended(id),
+      expires_in: CACHE_DEFAULT_EXPIRY
+    ) { workflow_status_suspend? }
+  end
+
+  # Keep workflow_status derived from the usable credit balance:
+  #   total > 0 -> active, total <= 0 -> suspend.
+  # System companies never pay and are exempt. save!(validate: false) is
+  # intentional: an unrelated company validation must not block a wallet
+  # mutation; the write callbacks still run (cache + client-cache refresh).
+  def sync_credit_status!(total_credit_balance:)
+    return if system_owned || system_company?
+
+    target = total_credit_balance.positive? ? :active : :suspend
+    return if workflow_status == target.to_s
+
+    self.workflow_status = target
+    save!(validate: false)
   end
 
   def resource_names
@@ -326,7 +366,14 @@ class Company < ApplicationRecord
 
     user.update!(system_role: :company_owner) unless system_owned
 
-    create_company_wallet!(walletable: self, main_credit_balance: 0)
+    wallet = create_company_wallet!(
+      walletable: self,
+      main_credit_balance: 0,
+      promo_credit_balance: system_owned ? 0 : SIGNUP_PROMO_CREDITS
+    )
+    # New companies start active when the signup promo is positive. If the
+    # constant is ever set to 0, this still derives the correct suspend status.
+    sync_credit_status!(total_credit_balance: wallet.total_credit_balance) unless system_owned
 
     Companies::WelcomeNotificationJob.set(wait: WELCOME_NOTIFICATION_DELAY).perform_later(id)
   end
@@ -370,6 +417,24 @@ class Company < ApplicationRecord
   def remove_cache
     Rails.sync_cache.delete(CacheKeyService.company(id))
     Rails.sync_cache.delete(CacheKeyService.user_companies_max_updated_at(user_id))
+    Rails.ram_cache.delete(CacheKeyService.company_suspended(id))
+    Rails.sync_cache.delete(CacheKeyService.company_suspended(id))
+  end
+
+  def write_suspended_cache
+    Rails.ram_cache.write(
+      CacheKeyService.company_suspended(id),
+      workflow_status_suspend?,
+      expires_in: CACHE_DEFAULT_EXPIRY
+    )
+  end
+
+  def broadcast_suspended_cache
+    Rails.sync_cache.delete(CacheKeyService.company_suspended(id))
+  end
+
+  def delete_suspended_cache
+    Rails.ram_cache.delete(CacheKeyService.company_suspended(id))
   end
 
   def assign_currency_from_country

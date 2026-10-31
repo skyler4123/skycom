@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Credit deduction via after_action", type: :request do
-  let(:company) { create(:company, country: :us, currency: :usd) }
+  let(:company) { create(:company, :without_signup_promo, country: :us, currency: :usd) }
   let(:owner_user) { company.user }
 
   before do
@@ -38,14 +38,14 @@ RSpec.describe "Credit deduction via after_action", type: :request do
       expect(company.company_wallet.reload.main_credit_balance).to eq(100)
     end
 
-    it "absorbs the shortfall into debt and still renders" do
+    it "allows the balance to go negative and still renders" do
       company.company_wallet.add_to!(balance: :main, amount: 1)
 
       get "/companies/#{company.id}/dashboards.json"
 
       expect(response).to have_http_status(:ok)
-      expect(company.company_wallet.reload.main_credit_balance).to eq(0)
-      expect(company.company_wallet.reload.debt_credit_balance).to eq(1)
+      expect(company.company_wallet.reload.main_credit_balance).to eq(-1)
+      expect(company.reload.workflow_status).to eq("suspend")
     end
 
     it "does not deduct on HTML requests" do
@@ -74,9 +74,9 @@ RSpec.describe "Credit deduction via after_action", type: :request do
       body = JSON.parse(response.body)
       expect(body["wallet"]).to include(
         "main_credit_balance" => 50,
-        "promo_credit_balance" => 3,
-        "debt_credit_balance" => 0
+        "promo_credit_balance" => 3
       )
+      expect(body["wallet"]).not_to have_key("debt_credit_balance")
     end
 
     it "does not include a credit_warning key in the payload" do

@@ -1084,7 +1084,6 @@ export const dictionary = () => {
     "Company health": { vi: "Sức khỏe công ty" },
     "Company wallet": { vi: "Ví công ty" },
     "Credits remaining": { vi: "Tín dụng còn lại" },
-    "Debt": { vi: "Nợ" },
     "Due": { vi: "Đến hạn" },
     "Failed to load dashboard": { vi: "Không tải được bảng điều khiển" },
     "Gross margin": { vi: "Biên lợi nhuận gộp" },

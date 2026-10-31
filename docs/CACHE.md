@@ -367,6 +367,7 @@ Two key families:
 | `session(id)` | `session:<id>` | `sync_cache` | 1 hour | write `Session#refresh_cache`; delete on destroy / invalid sign-out |
 | `user(id)` | `user:<id>:record:v2` | `sync_cache` | 1 hour | write `User#refresh_cache`; delete on destroy |
 | `company(id)` | `company:<id>:record:v2` | `sync_cache` | 1 hour | write `Company#refresh_cache`; delete on destroy |
+| `company_suspended(id)` | `company:<id>:suspended` | `ram_cache` | 1 hour | write on `workflow_status` change / `Company#suspended?`; sync_cache pub/sub evicts all instances |
 | `employee_record(user_id:, company_id:)` | `employee:user:<uid>:company:<cid>:record:v2` | `sync_cache` | 1 hour | write `Employee#refresh_cache`; delete on destroy; `Role#invalidate_employee_caches` deletes holders |
 | `user_companies_max_updated_at(user_id)` | `user:<id>:companies_max_updated_at` | `sync_cache` | 1 hour | delete on Company save/destroy |
 | `employee_manager_ids(id)` | `employee:<id>:manager_ids` | `sync_cache` | 1 hour | delete on group membership or group manager change |
@@ -517,6 +518,7 @@ test:
 | Use Case | Cache Tier | Reason |
 |----------|-----------|--------|
 | `Employee#owner_role?` hot boolean (read on every permission check) | `ram_cache` | Tiny per-worker value; TTL + best-effort pub/sub eviction |
+| `Company#suspended?` hot boolean (request gate) | `ram_cache` | Tiny per-worker boolean; status changes write locally and broadcast a `sync_cache` invalidation |
 | Tiny hot scalars (flags, configs, booleans) | `ram_cache` | Nanosecond reads; per-worker isolation harmless |
 | ActiveRecord record caching (Session, User, Company, Employee) | `sync_cache` | Local reads, pub/sub on mutation |
 | Permissions hashes | `sync_cache` | Cross-instance consistency needed |

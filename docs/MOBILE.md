@@ -34,6 +34,15 @@ authentication.
 the user does not belong to returns `404`; the stored company id on the device
 is never treated as authorization.
 
+### Suspended company block
+
+`Mobile::Companies::SuspendedCompanyConcern` runs after mobile authorization on
+every `/mobile/companies/:company_id/*` page. A company with
+`workflow_status: suspend` gets a `403` mobile-layout notice (“top up on the
+web”); mobile has no top-up flow. Mobile sign-in, `/mobile/home`, and the
+company picker are not company-scoped and stay reachable. See
+`docs/CREDIT_DEDUCTION.md` §5.2.
+
 ### Native auth gate
 
 `android/.../SignInActivity` is the launcher and has no bottom navigation. It
@@ -235,6 +244,8 @@ request feature spec sets them through the DOM with `set_native_field`.
   actions are not built yet.
 - Mobile ERB remains English-only; `dictionary.js` covers the new JS toasts
   (`Copied to clipboard`, copy failure).
+- A suspended company sees a 403 page on mobile; there is no mobile top-up flow
+  yet, so recovery happens on the web.
 - No HTML tab bar; browser-only users navigate through Home quick actions.
 - Payroll is deliberately absent from Home and the bottom tabs. The only entry
   point is Profile, followed by the password gate.
