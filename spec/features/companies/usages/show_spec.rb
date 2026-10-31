@@ -73,7 +73,7 @@ RSpec.feature "Usage logging toggle", type: :feature, js: true do
 
     # Trigger a credit-consuming action while recording (dashboards deducts 2)
     visit company_dashboards_path(company)
-    expect(page).to have_selector('[data-chart="products"]', wait: 10)
+    expect(page).to have_selector('[data-dashboard-section="kpis"]', wait: 10)
 
     10.times do
       break if company.company_wallet.reload.company_usage_logs.exists?

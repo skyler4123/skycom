@@ -12,6 +12,9 @@ Rails.application.routes.draw do
       get "notifications", to: "notifications#index"
       get "employee", to: "employees#show"
       get "attendance_month", to: "attendance_months#show"
+      get "operations", to: "operations#index"
+      get "payroll/unlock", to: "payroll_unlocks#new", as: :payroll_unlock
+      post "payroll/unlock", to: "payroll_unlocks#create"
       get "payroll", to: "payrolls#show"
       post "attendances", to: "attendances#create"
       resources :attendance_requests, only: %i[new create]

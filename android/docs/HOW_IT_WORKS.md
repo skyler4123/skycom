@@ -72,11 +72,11 @@ Native adds:
 │        └─ on company redirect: persist company id → start MainActivity│
 │                                                                      │
 │ MainActivity : HotwireActivity                                       │
-│   ├─ NavigatorHost "home"       → /mobile/companies/<id>/home        │
-│   ├─ NavigatorHost "employee"   → /mobile/companies/<id>/employee    │
-│   ├─ NavigatorHost "attendance" → /mobile/companies/<id>/attendance_month
-│   ├─ NavigatorHost "payroll"    → /mobile/companies/<id>/payroll     │
-│   ├─ NavigatorHost "requests"   → /mobile/companies/<id>/attendance_requests/new
+│   ├─ NavigatorHost "home"        → /mobile/companies/<id>/home       │
+│   ├─ NavigatorHost "notifications" → /mobile/companies/<id>/notifications
+│   ├─ NavigatorHost "employee"    → /mobile/companies/<id>/employee   │
+│   ├─ NavigatorHost "attendance"  → /mobile/companies/<id>/attendance_month
+│   ├─ NavigatorHost "operations"  → /mobile/companies/<id>/operations │
 │   └─ BottomNavigationView (Hidden until a company page loads)        │
 │                                                                      │
 │ SkycomApplication                                                    │
@@ -157,7 +157,7 @@ version as the library.
 |---|---|
 | `android/app/src/main/java/com/example/skycomandroid/SkycomApplication.kt` | Runs before any Activity. Enables WebView debugging in debug, sets Hotwire log level, and loads the path configuration from the bundled asset + remote URL. |
 | `android/app/src/main/java/com/example/skycomandroid/SignInActivity.kt` | Unauthenticated gate. Loads `/mobile/sign_in`, has no bottom tabs, stores the company id from the post-login redirect, and starts `MainActivity`. |
-| `android/app/src/main/java/com/example/skycomandroid/MainActivity.kt` | Authenticated shell. Builds five `HotwireBottomTab`s from the stored company id, wires the `HotwireBottomNavigationController`, and returns to sign-in on auth loss. |
+| `android/app/src/main/java/com/example/skycomandroid/MainActivity.kt` | Authenticated shell. Builds five `HotwireBottomTab`s (Home, Notifications, Profile, Attendance, Operations) from the stored company id, wires the `HotwireBottomNavigationController`, clears the Profile stack when leaving the tab or backgrounding, and returns to sign-in on auth loss. |
 | `android/app/src/main/java/com/example/skycomandroid/SkycomWebFragment.kt` | Custom `HotwireWebFragment` that reports the final WebView URL and HTTP errors to the active activity. |
 | `android/app/src/main/java/com/example/skycomandroid/CompanyStore.kt` | `SharedPreferences` wrapper for the last company id. |
 | `android/app/src/main/java/com/example/skycomandroid/CompanyUrl.kt` | Parses `/mobile/companies/<uuid>/...`, `/mobile/sign_in`, and `/mobile/home`. |
@@ -175,7 +175,7 @@ version as the library.
 | `android/app/src/main/res/drawable/ic_tab_home.xml` | House icon. |
 | `android/app/src/main/res/drawable/ic_tab_employee.xml` | Person icon. |
 | `android/app/src/main/res/drawable/ic_tab_attendance.xml` | Calendar icon. |
-| `android/app/src/main/res/drawable/ic_tab_payroll.xml` | Money icon. |
+| `android/app/src/main/res/drawable/ic_tab_operations.xml` | Grid icon. |
 | `android/app/src/main/res/drawable/ic_tab_requests.xml` | Assignment icon. |
 
 The icons are plain 24dp vector drawables. `BottomNavigationView` applies its
@@ -192,12 +192,12 @@ color.
 
 | File | Purpose |
 |---|---|
-| `config/routes.rb` | `namespace :mobile` routes: `sign_in`, `sign_out`, the no-employee `home` fallback, and `/mobile/companies/:company_id/{home,employee,attendance_month,payroll,attendances,attendance_requests}`. |
+| `config/routes.rb` | `namespace :mobile` routes: `sign_in`, `sign_out`, the no-employee `home` fallback, and `/mobile/companies/:company_id/{home,employee,attendance_month,operations,payroll,payroll/unlock,attendances,attendance_requests}`. |
 | `app/controllers/mobile/base_controller.rb` | `layout "mobile"`; **overrides `authenticate`** to redirect to `mobile_sign_in_path` instead of the marketing root. |
 | `app/controllers/mobile/sessions_controller.rb` | Mobile sign-in/sign-out. Skips `authenticate` for `new`/`create`; creates a `Session`, sets cookies, and redirects to the employee's company home (or the no-employee fallback). |
 | `app/controllers/mobile/home_controller.rb` | No-employee fallback; redirects employees to their company-scoped home. |
 | `app/controllers/mobile/companies/base_controller.rb` | Resolves `@employee` through `current_user.employees.find_by!(company_id:)`; non-members get `404`. |
-| `app/controllers/mobile/companies/*_controller.rb` | Company-scoped home, employee, attendance, payroll, check-in, and request actions. |
+| `app/controllers/mobile/companies/*_controller.rb` | Company-scoped home, notifications, profile, attendance, operations, payroll/unlock, check-in, and request actions. |
 | `app/views/layouts/mobile.html.erb` | Mobile HTML shell: viewport meta, CSRF/CSP tags, stylesheet, importmap/Turbo. |
 | `app/views/mobile/**` | The HTML pages rendered inside the WebView. |
 | `public/configurations/android_v1.json` | Remote path configuration served by Rails as a static file. |
@@ -334,19 +334,21 @@ task.
 | Tab | Title string | Host ID | Start location |
 |---|---|---|---|
 | Home | `tab_home` | `home_navigator_host` | `/mobile/companies/<id>/home` |
-| Employee | `tab_employee` | `employee_navigator_host` | `/mobile/companies/<id>/employee` |
+| Notifications | `tab_notifications` | `notifications_navigator_host` | `/mobile/companies/<id>/notifications` |
+| Profile | `tab_profile` | `employee_navigator_host` | `/mobile/companies/<id>/employee` |
 | Attendance | `tab_attendance` | `attendance_navigator_host` | `/mobile/companies/<id>/attendance_month` |
-| Payroll | `tab_payroll` | `payroll_navigator_host` | `/mobile/companies/<id>/payroll` |
-| Requests | `tab_requests` | `requests_navigator_host` | `/mobile/companies/<id>/attendance_requests/new` |
+| Operations | `tab_operations` | `operations_navigator_host` | `/mobile/companies/<id>/operations` |
 
 `<id>` is the UUID extracted from the post-login redirect and stored in
 `CompanyStore`. The bar is hidden on `SignInActivity`; it appears in
 `MainActivity` only after a company-scoped page loads.
 
-**Why these five?** They mirror the five actions on the mobile home page.
-**Check In** is a POST action
-(`/mobile/companies/<id>/attendances`), not a page, so it stays a button on the
-Home page rather than a tab.
+Payroll is not a tab. It is pushed onto the Profile stack from the Profile page
+and sits behind `/payroll/unlock`. The shell clears the Profile stack when the
+user leaves the tab or backgrounds the app, so returning cannot reveal an
+already-open payroll screen without a fresh password entry. **Check In** is a
+POST action (`/mobile/companies/<id>/attendances`), not a page, so it stays a
+button on the Home page rather than a tab.
 
 ### 5.1 How a tab is defined
 
@@ -736,13 +738,24 @@ MainActivity.onCreate
 ### 9.2 Tab switch
 
 ```
-tap Payroll
+tap Operations
   → BottomNavigationView listener
-  → controller.switchTab(payroll)
-  → delegate.setCurrentNavigator(payroll.configuration)
-  → hide all hosts except payroll_navigator_host
-  → back callback targets the payroll Navigator
-  → if first visit: payroll Navigator loads /mobile/companies/<id>/payroll
+  → if leaving Profile: clear the Profile Navigator to its root
+  → controller.switchTab(operations)
+  → delegate.setCurrentNavigator(operations.configuration)
+  → hide all hosts except operations_navigator_host
+  → back callback targets the Operations Navigator
+  → if first visit: Operations Navigator loads /mobile/companies/<id>/operations
+```
+
+Payroll is a stack page inside Profile:
+
+```
+tap Payroll on Profile
+  → push /mobile/companies/<id>/payroll/unlock inside the Profile Navigator
+  → enter password → POST /payroll/unlock
+  → redirect to /mobile/companies/<id>/payroll
+  → leaving Profile tab / backgrounding clears the stack back to Profile
 ```
 
 ### 9.3 Back
@@ -1211,10 +1224,11 @@ the translated tab titles. This is not set up yet.
   a future picker would update it and rebuild the tab roots.
 - **English-only native labels.**
 - **Duplicated navigation:** the mobile home page still links to
-  Employee/Attendance/Payroll/Requests, and the detail pages still have
-  "Back to Home" links. With tabs, those links navigate inside the active tab
-  instead of switching tabs. It works, but a future polish pass should make the
-  web home a dashboard that does not duplicate the tabs.
+  Profile/Attendance/Requests, and the detail pages still have "Back to Home"
+  links. With tabs, those links navigate inside the active tab instead of
+  switching tabs. It works, but a future polish pass should make the web home a
+  dashboard that does not duplicate the tabs. Payroll is intentionally excluded
+  from Home quick actions.
 - **Path-config caching:** editing the remote JSON does not always take effect
   immediately; clear app data or wait for the cache.
 - **Backup:** `android:allowBackup="true"` may include WebView cookies in device
@@ -1318,14 +1332,16 @@ Expected: `0 errors` (warnings about newer dependency versions are fine).
 5. Confirm the sign-in page has **no bottom tabs**.
 6. Sign in; confirm the bottom tabs appear and the URL is
    `/mobile/companies/<company_id>/home` (not a `current` alias).
-7. Check each tab: Home, Employee, Attendance, Payroll, Requests; every URL is
-   company-scoped.
-8. Check Back navigation inside a tab.
-9. Pull to refresh on a normal page (should refresh) and on the sign-in/new
-   form (should be disabled).
-10. Sign out; confirm the tabs disappear and the app returns to
+7. Check each tab: Home, Notifications, Profile, Attendance, Operations; every
+   URL is company-scoped.
+8. Open Profile → Payroll, confirm the password gate, then verify returning to
+   Profile and reopening Payroll asks for the password again.
+9. Check Back navigation inside a tab.
+10. Pull to refresh on a normal page (should refresh) and on the sign-in/new
+    form (should be disabled).
+11. Sign out; confirm the tabs disappear and the app returns to
     `/mobile/sign_in`.
-11. Relaunch while signed in: the app should go straight to the stored company
+12. Relaunch while signed in: the app should go straight to the stored company
     tabs. Relaunch while signed out: sign-in only, no tabs.
 
 If something fails, use §12 and the logs in §10 before changing code.

@@ -185,6 +185,11 @@ CREDIT_USAGE_RATES = {
   create_customer: 7
 }.freeze
 
+# Dashboard/analytics low-stock alert threshold. Stock is per warehouse; the
+# count is warehouse SKU rows whose available quantity (quantity - pending) is
+# below this value. Products do not carry a per-SKU reorder point yet.
+LOW_STOCK_THRESHOLD = 10
+
 # =============================================================================
 # Company Support Tickets (B2B — company → Skycom)
 # Ticket-level: used by CompanyTicket::FileAttachmentConcern (CompanyTicket).
@@ -297,8 +302,10 @@ MIGRATION_IMPORT_EXCLUDED_RESOURCES = %w[
 # their index page and accept `?export=1` to return the full filtered record set.
 # Add/remove a key to enable/disable export for that page globally.
 # =============================================================================
+# analytics is intentionally excluded: its JSON is a nested report, not a flat
+# index array, so the generic index CSV exporter would produce an empty file.
 EXPORT_ENABLED_RESOURCES = %w[
-  analytics attendance_config_logs attendance_configs attendance_days
+  attendance_config_logs attendance_configs attendance_days
   attendance_logs attendance_months attendance_requests branches brands
   calendars categories company_ticket_logs company_tickets customer_profiles
   customers customer_subprofiles departments discount_groups discounts

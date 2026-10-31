@@ -1,4 +1,6 @@
 class Mobile::Companies::PayrollsController < Mobile::Companies::BaseController
+  before_action :require_payroll_unlock, only: :show
+
   def show
     @month = parse_month(params[:month]) || Date.current.beginning_of_month
     @payroll = Payroll.where(employee: @employee).where(month: @month.beginning_of_month..@month.end_of_month).includes(:attendance_month).first
@@ -11,6 +13,17 @@ class Mobile::Companies::PayrollsController < Mobile::Companies::BaseController
   end
 
   private
+
+  def require_payroll_unlock
+    return if payroll_unlocked?
+
+    redirect_to mobile_company_payroll_unlock_path(@company, month: params[:month])
+  end
+
+  def payroll_unlocked?
+    session[:mobile_payroll_unlock_company_id] == @company.id &&
+      session[:mobile_payroll_unlock_expires_at].to_i > Time.current.to_i
+  end
 
   def parse_month(value)
     return nil if value.blank?

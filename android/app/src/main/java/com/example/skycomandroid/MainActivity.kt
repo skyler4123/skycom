@@ -48,6 +48,9 @@ class MainActivity : HotwireActivity(), MobileWebListener {
         bottomNavigationController.view.visibility = View.GONE
         bottomNavigationController.load(buildTabs(id), viewModel.selectedTabIndex)
         bottomNavigationController.setOnTabSelectedListener { index, _ ->
+            if (viewModel.selectedTabIndex == PROFILE_TAB_INDEX && index != PROFILE_TAB_INDEX) {
+                clearProfileStack()
+            }
             viewModel.selectedTabIndex = index
         }
 
@@ -115,6 +118,15 @@ class MainActivity : HotwireActivity(), MobileWebListener {
         }
     }
 
+    override fun onStop() {
+        // Payroll lives inside the Profile tab. Do not leave it visible when
+        // the app goes to the background or another employee picks up the device.
+        if (::bottomNavigationController.isInitialized) {
+            clearProfileStack()
+        }
+        super.onStop()
+    }
+
     private fun updateTabsVisibility(url: String?) {
         if (url == null) return
 
@@ -140,6 +152,10 @@ class MainActivity : HotwireActivity(), MobileWebListener {
         finish()
     }
 
+    private fun clearProfileStack() {
+        delegate.findNavigatorHost(R.id.employee_navigator_host)?.navigator?.clearAll()
+    }
+
     private fun buildTabs(companyId: String): List<HotwireBottomTab> {
         val root = "/mobile/companies/$companyId"
         return listOf(
@@ -158,7 +174,7 @@ class MainActivity : HotwireActivity(), MobileWebListener {
                 path = "$root/notifications"
             ),
             hotwireTab(
-                titleResId = R.string.tab_employee,
+                titleResId = R.string.tab_profile,
                 iconResId = R.drawable.ic_tab_employee,
                 name = "employee",
                 navigatorHostId = R.id.employee_navigator_host,
@@ -172,11 +188,11 @@ class MainActivity : HotwireActivity(), MobileWebListener {
                 path = "$root/attendance_month"
             ),
             hotwireTab(
-                titleResId = R.string.tab_payroll,
-                iconResId = R.drawable.ic_tab_payroll,
-                name = "payroll",
-                navigatorHostId = R.id.payroll_navigator_host,
-                path = "$root/payroll"
+                titleResId = R.string.tab_operations,
+                iconResId = R.drawable.ic_tab_operations,
+                name = "operations",
+                navigatorHostId = R.id.operations_navigator_host,
+                path = "$root/operations"
             )
         )
     }
@@ -199,5 +215,6 @@ class MainActivity : HotwireActivity(), MobileWebListener {
 
     companion object {
         const val EXTRA_COMPANY_ID = "company_id"
+        private const val PROFILE_TAB_INDEX = 2
     }
 }
