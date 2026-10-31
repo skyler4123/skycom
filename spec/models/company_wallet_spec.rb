@@ -54,6 +54,7 @@ RSpec.describe CompanyWallet, type: :model do
       }.to change(wallet, :main_credit_balance).by(-20)
 
       expect(wallet.reload.main_credit_balance).to eq(-10)
+      expect(company.reload.workflow_status).to eq("suspend")
       expect(CompanyWalletLog.count).to eq(2)
       expect(CompanyWalletLog.last.balance_after).to eq(-10)
     end

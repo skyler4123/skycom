@@ -156,6 +156,18 @@ class CacheKeyService
     "company:#{company_id}:analytics:#{normalized}"
   end
 
+  # Pattern: company:<company_id>:dashboards:<financial|operational>
+  # Purpose: the complete dashboard JSON payload for one company and one
+  #   financial-visibility level.
+  # Store: Rails.sync_cache
+  # TTL: DASHBOARD_CACHE_EXPIRY (5 minutes)
+  # Written by: Companies::DashboardsController#index
+  # Cleared by: TTL only — dashboard data accepts up to 5 minutes of staleness
+  def self.company_dashboard(company_id, can_view_financials:)
+    scope = can_view_financials ? "financial" : "operational"
+    "company:#{company_id}:dashboards:#{scope}"
+  end
+
   # Pattern: company:<company_id>:storage_statistics
   # Purpose: aggregated storage usage for the storage statistics page.
   # Store: Rails.sync_cache

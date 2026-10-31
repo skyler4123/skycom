@@ -30,7 +30,7 @@ See `docs/CACHE.md` §6 for examples (e.g., `COOKIE_EXPIRY` lives in
 | Enum mappings | `TIMEZONES`, `CURRENCIE_CODES`, `LIFECYCLE_STATUS`, `WORKFLOW_STATUS`, `COMPANY_WORKFLOW_STATUS` |
 | Credit purchase tiers | `CREDIT_RATES` — per-country `{ money_cents => credits }` map |
 | Credit action costs | `CREDIT_USAGE_RATES` — global per-action credit cost (not country-based) |
-| Signup credit grant | `SIGNUP_PROMO_CREDITS` — promo credits granted to every new non-system company |
+| Signup credit grant | `SIGNUP_PROMO_CREDITS` — promo credits granted to every new company, including system-owned companies |
 
 ## What Stays Local
 

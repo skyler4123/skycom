@@ -104,6 +104,13 @@ owner in shift/attendance seeding, so the owner demo login gets payroll data
 too. Payroll drafts are then generated from salary + attendance by
 `Payrolls::GenerateService`.
 
+The owner employee is also appended to each enrich service's `@employees`
+collection after the regular employees are created. That makes owner records
+participate in the same downstream sample data as everyone else — department
+assignment, retail employee profiles/subprofiles, event hosts, customer/order
+employee appointments, and attendance-request samples — instead of leaving the
+owner's own screens empty.
+
 Future business types (Restaurant, Education) will follow the same pattern
 with their own `*InitService` and `*EnrichService`.
 

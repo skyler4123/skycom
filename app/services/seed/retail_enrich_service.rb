@@ -305,6 +305,12 @@ class Seed::RetailEnrichService
 
       @employees.concat(branch_employees)
     end
+
+    # Treat the owner like every other employee for enrich data (departments,
+    # profiles, events, orders, requests). Compensation already attaches the
+    # owner to the first branch.
+    owner = @retail.employees.find_by(business_type: OWNER_BUSINESS_TYPE)
+    @employees << owner if owner && !@employees.include?(owner)
   end
 
   def seed_compensation

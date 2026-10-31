@@ -61,6 +61,7 @@ RSpec.describe System, type: :model do
       # Owner records only — no retail/business seeding
       expect(company.employees.where(business_type: :owner)).to exist
       expect(company.company_wallet).to be_present
+      expect(company.company_wallet.promo_credit_balance).to eq(SIGNUP_PROMO_CREDITS)
       expect(company.categories.where(resource_name: "products")).to be_empty
     end
 
