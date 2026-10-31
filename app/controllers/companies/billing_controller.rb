@@ -2,11 +2,15 @@
 
 # Companies::BillingController — Billing dashboard (read-only).
 # Shell-first GET /companies/:id/billing: HTML shell + JSON with wallet snapshot
-# (main/promo/debt from CompanyWallet, app/models/company_wallet.rb:10) and
+# (main/promo from CompanyWallet, app/models/company_wallet.rb) and
 # credit purchase history CompanyOrder → CompanyInvoice → CompanyTransactions.
 # No mutations here — top-ups flow via CompanyOrder#complete! → wallet.add_credits!,
 # deductions via CompanyCreditDeduction::* after_action (see docs/CREDIT_DEDUCTION.md).
 class Companies::BillingController < Companies::ApplicationController
+  # Read-only billing stays available so a suspended company can inspect its
+  # balance and purchase history while recovering.
+  skip_before_action :block_suspended_company
+
   def show
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -16,7 +20,6 @@ class Companies::BillingController < Companies::ApplicationController
           wallet: {
             main_credit_balance: current_company.company_wallet&.main_credit_balance || 0,
             promo_credit_balance: current_company.company_wallet&.promo_credit_balance || 0,
-            debt_credit_balance: current_company.company_wallet&.debt_credit_balance || 0,
             currency: current_company.currency
           },
           orders: orders.map { |o| format_order(o) }

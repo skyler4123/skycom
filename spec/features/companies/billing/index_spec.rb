@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.feature "Companies::Billing", type: :feature, js: true do
-  let(:company) { create(:company, country: :us, currency: :usd) }
+  let(:company) { create(:company, :without_signup_promo, country: :us, currency: :usd) }
   let(:owner) { company.user }
 
   let!(:paid_order) do

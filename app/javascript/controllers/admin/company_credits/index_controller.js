@@ -36,7 +36,6 @@ export default class Admin_CompanyCredits_IndexController extends Admin_LayoutCo
       { key: "business_type", name: "Type" },
       { key: "main_credit_balance", name: "Main" },
       { key: "promo_credit_balance", name: "Promo" },
-      { key: "debt_credit_balance", name: "Debt" },
       { key: "total_credit_balance", name: "Total" },
       { key: "owner_name", name: "Owner" }
     ]
@@ -87,7 +86,6 @@ export default class Admin_CompanyCredits_IndexController extends Admin_LayoutCo
                 code: (value) => `<span class="font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium">${value || "—"}</span>`,
                 main_credit_balance: (value) => `<span class="font-mono text-sm text-foreground">${Number(value || 0).toLocaleString()}</span>`,
                 promo_credit_balance: (value) => `<span class="font-mono text-sm font-medium text-success ">${Number(value || 0).toLocaleString()}</span>`,
-                debt_credit_balance: (value) => `<span class="font-mono text-sm text-muted-foreground">${Number(value || 0).toLocaleString()}</span>`,
                 total_credit_balance: (value) => `<span class="font-mono text-sm font-bold text-foreground">${Number(value || 0).toLocaleString()}</span>`,
                 owner_name: (value) => value ? `<span class="text-sm text-muted-foreground">${value}</span>` : '<span class="text-muted-foreground/60">—</span>'
               }

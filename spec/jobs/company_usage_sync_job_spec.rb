@@ -80,5 +80,25 @@ RSpec.describe CompanyUsageSyncJob do
         expect { described_class.perform_now }.not_to raise_error
       end
     end
+
+    it "drains suspended companies without touching their wallet balance" do
+      company.update!(workflow_status: :suspend)
+
+      expect {
+        travel_to(Time.zone.local(2026, 8, 18, 14, 5)) { described_class.perform_now }
+      }.not_to change { company.company_wallet.reload.total_credit_balance }
+
+      expect(CompanyDailyUsage.find_by!(company: company, usage_date: today).total_credits).to eq(25)
+    end
+
+    it "skips disabled companies" do
+      company.update!(workflow_status: :disabled)
+
+      expect {
+        travel_to(Time.zone.local(2026, 8, 18, 14, 5)) { described_class.perform_now }
+      }.not_to change(CompanyDailyUsage, :count)
+
+      expect(company.credit_usage_delta).to eq(25)
+    end
   end
 end

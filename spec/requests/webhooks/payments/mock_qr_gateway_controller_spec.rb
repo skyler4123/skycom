@@ -66,6 +66,15 @@ RSpec.describe "Webhooks::Payments::MockQrGatewayController", type: :request do
       expect(JSON.parse(response.body)["status"]).to eq("completed")
     end
 
+    it "reactivates a suspended company when the top-up completes" do
+      company.update!(workflow_status: :suspend)
+
+      post_webhook(valid_payload)
+
+      expect(response).to have_http_status(:ok)
+      expect(company.reload.workflow_status).to eq("active")
+    end
+
     it "publishes the top_up_completed websocket event" do
       post_webhook(valid_payload)
 

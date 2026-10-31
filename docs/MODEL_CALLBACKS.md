@@ -49,9 +49,12 @@ Callbacks defined directly in the model file (not inherited from a concern).
 |----------|------|--------|-------------|
 | `before_validation :assign_currency_from_country` | — | `assign_currency_from_country` | Maps `country` to `currency` via `COUNTRY_CURRENCY_MAP` (`us → usd`, `vn → vnd`) whenever the country has a mapping. Keeps currency in step with the user-chosen country on the New Company page (`company[country]`); `currency` is never permittable. |
 | `after_create :setup_owner_records` | 104 | `setup_owner_records` | Creates owner infrastructure: (1) Owner `Role` with `business_type: :owner`, (2) "Owner All Access" `Policy` with `resource: "all"` / `action: "all"`, (3) Owner `Employee` linked to the creating user, (4) Both `PolicyAppointment` and `RoleAppointment` with `business_type: :owner`, (5) Sets `user.system_role` to `company_owner` so `accessible_companies` returns the new company. |
-| `after_create :initialize_company` | 126 | `initialize_company` | Also creates the company's `CompanyWallet` (`credit_balance: 0`, `walletable: company`) — unconditional, like the owner records. The wallet is the chain's bottom node: `CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`. (Sidebar config seeding was removed 2026-09-22 — sidebar control is FE-only, see `docs/SIDEBAR.md`.) Finally enqueues `Companies::WelcomeNotificationJob` with `WELCOME_NOTIFICATION_DELAY` (10 min, ID only — no-ops if the company/owner is gone; throttled idempotent). Applies to system companies too. When the company is marked `system_owned` (created by `System#ensure_company!`), business-type seeding and payment-method setup are skipped and the owner user's `system_role` is left untouched (owner records, wallet, and welcome enqueue still run). |
+| `after_create :initialize_company` | 136 | `initialize_company` | Creates the company's `CompanyWallet` with `main_credit_balance: 0` and `promo_credit_balance: SIGNUP_PROMO_CREDITS` (1,000 for every company, including `system_owned`), then calls `sync_credit_status!` so a positive signup promo starts `active` and a zero balance starts `suspend`. The wallet is the chain's bottom node: `CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`. (Sidebar config seeding was removed 2026-09-22 — sidebar control is FE-only, see `docs/SIDEBAR.md`.) Finally enqueues `Companies::WelcomeNotificationJob` with `WELCOME_NOTIFICATION_DELAY` (10 min, ID only — no-ops if the company/owner is gone; throttled idempotent). When the company is marked `system_owned` (created by `System#ensure_company!`), business-type seeding/payment-method setup and the owner user's `system_role` demotion are skipped, while the wallet still receives the signup promo; `sync_credit_status!` keeps system companies exempt from suspension. |
 | `after_commit :refresh_cache, on: [:create, :update]` | — | `refresh_cache` | Writes the company attributes hash to `Rails.sync_cache` under `CacheKeyService.company(id)` (TTL `CACHE_DEFAULT_EXPIRY` = 1 hour) and deletes `CacheKeyService.user_companies_max_updated_at(user_id)`. |
-| `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `CacheKeyService.company(id)` and `CacheKeyService.user_companies_max_updated_at(user_id)` from `Rails.sync_cache` (pub/sub evicts other instances). |
+| `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `CacheKeyService.company(id)`, `CacheKeyService.user_companies_max_updated_at(user_id)`, and `CacheKeyService.company_suspended(id)` from `Rails.sync_cache` (pub/sub evicts other instances). |
+| `after_update :write_suspended_cache, if: :saved_change_to_workflow_status?` | — | `write_suspended_cache` | Writes the `Company#suspended?` boolean to `Rails.ram_cache` immediately so the same process (and transactional tests) sees the new gate. |
+| `after_commit :broadcast_suspended_cache, on: :update, if: :saved_change_to_workflow_status?` | — | `broadcast_suspended_cache` | Deletes `CacheKeyService.company_suspended(id)` through `Rails.sync_cache`; the pub/sub listener evicts the ram_cache key on every web instance. |
+| `after_rollback :delete_suspended_cache` | — | `delete_suspended_cache` | Removes the locally written suspension boolean when the status update rolls back. |
 
 ---
 
@@ -476,12 +479,13 @@ Each concern defines the same callback:
 | `before_create` | 1 | Session |
 | `after_create` | 6 | Category, Company, Branch, PolicyAppointment, PropertyMapping, RoleAppointment |
 | `belongs_to :company, touch: true` | 6 | Branch, Department, Category, PropertyMapping, TableConfig, Role |
-| `after_update` (conditional) | 2 | CompanyPaymentMethodAppointment, PolicyAppointment |
+| `after_update` (conditional) | 3 | Company (`workflow_status` suspension cache), CompanyPaymentMethodAppointment, PolicyAppointment |
 | `before_update` | 3 | PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_destroy` | 5 | Employee, System, PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_discard` | 1 | Employee |
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 4 | Session, User, Company, Employee (`refresh_cache`/`remove_cache` for compact record cache) |
+| `after_rollback` | 1 | Company (`workflow_status` suspension cache cleanup) |
 | `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 45 models), (PropertyMappingConcern → 45 models), (ImageAttachmentsConcern → 6 models + Product) |
 
 **Total unique callback declarations: ~34 directly across 15 model files + 7 concern files propagating to ~63+ models.**

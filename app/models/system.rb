@@ -65,7 +65,7 @@ class System < ApplicationRecord
       description: "Skycom platform system company",
       business_type: :system,
       lifecycle_status: :active,
-      workflow_status: :confirmed,
+      workflow_status: :active,
       country: SYSTEM_COMPANY_COUNTRIES[country] || :us,
       currency: SYSTEM_COMPANY_CURRENCIES[currency] || :usd
     ).tap { |c| c.system_owned = true }

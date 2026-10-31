@@ -46,6 +46,28 @@ WORKFLOW_STATUS = {
   shipped: 11
 }
 
+# Company-only workflow statuses (companies.workflow_status).
+#
+# These answer "can this tenant use Skycom and should background jobs process it?"
+# They are deliberately separate from the order/payment WORKFLOW_STATUS above.
+#
+# active   — normal company with usable credit. Full web access and processed by
+#            company-wide background jobs.
+# disabled — owner no longer uses Skycom. Excluded from company-wide background
+#            jobs. Not derived automatically; a later credit movement returns it
+#            to active.
+# suspend  — no usable credit (main + promo <= 0). Web, JSON, and mobile requests
+#            are blocked and sent to the top-up flow. Still processed by
+#            company-wide background jobs (usage sync, promo grants) because
+#            those jobs are free-credit.
+#
+# companies.lifecycle_status is legacy and is NOT used for access control.
+COMPANY_WORKFLOW_STATUS = {
+  active: 0,
+  disabled: 1,
+  suspend: 2
+}.freeze
+
 GATEWAY_STRATEGIES = begin
   base = {
     # System payments (value < 10 — no external gateway call)
@@ -169,6 +191,10 @@ MOCK_OAUTH_EMAIL = "Manager_1_clinic_1@company3.com".freeze
 # =============================================================================
 # Credit System (Pay-as-You-Go)
 # =============================================================================
+
+# Promo credits granted to every newly created company (except system companies).
+# They land in promo_credit_balance so normal deductions drain them first.
+SIGNUP_PROMO_CREDITS = 1_000
 
 # Per-country credit purchase tiers: money in CENTS → credits.
 # CompanyOrder validates its money_amount_cents/credit_amount against these.

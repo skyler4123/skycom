@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.feature "Companies::Usage", type: :feature, js: true do
-  let(:branch) { create(:branch) }
-  let(:company) { branch.company }
+  let(:company) { create(:company) }
+  let(:branch) { create(:branch, company: company) }
   let(:owner) { company.user }
   let(:today) { Time.current.to_date }
 

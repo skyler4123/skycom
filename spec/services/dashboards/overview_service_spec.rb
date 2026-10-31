@@ -11,7 +11,7 @@ RSpec.describe Dashboards::OverviewService do
 
   let(:can_view_financials) { true }
   let(:company) do
-    create(:company,
+    create(:company, :without_signup_promo,
       business_type: :retail,
       country: :us,
       currency: :usd,
@@ -194,8 +194,7 @@ RSpec.describe Dashboards::OverviewService do
         active_customers_count: 1,
         gross_margin_pct: 50.0,
         cost_coverage_pct: 40.0,
-        credits_total: 90,
-        credits_debt: 0
+        credits_total: 90
       )
     end
 
@@ -272,7 +271,6 @@ RSpec.describe Dashboards::OverviewService do
       expect(result[:wallet]).to include(
         main_credit_balance: 90,
         promo_credit_balance: 0,
-        debt_credit_balance: 0,
         total_credit_balance: 90,
         used_this_month: 10,
         currency: "usd",
@@ -303,7 +301,7 @@ RSpec.describe Dashboards::OverviewService do
   end
 
   describe "#call with no data" do
-    let(:company) { create(:company, business_type: :retail, name: "Empty Co") }
+    let(:company) { create(:company, :without_signup_promo, business_type: :retail, name: "Empty Co") }
 
     before do
       company.orders.destroy_all

@@ -2,16 +2,23 @@
 
 # CompanyCreditDeduction::BaseService — the epic credit-deduction service.
 #
-# One purpose: move credits out of the company wallet for a single
-# action (and meter the usage). Subclasses represent ONE place/controller
-# action (e.g. CompanyCreditDeduction::Companies::Dashboards::IndexService) because the
-# deduction rules can differ between places even for the same action type
-# (cost, description, guards). Controllers trigger deduction via the
-# CreditDeductionConcern after_action DSL — never inline in actions.
+# CONTROLLER-ONLY. This service must never be called from a background job,
+# import, seed, or data migration. Background jobs are free-credit: they may
+# grant credits (top-ups, promo campaigns) and drain usage counters, but they
+# must not take credits out of a wallet. The only caller is
+# Companies::CreditDeductionConcern's after_action DSL; controllers declare the
+# service per action and never deduct inline.
 #
-# Deduction priority: promo balance first, then main balance; any
-# uncovered remainder is absorbed by the debt balance (normally 0).
-# The service never raises for an insufficient balance — debt absorbs.
+# One purpose: move credits out of the company wallet for a single controller
+# action and meter the usage. Subclasses represent ONE place/controller action
+# (e.g. CompanyCreditDeduction::Companies::Dashboards::IndexService) because the
+# deduction rules can differ between places even for the same action type
+# (cost, description, guards).
+#
+# Deduction priority: promo balance first (while positive), then main absorbs
+# the remainder. Main may go negative when the balance is insufficient. The
+# service never raises for a low balance. If the balance was already negative
+# before the deduction, it logs a warning and rechecks workflow_status.
 module CompanyCreditDeduction
   class BaseService
     def self.call(company:, **kwargs)
@@ -63,17 +70,35 @@ module CompanyCreditDeduction
     # -- Deduction core --------------------------------------------------------
 
     def deduct(wallet, amount)
-      amount = deduct_from_balance(wallet, :promo, amount)
-      amount = deduct_from_balance(wallet, :main, amount)
-      absorb_into_debt(wallet, amount) if amount.positive?
+      balance_before = wallet.total_credit_balance
+      was_negative = balance_before.negative?
+
+      remaining = deduct_from_balance(wallet, :promo, amount)
+      if remaining.positive?
+        wallet.deduct_from!(
+          balance: :main, amount: remaining,
+          source: @company, description: description, action_type: action_type
+        )
+      end
+
+      return unless was_negative
+
+      balance_after = wallet.total_credit_balance
+      Rails.logger.warn(
+        "[CompanyCreditDeduction] deduction while negative " \
+        "company=#{@company.id} action=#{action_type} " \
+        "balance_before=#{balance_before} cost=#{amount} balance_after=#{balance_after}"
+      )
+      @company.sync_credit_status!(total_credit_balance: balance_after)
     end
 
     # Drains as much as possible from one balance; returns the remaining amount.
+    # A non-positive balance (already empty or negative) is left untouched.
     def deduct_from_balance(wallet, balance, amount)
       return amount if amount.zero?
 
-      available = wallet.public_send("#{CompanyWallet::BALANCES.fetch(balance)}")
-      return amount if available.zero?
+      available = wallet.public_send(CompanyWallet::BALANCES.fetch(balance))
+      return amount if available <= 0
 
       taken = [ amount, available ].min
       wallet.deduct_from!(
@@ -81,13 +106,6 @@ module CompanyCreditDeduction
         source: @company, description: description, action_type: action_type
       )
       amount - taken
-    end
-
-    def absorb_into_debt(wallet, amount)
-      wallet.add_to!(
-        balance: :debt, amount: amount,
-        source: @company, description: description, action_type: action_type
-      )
     end
   end
 end

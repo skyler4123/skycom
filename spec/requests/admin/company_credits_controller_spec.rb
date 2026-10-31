@@ -25,7 +25,8 @@ RSpec.describe "Admin::CompanyCredits", type: :request do
         body = JSON.parse(response.body)
         row = body["company_credits"].find { |c| c["id"] == company1.id }
         expect(row).to include("promo_credit_balance", "main_credit_balance",
-          "debt_credit_balance", "total_credit_balance", "owner_name")
+          "total_credit_balance", "owner_name")
+        expect(row).not_to have_key("debt_credit_balance")
         expect(body["pagination"]).to be_present
       end
 

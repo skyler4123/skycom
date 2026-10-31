@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe PromoCampaigns::ExecuteService, type: :model do
   let!(:company) do
-    c = create(:company)
+    c = create(:company, :without_signup_promo)
     c.update!(business_type: :retail, country: :us, employee_count: 50)
     c
   end
@@ -30,6 +30,18 @@ RSpec.describe PromoCampaigns::ExecuteService, type: :model do
     tag_ids = EmployeeNotificationTagAppointment.where(company: company, employee: owner).pluck(:notification_tag_id)
     expect(Notification.joins(:notification_tag_appointments)
       .where(company: company, notification_tag_appointments: { notification_tag_id: tag_ids }).count).to be >= 1
+  end
+
+  it "reactivates a suspended company with the promo grant without deducting" do
+    company.update!(workflow_status: :suspend)
+    campaign = campaign_for(amount: 300, max_cap: 1000)
+
+    expect {
+      described_class.call(campaign: campaign)
+    }.not_to change { company.company_wallet.reload.main_credit_balance }
+
+    expect(company.reload.workflow_status).to eq("active")
+    expect(company.company_wallet.reload.promo_credit_balance).to eq(300)
   end
 
   it "notifies with campaign title/body" do
@@ -91,7 +103,7 @@ RSpec.describe PromoCampaigns::ExecuteService, type: :model do
   end
 
   it "leaves non-matching companies untouched with no notification" do
-    other = create(:company)
+    other = create(:company, :without_signup_promo)
     other.update!(business_type: :retail, country: :vn, employee_count: 50)
     company.update!(country: :us)
     campaign = campaign_for(amount: 300, max_cap: 1000, conditions: { "country" => [ "us" ] })

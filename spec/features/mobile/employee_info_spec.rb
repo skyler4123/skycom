@@ -93,14 +93,14 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
     expect(page).to have_current_path(mobile_sign_in_path)
   end
 
-  scenario "redirects an unauthorized employee to home" do
-    unauthorized_user = create(:user)
-    create(:employee, user: unauthorized_user, company: company)
+  scenario "lets any company member view their own profile" do
+    member_user = create(:user)
+    create(:employee, user: member_user, company: company, name: "Member Profile")
 
-    sign_in(unauthorized_user)
+    sign_in(member_user)
     visit mobile_company_employee_path(company)
 
-    expect(page).to have_current_path(mobile_company_home_path(company))
-    expect(page).to have_content("not authorized")
+    expect(page).to have_current_path(mobile_company_employee_path(company))
+    expect(page).to have_content("Member Profile")
   end
 end

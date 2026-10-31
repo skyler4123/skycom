@@ -97,9 +97,17 @@ existing guards (`unless self.class.skip_init || system_owned`):
 | `setup_payment_method_appointments` | ❌ skipped |
 | Owner Role / Policy / Employee / RoleAppointment | ✅ created |
 | `user.system_role` demotion to `company_owner` | ❌ skipped (owner stays `super_admin`) |
-| Wallet (`main_credit_balance: 0`) | ✅ created |
+| Wallet (`main_credit_balance: 0`, `promo_credit_balance: SIGNUP_PROMO_CREDITS`) | ✅ created |
 
 (Sidebar config seeding was removed 2026-09-22 — sidebar control is FE-only, `docs/SIDEBAR.md`.)
+
+System companies are **exempt from credit suspension**: `Company#sync_credit_status!`
+returns early for `system_owned` companies and for companies with a `System`
+FK, so their `workflow_status` stays `active`. They start with the same
+`SIGNUP_PROMO_CREDITS` wallet grant as every other company and can still be
+topped up like a tenant; only the suspension behavior is special.
+The grant applies at creation — existing system companies keep their current
+wallet until they are re-seeded or backfilled. See `docs/CREDIT_DEDUCTION.md` §4.
 
 The dedicated owner user keeps `system_role: :super_admin` (platform staff —
 `accessible_companies` returns all companies, which fits a future support

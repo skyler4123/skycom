@@ -180,11 +180,13 @@ RSpec.describe Company, type: :model do
   end
 
   describe "credit wallet" do
-    it "auto-creates a company wallet on create" do
+    it "auto-creates a company wallet with the signup promo on create" do
       company = create(:company)
       expect(company.company_wallet).to be_present
       expect(company.company_wallet.main_credit_balance).to eq(0)
+      expect(company.company_wallet.promo_credit_balance).to eq(SIGNUP_PROMO_CREDITS)
       expect(company.company_wallet.walletable).to eq(company)
+      expect(company.workflow_status).to eq("active")
     end
   end
 
@@ -309,6 +311,13 @@ RSpec.describe Company, type: :model do
       company = build_company(company_user).tap { |c| c.system_owned = true }.tap(&:save!)
       expect(company.categories.where(resource_name: "products")).to be_empty
       expect(company.employees.where(business_type: :owner)).to exist
+    end
+
+    it "still grants the signup promo when system_owned" do
+      company = build_company(company_user).tap { |c| c.system_owned = true }.tap(&:save!)
+
+      expect(company.company_wallet.promo_credit_balance).to eq(SIGNUP_PROMO_CREDITS)
+      expect(company.company_wallet.main_credit_balance).to eq(0)
     end
 
     it "seeds business-type init for normal companies (control)" do

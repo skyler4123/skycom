@@ -29,7 +29,7 @@ RSpec.feature "Companies::Dashboards", type: :feature, js: true do
 
   context "with company health data" do
     let(:company) do
-      create(:company,
+      create(:company, :without_signup_promo,
         business_type: :retail,
         country: :us,
         currency: :usd,
@@ -210,7 +210,7 @@ RSpec.feature "Companies::Dashboards", type: :feature, js: true do
   end
 
   context "with credit deduction edge cases" do
-    let(:company) { create(:company, name: "Credit Spec Co") }
+    let(:company) { create(:company, :without_signup_promo, name: "Credit Spec Co") }
     let(:owner) { company.user }
 
     before do
@@ -242,7 +242,7 @@ RSpec.feature "Companies::Dashboards", type: :feature, js: true do
       expect(company.company_wallet.reload.main_credit_balance).to eq(100)
     end
 
-    scenario "absorbs the shortfall into debt and still renders without a warning" do
+    scenario "allows the balance to go negative and still renders without a warning" do
       company.company_wallet.add_credits!(amount: 1)
 
       visit company_dashboards_path(company)
@@ -250,8 +250,8 @@ RSpec.feature "Companies::Dashboards", type: :feature, js: true do
       expect(page).to have_content("Company health", wait: 10)
       expect(page).to have_content(company.name, wait: 10)
       expect(page).not_to have_content("Insufficient credits")
-      expect(company.company_wallet.reload.main_credit_balance).to eq(0)
-      expect(company.company_wallet.reload.debt_credit_balance).to eq(1)
+      expect(company.company_wallet.reload.main_credit_balance).to eq(-1)
+      expect(company.reload.workflow_status).to eq("suspend")
     end
   end
 end

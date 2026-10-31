@@ -47,6 +47,10 @@ RSpec.describe CacheKeyService do
       expect(described_class.user_companies_max_updated_at(7))
         .to eq("user:7:companies_max_updated_at")
     end
+
+    it "builds the company suspended key" do
+      expect(described_class.company_suspended(3)).to eq("company:3:suspended")
+    end
   end
 
   describe "aggregate caches" do
@@ -87,6 +91,13 @@ RSpec.describe CacheKeyService do
     it "builds the storage statistics key" do
       expect(described_class.company_storage_statistics(3))
         .to eq("company:3:storage_statistics")
+    end
+
+    it "builds a dashboard key per financial visibility" do
+      expect(described_class.company_dashboard(3, can_view_financials: true))
+        .to eq("company:3:dashboards:financial")
+      expect(described_class.company_dashboard(3, can_view_financials: false))
+        .to eq("company:3:dashboards:operational")
     end
   end
 

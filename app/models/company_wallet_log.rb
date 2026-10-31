@@ -17,7 +17,7 @@ class CompanyWalletLog < ApplicationRecord
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true, default: :active
   enum :workflow_status, WORKFLOW_STATUS, prefix: true, default: :confirmed
   # Which wallet balance moved (mirrors CompanyWallet::BALANCES keys).
-  enum :balance_type, { main: 0, promo: 1, debt: 2 }, prefix: true
+  enum :balance_type, { main: 0, promo: 1 }, prefix: true
   belongs_to :company
   belongs_to :company_wallet
   belongs_to :source, polymorphic: true, optional: true

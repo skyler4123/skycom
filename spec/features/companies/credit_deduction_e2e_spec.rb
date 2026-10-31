@@ -65,7 +65,6 @@ RSpec.feature "Credit deduction E2E", type: :feature, js: true do
       wallet = company.company_wallet.reload
       expect(wallet.promo_credit_balance).to eq(snapshot[:promo_start] - 2)
       expect(wallet.main_credit_balance).to eq(snapshot[:main_start])
-      expect(wallet.debt_credit_balance).to eq(0)
 
       # DB still empty before drain
       expect(CompanyDailyUsage.count).to eq(0)
@@ -112,7 +111,6 @@ RSpec.feature "Credit deduction E2E", type: :feature, js: true do
       expect(delta).to eq(4)
       expect(company.company_wallet.reload.promo_credit_balance).to eq(snapshot[:promo_start] - 4)
       expect(company.company_wallet.reload.main_credit_balance).to eq(snapshot[:main_start])
-      expect(company.company_wallet.reload.debt_credit_balance).to eq(0)
 
       CompanyUsageSyncJob.perform_now
 

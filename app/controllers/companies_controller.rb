@@ -7,6 +7,11 @@ class CompaniesController < ApplicationController
   before_action :authorize_company_owner!, only: %i[show edit update]
   before_action :authorize_company_creator!, only: %i[new create]
 
+  # Company settings are also blocked while suspended; creating a new company
+  # stays available so the owner can recover elsewhere.
+  include Companies::SuspendedCompanyConcern
+  skip_before_action :block_suspended_company, only: %i[new create]
+
   def new
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -60,6 +65,12 @@ class CompaniesController < ApplicationController
   end
 
   private
+
+  # The suspension concern reads current_company; this controller loads the
+  # record into @company via authorize_company_owner!.
+  def current_company
+    @company
+  end
 
   def authorize_company_owner!
     @company = Company.find(params[:id])
