@@ -23,6 +23,14 @@ RSpec.describe "Mobile company scoping", type: :request do
     expect(response).to have_http_status(:not_found)
   end
 
+  it "returns not found for another company's operations" do
+    other_company = create(:company)
+
+    get mobile_company_operations_path(other_company)
+
+    expect(response).to have_http_status(:not_found)
+  end
+
   it "returns not found when the user has no employee record" do
     stranger = create(:user)
     get sign_in_for_test_path(email: stranger.email)

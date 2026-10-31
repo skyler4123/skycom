@@ -1,6 +1,6 @@
 <% content_for :title, "Payroll" %>
 
-<%= render "mobile/shared/header", title: "Payroll", avatar_name: @employee.name, avatar_path: mobile_company_employee_path(@company) %>
+<%= render "mobile/shared/header", title: "Payroll", back_path: mobile_company_employee_path(@company), avatar_name: @employee.name, avatar_path: mobile_company_employee_path(@company), replace_navigation: true %>
 
 <main class="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl px-4 pb-8 pt-4">
   <div class="flex flex-col gap-4">

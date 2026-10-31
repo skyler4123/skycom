@@ -84,12 +84,18 @@ stored company id; the tab bar is hidden on sign-in.
 | Tab | Web path |
 |---|---|
 | Home | `/mobile/companies/<company_id>/home` |
-| Employee | `/mobile/companies/<company_id>/employee` |
+| Notifications | `/mobile/companies/<company_id>/notifications` |
+| Profile | `/mobile/companies/<company_id>/employee` |
 | Attendance | `/mobile/companies/<company_id>/attendance_month` |
-| Payroll | `/mobile/companies/<company_id>/payroll` |
-| Requests | `/mobile/companies/<company_id>/attendance_requests/new` |
+| Operations | `/mobile/companies/<company_id>/operations` |
 
 Each tab owns a `NavigatorHost` and keeps its own back stack. Tabs are loaded lazily on first selection.
+
+Payroll is deliberately **not** a tab. It opens from Profile through
+`/mobile/companies/<company_id>/payroll/unlock`, which verifies the signed-in
+user's password and grants a five-minute unlock. The Profile back stack is
+cleared when leaving the tab or backgrounding the app so payroll cannot reappear
+without a fresh password confirmation.
 
 ## Troubleshooting
 

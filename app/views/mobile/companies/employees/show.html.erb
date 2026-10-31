@@ -1,6 +1,6 @@
-<% content_for :title, "Employee" %>
+<% content_for :title, "Profile" %>
 
-<%= render "mobile/shared/header", title: "Employee", avatar_name: @employee.name, avatar_path: mobile_company_employee_path(@company) %>
+<%= render "mobile/shared/header", title: "Profile", avatar_name: @employee.name, avatar_path: mobile_company_employee_path(@company) %>
 
 <main class="mx-auto w-full max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl px-4 pb-8 pt-4">
   <div class="flex flex-col gap-4">
@@ -169,6 +169,19 @@
     </section>
 
     <div class="flex flex-col gap-2 pt-1">
+      <%= link_to mobile_company_payroll_unlock_path(@company), class: "group flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-line bg-card p-4 text-left shadow-sm transition-colors hover:border-primary/30" do %>
+        <div class="flex min-w-0 items-center gap-3">
+          <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <span class="material-symbols-outlined text-xl">payments</span>
+          </span>
+          <div class="min-w-0">
+            <p class="text-sm font-bold text-foreground">Payroll</p>
+            <p class="mt-0.5 text-xs text-muted-foreground">Password required · Salary and deductions</p>
+          </div>
+        </div>
+        <span class="material-symbols-outlined shrink-0 text-xl text-muted-foreground">lock</span>
+      <% end %>
+
       <button type="button" disabled class="flex h-11 w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-muted text-sm font-semibold text-muted-foreground ">
         Edit Profile Details
       </button>

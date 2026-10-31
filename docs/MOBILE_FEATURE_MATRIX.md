@@ -1,6 +1,6 @@
 # Skycom Mobile Feature Matrix
 
-> **Last verified:** 2026-10-27
+> **Last verified:** 2026-10-31
 > **Scope:** Android Hotwire Native app + the server-rendered
 > `/mobile/companies/:company_id/*` pages.
 > **Purpose:** the single place to compare mobile with web, track what works,
@@ -9,10 +9,11 @@
 ## 0. How to read this
 
 Mobile is an **employee self-service companion**, not a full ERP client. It
-currently mirrors the web **My Profile** group (Employee, Attendance, Payroll)
-and adds a Home dashboard and an attendance-request form. Everything else in
-the web sidebar is classified as web-only unless it is explicitly listed as a
-mobile backlog item.
+currently mirrors the web **My Profile** group (Profile, Attendance, Payroll),
+adds a Home dashboard and an attendance-request form, and exposes a read-only
+**Operations** list of the company's operating Pages. Payroll is a stack page
+behind a password gate, not a bottom tab. Everything else in the web sidebar is
+classified as web-only unless it is explicitly listed as a mobile backlog item.
 
 | Badge | Meaning |
 |---|---|
@@ -40,26 +41,28 @@ Source files for the inventory:
 |---|---|---|---|
 | Auth | 🟡 | Email/password sign-in, sign-out, session cookie | Forgot password, biometrics, SSO |
 | Home | 🟡 | Greeting, live clock, multi check-in state/times, today shift, monthly stats, quick actions, activity, paid-leave balance, latest company notice | No checkout/break |
-| Profile | 🟡 | Own name, code, type, roles, category, email, phone, company, branch, departments, next shift, monthly totals, group managers, contract renewal | No edit, no dynamic profiles |
+| Profile | 🟡 | Own name, code, type, roles, category, email, phone, company, branch, departments, next shift, monthly totals, group managers, contract renewal, Payroll entry point | No edit, no dynamic profiles |
 | Attendance | 🟡 | Own month summary, daily rows, month navigation, check-in | No check-out, geofence, QR, request history, or PDF |
 | Requests | 🟡 | Create attendance request with validation, group managers listed from employee teams | No inbox, status, or attachments |
-| Payroll | 🟡 | Own status/step, period, worked hours, present days, overtime, salary/allowance/tax/net money | No payslip/PDF |
+| Payroll | 🟡 | Password gate, own status/step, period, worked hours, present days, overtime, salary/allowance/tax/net money; 5-minute unlock | No payslip/PDF |
+| Operations | 🟡 | Read-only list of company Page records with branch, type, role, resolution, and statuses | No page detail, filtering, or actions |
 | Notifications | ⛔ | — | No inbox, unread badge, mark-read, push, or preferences |
 | Leave | 🟡 | Paid-leave balance and pending days on Home, seeded leave requests | No leave request form or history |
 | Schedule | 🟡 | Today/next shift read | No roster, shift list, or swap |
 | Documents and help desk | ⛔ | — | Web-only; future candidates |
 | Native shell | 🟡 | Five tabs, pull-to-refresh, edge-to-edge safe area, dark mode | No GPS, camera, biometrics, push, offline, or deep links |
 
-**Headline:** 6 mobile screens, 5 native tabs, 3 write endpoints
-(check-in, request create, sign-out), 3 read surfaces (profile, attendance
-month, payroll). The web has **69 sidebar items** across 16 active groups plus
+**Headline:** 8 mobile screens (including the payroll password gate and
+Operations), 5 native tabs, 3 write endpoints (check-in, request create,
+sign-out), and 4 read surfaces (profile, attendance month, payroll,
+operations). The web has **69 sidebar items** across 16 active groups plus
 3 coming-soon groups.
 
 **Biggest blockers**
 
 1. Attendance months are not refreshed by a scheduled job in production.
 2. Mobile can only check in; the HR check-out service is unused.
-3. The Requests tab opens a form, not a request inbox.
+3. The Requests screen opens a form, not a request inbox.
 4. Notifications exist on web but have no mobile surface.
 5. `current_user.employees.first` is used everywhere; multi-employee users
    can see the wrong record.
@@ -74,11 +77,13 @@ month, payroll). The web has **69 sidebar items** across 16 active groups plus
 | # | Screen | Route | Controller | Reads | Writes | Limits |
 |---|---|---|---|---|---|---|
 | 1 | Sign in | `GET/POST /mobile/sign_in` | `Mobile::SessionsController#new/create` | `User`, session | Sign in | No forgot password or biometrics; sign-in activity has no tabs |
-| 2 | Home | `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `Employee`, `AttendanceMonth`, `ScheduledShift`, `AttendanceLog`, `AttendanceRequest`, `Payroll`, `AttendanceBalance`, `Document` | Check-in via `POST /mobile/companies/:company_id/attendances` | No checkout or break |
-| 3 | Employee | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `Employee` (group managers), roles, departments, category, next shift, month totals | — | Read-only; no edit or dynamic profiles |
+| 2 | Home | `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `Employee`, `AttendanceMonth`, `ScheduledShift`, `AttendanceLog`, `AttendanceRequest`, `AttendanceBalance`, `Document` | Check-in via `POST /mobile/companies/:company_id/attendances` | No checkout or break; no Payroll shortcut |
+| 3 | Profile | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `Employee` (group managers), roles, departments, category, next shift, month totals | — | Read-only; no edit or dynamic profiles |
 | 4 | Attendance month | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `AttendanceMonth`, `AttendanceDay` | — | Read-only; no PDF, collect, or request list |
-| 5 | Payroll | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `Payroll` (money), `AttendanceMonth` | — | No payslip download |
-| 6 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee` (group managers), `AttendanceRequest` | Create request | No attachments |
+| 5 | Payroll password gate | `GET/POST /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#new/create` | `User` password, session | Password confirmation | Five-minute company-scoped unlock; every Profile entry asks again |
+| 6 | Payroll | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `Payroll` (money), `AttendanceMonth` | — | Password-gated; no payslip download |
+| 7 | Operations | `GET /mobile/companies/:company_id/operations` | `Mobile::Companies::OperationsController#index` | `Page` (branch, type, role, resolution, statuses) | — | Read-only list only; no detail or actions |
+| 8 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee` (group managers), `AttendanceRequest` | Create request | No attachments |
 
 `GET /mobile/home` remains the signed-in no-employee fallback and renders
 without a company id. Every tenant page asserts membership through
@@ -88,7 +93,7 @@ Cross-cutting mobile behavior:
 
 | Capability | Status | Notes |
 |---|---|---|
-| Native bottom tabs | ✅ | Owned by the Android shell; hidden on sign-in; roots use the stored company id |
+| Native bottom tabs | ✅ | Home, Notifications, Profile, Attendance, Operations; hidden on sign-in; roots use the stored company id. Payroll is a Profile stack page behind a password gate. |
 | Theme toggle + persistence | ✅ | `localStorage["darkmode"]`, same key as desktop |
 | Pull-to-refresh | ✅ | Enabled by the Android path configuration, except sign-in/new |
 | Safe area | ✅ | HTML emits `env(safe-area-inset-top)` |
@@ -120,14 +125,15 @@ Cross-cutting mobile behavior:
 | Daily rows | ✅ admin | ✅ | Own month |
 | Month navigation | ✅ admin | ✅ | Prev/next query param |
 | Attendance request create | ✅ | ✅ | Date, type, times, reason |
-| Request list/status | ✅ admin | ⛔ | Requests tab is the form |
+| Request list/status | ✅ admin | ⛔ | Requests screen is the form |
 | Request approvals | ✅ manager | ⛔ | Web-only manager workflow |
 | Request approver | ✅ after decision | ✅ | All group managers listed (owner fallback) |
 | Request attachments | — | ⛔ | No attachment association |
 | Attendance PDF/audit | — | ⛔ | No endpoint; HR roadmap item |
-| Payroll status/step | ✅ admin | ✅ | Draft/approved/paid |
-| Payroll hours/day totals | ✅ admin | ✅ | From `AttendanceMonth` |
-| Payroll money | ✅ admin | ✅ | `payrolls` money columns + `Payrolls::GenerateService` |
+| Payroll password confirmation | — | ✅ | Profile → Payroll always asks; 5-minute unlock for the screen |
+| Payroll status/step | ✅ admin | ✅ | Draft/approved/paid; password-gated |
+| Payroll hours/day totals | ✅ admin | ✅ | From `AttendanceMonth`; password-gated |
+| Payroll money | ✅ admin | ✅ | `payrolls` money columns + `Payrolls::GenerateService`; password-gated |
 | Payslip/PDF | ❓ route only | ⛔ | `payslips` route has no controller/model |
 | Leave balance | — | ✅ | `AttendanceBalance` + approved/pending `AttendanceLeave` rows on Home |
 | Leave request/history | — | ⛔ | No mobile leave form or history yet |
@@ -215,7 +221,7 @@ status.
 | Dynamic Tables | ⛔ | Admin |
 | Table Config Logs | ⛔ | Admin audit |
 | Workflows | ⛔ | Admin |
-| Pages | ⛔ | Content admin |
+| Pages | 🟡 | Read-only company Page list on the Operations tab; no admin actions |
 | Documents | ⛔ | Future candidate (employee documents) |
 | Data Import | ⛔ | Admin |
 | Payment Methods | ⛔ | Admin |
@@ -336,7 +342,7 @@ status.
 |---|---|---|---|---|---|
 | M-01 | Schedule attendance resolution | Mobile attendance months read `attendance_months`, but `Attendance::DailyResolutionJob` is not in `config/recurring.yml` | Ops/queue configuration | Nightly job (or post-check-in trigger) refreshes monthly totals | S |
 | M-02 | Check-out | Mobile can only check in; `Attendance::CheckOutService` exists | Mobile controller + Home UI | Clock Out writes `check_out`, guards duplicates, Home shows completed state; break tracking remains separate | S |
-| M-03 | Request inbox and status | The Requests tab opens a form; employees cannot see history or decisions | `AttendanceRequestsController#index` or a mobile-only query | Own requests list with date, type, status, detail link; New Request button | M |
+| M-03 | Request inbox and status | The Requests screen opens a form; employees cannot see history or decisions | `AttendanceRequestsController#index` or a mobile-only query | Own requests list with date, type, status, detail link; New Request button | M |
 | M-04 | Notifications inbox and unread badge | Web notifications exist; mobile has no surface | `Companies::NotificationsController` | List, mark read/all read, unread count in the header | M |
 | M-05 | Multi-employee/company selector | Every mobile controller uses `employees.first`; multi-account users can see the wrong record | Session/current-employee selection | Selector at sign-in or profile; all mobile pages scoped to the selection | M |
 ### P1 — self-service parity
@@ -378,7 +384,7 @@ preferences, and dynamic employee profiles.
 
 | Area | Current | Gap / next |
 |---|---|---|
-| Navigation | 5 tabs: Home, Employee, Attendance, Payroll, Requests | Requests opens the form; make it an inbox with a New Request action |
+| Navigation | 5 tabs: Home, Notifications, Profile, Attendance, Operations | Payroll is deliberately absent from the tab bar; it opens from Profile through the password gate. Profile stack clears on tab exit/background. Notifications/Requests could later gain an inbox workflow. |
 | Hotwire Native | 1.3.2, fragments, lazy tabs | Keep version current |
 | Path configuration | Asset `json/path-configuration.json`; pull-to-refresh on; off for sign-in/new | Remote `configurations/android_v1.json` URL has no server route; add it or drop it |
 | Tabs/back | Native bottom nav; HTML sticky header | No native toolbar; HTML back link on stack pages |
@@ -442,6 +448,8 @@ preferences, and dynamic employee profiles.
 | Mobile routes | `config/routes.rb` (`namespace :mobile`) |
 | Mobile controllers | `app/controllers/mobile/` |
 | Mobile views/partials | `app/views/mobile/` |
+| Payroll password gate | `app/controllers/mobile/companies/payroll_unlocks_controller.rb`, `app/views/mobile/companies/payroll_unlocks/` |
+| Operations page list | `app/controllers/mobile/companies/operations_controller.rb`, `app/views/mobile/companies/operations/` |
 | Mobile formatting helpers | `app/helpers/mobile_helper.rb` |
 | Mobile implementation contract | `docs/MOBILE.md` |
 | Android shell | `android/app/src/main/java/com/example/skycomandroid/MainActivity.kt` |
