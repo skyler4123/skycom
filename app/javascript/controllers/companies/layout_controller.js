@@ -187,7 +187,7 @@ export default class Companies_LayoutController extends Controller {
 
     return `
       <!-- Layout Wrapper: Font, Background, Colors -->
-      <div class="min-w-0 flex flex-1 font-display bg-card text-foreground">
+      <div class="min-w-0 flex flex-1 font-sans bg-card text-foreground">
         <!-- Flex Container: Sidebar + Main -->
         <div class="min-w-0 flex flex-1">
           <!-- Sidebar -->
