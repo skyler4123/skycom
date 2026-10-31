@@ -22,6 +22,8 @@ class Mobile::SessionsController < Mobile::BaseController
   def destroy
     current_session&.destroy
     session.delete(:mobile_company_id)
+    session.delete(:mobile_payroll_unlock_company_id)
+    session.delete(:mobile_payroll_unlock_expires_at)
     cookies.clear
     redirect_to mobile_sign_in_path, notice: "Signed out"
   end

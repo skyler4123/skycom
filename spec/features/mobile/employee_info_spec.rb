@@ -21,7 +21,7 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
     sign_in(user)
     visit mobile_company_employee_path(company)
 
-    expect(page).to have_content("Employee")
+    expect(page).to have_css("header h1", text: "Profile")
     expect(page).to have_content(employee.name)
     expect(page).to have_content(employee.email)
     expect(page).to have_content(company.name)
@@ -32,6 +32,17 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
     expect(page).to have_content("Morgan Manager")
     expect(page).to have_content("30 November 2026")
     expect(page).not_to have_content("Sample")
+  end
+
+  scenario "opens payroll through the password gate" do
+    sign_in(user)
+    visit mobile_company_employee_path(company)
+
+    click_link "Payroll"
+
+    expect(page).to have_current_path(mobile_company_payroll_unlock_path(company))
+    expect(page).to have_content("Payroll is private")
+    expect(page).not_to have_content("$")
   end
 
   scenario "shows every group manager" do

@@ -53,14 +53,14 @@ RSpec.feature "Mobile dark mode", type: :feature, js: true do
     expect(html_dark?).to be(true)
     expect(page.evaluate_script("localStorage.getItem('darkmode')")).to eq("true")
 
-    # Turbo-navigate to Employee and assert the theme holds.
+    # Turbo-navigate to Profile and assert the theme holds.
     find("a[href='#{mobile_company_employee_path(company)}']", match: :first).click
-    expect(page).to have_content("Employee", wait: 10)
+    expect(page).to have_css("header h1", text: "Profile", wait: 10)
     expect(html_dark?).to be(true)
     expect(page.evaluate_script("localStorage.getItem('darkmode')")).to eq("true")
 
-    # Turbo-navigate to Payroll and assert again.
-    visit mobile_company_payroll_path(company)
+    # Turbo-navigate to Operations and assert again.
+    visit mobile_company_operations_path(company)
     expect(page).to have_selector("header", wait: 10)
     expect(html_dark?).to be(true)
     expect(page.evaluate_script("localStorage.getItem('darkmode')")).to eq("true")
@@ -74,7 +74,8 @@ RSpec.feature "Mobile dark mode", type: :feature, js: true do
       mobile_company_notifications_path(company),
       mobile_company_employee_path(company),
       mobile_company_attendance_month_path(company),
-      mobile_company_payroll_path(company),
+      mobile_company_operations_path(company),
+      mobile_company_payroll_unlock_path(company),
       new_mobile_company_attendance_request_path(company)
     ]
 
