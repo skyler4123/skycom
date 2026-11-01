@@ -267,6 +267,27 @@ export const closeSwal = () => Swal.close()
  */
 export const closeModal = () => Swal.close()
 
+/**
+ * Confirmation dialog for destructive actions. Returns the SweetAlert result
+ * promise; callers check `result.isConfirmed` before performing the request.
+ */
+export const confirmAction = ({
+  title,
+  text,
+  icon = "warning",
+  confirmButtonText = "Confirm",
+  cancelButtonText = "Cancel"
+} = {}) => {
+  return Swal.fire({
+    title,
+    text,
+    icon,
+    showCancelButton: true,
+    confirmButtonText,
+    cancelButtonText
+  })
+}
+
 export const closeModalAction = () => `data-action="click->modal#close"`
 
 /**

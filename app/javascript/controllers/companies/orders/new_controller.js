@@ -7,8 +7,18 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
   /** @type {Array<{key: string, label: string, type: string}>} */
   propertyMetadata = []
 
-  connect() {
+  /** @type {{ id: string, name: string }[]} */
+  employees = []
+
+  async connect() {
     super.connect()
+
+    try {
+      const response = await fetchJson(`${Helpers.new_company_order_path(currentCompany().id)}.json`)
+      this.employees = response.employees || []
+    } catch (error) {
+      this.employees = []
+    }
 
     this.categoryId = new URLSearchParams(window.location.search).get('category_id')
       || this.defaultFilterCategory()?.id || null
@@ -126,6 +136,19 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
               ${currencyOptions}
             </select>
           </div>
+
+          ${this.employees.length ? `
+            <div class="space-y-1">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Salesperson")}</label>
+              <select name="order[salesperson_id]"
+                class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
+                <option value="">${translate("Unattributed")}</option>
+                ${this.employees.map(employee => `
+                  <option value="${employee.id}" ${employee.id === currentEmployeeId() ? "selected" : ""}>${employee.name}</option>
+                `).join("")}
+              </select>
+            </div>
+          ` : ""}
 
           <div class="col-span-2 space-y-1">
             <input type="hidden" name="order[customer_id]" value="">

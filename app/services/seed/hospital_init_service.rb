@@ -421,6 +421,7 @@ class Seed::HospitalInitService
         "Appointment" => { read: true }
       },
       Manager: {
+        "KpiConfig" => { read: true },
         "Product" => { create: true, read: true, update: true, delete: true },
         "Page" => { create: true, read: true, update: true, delete: true },
         "ShiftTemplate" => { create: true, read: true, update: true, delete: true },

@@ -150,6 +150,16 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
                 <p class="text-sm font-semibold text-foreground">${category?.name || translate("N/A")}</p>
               </div>
             </div>
+
+            <div class="flex items-center gap-3">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-warning">
+                <span class="material-symbols-outlined">person</span>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Salesperson")}</p>
+                <p class="text-sm font-semibold text-foreground">${o.salesperson?.name || translate("Unattributed")}</p>
+              </div>
+            </div>
           </div>
 
           ${dynamicFields}

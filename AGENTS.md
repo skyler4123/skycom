@@ -37,6 +37,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | QR codes | `docs/QR_CODE.md` — `renderQrCode` helper |
 | The events domain | `docs/EVENTS.md` — schema, endpoints, seeding (§7 lists what is not built yet) |
 | Credit/usage-tracking tables | `docs/ATOMIC_PURPOSE.md` — atomic purpose pattern + hot-path rule |
+| Employee KPI scores, KPI configs, salesperson attribution | `docs/KPI.md` — metric registry, scoring, periods, ABAC |
 
 ### Auth & tenancy
 

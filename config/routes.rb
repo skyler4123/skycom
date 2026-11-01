@@ -66,6 +66,8 @@ Rails.application.routes.draw do
           get :receipt
         end
       end
+      resources :kpi_configs, only: %i[index create update destroy]
+      resources :performance, only: %i[index show]
       resources :transactions
       resources :employees
       resources :employee_groups, only: %i[index show new create edit update]

@@ -51,6 +51,7 @@ export const SIDEBAR_ITEMS = [
   { key: "employee_groups", group: "organization", icon: "group_work", label: "Employee Groups", href: (cid) => Helpers.company_employee_groups_path(cid) },
   { key: "employee_profiles", group: "organization", icon: "badge", label: "Employee Profiles", href: (cid) => Helpers.company_employee_profiles_path(cid) },
   { key: "employee_subprofiles", group: "organization", icon: "cards", label: "Employee Subprofiles", href: (cid) => Helpers.company_employee_subprofiles_path(cid) },
+  { key: "performance", group: "organization", icon: "leaderboard", label: "Performance", href: (cid) => Helpers.company_performance_index_path(cid) },
   { key: "facilities", group: "organization", icon: "meeting_room", label: "Facilities", href: (cid) => Helpers.company_facilities_path(cid) },
   { key: "categories", group: "platform", icon: "category", label: "Categories", href: (cid) => Helpers.company_categories_path(cid) },
   { key: "property_mappings", group: "platform", icon: "settings_applications", label: "Dynamic Properties", href: (cid) => Helpers.company_property_mappings_path(cid) },

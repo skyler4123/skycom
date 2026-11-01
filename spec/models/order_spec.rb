@@ -6,6 +6,7 @@ RSpec.describe Order, type: :model do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
     it { should belong_to(:customer).optional }
+    it { should belong_to(:salesperson).class_name("Employee").optional }
     it { should have_many(:invoices).dependent(:destroy) }
     it { should have_many(:order_product_appointments).dependent(:destroy) }
     it { should have_many(:products).through(:order_product_appointments) }
@@ -24,6 +25,23 @@ RSpec.describe Order, type: :model do
     it { should validate_presence_of(:currency) }
     it { should validate_presence_of(:business_type) }
     it { should validate_length_of(:name).is_at_most(255) }
+
+    it "accepts a salesperson from the same company" do
+      company = create(:company)
+      order = create(:order, company: company, customer: create(:customer, company: company))
+      order.salesperson = create(:employee, company: company)
+
+      expect(order).to be_valid
+    end
+
+    it "rejects a salesperson from another company" do
+      company = create(:company)
+      order = create(:order, company: company, customer: create(:customer, company: company))
+      order.salesperson = create(:employee)
+
+      expect(order).not_to be_valid
+      expect(order.errors[:salesperson]).to include("must belong to the same company")
+    end
   end
 
   describe "enums" do

@@ -44,6 +44,7 @@ class Company < ApplicationRecord
     Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
     AttendanceConfig AttendanceLog AttendanceDay AttendanceMonth AttendanceRequest
     Payroll
+    KpiConfig
     EventConfigLog AttendanceConfigLog TableConfigLog PermissionLog
     Stock StockTransfer StockImport StockExport StockAdjustment StockPending
     Event EventGroup EventConfig
@@ -151,6 +152,7 @@ class Company < ApplicationRecord
   has_many :customer_subprofiles, dependent: :destroy
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy
+  has_many :kpi_configs, dependent: :destroy
   has_many :purchases, dependent: :destroy
   has_many :purchase_items, dependent: :destroy
   has_many :workflows, dependent: :destroy

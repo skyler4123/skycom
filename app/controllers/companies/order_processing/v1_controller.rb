@@ -23,7 +23,8 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
       company: current_company,
       branch: current_company.branches.find(checkout_params[:branch_id]),
       items: checkout_params[:items],
-      customer: checkout_params[:customer_id] ? current_company.customers.find_by(id: checkout_params[:customer_id]) : nil
+      customer: checkout_params[:customer_id] ? current_company.customers.find_by(id: checkout_params[:customer_id]) : nil,
+      employee: current_employee
     )
 
     render json: order_result.merge(message: "Order created"), status: :created
