@@ -5,8 +5,8 @@
 #
 # Why it exists: records exactly what the import created or updated and which
 # polymorphic record it touched, so a migration can be inspected and its effects
-# traced (see docs/DATA_IMPORT.md).
-# How it works: written by the data-import engine alongside each processed row;
+# traced (see docs/DATA_MIGRATION.md).
+# How it works: written by the data-migration engine alongside each processed row;
 # action is created/updated and the polymorphic `record` points at the affected
 # domain row.
 # Main associations: belongs_to :company_migration, :company (required);

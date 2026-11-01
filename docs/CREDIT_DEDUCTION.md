@@ -29,11 +29,11 @@ credits out of the wallet.
 | Controller action via `deduct_company_credits_for` | ✅ | ✅ | ✅ |
 | `CompanyUsageSyncJob` | ❌ | ❌ | ❌ — it only drains the counter |
 | Promo campaign job / top-up completion | ❌ | ✅ | ❌ |
-| Data import / migration job | ❌ | ❌ | ❌ |
+| Data migration job | ❌ | ❌ | ❌ |
 | Order finalization job | ❌ | ❌ | ❌ |
 | Seed data | ❌ | ✅ (demo top-ups) | ✅ (demo usage only) |
 
-When a feature exists in both a controller and a background job (data import,
+When a feature exists in both a controller and a background job (data migration,
 order finalization, bulk updates), **the deduction belongs to the controller
 entry point only**. Do not move it into a shared domain service that the job
 also calls. The mechanical guard is

@@ -2,13 +2,13 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 import Companies_CompanyMigrations_NewModalController from "controllers/companies/company_migrations/new_modal_controller"
 
 export default class Companies_CompanyMigrations_IndexController extends Companies_LayoutController {
-  // Data Import index — migration list, create modal, guarded draft delete.
+  // Migrations index — migration list, create modal, guarded draft delete.
   // Full import workflow (upload/split, config editor, dry run, approve,
   // rollback, progress) lives on the show page.
   // Depends on BE: Companies::CompanyMigrationsController (index/create/destroy)
   // Endpoints: GET <pathname>.json, POST /companies/:id/company_migrations.json,
   //            DELETE /companies/:id/company_migrations/:id
-  // Docs: docs/DATA_IMPORT.md
+  // Docs: docs/DATA_MIGRATION.md
 
   /** @type {CompanyMigration[]} */ migrations = []
 
@@ -20,7 +20,7 @@ export default class Companies_CompanyMigrations_IndexController extends Compani
       const response = await fetchJson(`${pathname()}.json`)
       this.migrations = response.company_migrations || []
     } catch (error) {
-      toast({ type: "error", message: `${translate("Failed to load imports")}: ${error.errors?.join(", ") || error.message}` })
+      toast({ type: "error", message: `${translate("Failed to load migrations")}: ${error.errors?.join(", ") || error.message}` })
     }
 
     poll(() => {
@@ -39,7 +39,7 @@ export default class Companies_CompanyMigrations_IndexController extends Compani
 
   async deleteMigration(event) {
     const migrationId = event.currentTarget.dataset.migrationId
-    if (!confirm(translate("Delete this import and its uploaded chunks?"))) return
+    if (!confirm(translate("Delete this migration and its uploaded chunks?"))) return
 
     try {
       const response = await fetchJson(Helpers.company_company_migration_path(currentCompany().id, migrationId), {
@@ -47,7 +47,7 @@ export default class Companies_CompanyMigrations_IndexController extends Compani
       })
       reloadThenToast({ type: "success", message: response.message })
     } catch (error) {
-      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to delete import") })
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to delete migration") })
     }
   }
 
@@ -88,16 +88,16 @@ export default class Companies_CompanyMigrations_IndexController extends Compani
       <div class="p-4 flex-1 flex flex-col">
         <div class="p-4 bg-card rounded-xl border border-line flex-1">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-foreground">${translate("Data Import")}</h2>
+            <h2 class="text-lg font-bold text-foreground">${translate("Migrations")}</h2>
             <button type="button" data-action="click->${this.identifier}#openNewModal"
               class="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm font-medium cursor-pointer">
               <span class="material-symbols-outlined text-[20px]">add</span>
-              ${translate("New Import")}
+              ${translate("New Migration")}
             </button>
           </div>
 
           ${this.migrations.length === 0
-            ? `<p class="mt-6 text-sm text-muted-foreground text-center">${translate("No imports yet")}</p>`
+            ? `<p class="mt-6 text-sm text-muted-foreground text-center">${translate("No migrations yet")}</p>`
             : `<div class="overflow-x-auto">
                 <table class="w-full text-sm">
                   <thead>

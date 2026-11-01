@@ -138,12 +138,12 @@ RSpec.feature "Companies::CompanyMigrations Show", type: :feature, js: true do
     expect(page).to have_content("10/10")
   end
 
-  scenario "renders an error card when the import cannot be loaded" do
+  scenario "renders an error card when the migration cannot be loaded" do
     visit company_company_migration_path(company, SecureRandom.uuid)
 
-    expect(page).to have_content("Could not load this import", wait: 10)
+    expect(page).to have_content("Could not load this migration", wait: 10)
     expect(page).to have_no_selector("#migration-upload-input")
-    expect(page).to have_content("Import not found")
+    expect(page).to have_content("Migration not found")
   end
 
   scenario "rollback button appears for a completed migration and queues the rollback" do

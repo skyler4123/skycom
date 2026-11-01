@@ -32,7 +32,7 @@ module CompanyMigrations
       ProgressPublisher.publish_finished(company_migration: migration)
       notify(
         migration,
-        name: "Data import '#{migration.name}' finished",
+        name: "Migration '#{migration.name}' finished",
         description: "#{migration.created_rows} of #{migration.total_rows} rows imported (#{migration.failed_rows} failed).",
         severity: :info,
         throttle_key: "company_migration:#{migration.id}:finished"
@@ -50,7 +50,7 @@ module CompanyMigrations
       ProgressPublisher.publish_finished(company_migration: migration)
       notify(
         migration,
-        name: "Data import '#{migration.name}' failed",
+        name: "Migration '#{migration.name}' failed",
         description: errors.first.to_s,
         severity: :warning,
         throttle_key: "company_migration:#{migration.id}:failed"

@@ -1,4 +1,4 @@
-// Pure CSV chunk splitter for the Data Import upload flow. Rows are found
+// Pure CSV chunk splitter for the Migrations upload flow. Rows are found
 // with a quote-aware single pass (a quoted field may contain commas, escaped
 // "" pairs, and newlines), so a chunk boundary can never land inside a row or
 // a quoted field. Every chunk after the first repeats the header row (BOM

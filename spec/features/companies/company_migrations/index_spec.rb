@@ -32,10 +32,10 @@ RSpec.feature "Companies::CompanyMigrations Index", type: :feature, js: true do
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
-  scenario "sidebar shows Data Import" do
+  scenario "sidebar shows Migrations" do
     visit company_dashboards_path(company)
 
-    expect(page).to have_link("Data Import", href: /company_migrations/, visible: :all, wait: 10)
+    expect(page).to have_link("Migrations", href: /company_migrations/, visible: :all, wait: 10)
   end
 
   scenario "lists migrations with status and counters" do
@@ -63,14 +63,15 @@ RSpec.feature "Companies::CompanyMigrations Index", type: :feature, js: true do
 
   scenario "creates a migration from the modal and lands on its page" do
     visit company_company_migrations_path(company)
-    expect(page).to have_button("New Import", wait: 10)
+    expect(page).to have_css("h2", text: "Migrations", wait: 10)
+    expect(page).to have_button("New Migration", wait: 10)
 
     name = "Customers import #{SecureRandom.hex(3)}"
-    click_button "New Import"
+    click_button "New Migration"
     expect(page).to have_selector('input[name="company_migration[name]"]', wait: 10)
 
     fill_in "company_migration[name]", with: name
-    click_button "Save Import"
+    click_button "Save Migration"
 
     expect(page).to have_current_path(/company_migrations\/[a-f0-9-]+$/, wait: 10)
     expect(CompanyMigration.find_by(company: company, name: name)).to be_present

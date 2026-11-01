@@ -1,11 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class Companies_CompanyMigrations_NewModalController extends Controller {
-  // Create-import modal — a session shell; chunks upload on the show page.
+  // Create-migration modal — a session shell; chunks upload on the show page.
   // On success navigates straight to the new migration's show page.
   // Depends on BE: Companies::CompanyMigrationsController#create
   // Endpoints: POST /companies/:id/company_migrations.json
-  // Docs: docs/DATA_IMPORT.md
+  // Docs: docs/DATA_MIGRATION.md
 
   connect() {
     this.element.innerHTML = this.modalHTML()
@@ -27,16 +27,16 @@ export default class Companies_CompanyMigrations_NewModalController extends Cont
 
       window.location.href = Helpers.company_company_migration_path(currentCompany().id, response.company_migration.id)
     } catch (error) {
-      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to create import") })
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to create migration") })
     }
   }
 
   modalHTML() {
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-foreground">${translate("New Import")}</h2>
+        <h2 class="text-xl font-bold text-foreground">${translate("New Migration")}</h2>
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Import Name")}</label>
+          <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Migration Name")}</label>
           <input type="text" name="company_migration[name]" required placeholder="e.g. Customers 2026-10"
             class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm" />
         </div>
@@ -47,7 +47,7 @@ export default class Companies_CompanyMigrations_NewModalController extends Cont
           </button>
           <button type="submit"
             class="px-6 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-bold text-sm cursor-pointer">
-            ${translate("Save Import")}
+            ${translate("Save Migration")}
           </button>
         </div>
       </div>

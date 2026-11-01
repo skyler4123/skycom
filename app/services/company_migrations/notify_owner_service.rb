@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Owner notification for a CompanyMigration event: find-or-create the system
-# "Data Import" tag, subscribe the owner, then delegate to
+# "Migrations" tag, subscribe the owner, then delegate to
 # Notifications::CreateService (throttled so retries cannot spam the owner).
 # Mirrors Companies::WelcomeNotificationJob's tag/subscribe pattern.
 module CompanyMigrations
@@ -31,7 +31,7 @@ module CompanyMigrations
       return { success: false, errors: [ "owner not found" ] } if owner.nil?
 
       tag = NotificationTag.find_or_create_by!(company: @company, name: MIGRATION_NOTIFICATION_TAG) do |record|
-        record.description = "Data import progress for the company owner."
+        record.description = "Migration progress for the company owner."
         record.business_type = :system
       end
       EmployeeNotificationTagAppointment.find_or_create_by!(

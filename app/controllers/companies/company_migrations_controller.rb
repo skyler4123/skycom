@@ -12,13 +12,13 @@ require "csv"
 #                  Companies_CompanyMigrations_NewModalController (create modal)
 # Endpoints: GET/POST /companies/:company_id/company_migrations(.json) + member
 #            POST chunks, PATCH config, POST dry_run, POST approve, POST rollback — see config/routes.rb
-# Docs: docs/DATA_IMPORT.md
+# Docs: docs/DATA_MIGRATION.md
 class Companies::CompanyMigrationsController < Companies::ApplicationController
   rescue_from ActiveRecord::RecordNotFound do
     respond_to do |format|
       # Shell-First: the FE renders the error card from the .json 404.
       format.html { render html: "", layout: true, status: :not_found }
-      format.json { render json: { errors: [ "Import not found" ] }, status: :not_found }
+      format.json { render json: { errors: [ "Migration not found" ] }, status: :not_found }
     end
   end
 
@@ -49,7 +49,7 @@ class Companies::CompanyMigrationsController < Companies::ApplicationController
       source_file_size: migration_params[:source_file_size]
     )
 
-    render json: { company_migration: format_summary(migration), message: "Import created" }, status: :created
+    render json: { company_migration: format_summary(migration), message: "Migration created" }, status: :created
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
   end
@@ -130,17 +130,17 @@ class Companies::CompanyMigrationsController < Companies::ApplicationController
 
   def approve
     migration = find_migration
-    return render_errors([ "Import is not ready to approve" ]) unless migration.approvable?
+    return render_errors([ "Migration is not ready to approve" ]) unless migration.approvable?
 
     migration.update!(workflow_status: :approved, approved_at: Time.current)
     CompanyMigrations::ImportJob.perform_later(migration.id)
 
-    render json: { message: "Import approved and queued" }
+    render json: { message: "Migration approved and queued" }
   end
 
   def rollback
     migration = find_migration
-    return render_errors([ "This import cannot be rolled back" ]) unless migration.rollbackable?
+    return render_errors([ "This migration cannot be rolled back" ]) unless migration.rollbackable?
 
     migration.update!(workflow_status: :rolling_back)
     CompanyMigrations::RollbackJob.perform_later(migration.id)
@@ -150,7 +150,7 @@ class Companies::CompanyMigrationsController < Companies::ApplicationController
 
   def destroy
     migration = find_migration
-    return render_errors([ "Only draft imports can be deleted" ]) unless migration.workflow_status_draft?
+    return render_errors([ "Only draft migrations can be deleted" ]) unless migration.workflow_status_draft?
 
     folder = migration.folder
 
@@ -160,7 +160,7 @@ class Companies::CompanyMigrationsController < Companies::ApplicationController
       folder.destroy!
     end
 
-    render json: { message: "Import deleted" }
+    render json: { message: "Migration deleted" }
   end
 
   private
@@ -177,7 +177,7 @@ class Companies::CompanyMigrationsController < Companies::ApplicationController
     file = params[:file]
     errors = []
 
-    errors << "import is not editable" unless migration.workflow_status_draft?
+    errors << "migration is not editable" unless migration.workflow_status_draft?
     errors << "file is required" if file.blank?
 
     if file.present?

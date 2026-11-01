@@ -80,7 +80,7 @@ RSpec.describe "Companies::CompanyMigrationsController", type: :request do
   end
 
   describe "POST #create" do
-    it "creates a draft migration inside the shared Data Import folder" do
+    it "creates a draft migration inside the shared Migrations folder" do
       post base_path, params: {
         company_migration: { name: "Customers import", source_filename: "customers.csv", source_file_size: 1234 }
       }
@@ -88,7 +88,7 @@ RSpec.describe "Companies::CompanyMigrationsController", type: :request do
       expect(response).to have_http_status(:created)
       migration = CompanyMigration.find(JSON.parse(response.body)["company_migration"]["id"])
       expect(migration.workflow_status).to eq("draft")
-      expect(migration.folder.parent&.name).to eq("Data Import")
+      expect(migration.folder.parent&.name).to eq("Migrations")
     end
 
     it "returns 422 errors without a name" do
@@ -187,7 +187,7 @@ RSpec.describe "Companies::CompanyMigrationsController", type: :request do
       expect(JSON.parse(response.body)["errors"].join).to match(/too big/)
     end
 
-    it "returns 422 once the import is not editable" do
+    it "returns 422 once the migration is not editable" do
       migration = create(:company_migration, company: company, workflow_status: :completed)
 
       post "#{base_path}/#{migration.id}/chunks", params: { file: upload_for(chunk_body), chunk_index: 0 }
@@ -239,7 +239,7 @@ RSpec.describe "Companies::CompanyMigrationsController", type: :request do
       post "#{base_path}/#{migration.id}/approve"
 
       expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body)["message"]).to eq("Import approved and queued")
+      expect(JSON.parse(response.body)["message"]).to eq("Migration approved and queued")
       expect(migration.reload.workflow_status).to eq("approved")
       expect(migration.approved_at).to be_present
       expect(CompanyMigrations::ImportJob).to have_been_enqueued.with(migration.id)

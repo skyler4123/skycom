@@ -11,7 +11,7 @@ RSpec.describe CompanyMigrations::NotifyOwnerService do
     described_class.call(
       **{
         company: company,
-        name: "Data import 'X' finished",
+        name: "Migration 'X' finished",
         description: "10 of 10 rows imported (0 failed).",
         severity: :info,
         throttle_key: "company_migration:test:finished"
@@ -31,7 +31,7 @@ RSpec.describe CompanyMigrations::NotifyOwnerService do
       expect(EmployeeNotificationTagAppointment.exists?(employee: owner, notification_tag: tag)).to be(true)
       expect(Notification.where(company: company).count).to eq(1)
 
-      notify(name: "Data import 'X' finished again", throttle_key: "other")
+      notify(name: "Migration 'X' finished again", throttle_key: "other")
 
       expect(NotificationTag.where(company: company, name: MIGRATION_NOTIFICATION_TAG).count).to eq(1)
       expect(Notification.where(company: company).count).to eq(2)
