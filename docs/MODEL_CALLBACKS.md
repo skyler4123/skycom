@@ -421,6 +421,8 @@ Reads `validates` hashes from `property_mapping.property_metadata` and applies t
 
 **Included in (45 models):** All models including `PropertyMappingConcern` (products, services, branches, employees, customers, etc.)
 
+> **Opt-out for imports**: `before_validation :auto_populate_property_fields` (registered by `PropertyMappingConcern`) fills empty property slots with seed-time random values. Set `record.skip_property_auto_population = true` to skip it. `Imports::DryRunService` and `Imports::RunService` set this flag so blank CSV cells stay blank instead of being invented.
+
 ---
 
 ### DynamicSearchConcern (`app/models/concerns/dynamic_search_concern.rb`)

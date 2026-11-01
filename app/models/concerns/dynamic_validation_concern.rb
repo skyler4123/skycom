@@ -18,12 +18,18 @@ module DynamicValidationConcern
   ALLOWED_VALIDATORS = %w[presence numericality inclusion format length].freeze
 
   included do
+    # Import sets this flag so a CSV row with blank property cells cannot be
+    # silently filled with random seed data. Default off — normal record
+    # creation keeps the existing behavior.
+    attr_accessor :skip_property_auto_population
+
     validate :dynamic_property_validations
   end
 
   private
 
   def auto_populate_property_fields
+    return if skip_property_auto_population
     return unless respond_to?(:property_mapping) && property_mapping.present?
 
     metadata = property_mapping.properties || []

@@ -197,7 +197,9 @@ EVENTS = {
   notification_created: "notification_created",
   company_ticket_created: "company_ticket_created",
   company_ticket_commented: "company_ticket_commented",
-  company_ticket_status_changed: "company_ticket_status_changed"
+  company_ticket_status_changed: "company_ticket_status_changed",
+  import_progress: "import_progress",
+  import_finished: "import_finished"
 }.freeze
 ```
 
@@ -210,7 +212,9 @@ EVENTS: {
   notification_created: "notification_created",
   company_ticket_created: "company_ticket_created",
   company_ticket_commented: "company_ticket_commented",
-  company_ticket_status_changed: "company_ticket_status_changed"
+  company_ticket_status_changed: "company_ticket_status_changed",
+  import_progress: "import_progress",
+  import_finished: "import_finished"
 }
 ```
 
@@ -223,6 +227,8 @@ EVENTS: {
 | `company_ticket_created` | `"company_ticket_created"` | Help Center index, Admin pool | `{ name, priority }` |
 | `company_ticket_commented` | `"company_ticket_commented"` | Help Center show, Admin detail | `{ message_preview, author_type }` |
 | `company_ticket_status_changed` | `"company_ticket_status_changed"` | Help Center show, Admin detail | `{ from_status, to_status }` |
+| `import_progress` | `"import_progress"` | `companies/imports/show_controller.js` | `{ phase, status, processed_rows, total_rows, created_rows, failed_rows }` |
+| `import_finished` | `"import_finished"` | `companies/imports/show_controller.js` | `{ status, created_rows, failed_rows }` |
 
 ---
 
@@ -258,6 +264,7 @@ def self.publish_event(channel:, event_key:, data: {})
 | Source | File | What It Publishes |
 |--------|------|-------------------|
 | **Webhooks::BankPaymentController** | `app/controllers/webhooks/bank_payment_controller.rb` | `top_up_completed` to company channel after wallet credit |
+| **Imports::ProgressPublisher** | `app/services/imports/progress_publisher.rb` | `import_progress` per batch and `import_finished` from the run/rollback jobs |
 
 ---
 

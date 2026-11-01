@@ -316,6 +316,77 @@ MIGRATION_IMPORT_EXCLUDED_RESOURCES = %w[
 ].freeze
 
 # =============================================================================
+# Import — user-prepared CSV ingestion (docs/IMPORT.md)
+# Deliberately isolated from Data Migration: new tables (imports/import_logs),
+# new Imports:: service namespace, new Companies::ImportsController.
+# =============================================================================
+
+# Import lifecycle stored in imports.workflow_status (there is no
+# lifecycle_status column for this feature; see docs/IMPORT.md).
+IMPORT_WORKFLOW_STATUS = {
+  draft: 0,
+  approved: 1,
+  processing: 2,
+  completed: 3,
+  failed: 4,
+  rolling_back: 5,
+  rolled_back: 6
+}.freeze
+
+# Root storage folder holding one child folder per import.
+IMPORT_ROOT_FOLDER_NAME = "Imports"
+
+# Single-file upload cap. Must stay at or under
+# STORED_FILE_MAX_SIZES_BY_TYPE[:text] (5MB) so the StoredFile is accepted.
+IMPORT_MAX_FILE_BYTES = 5.megabytes
+
+# Hard cap on data rows in one import (dry run validates all of them).
+IMPORT_MAX_ROWS = 20_000
+
+# Rows written per audit-log/progress batch.
+IMPORT_BATCH_SIZE = 500
+
+# Latest records rendered under the resolved headers on the show page.
+IMPORT_PREVIEW_ROW_LIMIT = 10
+
+# Per-run cap on stored row error samples.
+IMPORT_ERROR_SAMPLES_LIMIT = 50
+
+# System notification tag import notifications carry.
+IMPORT_NOTIFICATION_TAG = "Imports"
+
+# Columns the engine owns or does not support as CSV headers. Everything else
+# on a target model is importable (including business_type/lifecycle/workflow
+# enums, external_id, and *_id foreign keys). JSON columns are excluded too;
+# see Imports::SchemaResolver.
+IMPORT_ENGINE_COLUMNS = %w[
+  id company_id category_id property_mapping_id
+  created_at updated_at discarded_at permission_resource_name
+  metadata type lock_version
+].freeze
+
+# Target models v1 exposes. Master/reference data only: no permission/auth,
+# platform schema, order/invoice/payment/credit, or stock tables.
+# The FE picker keeps a mirror in
+# app/javascript/controllers/helpers/import_tables.js — update both together.
+IMPORTABLE_RESOURCES = {
+  "branches" => "Branch",
+  "brands" => "Brand",
+  "customer_profiles" => "CustomerProfile",
+  "customer_subprofiles" => "CustomerSubprofile",
+  "customers" => "Customer",
+  "departments" => "Department",
+  "employee_profiles" => "EmployeeProfile",
+  "employee_subprofiles" => "EmployeeSubprofile",
+  "employees" => "Employee",
+  "facilities" => "Facility",
+  "products" => "Product",
+  "services" => "Service",
+  "suppliers" => "Supplier",
+  "warehouses" => "Warehouse"
+}.freeze
+
+# =============================================================================
 # Company Settings (company-level config incl. custom sidebar groups)
 # One CompanySetting per company per business_type is active at a time
 # (see CompanySetting). The active sidebar_groups record holds all custom

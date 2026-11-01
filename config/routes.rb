@@ -139,6 +139,14 @@ Rails.application.routes.draw do
           post :rollback
         end
       end
+      resources :imports do
+        member do
+          post :source_file
+          post :dry_run
+          post :approve
+          post :rollback
+        end
+      end
       get "storage_statistics", to: "storage_statistics#index"
       resources :announcements
       resources :discounts
