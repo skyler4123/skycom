@@ -1230,6 +1230,7 @@ export const dictionary = () => {
     "Maps to": { vi: "Ánh xạ tới" },
     "Notes": { vi: "Ghi chú" },
     "Sample data": { vi: "Dữ liệu mẫu" },
+    "Header names are case-sensitive.": { vi: "Tên cột phân biệt chữ hoa và chữ thường." },
     "of": { vi: "trong" },
     "records": { vi: "bản ghi" },
     "No records in this category yet.": { vi: "Danh mục này chưa có bản ghi." },

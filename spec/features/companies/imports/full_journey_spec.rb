@@ -48,6 +48,9 @@ RSpec.feature "Companies::Imports Full Journey", type: :feature, js: true do
   end
 
   scenario "walks the whole import lifecycle" do
+    # Seeded so the sample table renders and its header casing can be checked.
+    create_product_in_category(company: company, category: category, name: "Sample Product")
+
     # 1) Index page is alive
     visit company_imports_path(company)
     expect(page).to have_css("h2", text: "Imports", wait: 10)
@@ -76,6 +79,11 @@ RSpec.feature "Companies::Imports Full Journey", type: :feature, js: true do
     expect(page).to have_css("td.font-mono", text: "Skin Type Suitability")
     expect(page).to have_css("td.font-mono", text: "Volume (ml)")
     expect(page).not_to have_css("td.font-mono", text: "property_string_1")
+
+    # The sample table must show the exact (case-sensitive) header strings.
+    expect(page).to have_content("Sample Product")
+    expect(page).to have_css("[data-sample-table] th", text: "name")
+    expect(page).not_to have_css("[data-sample-table] thead tr.uppercase")
 
     import.reload
     expect(import.target_table).to eq("products")

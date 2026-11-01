@@ -494,7 +494,9 @@ export default class Companies_Imports_ShowController extends Companies_LayoutCo
     const sample = this.import.sample || { headers: [], rows: [], total_records: 0 }
     if ((sample.headers || []).length === 0) return ""
 
-    const head = sample.headers.map((entry) => `<th class="py-1.5 pr-4 whitespace-nowrap">${escapeHtml(entry.header)}</th>`).join("")
+    // Header names are case-sensitive, so never apply `uppercase` here — the
+    // sample table must show the exact CSV header strings.
+    const head = sample.headers.map((entry) => `<th class="py-1.5 pr-4 whitespace-nowrap font-mono text-foreground">${escapeHtml(entry.header)}</th>`).join("")
     const body = sample.rows.map((row) => `
       <tr class="border-b border-line/60">
         ${sample.headers.map((entry) => `<td class="py-1 pr-4 whitespace-nowrap text-muted-foreground">${escapeHtml(row[entry.header])}</td>`).join("")}
@@ -509,13 +511,14 @@ export default class Companies_Imports_ShowController extends Companies_LayoutCo
             ${translate("Showing")} ${sample.rows.length} ${translate("of")} ${sample.total_records} ${translate("records")}
           </p>
         </div>
+        <p class="text-[11px] text-muted-foreground">${translate("Header names are case-sensitive.")}</p>
         ${sample.rows.length === 0 ? `
           <p class="text-xs text-muted-foreground">${translate("No records in this category yet.")}</p>
         ` : `
           <div class="overflow-x-auto">
-            <table class="w-full text-xs">
+            <table data-sample-table class="w-full text-xs">
               <thead>
-                <tr class="text-left text-[10px] font-bold text-muted-foreground uppercase border-b border-line">${head}</tr>
+                <tr class="text-left text-[10px] font-bold text-muted-foreground border-b border-line">${head}</tr>
               </thead>
               <tbody>${body}</tbody>
             </table>
