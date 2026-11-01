@@ -1,5 +1,16 @@
 # frozen_string_literal: true
 
+# AttendanceLeave — Atomic purpose: one employee's leave request for a date
+# range.
+#
+# Why it exists: paid/sick/unpaid time off needs an approval trail that feeds
+# the yearly AttendanceBalance instead of editing balances directly.
+# How it works: belongs to company/branch/employee with an optional deciding
+# employee; status moves pending → approved/rejected and leave_type is
+# paid/sick/unpaid. `for_year` scopes by start_date; balances count only
+# approved paid requests.
+# Main associations: belongs_to :company, :employee (required); :branch,
+# :decided_by (optional).
 class AttendanceLeave < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 

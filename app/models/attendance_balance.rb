@@ -1,5 +1,16 @@
 # frozen_string_literal: true
 
+# AttendanceBalance — Atomic purpose: one employee's paid-leave entitlement for
+# one year.
+#
+# Why it exists: leave entitlement is annual and per employee; one row per
+# (employee, year) makes remaining-day math deterministic and prevents
+# duplicate balances.
+# How it works: belongs to company/employee. `entitled_days` is the granted
+# allowance; approved/pending/remaining days are derived from paid
+# AttendanceLeave rows in the same year. `.for` returns an unsaved zero balance
+# when no row exists yet.
+# Main associations: belongs_to :company, :employee (required).
 class AttendanceBalance < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
