@@ -2,14 +2,14 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 import { splitCsvChunks } from "controllers/helpers/csv_splitter"
 
 export default class Companies_CompanyMigrations_ShowController extends Companies_LayoutController {
-  // Data Import show — browser-side chunk splitting + upload, raw preview,
+  // Migrations show — browser-side chunk splitting + upload, raw preview,
   // mapping-config editor, dry run, approve/rollback, and live progress.
   // Depends on BE: Companies::CompanyMigrationsController
   //   (show/chunks/update_config/dry_run/approve/rollback)
   // Endpoints: GET <pathname>.json, POST .../chunks, PATCH .../update_config,
   //            POST .../dry_run, POST .../approve, POST .../rollback
   // WS: company_migration_progress / company_migration_finished (company channel)
-  // Docs: docs/DATA_IMPORT.md
+  // Docs: docs/DATA_MIGRATION.md
 
   /** @type {CompanyMigration|null} */ migration = null
   /** @type {Object|null} */ liveProgress = null
@@ -25,7 +25,7 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
       this.migration = response.company_migration
     } catch (error) {
       this.loadError = error.errors?.join(", ") || error.message || ""
-      toast({ type: "error", message: `${translate("Failed to load import")}: ${this.loadError}` })
+      toast({ type: "error", message: `${translate("Failed to load migration")}: ${this.loadError}` })
     }
 
     this.subscribeToProgress()
@@ -54,7 +54,7 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
 
     WEBSOCKET.subscribe(channel, "company_migration_finished", (data) => {
       if (data.id !== this.migration.id) return
-      toast({ type: "success", message: translate("Import updated") })
+      toast({ type: "success", message: translate("Migration updated") })
       window.location.reload()
     })
   }
@@ -157,7 +157,7 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
       })
       reloadThenToast({ type: "success", message: response.message })
     } catch (error) {
-      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to approve import") })
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to approve migration") })
     }
   }
 
@@ -426,11 +426,11 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
       return `
         <div class="p-4 flex-1 flex flex-col">
           <div class="p-4 bg-card rounded-xl border border-danger/20 ">
-            <h2 class="text-lg font-bold text-danger ">${translate("Could not load this import")}</h2>
+            <h2 class="text-lg font-bold text-danger ">${translate("Could not load this migration")}</h2>
             <p class="mt-1 text-sm text-muted-foreground">${escapeHtml(this.loadError)}</p>
             <a href="${Helpers.company_company_migrations_path(currentCompany()?.id)}"
               class="mt-3 inline-block text-sm text-primary hover:underline">
-              ${translate("Back to Data Import")}
+              ${translate("Back to Migrations")}
             </a>
           </div>
         </div>

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-# Opens a migration session: the shared "Data Import" root folder, a
+# Opens a migration session: the shared "Migrations" root folder, a
 # migration-only child folder that holds its chunks, and the draft record
 # linking both.
 module CompanyMigrations
   class SetupService
-    ROOT_FOLDER_NAME = "Data Import"
+    ROOT_FOLDER_NAME = "Migrations"
 
     def self.call(company:, name:, source_filename: nil, source_file_size: nil)
       new(
@@ -25,7 +25,7 @@ module CompanyMigrations
 
     def call
       root = @company.folders.find_or_create_by!(parent_id: nil, name: ROOT_FOLDER_NAME)
-      folder = root.children.create!(company: @company, name: @name.presence || "Import #{SecureRandom.hex(4)}")
+      folder = root.children.create!(company: @company, name: @name.presence || "Migration #{SecureRandom.hex(4)}")
 
       @company.company_migrations.create!(
         name: @name,

@@ -289,7 +289,7 @@ STORED_FILE_MAX_SIZES_BY_TYPE = {
 }.freeze
 
 # =============================================================================
-# Data Import (CompanyMigration) — config-driven CSV ingestion
+# Data Migration (CompanyMigration) — config-driven CSV ingestion
 # =============================================================================
 
 # Max bytes per uploaded CSV chunk. Must stay under
@@ -306,7 +306,7 @@ MIGRATION_IMPORT_BATCH_SIZE = 500
 MIGRATION_ERROR_SAMPLES_LIMIT = 20
 
 # System notification tag owner notifications for a migration carry.
-MIGRATION_NOTIFICATION_TAG = "Data Import"
+MIGRATION_NOTIFICATION_TAG = "Migrations"
 
 # Models a config may never target (permission/auth machinery).
 MIGRATION_IMPORT_EXCLUDED_RESOURCES = %w[

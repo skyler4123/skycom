@@ -8,7 +8,7 @@
 #     "targets": [ { "resource", "identity", "category", "columns", "defaults" } ] }
 #
 # Generic by design: any Skycom model may be the target except the permission
-# machinery (MIGRATION_IMPORT_EXCLUDED_RESOURCES). See docs/DATA_IMPORT.md.
+# machinery (MIGRATION_IMPORT_EXCLUDED_RESOURCES). See docs/DATA_MIGRATION.md.
 module CompanyMigrations
   class Config
     # Columns the engine owns — a config can never map or default them.

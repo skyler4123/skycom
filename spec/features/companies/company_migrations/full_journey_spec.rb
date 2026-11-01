@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-# The perfect-case end-to-end journey for Data Import: index → create → upload
+# The perfect-case end-to-end journey for Migrations: index → create → upload
 # → preview → config → dry run → approve → import → dashboard → rollback,
 # asserting UI and DB at every step. Granular specs own the failure branches;
 # this one proves the whole user flow works in a real browser.
@@ -54,20 +54,20 @@ RSpec.feature "Companies::CompanyMigrations Full Journey", type: :feature, js: t
   scenario "walks the whole import lifecycle" do
     # 1) Index page is alive
     visit company_company_migrations_path(company)
-    expect(page).to have_content("Data Import", wait: 10)
-    expect(page).to have_button("New Import")
+    expect(page).to have_css("h2", text: "Migrations", wait: 10)
+    expect(page).to have_button("New Migration")
 
     # 2) Create through the modal → lands on the show page
     name = "Journey customers #{SecureRandom.hex(3)}"
-    click_button "New Import"
+    click_button "New Migration"
     expect(page).to have_selector('input[name="company_migration[name]"]', wait: 10)
     fill_in "company_migration[name]", with: name
-    click_button "Save Import"
+    click_button "Save Migration"
 
     expect(page).to have_current_path(/company_migrations\/[a-f0-9-]+$/, wait: 10)
     migration = CompanyMigration.find_by!(company: company, name: name)
     expect(migration.workflow_status).to eq("draft")
-    expect(migration.folder.parent&.name).to eq("Data Import")
+    expect(migration.folder.parent&.name).to eq("Migrations")
 
     # 3) Upload customers-10 → chunk recorded, preview rendered
     expect(page).to have_selector("#migration-upload-input", wait: 10)
@@ -118,7 +118,7 @@ RSpec.feature "Companies::CompanyMigrations Full Journey", type: :feature, js: t
     expect(migration.created_rows).to eq(10)
     expect(migration.failed_rows).to eq(0)
     expect(company.customers.where(external_id: "dE014d010c7ab0c").exists?).to be(true)
-    expect(Notification.where(company: company, name: "Data import '#{migration.name}' finished").count).to eq(1)
+    expect(Notification.where(company: company, name: "Migration '#{migration.name}' finished").count).to eq(1)
 
     # 7) The imported data shows on the Customers dashboard
     imported_category = company.categories.find_by!(name: "Imported Customers", resource_name: "customers")

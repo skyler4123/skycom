@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-# CompanyMigration — Atomic purpose: one CSV/data import job for a company,
+# CompanyMigration — Atomic purpose: one CSV/data migration job for a company,
 # tracked as a state machine over uploaded chunks.
 #
 # Why it exists: large imports must be dry-run, approved, executed in chunks, and
 # rolled back safely; this row owns the mapping config, counters, and lifecycle
-# state (see docs/DATA_IMPORT.md).
+# state (see docs/DATA_MIGRATION.md).
 # How it works: `config` parses migration_mapping_config; approve requires at
 # least one uploaded chunk and a dry run matching the current config digest;
 # counters are recomputed from ordered StoredFile chunks. Progress and per-record

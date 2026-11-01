@@ -223,7 +223,7 @@ status.
 | Workflows | ⛔ | Admin |
 | Pages | 🟡 | Read-only company Page list on the Operations tab; no admin actions |
 | Documents | ⛔ | Future candidate (employee documents) |
-| Data Import | ⛔ | Admin |
+| Migrations | ⛔ | Admin |
 | Payment Methods | ⛔ | Admin |
 
 ### Storage

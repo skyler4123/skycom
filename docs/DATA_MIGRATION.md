@@ -1,4 +1,4 @@
-# Skycom Data Import (CompanyMigration)
+# Skycom Data Migration (CompanyMigration)
 
 > **Status**: Live v1. Owner-only, config-driven CSV ingestion. The
 > `migration_mapping_config` document tells a generic engine what to write and
@@ -14,7 +14,7 @@
 |---------|------|
 | `CompanyMigration` | Source of truth — config, counters, audit logs, approve/rollback workflow, and (via `folder_id`) the upload folder |
 | `migration_mapping_config` (jsonb) | The program: source options + one or more targets (resource, identity, category, columns, defaults) |
-| Migration folder (`Folder` + `StoredFile` chunks) | Root "Data Import" folder holds one child folder per migration; every chunk file is a `StoredFile` attached to the migration |
+| Migration folder (`Folder` + `StoredFile` chunks) | Root "Migrations" folder holds one child folder per migration; every chunk file is a `StoredFile` attached to the migration |
 | `CompanyMigrationLog` | Per-record audit: `created` → rollback destroys, `updated` → rollback restores `previous_state` |
 | `CompanyMigrations::ImportJob` / `RollbackJob` | Solid Queue executors; statuses are job-owned |
 
@@ -342,7 +342,7 @@ Routes under `companies` (`config/routes.rb`):
 | Route | Action | Notes |
 |-------|--------|-------|
 | `GET /companies/:company_id/company_migrations(.json)` | `index` | List + create modal data |
-| `POST …/company_migrations.json` | `create` | `SetupService`: root "Data Import" folder + per-migration folder + draft record |
+| `POST …/company_migrations.json` | `create` | `SetupService`: root "Migrations" folder + per-migration folder + draft record |
 | `GET …/company_migrations/:id(.json)` | `show` | Full payload: counters, chunks, preview, config, dry-run result, `chunk_max_bytes`, `can_approve`, `can_rollback`, `config_locked` |
 | `POST …/:id/chunks` | `chunks` | Multipart `file` + `chunk_index`; strict order, header must match chunk 0, size ≤ `MIGRATION_CHUNK_MAX_BYTES` |
 | `PATCH …/:id/update_config` | `update_config` | Validates the config, clears `dry_run_result`, denormalizes `target_resource` |
@@ -353,10 +353,10 @@ Routes under `companies` (`config/routes.rb`):
 
 Frontend (Shell-First; all strings via `translate()`):
 
-- `Companies_CompanyMigrations_IndexController` — migration table, New Import modal, guarded draft delete.
+- `Companies_CompanyMigrations_IndexController` — migration table, New Migration modal, guarded draft delete.
 - `Companies_CompanyMigrations_NewModalController` — name-only create; redirects to the show page.
 - `Companies_CompanyMigrations_ShowController` — file picker → `splitCsvChunks()` (quote-aware; each chunk repeats the header, BOM only on chunk 0) → sequential `POST chunks` starting at `total_chunks` (re-pick the same file to resume); chunks list; raw preview (first rows); JSON config editor; Run dry run; Approve (disabled until a passing dry run); Rollback; live progress via WebSocket.
-- Sidebar item **Data Import** (`platform` group), dictionary entries in English + Vietnamese.
+- Sidebar item **Migrations** (`platform` group), dictionary entries in English + Vietnamese.
 
 ---
 
@@ -368,7 +368,7 @@ Frontend (Shell-First; all strings via `translate()`):
 | `MIGRATION_PREVIEW_ROW_LIMIT` | 10 | Raw preview + dry-run sample rows |
 | `MIGRATION_IMPORT_BATCH_SIZE` | 500 | Rows per upsert batch (import + rollback) |
 | `MIGRATION_ERROR_SAMPLES_LIMIT` | 20 | Stored error samples |
-| `MIGRATION_NOTIFICATION_TAG` | "Data Import" | Owner notification tag |
+| `MIGRATION_NOTIFICATION_TAG` | "Migrations" | Owner notification tag |
 | `MIGRATION_IMPORT_EXCLUDED_RESOURCES` | see §3 | Config denylist |
 
 ---
@@ -399,7 +399,7 @@ bundle exec parallel_rspec -n 14 spec/smoke spec/models/company_migration* spec/
 
 ### Manual demo checklist (dev)
 
-1. `bin/dev`; sign in as the company owner; sidebar → **Data Import** → New Import.
+1. `bin/dev`; sign in as the company owner; sidebar → **Migrations** → New Migration.
 2. Upload `faker/files/customers-10.csv`; check the preview shows the 10 rows.
 3. Paste the §2 config into the editor, Save, Run dry run → Passed, Approve.
 4. Watch `processed/total` move to 10/10; open the Customers dashboard.

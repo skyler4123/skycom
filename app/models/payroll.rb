@@ -2,6 +2,10 @@
 
 # Payroll — Atomic purpose: one employee's payroll result for one month.
 #
+# Why it exists: payroll must be reviewable, approvable, and payable inside
+# Skycom without Skycom becoming the payroll calculator or a second source of
+# truth for attendance/tax math.
+#
 # Contract: Skycom is NOT the payroll calculator. It exposes raw input
 # (attendance totals, salary/allowance bases) for the company to calculate
 # outside Skycom, then stores the finished figures so they can be reviewed,

@@ -79,7 +79,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | URL/controller structure, Stimulus naming, mandatory table fields | `docs/ARCHITECTURE_GUIDES.md` — technical standards incl. system-fields block |
 | A new resource type or pairwise join | `docs/RESOURCES.md` — gem/system/managed/appointment catalog + atomic-pair recipe |
 | Company seeding, init, or enrich flow | `docs/INIT_AND_ENRICH.md` |
-| Company data import (CSV migration engine) | `docs/DATA_IMPORT.md` — config schema, approve/rollback lifecycle, chunk upload, safe-target rails |
+| Company data migration (CSV migration engine) | `docs/DATA_MIGRATION.md` — config schema, approve/rollback lifecycle, chunk upload, safe-target rails |
 
 ## Quick Commands
 - `bin/dev` - Start dev server (web + css + job via foreman)

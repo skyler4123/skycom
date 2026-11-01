@@ -30,7 +30,7 @@ RSpec.describe CompanyMigrations::ImportJob do
       expect(migration.completed_at).to be_present
       expect(company.customers.count).to eq(10)
 
-      expect(Notification.where(company: company, name: "Data import '#{migration.name}' finished").count).to eq(1)
+      expect(Notification.where(company: company, name: "Migration '#{migration.name}' finished").count).to eq(1)
       tag = NotificationTag.find_by(company: company, name: MIGRATION_NOTIFICATION_TAG)
       expect(EmployeeNotificationTagAppointment.exists?(employee: owner, notification_tag: tag)).to be(true)
     end
@@ -48,7 +48,7 @@ RSpec.describe CompanyMigrations::ImportJob do
       expect(migration.workflow_status).to eq("failed")
       expect(migration.error_samples.last["errors"]).to include(/missing a unique index/)
       expect(company.customers.count).to eq(0)
-      expect(Notification.where(company: company, name: "Data import '#{migration.name}' failed").count).to eq(1)
+      expect(Notification.where(company: company, name: "Migration '#{migration.name}' failed").count).to eq(1)
     end
 
     it "is a no-op unless approved" do

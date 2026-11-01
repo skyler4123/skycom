@@ -4,13 +4,13 @@
 # company folder and optionally attached to a domain record.
 #
 # Why it exists: centralizes upload metadata, MIME/size validation, and chunk
-# bookkeeping for data imports; the polymorphic attachable lets a file belong to
+# bookkeeping for data migrations; the polymorphic attachable lets a file belong to
 # a migration or another record without a per-domain table.
 # How it works: has_one_attached :file; before_save syncs file_size,
 # content_type, extension, and name from the blob. Validations enforce the same
 # company for folder/attachable plus the ACCEPTABLE_STORED_FILE_TYPES and
 # STORED_FILE_MAX_SIZES_BY_TYPE limits. Import chunk counters live in metadata
-# via store_accessor (see docs/STORAGE.md, docs/DATA_IMPORT.md).
+# via store_accessor (see docs/STORAGE.md, docs/DATA_MIGRATION.md).
 # Main associations: belongs_to :company (touch), :folder, :attachable
 # (polymorphic, optional); has_one_attached :file.
 class StoredFile < ApplicationRecord
