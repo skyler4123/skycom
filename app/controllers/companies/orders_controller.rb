@@ -88,7 +88,7 @@ class Companies::OrdersController < Companies::ApplicationController
   def new
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: {} }
+      format.json { render json: { employees: salesperson_options } }
     end
   end
 
@@ -97,7 +97,7 @@ class Companies::OrdersController < Companies::ApplicationController
 
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { order: format_order(order) } }
+      format.json { render json: { order: format_order(order), employees: salesperson_options } }
     end
   end
 
@@ -143,19 +143,27 @@ class Companies::OrdersController < Companies::ApplicationController
       :currency,
       :category_id,
       :customer_id,
+      :salesperson_id,
       *property_keys
     )
+  end
+
+  def salesperson_options
+    current_company.employees.where(discarded_at: nil).order(:name).map do |employee|
+      { id: employee.id, name: employee.name }
+    end
   end
 
   def format_order(order)
     order.as_json(only: [
       :id, :name, :description, :code,
       :lifecycle_status, :workflow_status, :business_type,
-      :currency, :category_id, :customer_id,
+      :currency, :category_id, :customer_id, :salesperson_id,
       :created_at, :updated_at,
       *property_keys
     ]).merge(
-      category: order.category&.as_json(only: [ :id, :name ])
+      category: order.category&.as_json(only: [ :id, :name ]),
+      salesperson: order.salesperson&.as_json(only: [ :id, :name ])
     )
   end
 

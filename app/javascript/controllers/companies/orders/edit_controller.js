@@ -7,6 +7,9 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
   /** @type {Array<{key: string, label: string, type: string}>} */
   propertyMetadata = []
 
+  /** @type {{ id: string, name: string }[]} */
+  employees = []
+
   async connect() {
     super.connect()
 
@@ -17,6 +20,7 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
     try {
       const response = await fetchJson(`${Helpers.company_order_path(companyId, orderId)}.json`)
       this.order = response.order
+      this.employees = response.employees || []
 
       if (this.order?.category_id) {
         const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.order.category_id)
@@ -138,6 +142,19 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
             <input type="text" name="order[code]" value="${o.code || ''}"
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
           </div>
+
+          ${this.employees.length ? `
+            <div class="space-y-1">
+              <label class="text-xs font-medium text-muted-foreground">${translate("Salesperson")}</label>
+              <select name="order[salesperson_id]"
+                class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
+                <option value="">${translate("Unattributed")}</option>
+                ${this.employees.map(employee => `
+                  <option value="${employee.id}" ${employee.id === o.salesperson_id ? "selected" : ""}>${employee.name}</option>
+                `).join("")}
+              </select>
+            </div>
+          ` : ""}
 
           <div class="space-y-1">
             <label class="text-xs font-medium text-muted-foreground">${translate("Category")}</label>

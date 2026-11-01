@@ -748,6 +748,7 @@ class Seed::RetailInitService
         "Student" => { create: true, read: true, update: true, delete: true }
       },
       Manager: {
+        "KpiConfig" => { read: true },
         "Appointment" => { create: true, read: true, update: true, delete: true },
         "Brand" => { create: true, read: true, update: true, delete: true },
         "Page" => { create: true, read: true, update: true, delete: true },

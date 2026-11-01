@@ -2,7 +2,7 @@
 
 module OrderProcessingV1
   class CreateOrderService
-    def self.call(company:, branch:, items:, customer: nil)
+    def self.call(company:, branch:, items:, customer: nil, employee: nil)
       total_price = items.sum { |i| i[:quantity].to_i * i[:unit_price].to_f }
 
       order_customer = customer || company.customers.create!(
@@ -17,7 +17,8 @@ module OrderProcessingV1
         name: "POS Order #{Time.current.to_i}",
         workflow_status: :pending,
         currency: :usd,
-        business_type: :in_store
+        business_type: :in_store,
+        salesperson: employee
       )
 
       order_product_appointments = items.map do |item|
