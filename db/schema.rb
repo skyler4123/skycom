@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_31_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_01_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -3937,6 +3937,68 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_000001) do
     t.index ["discarded_at"], name: "index_folders_on_discarded_at"
     t.index ["external_id"], name: "index_folders_on_external_id"
     t.index ["parent_id"], name: "index_folders_on_parent_id"
+  end
+
+  create_table "import_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "import_id", null: false
+    t.uuid "company_id", null: false
+    t.string "record_type", null: false
+    t.uuid "record_id", null: false
+    t.integer "action", null: false
+    t.integer "source_row"
+    t.jsonb "previous_state", default: {}, null: false
+    t.string "resource"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_import_logs_on_company_id"
+    t.index ["discarded_at"], name: "index_import_logs_on_discarded_at"
+    t.index ["import_id", "record_type", "record_id"], name: "idx_import_logs_unique_record", unique: true
+    t.index ["record_type", "record_id"], name: "index_import_logs_on_record_type_and_record_id"
+  end
+
+  create_table "imports", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "folder_id", null: false
+    t.uuid "creator_id"
+    t.uuid "category_id"
+    t.string "name", null: false
+    t.text "description"
+    t.string "target_table"
+    t.string "target_model"
+    t.jsonb "schema_snapshot", default: {}, null: false
+    t.jsonb "dry_run_result"
+    t.jsonb "error_samples", default: [], null: false
+    t.string "source_filename"
+    t.bigint "source_file_size"
+    t.string "source_digest"
+    t.bigint "total_rows", default: 0, null: false
+    t.bigint "processed_rows", default: 0, null: false
+    t.bigint "created_rows", default: 0, null: false
+    t.bigint "failed_rows", default: 0, null: false
+    t.datetime "approved_at"
+    t.datetime "completed_at"
+    t.datetime "rolled_back_at"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_imports_on_category_id"
+    t.index ["company_id"], name: "index_imports_on_company_id"
+    t.index ["creator_id"], name: "index_imports_on_creator_id"
+    t.index ["discarded_at"], name: "index_imports_on_discarded_at"
+    t.index ["folder_id"], name: "index_imports_on_folder_id"
+    t.index ["target_table"], name: "index_imports_on_target_table"
+    t.index ["workflow_status"], name: "index_imports_on_workflow_status"
   end
 
   create_table "invoice_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -7993,6 +8055,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_000001) do
   add_foreign_key "facility_tag_appointments", "facilities"
   add_foreign_key "facility_tag_appointments", "tags"
   add_foreign_key "folders", "companies"
+  add_foreign_key "import_logs", "companies"
+  add_foreign_key "import_logs", "imports"
+  add_foreign_key "imports", "categories", on_delete: :nullify
+  add_foreign_key "imports", "companies"
+  add_foreign_key "imports", "employees", column: "creator_id", on_delete: :nullify
+  add_foreign_key "imports", "folders"
   add_foreign_key "invoice_tag_appointments", "companies"
   add_foreign_key "invoice_tag_appointments", "invoices"
   add_foreign_key "invoice_tag_appointments", "tags"

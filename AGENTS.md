@@ -72,6 +72,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 |---|---|
 | Server- or browser-side caching | `docs/CACHE.md` — `ram_cache` / `local_cache` / `sync_cache` / `global_cache` tiers + client cache + **cache key catalog (§7)** |
 | Realtime updates | `docs/WEBSOCKET.md` — channel naming + event protocol + add-new-event recipe |
+| User-prepared CSV import | `docs/IMPORT.md` — allowlist, exact header contract, full-file dry run, run/rollback |
 | Search | `docs/MEILISEARCH.md` — sync architecture + making a model searchable |
 | External API integration (dev/test) | `docs/MOCK_API.md` — mock server routes + add-new-API template |
 | Backlog / future work | `docs/TODO.md` — performance backlog conventions + payroll client-calculation tasks |

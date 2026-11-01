@@ -62,6 +62,7 @@ export const SIDEBAR_ITEMS = [
   { key: "folders", group: "storage", icon: "folder", label: "Folders", href: (cid) => Helpers.company_folders_path(cid) },
   { key: "storage_statistics", group: "storage", icon: "pie_chart", label: "Storage Statistics", href: (cid) => Helpers.company_storage_statistics_path(cid) },
   { key: "company_migrations", group: "platform", icon: "upload_file", label: "Migrations", href: (cid) => Helpers.company_company_migrations_path(cid) },
+  { key: "imports", group: "platform", icon: "file_upload", label: "Imports", href: (cid) => Helpers.company_imports_path(cid) },
   { key: "calendar", group: "calendar", icon: "calendar_month", label: "Calendar", href: (cid) => Helpers.company_calendar_path(cid) },
   { key: "events", group: "calendar", icon: "event", label: "Events", href: (cid) => Helpers.company_events_path(cid) },
   { key: "event_configs", group: "calendar", icon: "tune", label: "Event Configs", href: (cid) => Helpers.company_event_configs_path(cid) },  { key: "event_config_logs", group: "calendar", icon: "history", label: "Event Config Logs", href: (cid) => Helpers.company_event_config_logs_path(cid) },  { key: "payment_methods", group: "platform", icon: "payments", label: "Payment Methods", href: (cid) => Helpers.company_payment_method_appointments_path(cid) },

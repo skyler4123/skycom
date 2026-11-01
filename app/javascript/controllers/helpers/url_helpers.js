@@ -227,6 +227,12 @@ export const update_config_company_company_migration_path = (companyId, migratio
 export const dry_run_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/dry_run`
 export const approve_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/approve`
 export const rollback_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/rollback`
+export const company_imports_path = (companyId) => `/companies/${companyId}/imports`
+export const company_import_path = (companyId, importId) => `/companies/${companyId}/imports/${importId}`
+export const source_file_company_import_path = (companyId, importId) => `/companies/${companyId}/imports/${importId}/source_file`
+export const dry_run_company_import_path = (companyId, importId) => `/companies/${companyId}/imports/${importId}/dry_run`
+export const approve_company_import_path = (companyId, importId) => `/companies/${companyId}/imports/${importId}/approve`
+export const rollback_company_import_path = (companyId, importId) => `/companies/${companyId}/imports/${importId}/rollback`
 export const create_company_documents_path = (companyId) => `/companies/${companyId}/documents`
 export const new_company_document_path = (companyId) => `/companies/${companyId}/documents/new`
 export const company_document_path = (companyId, documentId) => `/companies/${companyId}/documents/${documentId}`
