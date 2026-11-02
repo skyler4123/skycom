@@ -33,6 +33,22 @@ RSpec.describe OrderProcessingV1::CreateOrderService do
       expect(result[:total_price]).to eq(100.00)
     end
 
+    context "employee attribution" do
+      let(:employee) { create(:employee, company: company) }
+
+      it "attributes the order to the given employee" do
+        described_class.call(company: company, branch: branch, items: items, customer: customer, employee: employee)
+
+        expect(Order.last.employee).to eq(employee)
+      end
+
+      it "leaves the employee blank when no employee is given" do
+        described_class.call(company: company, branch: branch, items: items, customer: customer)
+
+        expect(Order.last.employee).to be_nil
+      end
+    end
+
     context "with multiple items" do
       let(:product2) { create(:product, company: company, branch: branch) }
       let!(:stock2) { create(:stock, company:, product: product2, warehouse:, quantity: 5) }

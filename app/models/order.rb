@@ -11,7 +11,8 @@
 # them and #line_total sums their total_price. Invoices and discounts hang off the
 # order (see docs/ORDER_PROCESSING_V1.md, docs/DISCOUNTS.md).
 # Main associations: belongs_to :company, :category, :property_mapping
-# (required), :branch and :customer (optional); has_many :invoices, :discounts,
+# (required), :branch, :customer, and :employee (optional; the employee credited
+# with the order, not necessarily its creator); has_many :invoices, :discounts,
 # :order_product_appointments, :order_service_appointments,
 # :order_product_group_appointments, :order_service_group_appointments,
 # :order_subscription_plan_appointments, :event_order_appointments
@@ -40,6 +41,7 @@ class Order < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :customer, optional: true
+  belongs_to :employee, optional: true
   belongs_to :category
   belongs_to :property_mapping
 
@@ -63,6 +65,7 @@ class Order < ApplicationRecord
   validates :currency, presence: true
 
   validates :business_type, presence: true
+  validate :employee_belongs_to_company
 
   # --- Methods ---
   # Combined line items across all atomic order tables (products, services,
@@ -81,5 +84,14 @@ class Order < ApplicationRecord
       order_product_group_appointments.sum(:total_price) +
       order_service_group_appointments.sum(:total_price) +
       order_subscription_plan_appointments.sum(:total_price)
+  end
+
+  private
+
+  def employee_belongs_to_company
+    return if employee.nil? || company_id.nil?
+    return if employee.company_id == company_id
+
+    errors.add(:employee, "must belong to the same company")
   end
 end

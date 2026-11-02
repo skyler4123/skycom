@@ -16,7 +16,6 @@ class CreateEmployees < ActiveRecord::Migration[8.0]
       t.integer :currency
       t.integer :country
       t.integer :timezone
-      t.uuid    :manager_id, index: true
       t.bigint  :monthly_salary_cents, null: false, default: 0
       t.bigint  :monthly_allowance_cents, null: false, default: 0
 
@@ -42,6 +41,8 @@ class CreateEmployees < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_foreign_key :employees, :employees, column: :manager_id, on_delete: :nullify
+    # employee_groups is created before employees, so its manager foreign key
+    # is declared here, right after the referenced table exists.
+    add_foreign_key :employee_groups, :employees, column: :manager_id, on_delete: :nullify
   end
 end

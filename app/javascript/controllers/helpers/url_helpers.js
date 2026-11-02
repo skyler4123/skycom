@@ -384,6 +384,12 @@ export const company_customer_subprofile_path = (companyId, id) => `/companies/$
 export const edit_company_customer_subprofile_path = (companyId, id) => `/companies/${companyId}/customer_subprofiles/${id}/edit`
 
 export const company_analytics_path = (companyId) => `/companies/${companyId}/analytics`
+
+export const company_kpi_configs_path = (companyId) => `/companies/${companyId}/kpi_configs`
+export const create_company_kpi_configs_path = (companyId) => `/companies/${companyId}/kpi_configs`
+export const company_kpi_config_path = (companyId, id) => `/companies/${companyId}/kpi_configs/${id}`
+export const company_performance_index_path = (companyId) => `/companies/${companyId}/performance`
+export const company_performance_path = (companyId, employeeId) => `/companies/${companyId}/performance/${employeeId}`
 export const company_tax_path = (companyId) => `/companies/${companyId}/tax`
 export const company_tax_summary_path = (companyId) => `/companies/${companyId}/tax/summary`
 export const company_tax_invoices_path = (companyId) => `/companies/${companyId}/tax/invoices`

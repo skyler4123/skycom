@@ -95,7 +95,7 @@ RSpec.feature "My Profile", type: :feature, js: true do
 
   scenario "Attendance month dropdown switches months" do
     visit my_company_attendance_months_path(company)
-    find("select").select("September 2026")
+    find("select").select(attendance_month_other.month.strftime("%B %Y"))
     expect(page).to have_content(attendance_month_other.total_work_minutes.to_s, wait: 10)
   end
 
@@ -111,7 +111,7 @@ RSpec.feature "My Profile", type: :feature, js: true do
 
   scenario "Payroll month dropdown switches months" do
     visit company_payroll_my_path(company)
-    find("select").select("September 2026")
+    find("select").select(payroll_other.month.strftime("%B %Y"))
     expect(page).to have_content(payroll_other.month.to_date.strftime('%B %Y'), wait: 10)
   end
 end

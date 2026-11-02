@@ -105,8 +105,9 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 60 | `discounts` | Sales | Single-use discount codes (unique per company, consumption state, SoT bindings) |
 | 61 | `stock_pendings` | Inventory | Owner-less pending-hold records (one hold ledger row on reserve, one release row on consume/release) |
 | 62 | `event_configs` | Events | Per-category event rules (stock holds, order bridge, overlap warnings) |
+| 63 | `kpi_configs` | HR | Configurable employee KPI rules (metric, target, weight, period, scope) |
 
-**Total: 61 tables**
+**Total: 62 tables**
 
 ---
 

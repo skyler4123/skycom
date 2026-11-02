@@ -13,6 +13,7 @@ RSpec.describe Employee, type: :model do
     it { should have_many(:employee_employee_group_appointments).dependent(:destroy) }
     it { should have_many(:employee_groups).through(:employee_employee_group_appointments) }
     it { should have_many(:managed_employee_groups).class_name("EmployeeGroup").with_foreign_key(:manager_id).dependent(:nullify) }
+    it { should have_many(:orders).dependent(:nullify) }
     it { should have_many(:department_employee_appointments).dependent(:destroy) }
     it { should have_many(:departments).through(:department_employee_appointments) }
     it { should have_many(:employee_tag_appointments).dependent(:destroy) }

@@ -406,6 +406,7 @@ class Seed::HotelInitService
         "Supplier" => { read: true }
       },
       Manager: {
+        "KpiConfig" => { read: true },
         "Product" => full_crud,
         "Page" => full_crud,
         "ShiftTemplate" => full_crud,

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_01_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -2665,6 +2665,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000003) do
     t.uuid "branch_id"
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
+    t.uuid "manager_id"
     t.string "email"
     t.string "name"
     t.text "description"
@@ -2713,7 +2714,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000003) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "manager_id"
     t.index ["branch_id"], name: "index_employee_groups_on_branch_id"
     t.index ["business_type"], name: "index_employee_groups_on_business_type"
     t.index ["category_id"], name: "index_employee_groups_on_category_id"
@@ -4101,6 +4101,38 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000003) do
     t.index ["workflow_status"], name: "index_invoices_on_workflow_status"
   end
 
+  create_table "kpi_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "category_id"
+    t.uuid "branch_id"
+    t.uuid "department_id"
+    t.uuid "role_id"
+    t.string "name", null: false
+    t.text "description"
+    t.string "metric_key", null: false
+    t.integer "direction", default: 0, null: false
+    t.integer "period_type", default: 0, null: false
+    t.decimal "target_value", precision: 15, scale: 2
+    t.decimal "weight", precision: 8, scale: 2, default: "1.0", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_kpi_configs_on_branch_id"
+    t.index ["category_id"], name: "index_kpi_configs_on_category_id"
+    t.index ["company_id", "name"], name: "index_kpi_configs_on_company_id_and_name", unique: true
+    t.index ["company_id", "workflow_status"], name: "index_kpi_configs_on_company_id_and_workflow_status"
+    t.index ["company_id"], name: "index_kpi_configs_on_company_id"
+    t.index ["department_id"], name: "index_kpi_configs_on_department_id"
+    t.index ["discarded_at"], name: "index_kpi_configs_on_discarded_at"
+    t.index ["role_id"], name: "index_kpi_configs_on_role_id"
+  end
+
   create_table "memberships", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -4562,6 +4594,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000003) do
     t.uuid "customer_id", null: false
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
+    t.uuid "employee_id"
     t.string "email"
     t.string "name"
     t.text "description"
@@ -4614,10 +4647,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000003) do
     t.index ["business_type"], name: "index_orders_on_business_type"
     t.index ["category_id"], name: "index_orders_on_category_id"
     t.index ["code"], name: "index_orders_on_code", unique: true
+    t.index ["company_id", "employee_id", "created_at"], name: "index_orders_on_company_employee_created_at"
     t.index ["company_id"], name: "index_orders_on_company_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["discarded_at"], name: "index_orders_on_discarded_at"
     t.index ["email"], name: "index_orders_on_email", unique: true
+    t.index ["employee_id"], name: "index_orders_on_employee_id"
     t.index ["external_id"], name: "index_orders_on_external_id"
     t.index ["lifecycle_status"], name: "index_orders_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_orders_on_property_mapping_id"
@@ -8069,6 +8104,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000003) do
   add_foreign_key "invoices", "companies"
   add_foreign_key "invoices", "orders"
   add_foreign_key "invoices", "property_mappings"
+  add_foreign_key "kpi_configs", "branches", on_delete: :nullify
+  add_foreign_key "kpi_configs", "categories", on_delete: :nullify
+  add_foreign_key "kpi_configs", "companies"
+  add_foreign_key "kpi_configs", "departments", on_delete: :nullify
+  add_foreign_key "kpi_configs", "roles", on_delete: :nullify
   add_foreign_key "memberships", "branches"
   add_foreign_key "memberships", "categories"
   add_foreign_key "memberships", "companies"
@@ -8115,6 +8155,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000003) do
   add_foreign_key "orders", "categories"
   add_foreign_key "orders", "companies"
   add_foreign_key "orders", "customers"
+  add_foreign_key "orders", "employees", on_delete: :nullify
   add_foreign_key "orders", "property_mappings"
   add_foreign_key "pages", "branches"
   add_foreign_key "pages", "companies"
