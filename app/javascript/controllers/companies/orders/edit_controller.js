@@ -145,12 +145,12 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
 
           ${this.employees.length ? `
             <div class="space-y-1">
-              <label class="text-xs font-medium text-muted-foreground">${translate("Salesperson")}</label>
-              <select name="order[salesperson_id]"
+              <label class="text-xs font-medium text-muted-foreground">${translate("Employee")}</label>
+              <select name="order[employee_id]"
                 class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
                 <option value="">${translate("Unattributed")}</option>
                 ${this.employees.map(employee => `
-                  <option value="${employee.id}" ${employee.id === o.salesperson_id ? "selected" : ""}>${employee.name}</option>
+                  <option value="${employee.id}" ${employee.id === o.employee_id ? "selected" : ""}>${employee.name}</option>
                 `).join("")}
               </select>
             </div>

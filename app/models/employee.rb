@@ -15,7 +15,7 @@
 # :branch and :user (optional); has_many :roles, :employee_groups,
 # :managed_employee_groups, :departments,
 # :services, :customers, :documents, :events, :event_groups, :exams, :facilities,
-# :order_groups, :products, :projects, :project_groups, :tasks, :task_groups,
+# :orders, :order_groups, :products, :projects, :project_groups, :tasks, :task_groups,
 # :related_employees, :employee_profiles, :employee_subprofiles,
 # :scheduled_shifts, :attendance_logs, :attendance_days, :attendance_months,
 # :payrolls, and ticket links; has_one :notification_config (dependent: :destroy).
@@ -65,8 +65,7 @@ class Employee < ApplicationRecord
   has_many :attendance_days, dependent: :destroy
   has_many :attendance_months, dependent: :destroy
   has_many :payrolls, dependent: :destroy
-  has_many :sales_orders, class_name: "Order", foreign_key: :salesperson_id,
-    dependent: :nullify, inverse_of: :salesperson
+  has_many :orders, dependent: :nullify, inverse_of: :employee
 
   has_many :employee_employee_group_appointments, dependent: :destroy
   has_many :employee_groups, through: :employee_employee_group_appointments

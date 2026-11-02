@@ -2,7 +2,7 @@ module KpiHelper
   # Builds a paid order with one product line so revenue and count KPIs both
   # have deterministic input. The company is forced to USD because
   # Analytics::RevenueCalculator converts USD totals to cents.
-  def create_paid_order(company:, salesperson: nil, created_at: Time.current, total_price: 50.0, workflow_status: :paid)
+  def create_paid_order(company:, employee: nil, created_at: Time.current, total_price: 50.0, workflow_status: :paid)
     # update_columns skips before_validation :assign_currency_from_country,
     # which would otherwise restore the random country's currency.
     company.update_columns(currency: Company.currencies[:usd]) unless company.currency_usd?
@@ -17,7 +17,7 @@ module KpiHelper
       currency: :usd,
       business_type: :in_store,
       workflow_status: workflow_status,
-      salesperson: salesperson,
+      employee: employee,
       created_at: created_at
     )
 

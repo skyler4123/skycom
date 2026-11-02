@@ -10,8 +10,8 @@ RSpec.describe Kpi::LeaderboardService do
 
   it "scores every employee and sorts by composite descending" do
     create(:kpi_config, company: company, name: "Orders", metric_key: "orders_count", target_value: 10)
-    12.times { create_paid_order(company: company, salesperson: employee, created_at: in_range) }
-    5.times { create_paid_order(company: company, salesperson: coworker, created_at: in_range) }
+    12.times { create_paid_order(company: company, employee: employee, created_at: in_range) }
+    5.times { create_paid_order(company: company, employee: coworker, created_at: in_range) }
 
     result = described_class.call(company: company, from: range_from, to: range_to)
 
@@ -21,9 +21,9 @@ RSpec.describe Kpi::LeaderboardService do
     expect(result[:rows].find { |row| row[:employee_id] == coworker.id }[:composite_pct]).to eq(50.0)
   end
 
-  it "reports paid orders with no salesperson as unattributed" do
-    create_paid_order(company: company, salesperson: nil, created_at: in_range, total_price: 50.0)
-    create_paid_order(company: company, salesperson: nil, created_at: in_range, total_price: 25.0)
+  it "reports paid orders with no employee as unattributed" do
+    create_paid_order(company: company, employee: nil, created_at: in_range, total_price: 50.0)
+    create_paid_order(company: company, employee: nil, created_at: in_range, total_price: 25.0)
 
     result = described_class.call(company: company, from: range_from, to: range_to)
 
@@ -42,7 +42,7 @@ RSpec.describe Kpi::LeaderboardService do
 
   it "ignores orders outside the period" do
     create(:kpi_config, company: company, name: "Orders", metric_key: "orders_count", target_value: 10)
-    create_paid_order(company: company, salesperson: employee, created_at: in_range - 1.month)
+    create_paid_order(company: company, employee: employee, created_at: in_range - 1.month)
 
     result = described_class.call(company: company, from: range_from, to: range_to)
     row = result[:rows].find { |candidate| candidate[:employee_id] == employee.id }

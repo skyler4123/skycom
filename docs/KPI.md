@@ -2,7 +2,7 @@
 
 ## 1. Scope
 
-KPI v1 measures **paid orders per salesperson**. It is a visibility tool:
+KPI v1 measures **paid orders per employee**. It is a visibility tool:
 
 - No result snapshots, reviews, bonuses, or payroll link.
 - Scores are computed on demand for any date range.
@@ -11,19 +11,20 @@ KPI v1 measures **paid orders per salesperson**. It is a visibility tool:
 
 ## 2. Attribution
 
-`orders.salesperson_id` points at `employees.id`. One order has at most one
-salesperson — there is no split-credit table.
+`orders.employee_id` points at `employees.id` and records the employee
+credited with the order (not necessarily its creator). One order has at most
+one employee — there is no split-credit table.
 
-- POS checkout (`OrderProcessingV1::CreateOrderService`) sets the salesperson
+- POS checkout (`OrderProcessingV1::CreateOrderService`) sets the employee
   from `current_employee`.
-- The web order form exposes a salesperson picker, defaulted to the signed-in
+- The web order form exposes an employee picker, defaulted to the signed-in
   employee (`OrdersController#new` returns `employees`).
 - Historical orders stay `NULL` and appear as **unattributed** on the
   Performance page. They are excluded from employee scores, so a low score
   caused by missing attribution is visible instead of silent.
 
-A salesperson from another company is rejected by
-`Order#salesperson_belongs_to_company`.
+An employee from another company is rejected by
+`Order#employee_belongs_to_company`.
 
 ## 3. Tables
 
@@ -72,7 +73,7 @@ value; the registry stays the whitelist.
 
 | Key | Unit | Source |
 |---|---|---|
-| `orders_count` | count | Paid, non-discarded orders grouped by `salesperson_id` |
+| `orders_count` | count | Paid, non-discarded orders grouped by `employee_id` |
 | `orders_revenue_cents` | currency_cents | `Analytics::RevenueCalculator` over the same orders |
 
 Both use `created_at` inside the selected range, matching the dashboard's
@@ -119,7 +120,7 @@ Invalid or incomplete input falls back to `this_month`.
 | `Kpi::PeriodRange` | Preset/custom windows |
 
 `LeaderboardService` also reports `unattributed: { orders_count, revenue_cents }`
-for paid orders without a salesperson.
+for paid orders without an employee.
 
 ## 8. Permissions (ABAC)
 
@@ -179,11 +180,11 @@ self-view, CSV export, and arbitrary formula/SQL authoring.
 
 - Feature: `spec/features/companies/performance/index_spec.rb`,
   `show_spec.rb`, `spec/features/companies/kpi_configs/index_spec.rb`,
-  `spec/features/companies/orders/salesperson_spec.rb`
+  `spec/features/companies/orders/employee_spec.rb`
 - Model: `spec/models/kpi_config_spec.rb`, `spec/models/order_spec.rb`
 - Services: `spec/services/kpi/**`
 - Request: `spec/requests/companies/kpi_configs_controller_spec.rb`,
-  `performance_controller_spec.rb`, `orders_salesperson_spec.rb`
+  `performance_controller_spec.rb`, `orders_employee_spec.rb`
 
 Run `bundle exec parallel_rspec -n 14` in feature → model → request order
 (`docs/TEST_PRIORITY.md`).

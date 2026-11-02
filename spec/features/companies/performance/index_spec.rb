@@ -14,8 +14,8 @@ RSpec.feature "Companies::Performance Index", type: :feature, js: true do
   let(:in_range) { Time.zone.parse("2026-03-15 10:00:00") }
 
   before do
-    12.times { create_paid_order(company: company, salesperson: employee, created_at: in_range) }
-    create_paid_order(company: company, salesperson: nil, created_at: in_range)
+    12.times { create_paid_order(company: company, employee: employee, created_at: in_range) }
+    create_paid_order(company: company, employee: nil, created_at: in_range)
   end
 
   def seed_client_cache(user)

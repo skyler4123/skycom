@@ -143,7 +143,7 @@ export default class Companies_Performance_IndexController extends Companies_Lay
             <div class="mb-6 flex items-start gap-3 rounded-xl border border-warning/40 bg-warning/10 p-4" data-unattributed-banner>
               <span class="material-symbols-outlined text-warning text-[20px]!">warning</span>
               <p class="text-sm text-foreground">
-                ${translate("Some paid orders have no salesperson. Their revenue is excluded from employee scores.")}
+                ${translate("Some paid orders have no employee. Their revenue is excluded from employee scores.")}
               </p>
             </div>
           ` : ""}

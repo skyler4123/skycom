@@ -38,10 +38,10 @@ RSpec.describe "Companies::PerformanceController", type: :request do
   end
 
   before do
-    create_paid_order(company: company, salesperson: employee, created_at: in_range)
-    create_paid_order(company: company, salesperson: employee, created_at: in_range)
-    create_paid_order(company: company, salesperson: nil, created_at: in_range)
-    create_paid_order(company: company, salesperson: employee, created_at: in_range - 1.month)
+    create_paid_order(company: company, employee: employee, created_at: in_range)
+    create_paid_order(company: company, employee: employee, created_at: in_range)
+    create_paid_order(company: company, employee: nil, created_at: in_range)
+    create_paid_order(company: company, employee: employee, created_at: in_range - 1.month)
   end
 
   around do |example|

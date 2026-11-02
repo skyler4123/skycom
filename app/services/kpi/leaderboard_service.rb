@@ -2,7 +2,7 @@
 
 # Builds the company-wide KPI leaderboard for a date range. Each metric is
 # computed once for all employees (grouped query), then configs are applied per
-# employee. Also reports paid orders that have no salesperson, so a low score
+# employee. Also reports paid orders that have no employee, so a low score
 # caused by missing attribution is visible.
 module Kpi
   class LeaderboardService
@@ -67,7 +67,7 @@ module Kpi
       orders = company.orders.where(
         workflow_status: :paid,
         discarded_at: nil,
-        salesperson_id: nil,
+        employee_id: nil,
         created_at: from..to
       )
 

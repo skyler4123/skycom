@@ -35,7 +35,7 @@ RSpec.feature "Companies::Performance Show", type: :feature, js: true do
   end
 
   scenario "owner sees one employee's KPI breakdown" do
-    12.times { create_paid_order(company: company, salesperson: employee, created_at: in_range) }
+    12.times { create_paid_order(company: company, employee: employee, created_at: in_range) }
 
     sign_in(owner)
     seed_client_cache

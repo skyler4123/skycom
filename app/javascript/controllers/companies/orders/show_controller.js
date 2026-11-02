@@ -156,8 +156,8 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
                 <span class="material-symbols-outlined">person</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-muted-foreground">${translate("Salesperson")}</p>
-                <p class="text-sm font-semibold text-foreground">${o.salesperson?.name || translate("Unattributed")}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Employee")}</p>
+                <p class="text-sm font-semibold text-foreground">${o.employee?.name || translate("Unattributed")}</p>
               </div>
             </div>
           </div>

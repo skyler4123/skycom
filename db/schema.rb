@@ -4642,20 +4642,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "salesperson_id"
+    t.uuid "employee_id"
     t.index ["branch_id"], name: "index_orders_on_branch_id"
     t.index ["business_type"], name: "index_orders_on_business_type"
     t.index ["category_id"], name: "index_orders_on_category_id"
     t.index ["code"], name: "index_orders_on_code", unique: true
-    t.index ["company_id", "salesperson_id", "created_at"], name: "index_orders_on_company_salesperson_created_at"
+    t.index ["company_id", "employee_id", "created_at"], name: "index_orders_on_company_employee_created_at"
     t.index ["company_id"], name: "index_orders_on_company_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["discarded_at"], name: "index_orders_on_discarded_at"
     t.index ["email"], name: "index_orders_on_email", unique: true
+    t.index ["employee_id"], name: "index_orders_on_employee_id"
     t.index ["external_id"], name: "index_orders_on_external_id"
     t.index ["lifecycle_status"], name: "index_orders_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_orders_on_property_mapping_id"
-    t.index ["salesperson_id"], name: "index_orders_on_salesperson_id"
     t.index ["workflow_status"], name: "index_orders_on_workflow_status"
   end
 
@@ -8155,7 +8155,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
   add_foreign_key "orders", "categories"
   add_foreign_key "orders", "companies"
   add_foreign_key "orders", "customers"
-  add_foreign_key "orders", "employees", column: "salesperson_id", on_delete: :nullify
+  add_foreign_key "orders", "employees", on_delete: :nullify
   add_foreign_key "orders", "property_mappings"
   add_foreign_key "pages", "branches"
   add_foreign_key "pages", "companies"

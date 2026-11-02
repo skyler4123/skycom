@@ -18,7 +18,7 @@ module OrderProcessingV1
         workflow_status: :pending,
         currency: :usd,
         business_type: :in_store,
-        salesperson: employee
+        employee: employee
       )
 
       order_product_appointments = items.map do |item|

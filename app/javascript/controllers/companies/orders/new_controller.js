@@ -139,8 +139,8 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
 
           ${this.employees.length ? `
             <div class="space-y-1">
-              <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Salesperson")}</label>
-              <select name="order[salesperson_id]"
+              <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Employee")}</label>
+              <select name="order[employee_id]"
                 class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
                 <option value="">${translate("Unattributed")}</option>
                 ${this.employees.map(employee => `

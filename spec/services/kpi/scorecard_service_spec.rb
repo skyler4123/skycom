@@ -14,7 +14,7 @@ RSpec.describe Kpi::ScorecardService do
   it "returns raw values, achievement, and a weighted composite" do
     create(:kpi_config, company: company, name: "Orders", metric_key: "orders_count", target_value: 10, weight: 1)
     create(:kpi_config, company: company, name: "Revenue", metric_key: "orders_revenue_cents", target_value: 60_000, weight: 3)
-    12.times { create_paid_order(company: company, salesperson: employee, created_at: in_range, total_price: 50.0) }
+    12.times { create_paid_order(company: company, employee: employee, created_at: in_range, total_price: 50.0) }
 
     result = call_service
 
@@ -30,7 +30,7 @@ RSpec.describe Kpi::ScorecardService do
 
   it "shows the raw value without scoring when no target is set" do
     create(:kpi_config, company: company, name: "Orders", metric_key: "orders_count", target_value: nil)
-    3.times { create_paid_order(company: company, salesperson: employee, created_at: in_range) }
+    3.times { create_paid_order(company: company, employee: employee, created_at: in_range) }
 
     result = call_service
 
@@ -42,7 +42,7 @@ RSpec.describe Kpi::ScorecardService do
   it "inverts achievement for lower-is-better metrics" do
     create(:kpi_config, company: company, name: "Orders", metric_key: "orders_count",
       target_value: 10, direction: :lower_better)
-    5.times { create_paid_order(company: company, salesperson: employee, created_at: in_range) }
+    5.times { create_paid_order(company: company, employee: employee, created_at: in_range) }
 
     result = call_service
 
@@ -59,9 +59,9 @@ RSpec.describe Kpi::ScorecardService do
   it "counts only orders sold by the employee" do
     coworker = create(:employee, company: company)
     create(:kpi_config, company: company, name: "Orders", metric_key: "orders_count", target_value: 10)
-    create_paid_order(company: company, salesperson: employee, created_at: in_range)
-    create_paid_order(company: company, salesperson: coworker, created_at: in_range)
-    create_paid_order(company: company, salesperson: nil, created_at: in_range)
+    create_paid_order(company: company, employee: employee, created_at: in_range)
+    create_paid_order(company: company, employee: coworker, created_at: in_range)
+    create_paid_order(company: company, employee: nil, created_at: in_range)
 
     result = call_service
 

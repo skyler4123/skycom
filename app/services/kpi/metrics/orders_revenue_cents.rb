@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Sums paid order revenue per salesperson, in minor units. Delegates the
+# Sums paid order revenue per employee, in minor units. Delegates the
 # line-item math to Analytics::RevenueCalculator so KPI revenue cannot drift
 # from the dashboard.
 module Kpi
@@ -20,14 +20,14 @@ module Kpi
 
       def self.call(company:, employee_ids:, from:, to:)
         orders = Kpi::Metrics::OrdersCount.paid_orders(company: company, from: from, to: to)
-          .where(salesperson_id: employee_ids)
+          .where(employee_id: employee_ids)
         totals = Analytics::RevenueCalculator.new(company: company, orders: orders).order_totals
-        salespeople = orders.pluck(:id, :salesperson_id).to_h
+        employees = orders.pluck(:id, :employee_id).to_h
         result = employee_ids.index_with { 0 }
 
         totals.each do |order_id, cents|
-          salesperson_id = salespeople[order_id]
-          result[salesperson_id] += cents if result.key?(salesperson_id)
+          employee_id = employees[order_id]
+          result[employee_id] += cents if result.key?(employee_id)
         end
 
         result

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Counts paid orders attributed to each salesperson in a date range.
+# Counts paid orders attributed to each employee in a date range.
 module Kpi
   module Metrics
     class OrdersCount
@@ -18,8 +18,8 @@ module Kpi
 
       def self.call(company:, employee_ids:, from:, to:)
         counts = paid_orders(company: company, from: from, to: to)
-          .where(salesperson_id: employee_ids)
-          .group(:salesperson_id)
+          .where(employee_id: employee_ids)
+          .group(:employee_id)
           .count
 
         employee_ids.index_with { |employee_id| counts[employee_id] || 0 }
