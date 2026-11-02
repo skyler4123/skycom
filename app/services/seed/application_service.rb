@@ -107,6 +107,14 @@ class Seed::ApplicationService
     Seed::HospitalEnrichService.new(company: company_3, user: user_2, email: "hospital@company3.com")
     Seed::HotelEnrichService.new(company: company_4, user: user_2, email: "hotel@company4.com")
 
+    # Payroll and Performance both open on the current month. Guarantee the
+    # owner (and every employee) has a current-month payroll row, and give the
+    # owner a paid order plus an active KPI rule so neither page is empty.
+    [ company_1, company_2, company_3, company_4 ].each do |company|
+      Seed::PayrollService.ensure_current_month!(company: company)
+      Seed::KpiService.create_samples!(company: company)
+    end
+
     # Audit-trail demo rows for the read-only config log pages (2 per config).
     [ company_1, company_2, company_3, company_4 ].each do |company|
       Seed::ConfigLogService.seed_for(company: company)

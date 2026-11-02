@@ -198,6 +198,16 @@ class Seed::HospitalEnrichService
   def seed_compensation
     puts "Assigning compensation and reporting lines..."
     Seed::CompensationService.assign!(company: @company)
+    refresh_owner
+  end
+
+  # The owner was appended to @employees before compensation attached their
+  # branch. Reload it so downstream attendance/event samples see that branch.
+  def refresh_owner
+    owner = @company.employees.find_by(business_type: OWNER_BUSINESS_TYPE)
+    return if owner.nil?
+
+    @employees.map! { |employee| employee.id == owner.id ? owner : employee }
   end
 
   def seed_leave_data
@@ -587,8 +597,9 @@ class Seed::HospitalEnrichService
       template = templates.select { |candidate| candidate.start_time.hour < 12 }.sample || templates.sample
       next unless template
 
-      # Create past shifts for the last 35 days
-      (1..35).each do |day_offset|
+      # Create shifts for the last 35 days, including today so the current
+      # month has a resolved day when the seed runs on a weekday.
+      (0..35).each do |day_offset|
         date = Date.current - day_offset.days
         next if date.saturday? || date.sunday? # Skip weekends
 
@@ -623,7 +634,7 @@ class Seed::HospitalEnrichService
     end
 
     # Run resolution engine
-    resolved_dates = (1..35).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
+    resolved_dates = (0..35).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
     attendance_employees.each do |emp|
       resolved_dates.each do |date|
         Attendance::DailyResolutionService.new.call(employee: emp, date: date)

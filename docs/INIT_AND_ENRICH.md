@@ -47,7 +47,7 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Pages | 4 (2 per branch) |
 | Departments | 4 |
 | Employees | ~76 (across 2 branches) |
-| Compensation / teams | Every employee: salary, allowance, contract `expiration_date`; branch teams + Leadership `EmployeeGroup` with `employee_groups.manager_id`; owner attached to the first branch |
+| Compensation / teams | Every employee: salary, allowance, company-aligned `currency`, contract `expiration_date`; branch teams + Leadership `EmployeeGroup` with `employee_groups.manager_id`; owner attached to the first branch |
 | Leave balances + requests | 1 paid-leave balance per employee (14 days) + approved/pending `AttendanceLeave` rows |
 | Company announcement | 1 published `Document` (`business_type: announcement`) linked to every employee |
 | Customers | 100 (50 per branch) |
@@ -60,6 +60,14 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Invoices | ~10 |
 | Tickets + TicketComments | ~6 tickets per company (with comments; workflow states across phases) |
 | Billing Data | 7 days of metrics + 2 invoices |
+
+After all four enrich services finish, `Seed::ApplicationService` runs two
+cross-company demo steps so the owner's own screens are populated:
+
+| Step | What It Guarantees |
+|------|--------------------|
+| `Seed::PayrollService.ensure_current_month!` | Every active employee (owner included) has a current-month `AttendanceMonth` and draft `Payroll`. Uses resolved attendance when present; otherwise seeds a month-to-date fallback summary. |
+| `Seed::KpiService.create_samples!` | One active company-wide **Orders sold** `KpiConfig` (target 5). The owner gets one paid order per branch in the current month; staff orders are distributed round-robin, and one order stays unattributed so the leaderboard banner remains visible. |
 
 ## Seeding Flow
 
@@ -95,14 +103,22 @@ Seed::ApplicationService.run
           lines, leave, announcement, guests, accommodation services, minibar
           products, warehouses, stocks, transfers/imports/exports, stay orders +
           folios, bookings, purchases, discounts, shifts + attendance, credit data
+   |
+   +- Demo payroll + KPI for all 4 companies
+       +- Seed::PayrollService.ensure_current_month!
+       +- Seed::KpiService.create_samples!
 ```
 
 All three enrich services call `Seed::CompensationService`,
 `Seed::LeaveService`, and `Seed::AnnouncementService` after employees exist.
 Compensation also attaches the owner to the first branch and includes the
 owner in shift/attendance seeding, so the owner demo login gets payroll data
-too. Payroll drafts are then generated from salary + attendance by
-`Payrolls::GenerateService`.
+too. Attendance samples cover the last 35 days **including today**, so a
+weekday seed run always creates a current-month attendance day. Payroll drafts
+for the current and previous month are then generated from salary + attendance
+by `Payrolls::GenerateService`; `Seed::PayrollService.ensure_current_month!`
+backfills a month-to-date rollup when the run happens before any weekday has
+elapsed, so the owner's current-month payroll page is never empty.
 
 The owner employee is also appended to each enrich service's `@employees`
 collection after the regular employees are created. That makes owner records
