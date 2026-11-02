@@ -144,6 +144,23 @@ New companies get the policies from `Company::DEFAULT_RESOURCE_NAMES` plus the
 Manager appointment in their init service. The project is not released yet, so
 there is no backfill path: re-seed the dev/test company to pick up the policies.
 
+### Development seeding
+
+`Seed::KpiService.create_samples!` runs once per seeded company after the
+enrich services finish. It creates one active company-wide **Orders sold**
+rule (`orders_count`, monthly, target `5`) and attributes seeded orders so the
+Performance page has data on first login:
+
+- One paid order per branch is credited to the owner employee in the current
+  month.
+- Remaining unattributed orders go round-robin to staff; every other one is
+  marked paid.
+- One order stays unattributed so the leaderboard's unattributed banner is
+  still exercised.
+
+This is development seed data only — a new production company starts with no
+KPI rules until its owner creates them.
+
 ## 9. Endpoints
 
 | Method | Path | Purpose |

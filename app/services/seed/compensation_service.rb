@@ -6,7 +6,8 @@
 class Seed::CompensationService
   LEADERSHIP_GROUP_NAME = "Leadership"
 
-  # Monthly salary in cents by currency and role tier.
+  # Monthly salary in storage units by currency and role tier
+  # (USD cents; VND whole dong, since VND has no subunits).
   SALARY_TIERS = {
     usd: {
       owner: 9_000 * 100,
@@ -16,11 +17,11 @@ class Seed::CompensationService
       intern: 1_200 * 100
     },
     vnd: {
-      owner: 60_000_000 * 100,
-      manager: 40_000_000 * 100,
-      admin: 30_000_000 * 100,
-      staff: 18_000_000 * 100,
-      intern: 6_000_000 * 100
+      owner: 60_000_000,
+      manager: 40_000_000,
+      admin: 30_000_000,
+      staff: 18_000_000,
+      intern: 6_000_000
     }
   }.freeze
 
@@ -109,6 +110,7 @@ class Seed::CompensationService
     employee.assign_attributes(
       monthly_salary_cents: salary,
       monthly_allowance_cents: (salary * ALLOWANCE_RATE).round,
+      currency: @company.currency,
       expiration_date: employee.expiration_date || Date.current + rand(CONTRACT_MONTHS).months
     )
     employee.save! if employee.changed?
@@ -119,10 +121,8 @@ class Seed::CompensationService
     SALARY_TIERS.fetch(currency).fetch(salary_tier(employee))
   end
 
-  def salary_currency(employee)
-    return @company.currency.to_sym if employee.owner? && @company.currency.present?
-
-    currency = employee.currency.to_sym
+  def salary_currency(_employee)
+    currency = @company.currency.to_sym
     SALARY_TIERS.key?(currency) ? currency : :usd
   end
 

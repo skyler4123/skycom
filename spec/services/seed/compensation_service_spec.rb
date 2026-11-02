@@ -39,14 +39,23 @@ RSpec.describe Seed::CompensationService do
     expect(staff.expiration_date).to be_present
   end
 
-  it "uses VND salary tiers for VND employees" do
+  it "uses VND salary tiers for VND companies" do
     manager
-    company.update!(currency: :vnd)
-    manager.update!(currency: :vnd)
+    company.update!(country: :vn, currency: :vnd)
 
     described_class.assign!(company: company)
 
-    expect(manager.reload.monthly_salary_cents).to be >= 40_000_000 * 100
+    expect(manager.reload.monthly_salary_cents).to eq(40_000_000)
+  end
+
+  it "aligns every employee's currency with the company currency" do
+    manager
+    staff
+    company.update!(country: :vn, currency: :vnd)
+
+    described_class.assign!(company: company)
+
+    expect([ owner, manager, staff ].map { |employee| employee.reload.currency }).to all(eq("vnd"))
   end
 
   it "is idempotent when run twice" do
