@@ -6,6 +6,8 @@ class CreateOrders < ActiveRecord::Migration[8.0]
       t.references :customer, null: false, foreign_key: true, type: :uuid
       t.references :category, null: false, foreign_key: true, type: :uuid
       t.references :property_mapping, null: false, foreign_key: true, type: :uuid
+      t.references :employee, null: true, type: :uuid,
+                   foreign_key: { to_table: :employees, on_delete: :nullify }
 
       # --- Identity ---
       t.string :email, null: true, index: { unique: true }
@@ -38,5 +40,8 @@ class CreateOrders < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_index :orders, [ :company_id, :employee_id, :created_at ],
+              name: "index_orders_on_company_employee_created_at"
   end
 end

@@ -12,7 +12,7 @@ A **merge migration** is *not* a Rails feature. It is a manual housekeeping comm
 2. **Deletes** the now-redundant incremental migration file(s).
 3. **Rewinds** `db/schema.rb`'s `define(version:)` to the newest *surviving* migration timestamp.
 
-Result: the table's full definition lives in **one place**, not scattered across `create_*` + several `add_*` patches. `db/migrate` stays lean (currently 204 files) and readable.
+Result: the table's full definition lives in **one place**, not scattered across `create_*` + several `add_*` patches. `db/migrate` stays lean (currently 217 files) and readable.
 
 | Before merge | After merge |
 |---|---|
@@ -120,9 +120,13 @@ Do not hand-edit anything else in `schema.rb` — it is regenerated in the next 
 
 ```bash
 bin/rails db:drop db:create   # drops/recreates all configured DBs (dev + test) — expected
-bin/rails db:migrate:primary  # replays surviving migrations; dumps db/schema.rb only
+mv db/schema.rb /tmp/schema.rb.bak
+# ↑ Rails 8.1 loads schema.rb into an empty DB (no schema_migrations table), so
+#   without this the folded migrations are never replayed. See §5 gotcha.
+bin/rails db:migrate:primary  # replays surviving migrations and writes a fresh db/schema.rb
 bin/rails db:schema:load:queue db:schema:load:cable db:schema:load:cache
 # ↑ repopulates the auxiliary DBs by READING their read-only schema files — never writes to them
+rm /tmp/schema.rb.bak
 ```
 
 `db:migrate:primary` updates `schema_migrations` (removed rows disappear) and rewrites `db/schema.rb` from the folded migrations. The resulting `schema.rb` diff should show **zero unexpected changes** beyond the version line and the intended column placements.
@@ -162,6 +166,7 @@ In CI, clear the DB cache or force `db:schema:load` so `schema_migrations` match
 | `b8ac8f8e` (2026-07-05) | 5 HR migrations — shift templates, scheduled shifts, attendance logs/days/months | Renamed into clean sequential range `20260702170000..20260702182000`; no columns changed, only filenames. |
 | `6e567cd4` (2026-07-13) | `add_billing_enums_to_invoices` (`movement_type`, `target_balance`, `created_by` + indexes) | Folded into `create_billing_invoices.rb` above System Fields; `add_*` deleted, `schema.rb` version rewound `2026_07_12_101603` → `2026_07_02_190003`. |
 | `05e8c0e2` (2026-10-17) | `add_external_id_to_all_tables` (201 tables) + `add_profile_name_uniqueness` + `add_title_body_to_promo_campaigns` + `rename_notification_title_body` + dead settings migrations | `external_id` folded into every app `create_*` (pinned short index name kept for `subscription_group_subscription_plan_appointments`); profile/subprofile unique indexes, promo `title`/`body` and notifications `name`/`description` folded into their creates; dead settings creates + drop migration removed; `schema.rb` version rewound `2026_10_17_000001` → `2026_10_16_000004`; reset via `db:migrate:primary` + `db:schema:load:{queue,cable,cache}` (read-only guard, §5). |
+| uncommitted (2026-11-02) | `add_manager_to_employee_groups`, `remove_manager_from_employees`, `remove_debt_from_company_wallets`, `adjust_import_foreign_keys`, `add_employee_to_orders` | manager folded into `create_employee_groups`; its FK lives in `create_employees` because `employee_groups` is created first; `employees.manager_id` removed; wallet `debt_credit_balance` removed; import creator/category FKs nullify; order employee ref + composite index folded into `create_orders`. `schema.rb` version unchanged (`2026_11_01_000005`). Empty-DB schema auto-load discovered (§5). |
 
 ---
 
@@ -179,6 +184,7 @@ In CI, clear the DB cache or force `db:schema:load` so `schema_migrations` match
 
 | Pitfall | How to avoid |
 |---------|-------------|
+| `db:migrate` silently loads `db/schema.rb` on a freshly created DB | Rails 8.1's `DatabaseTasks#initialize_database` loads the schema dump when `schema_migrations` does not exist. `db:drop db:create db:migrate:primary` therefore **never replays the folded migrations** — it dumps the old schema back, so the merge looks clean while the old column placement survives. Move the dump aside first (Step 6): `mv db/schema.rb /tmp/schema.rb.bak`, migrate, then compare the regenerated file. |
 | Stale `schema_migrations` rows | Any DB that ran a deleted migration **must** be reset per database (§3 Step 6) — plain `db:migrate` alone leaves the deleted versions listed, and future `db:migrate` ordering can drift. |
 | Version not equal to max surviving file | After merging, `grep "define(version" db/schema.rb` must equal `ls db/migrate | sort -r | head -1` converted to `YYYY_MM_DD_HHMMSS`. If not, CI may think migrations are pending. |
 | Column placement drift | Folded columns must sit in the "business columns" area (before System Fields). Placing them after System Fields or inside the wrong table breaks the `ARCHITECTURE_GUIDES.md` convention and makes future merges harder. |

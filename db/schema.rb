@@ -2665,6 +2665,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
     t.uuid "branch_id"
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
+    t.uuid "manager_id"
     t.string "email"
     t.string "name"
     t.text "description"
@@ -2713,7 +2714,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "manager_id"
     t.index ["branch_id"], name: "index_employee_groups_on_branch_id"
     t.index ["business_type"], name: "index_employee_groups_on_business_type"
     t.index ["category_id"], name: "index_employee_groups_on_category_id"
@@ -4594,6 +4594,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
     t.uuid "customer_id", null: false
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
+    t.uuid "employee_id"
     t.string "email"
     t.string "name"
     t.text "description"
@@ -4642,7 +4643,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "employee_id"
     t.index ["branch_id"], name: "index_orders_on_branch_id"
     t.index ["business_type"], name: "index_orders_on_business_type"
     t.index ["category_id"], name: "index_orders_on_category_id"

@@ -3,13 +3,17 @@
 # Creates the Import run tracker. Each row is one user-prepared CSV import:
 # target table + one category, the uploaded source file, dry-run result,
 # counters, and the approve → run / rollback lifecycle. See docs/IMPORT.md.
+#
+# Creator and category foreign keys nullify on delete so historical imports
+# survive an employee/category removal (the model still requires a creator at
+# creation time).
 class CreateImports < ActiveRecord::Migration[8.1]
   def change
     create_table :imports, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :folder, null: false, foreign_key: true, type: :uuid
-      t.references :creator, null: false, foreign_key: { to_table: :employees }, type: :uuid
-      t.references :category, null: true, foreign_key: true, type: :uuid
+      t.references :creator, null: true, foreign_key: { to_table: :employees, on_delete: :nullify }, type: :uuid
+      t.references :category, null: true, foreign_key: { to_table: :categories, on_delete: :nullify }, type: :uuid
 
       t.string :name, null: false
       t.text :description
