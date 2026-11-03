@@ -123,6 +123,20 @@ class CacheKeyService
     "company:#{company_id}:tickets:open_count"
   end
 
+  # Pattern: company:<company_id>:pages:counts
+  #          company:<company_id>:branch:<branch_id>:pages:counts
+  # Purpose: advisory operating-page counts for the desktop Pages index and
+  #   mobile Operations tab.
+  # Store: Rails.sync_cache
+  # TTL: PAGE_COUNT_CACHE_EXPIRY (1 day)
+  # Written by: Page.counts_for
+  # Cleared by: TTL only — counts are advisory and may be stale after page changes.
+  def self.company_page_counts(company_id, branch_id: nil)
+    return "company:#{company_id}:pages:counts" if branch_id.blank?
+
+    "company:#{company_id}:branch:#{branch_id}:pages:counts"
+  end
+
   # Pattern: company_ticket:admin:open_count
   # Purpose: open support-ticket count across every company (admin pool).
   # Store: Rails.sync_cache

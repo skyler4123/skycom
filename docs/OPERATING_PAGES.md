@@ -82,7 +82,9 @@ only `mobile` records. Both surfaces show company-wide counts:
 ```
 
 When `branch_id` is present on the desktop index, both the list and counts are scoped
-to that branch. Without it, counts roll up across the company.
+to that branch. Without it, counts roll up across the company. Counts are advisory and
+cached for one day (`Page.counts_for` / `PAGE_COUNT_CACHE_EXPIRY`), so they may lag
+page changes by up to a day.
 
 Page names carry a resolution suffix so the two records are distinguishable:
 `"Retail POS Desktop"`, `"Retail POS Mobile"`. `Page` enforces the suffix in a

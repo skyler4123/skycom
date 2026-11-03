@@ -89,6 +89,24 @@ class Page < ApplicationRecord
     catalog_for(business_type).map { |entry| entry[:target_role] }
   end
 
+  # Advisory counts for the Pages index / mobile Operations tab. Cached for a
+  # day because the exact number is not operationally important.
+  def self.counts_for(company:, branch_id: nil)
+    Rails.sync_cache.fetch(
+      CacheKeyService.company_page_counts(company.id, branch_id: branch_id),
+      expires_in: PAGE_COUNT_CACHE_EXPIRY
+    ) do
+      scope = company.pages.where(business_type: company.business_type)
+      scope = scope.where(branch_id: branch_id) if branch_id.present?
+
+      {
+        total: scope.count,
+        desktop: scope.where(target_resolution: :desktop).count,
+        mobile: scope.where(target_resolution: :mobile).count
+      }
+    end
+  end
+
   def self.label_for(business_type:, target_role:)
     catalog_entry(business_type:, target_role:)&.dig(:name)
   end

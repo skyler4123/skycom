@@ -3,10 +3,6 @@ class Mobile::Companies::OperationsController < Mobile::Companies::BaseControlle
     scope = @company.pages.includes(:branch).where(business_type: @company.business_type)
 
     @pages = scope.where(target_resolution: :mobile).order(:name)
-    @summary = {
-      total: scope.count,
-      desktop: scope.where(target_resolution: :desktop).count,
-      mobile: scope.where(target_resolution: :mobile).count
-    }
+    @summary = Page.counts_for(company: @company)
   end
 end

@@ -192,4 +192,38 @@ RSpec.describe Page, type: :model do
       expect(Page.target_roles_for(:restaurant)).to include(:restaurant_cashier, :restaurant_waiter)
     end
   end
+
+  describe ".counts_for" do
+    before do
+      create(:page, company: company, branch: branch, target_role: :retail_cashier, target_resolution: :desktop)
+      create(:page, company: company, branch: branch, target_role: :retail_cashier, target_resolution: :mobile)
+      create(:page, company: company, branch: branch, target_role: :retail_store_manager, target_resolution: :desktop)
+      create(:page, company: company, branch: branch, target_role: :retail_store_manager, target_resolution: :mobile)
+    end
+
+    it "returns company-wide total, desktop, and mobile counts" do
+      expect(Page.counts_for(company: company)).to eq(total: 4, desktop: 2, mobile: 2)
+    end
+
+    it "returns branch-scoped counts under a separate cache key" do
+      other_branch = create(:branch, company: company)
+      create(:page, company: company, branch: other_branch,
+        target_role: :retail_cashier, target_resolution: :desktop)
+
+      expect(Page.counts_for(company: company, branch_id: branch.id))
+        .to eq(total: 4, desktop: 2, mobile: 2)
+      expect(Page.counts_for(company: company))
+        .to eq(total: 5, desktop: 3, mobile: 2)
+    end
+
+    it "caches the counts for one day" do
+      expect(Page.counts_for(company: company)).to eq(total: 4, desktop: 2, mobile: 2)
+
+      other_branch = create(:branch, company: company)
+      create(:page, company: company, branch: other_branch,
+        target_role: :retail_cashier, target_resolution: :desktop)
+
+      expect(Page.counts_for(company: company)).to eq(total: 4, desktop: 2, mobile: 2)
+    end
+  end
 end

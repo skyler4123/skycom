@@ -339,6 +339,7 @@ Per the `docs/CONSTANTS.md` convention, single-file constants live at their usag
 | Constant | Value | Defined In | Purpose |
 |----------|-------|------------|---------|
 | `CACHE_DEFAULT_EXPIRY` | 1 hour | `config/initializers/constants.rb` | Default TTL for app-owned keys (§7). TTL is a backstop; freshness comes from deletes and touches |
+| `PAGE_COUNT_CACHE_EXPIRY` | 1 day | `config/initializers/constants.rb` | Advisory operating-page counts (`Page.counts_for`). TTL only — exact counts are not operationally important |
 | `DASHBOARD_CACHE_EXPIRY` | 5 minutes | `app/controllers/companies/dashboards_controller.rb` | TTL for the full dashboard JSON payload (§7). Deliberately shorter because the payload includes fast-moving operational and wallet data |
 | `COOKIE_EXPIRY` | 1 day | `app/controllers/concerns/application_controller/cookie_concern.rb` | Session and client cache cookie lifetime |
 
@@ -381,6 +382,7 @@ Two key families:
 | `current_address(record)` | `<domain>:<id>:<cache_version>:current_address` | `sync_cache` | 1 hour | touch — `attach_address` touches the owner |
 | `customer_current_membership(customer)` | `customer:<id>:<cache_version>:current_membership` | `sync_cache` | 1 hour | touch — `attach_membership` touches the customer |
 | `customer_membership_of_type(customer, type)` | `customer:<id>:<cache_version>:membership:<type>` | `sync_cache` | 1 hour | same |
+| `company_page_counts(id, branch_id: nil)` | `company:<id>:pages:counts` / `company:<id>:branch:<bid>:pages:counts` | `sync_cache` | 1 day | TTL only — advisory counts may be stale after page changes |
 | `company_open_ticket_count(id)` | `company:<id>:tickets:open_count` | `sync_cache` | 1 hour | `CompanyTicket#invalidate_count_caches` |
 | `admin_open_ticket_count` | `company_ticket:admin:open_count` | `sync_cache` | 1 hour | `CompanyTicket#invalidate_count_caches` |
 | `employee_unread_notifications(id)` | `employee:<id>:notifications:unread` | `sync_cache` | 1 hour | notification create / mark-read / mark-all-read / prune |

@@ -20,7 +20,7 @@ class Companies::PagesController < Companies::ApplicationController
         render json: {
           pages: format_pages(scope.where(target_resolution: :desktop).order(:name)),
           branches: current_company.branches.select(:id, :name).as_json,
-          summary: resolution_summary(scope)
+          summary: Page.counts_for(company: current_company, branch_id: params[:branch_id])
         }
       end
     end
@@ -147,14 +147,6 @@ class Companies::PagesController < Companies::ApplicationController
       :name, :description, :branch_id, :target_role, :target_resolution,
       :lifecycle_status, :workflow_status, metadata: {}
     )
-  end
-
-  def resolution_summary(scope)
-    {
-      "total" => scope.count,
-      "desktop" => scope.where(target_resolution: :desktop).count,
-      "mobile" => scope.where(target_resolution: :mobile).count
-    }
   end
 
   def target_role_options

@@ -171,6 +171,9 @@ AVATAR_PROFILE_DIMENSIONS = [ 300, 300 ].freeze
 # TTL is a backstop: freshness comes from explicit deletes or record touches.
 CACHE_DEFAULT_EXPIRY = 1.hour
 
+# Advisory operating-page counts are allowed to be stale; cache them for a day.
+PAGE_COUNT_CACHE_EXPIRY = 1.day
+
 # =============================================================================
 # Owner Role Constants (ABAC)
 # Magic-string values used across the permission system to identify
