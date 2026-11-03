@@ -4,12 +4,20 @@ FactoryBot.define do
     association :company
     branch { association :branch, company: company }
     target_role { :retail_cashier }
+    target_resolution { :desktop }
+    name { nil }
+    business_type { nil }
+    metadata { {} }
 
     initialize_with do
       Seed::PageService.new(
         company: company,
         branch: branch,
-        target_role: target_role
+        name: name,
+        business_type: business_type,
+        target_role: target_role,
+        target_resolution: target_resolution,
+        metadata: metadata || {}
       )
     end
   end

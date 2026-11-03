@@ -149,6 +149,7 @@ export const create_company_pages_path = (companyId) => `/companies/${companyId}
 export const company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}`
 export const new_company_page_path = (companyId) => `/companies/${companyId}/pages/new`
 export const edit_company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}/edit`
+export const launch_company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}/launch`
 export const retail_cashier_company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}/retail_cashier`
 
 export const order_processing_v1_checkout_path = (companyId) => `/companies/${companyId}/order_processing/v1/checkout`

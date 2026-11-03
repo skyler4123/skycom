@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.feature "Companies::Pages::RetailCashier", type: :feature, js: true do
   let(:company_user) { create(:user, :company_owner) }
-  let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :education).tap(&:save!) }
+  let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :retail).tap(&:save!) }
   let(:owner) { company.user }
   let(:branch) { create(:branch, company: company) }
   let(:warehouse) { create(:warehouse, company: company, branch: branch) }

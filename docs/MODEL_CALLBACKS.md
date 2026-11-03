@@ -30,8 +30,9 @@ Callbacks defined directly in the model file (not inherited from a concern).
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `after_initialize :set_defaults_from_company, if: :new_record?` | 97 | `set_defaults_from_company` | Copies `timezone` and `currency_code` from parent `Company` to new Branch records (only on new record creation, not on find). |
-| `after_create :initialize_payment_methods` | 107 | `initialize_payment_methods` | Auto-creates a `BranchPaymentMethodAppointment` for each **active** `company.company_payment_method_appointments` row (`lifecycle_status: :active`). Copies the company appointment's name (suffixed `" for #{branch.name}"`), code (suffixed `-BR-<hex>`), `business_type`, `workflow_status`, and merchant fields; sets `lifecycle_status: :active`. Ensures every new branch inherits the company's payment methods. |
+| `after_initialize :set_defaults_from_company, if: :new_record?` | 120 | `set_defaults_from_company` | Copies `timezone` and `currency_code` from parent `Company` to new Branch records (only on new record creation, not on find). |
+| `after_create :initialize_payment_methods` | 121 | `initialize_payment_methods` | Auto-creates a `BranchPaymentMethodAppointment` for each **active** `company.company_payment_method_appointments` row (`lifecycle_status: :active`). Copies the company appointment's name (suffixed `" for #{branch.name}"`), code (suffixed `-BR-<hex>`), `business_type`, `workflow_status`, and merchant fields; sets `lifecycle_status: :active`. Ensures every new branch inherits the company's payment methods. |
+| `after_create :seed_default_pages` | 122 | `seed_default_pages` | Calls `Seed::PageService.ensure_defaults_for_branch!` so every new branch receives the company's operating-page catalog, once per `mobile` / `desktop` resolution. Skipped when `Company.skip_init` is true (specs seed pages explicitly). See `docs/OPERATING_PAGES.md`. |
 
 ---
 
@@ -149,6 +150,16 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 |----------|------|--------|-------------|
 | `after_save :clear_employee_managers_cache` | — | `clear_employee_managers_cache` | Deletes the member's `CacheKeyService.employee_manager_ids(id)` sync-cache key after the membership row is created or updated. |
 | `after_destroy :clear_employee_managers_cache` | — | `clear_employee_managers_cache` | Same eviction after the membership row is removed. |
+
+---
+
+### Page (`app/models/page.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :assign_business_type_from_company` | — | `assign_business_type_from_company` | Fills a blank `business_type` from the parent company. Explicit values are kept and validated against the company. |
+| `before_validation :assign_default_name_from_catalog` | — | `assign_default_name_from_catalog` | When `name` is blank, builds it from `PAGE_CATALOG` + the target resolution (`"Retail POS"` → `"Retail POS Desktop"`). |
+| `before_validation :ensure_name_resolution_suffix` | — | `ensure_name_resolution_suffix` | Strips an existing `Mobile` / `Desktop` suffix and re-appends the current resolution, so names stay unique and resolution changes rename the record correctly. |
 
 ---
 
@@ -476,7 +487,7 @@ Each concern defines the same callback:
 
 | Callback Type | Count | Models with Direct Declarations |
 |--------------|-------|---------------------------------|
-| `before_validation` | 5 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 19 models), (PropertyMappingConcern → 43 models) |
+| `before_validation` | 6 | Address, User, Page, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 19 models), (PropertyMappingConcern → 43 models) |
 | `after_initialize` | 1 | Branch |
 | `before_create` | 1 | Session |
 | `after_create` | 6 | Category, Company, Branch, PolicyAppointment, PropertyMapping, RoleAppointment |
@@ -488,7 +499,7 @@ Each concern defines the same callback:
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 4 | Session, User, Company, Employee (`refresh_cache`/`remove_cache` for compact record cache) |
 | `after_rollback` | 1 | Company (`workflow_status` suspension cache cleanup) |
-| `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 45 models), (PropertyMappingConcern → 45 models), (ImageAttachmentsConcern → 6 models + Product) |
+| `validate` | 6 | Page, CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 45 models), (PropertyMappingConcern → 45 models), (ImageAttachmentsConcern → 6 models + Product) |
 
 **Total unique callback declarations: ~34 directly across 15 model files + 7 concern files propagating to ~63+ models.**
 

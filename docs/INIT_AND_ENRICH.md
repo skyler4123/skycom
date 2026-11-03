@@ -28,6 +28,10 @@ When a user creates a new company (either via signup or during seeding), the `Co
 | Policies | ~600 | CRUD policies for all resource x action combinations |
 | PolicyAppointments | ~80 | Role-to-policy assignments with active/inactive status |
 
+Branch creation also seeds the company's operating pages:
+`Seed::PageService.ensure_defaults_for_branch!` creates every catalog page for the
+company's business type, once per `mobile` / `desktop` resolution.
+
 After init, the company is ready to use — users can navigate dashboards, create records, and manage the business.
 
 **Stocks are their own taxonomy (2026-09-09).** A `Stock` record belongs to a `stocks`-resource
@@ -44,7 +48,7 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Brands | 50 |
 | Suppliers | 12 (retail) / 8 (hospital enrich) |
 | Branches | 2 |
-| Pages | 4 (2 per branch) |
+| Pages | 8 (4 per branch: 2 roles × mobile/desktop) |
 | Departments | 4 |
 | Employees | ~76 (across 2 branches) |
 | Compensation / teams | Every employee: salary, allowance, company-aligned `currency`, contract `expiration_date`; branch teams + Leadership `EmployeeGroup` with `employee_groups.manager_id`; owner attached to the first branch |

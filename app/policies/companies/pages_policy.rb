@@ -16,6 +16,10 @@ class Companies::PagesPolicy < ApplicationPolicy
     record.can?(:read, Page)
   end
 
+  def launch?
+    record.can?(:read, Page)
+  end
+
   def create?
     record.can?(:create, Page)
   end

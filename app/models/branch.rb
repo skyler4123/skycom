@@ -119,12 +119,22 @@ class Branch < ApplicationRecord
 
   after_initialize :set_defaults_from_company, if: :new_record?
   after_create :initialize_payment_methods
+  after_create :seed_default_pages
 
   def subscription_buyer
     self.company.user
   end
 
   private
+
+  # Every branch starts with the operating-page catalog for its company's
+  # business type. Skipped in specs (Company.skip_init) so page specs stay
+  # explicit; call Seed::PageService.ensure_defaults_for_branch! directly there.
+  def seed_default_pages
+    return if company.nil? || Company.skip_init
+
+    Seed::PageService.ensure_defaults_for_branch!(self)
+  end
 
   def initialize_payment_methods
     return unless company

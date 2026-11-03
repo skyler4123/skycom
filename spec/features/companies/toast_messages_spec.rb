@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.feature "Companies::ToastMessages", type: :feature, js: true do
-  let(:company) { create(:company) }
+  let(:company) { create(:company, business_type: :retail) }
   let(:owner) { company.user }
   let(:branch) { create(:branch, company: company) }
 

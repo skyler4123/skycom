@@ -51,6 +51,28 @@ RSpec.describe Branch, type: :model do
     end
   end
 
+  describe "after_create default operating pages" do
+    let(:company_user) { create(:user, :company_owner) }
+    let(:company) { Seed::CompanyService.new(user: company_user, business_type: :retail).tap(&:save!) }
+
+    around do |example|
+      Company.skip_init = false
+      example.run
+    ensure
+      Company.skip_init = true
+    end
+
+    it "creates the company catalog pages for the new branch" do
+      branch = create(:branch, company: company)
+
+      expect(company.pages.where(branch: branch).count).to eq(4)
+      expect(company.pages.where(branch: branch).pluck(:name)).to contain_exactly(
+        "Retail POS Desktop", "Retail POS Mobile",
+        "Retail Store Manager Desktop", "Retail Store Manager Mobile"
+      )
+    end
+  end
+
   describe "after_create payment method initialization" do
     let(:company) { create(:company) }
     let(:payment_method) { create(:payment_method) }

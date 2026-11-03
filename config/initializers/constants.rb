@@ -68,6 +68,42 @@ COMPANY_WORKFLOW_STATUS = {
   suspend: 2
 }.freeze
 
+# Operating-page catalog. Each company business type exposes only the page
+# types listed here; every page type is instantiated once per target
+# resolution. `implemented` lists the resolutions that have a real UI — all
+# others render the shared "coming soon" screen. See docs/OPERATING_PAGES.md.
+PAGE_CATALOG = {
+  retail: [
+    { target_role: :retail_cashier, name: "Retail POS", implemented: %i[desktop] },
+    { target_role: :retail_store_manager, name: "Retail Store Manager", implemented: [] }
+  ],
+  restaurant: [
+    { target_role: :restaurant_cashier, name: "Restaurant POS", implemented: [] },
+    { target_role: :restaurant_waiter, name: "Restaurant Waiter", implemented: [] },
+    { target_role: :restaurant_kitchen_staff, name: "Restaurant Kitchen", implemented: [] }
+  ],
+  hospital: [
+    { target_role: :hospital_receptionist, name: "Hospital Reception", implemented: [] },
+    { target_role: :hospital_doctor, name: "Hospital Doctor", implemented: [] },
+    { target_role: :hospital_nurse, name: "Hospital Nurse", implemented: [] }
+  ],
+  education: [
+    { target_role: :education_receptionist, name: "Education Reception", implemented: [] },
+    { target_role: :education_teacher, name: "Education Teacher", implemented: [] },
+    { target_role: :education_manager, name: "Education Manager", implemented: [] }
+  ],
+  hotel: [
+    { target_role: :hotel_receptionist, name: "Hotel Reception", implemented: [] },
+    { target_role: :hotel_housekeeping, name: "Hotel Housekeeping", implemented: [] },
+    { target_role: :hotel_manager, name: "Hotel Manager", implemented: [] }
+  ],
+  fitness: [
+    { target_role: :fitness_receptionist, name: "Fitness Reception", implemented: [] },
+    { target_role: :fitness_trainer, name: "Fitness Trainer", implemented: [] },
+    { target_role: :fitness_manager, name: "Fitness Manager", implemented: [] }
+  ]
+}.freeze
+
 GATEWAY_STRATEGIES = begin
   base = {
     # System payments (value < 10 — no external gateway call)

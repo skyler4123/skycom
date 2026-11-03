@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Companies::PagesController#retail_cashier", type: :request do
   let(:company_user) { create(:user, :company_owner) }
-  let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :education).tap(&:save!) }
+  let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :retail).tap(&:save!) }
   let(:branch) { create(:branch, company: company) }
   let(:page_record) { create(:page, company: company, branch: branch, target_role: :retail_cashier) }
 

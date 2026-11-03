@@ -2,9 +2,16 @@
 
 ## 1. Overview
 
-Operating Pages are dedicated full-screen interfaces for specific operational roles (POS cashier, store manager, restaurant waiter, etc.). Each page type is defined by a `Page` record with a `target_role` enum value and gets its own Stimulus controller for the frontend UI.
+Operating Pages are dedicated full-screen interfaces for specific operational roles
+(POS cashier, store manager, restaurant waiter, etc.). Each page type is defined by a
+`Page` record with a `target_role` enum value and gets its own Stimulus controller for
+the frontend UI.
 
-The `retail_cashier` page is the reference implementation — a multi-customer POS with product/service grid, cart management, and payment flow.
+Every company gets the catalog for its `Company#business_type`, once per target
+resolution. A page record is therefore always **company + branch + role + resolution**.
+The `retail_cashier` desktop page is the reference implementation — a multi-customer
+POS with product/service grid, cart management, and payment flow. All other catalog
+pages render the shared **Coming soon** screen until their real UI is built.
 
 ---
 
@@ -14,52 +21,120 @@ Each operating page touches 6 layers:
 
 | Layer | File | Responsibility |
 |-------|------|----------------|
-| **Model** | `app/models/page.rb` | `target_role` enum value defines the page type |
-| **Route** | `config/routes.rb` | Member route under `resources :pages` |
-| **Controller** | `app/controllers/companies/pages_controller.rb` | Shell-First action returning JSON scoped to the page's branch |
-| **Policy** | `app/policies/companies/pages_policy.rb` | Authorization method for the action |
-| **URL Helper** | `app/javascript/controllers/helpers/url_helpers.js` | JS helper for the route path |
+| **Model** | `app/models/page.rb` | Catalog lookup, role/resolution enums, name suffix, placeholder predicate |
+| **Route** | `config/routes.rb` | Member routes under `resources :pages` (`retail_cashier`, `launch`) |
+| **Controller** | `app/controllers/companies/pages_controller.rb` | Shell-First actions, device filtering, counts, launch dispatch |
+| **Policy** | `app/policies/companies/pages_policy.rb` | `launch?` / `retail_cashier?` → `Page` read |
+| **URL Helper** | `app/javascript/controllers/helpers/url_helpers.js` | JS paths for index, launch, and the real POS |
 | **Stimulus** | `app/javascript/controllers/companies/pages/{name}_controller.js` | Full SPA frontend for the page |
 
----
+Mobile has a server-rendered counterpart:
 
-## 3. Existing Pages
-
-| `target_role` | Value | Action | Stimulus Controller | Route Path |
-|---|---|---|---|---|
-| `retail_cashier` | 110 | `retail_cashier` | `retail_cashier_controller.js` | `GET /pages/:id/retail_cashier` |
-| `retail_store_manager` | 120 | — | — | — |
-| `restaurant_cashier` | 210 | — | — | — |
-| `restaurant_waiter` | 220 | — | — | — |
-| `restaurant_kitchen_staff` | 230 | — | — | — |
-| `hospital_receptionist` | 310 | — | — | — |
-| `hospital_doctor` | 320 | — | — | — |
-| `hospital_nurse` | 330 | — | — | — |
+| Layer | File | Responsibility |
+|-------|------|----------------|
+| **Controller** | `app/controllers/mobile/companies/operations_controller.rb` | Mobile page list + counts |
+| **Controller** | `app/controllers/mobile/companies/pages_controller.rb` | Mobile page detail / Coming soon |
+| **Policy** | `app/policies/mobile/companies/pages_policy.rb` | Page read |
+| **Views** | `app/views/mobile/companies/{operations,pages}/` | Server-rendered mobile UI |
 
 ---
 
-## 4. Step-by-Step: Adding a New Operating Page
+## 3. Page Catalog
 
-Use the `retail_cashier` pattern. Each step shows the exact code to add.
+`PAGE_CATALOG` in `config/initializers/constants.rb` is the single source of truth
+for which page types each business type exposes. `Page.target_roles_for`,
+`Page.label_for`, and `Page.implemented?` read from it.
 
-### Step 1: Add `target_role` enum value
+| Business type | Page types (`target_role`) |
+|---|---|
+| Retail | `retail_cashier`, `retail_store_manager` |
+| Restaurant | `restaurant_cashier`, `restaurant_waiter`, `restaurant_kitchen_staff` |
+| Hospital | `hospital_receptionist`, `hospital_doctor`, `hospital_nurse` |
+| Education | `education_receptionist`, `education_teacher`, `education_manager` |
+| Hotel | `hotel_receptionist`, `hotel_housekeeping`, `hotel_manager` |
+| Fitness | `fitness_receptionist`, `fitness_trainer`, `fitness_manager` |
 
-**File**: `app/models/page.rb`
+Each catalog entry has a display name (`"Retail POS"`, `"Restaurant Waiter"`, …) and
+an `implemented` list of resolutions. `Page#placeholder?` is true unless the entry
+marks the current resolution as implemented.
+
+Today only `retail_cashier` + `desktop` is implemented. Everything else — including
+`retail_cashier` + `mobile` — is a placeholder.
+
+---
+
+## 4. Resolution and Device Split
+
+`Page#target_resolution` has exactly two values:
 
 ```ruby
-enum :target_role, {
-  # Retail Roles
-  retail_cashier: 110,
-  retail_store_manager: 120,
-  new_role: 130,  # <-- Add here (130 = next retail slot)
+enum :target_resolution, { mobile: 10, desktop: 20 }, prefix: true, default: :desktop
+```
 
-  # Restaurant Roles
-  restaurant_cashier: 210,
+- `mobile` covers phones and tablets.
+- `desktop` covers desktop browsers.
+
+The desktop Pages index lists only `desktop` records. The mobile Operations tab lists
+only `mobile` records. Both surfaces show company-wide counts:
+
+```json
+{ "total": 4, "desktop": 2, "mobile": 2 }
+```
+
+When `branch_id` is present on the desktop index, both the list and counts are scoped
+to that branch. Without it, counts roll up across the company.
+
+Page names carry a resolution suffix so the two records are distinguishable:
+`"Retail POS Desktop"`, `"Retail POS Mobile"`. `Page` enforces the suffix in a
+`before_validation` callback, and swaps it when the resolution changes.
+
+---
+
+## 5. Launch Flow
+
+Every page row links to one stable action:
+
+```
+GET /companies/:company_id/pages/:id/launch
+```
+
+- **Implemented page** — `launch` redirects to its real screen (currently the
+  `retail_cashier` desktop POS). JSON responses include `launch_path`.
+- **Placeholder page** — `launch` renders the Shell-First layout. The
+  `Companies_Pages_LaunchController` fetches `launch.json` and renders the shared
+  “Coming soon” card with the page name, branch, role, and resolution.
+
+On mobile, cards in the Operations tab link to:
+
+```
+GET /mobile/companies/:company_id/pages/:id
+```
+
+`Mobile::Companies::PagesController#show` renders the mobile Coming soon screen for
+placeholders. When a mobile page is implemented, this is the surface that gains its
+real UI.
+
+---
+
+## 6. Adding a New Operating Page
+
+### Step 1: Add the catalog entry
+
+**File**: `config/initializers/constants.rb`
+
+```ruby
+PAGE_CATALOG = {
+  retail: [
+    { target_role: :retail_cashier, name: "Retail POS", implemented: %i[desktop] },
+    { target_role: :retail_store_manager, name: "Retail Store Manager", implemented: [] }
+  ]
   # ...
 }
 ```
 
-Values are grouped by business type (retail: 100s, restaurant: 200s, hospital: 300s) and spaced by 10s.
+Add the new `target_role` enum value in `app/models/page.rb` if it does not exist.
+Values are grouped by business type (retail: 100s, restaurant: 200s, hospital: 300s,
+education: 400s, hotel: 500s, fitness: 600s) and spaced by 10s.
 
 ### Step 2: Add code prefix to seed service
 
@@ -67,8 +142,8 @@ Values are grouped by business type (retail: 100s, restaurant: 200s, hospital: 3
 
 ```ruby
 CODE_PREFIXES = {
-  cashier: "CSH",
-  store_manager: "MGR",
+  retail_cashier: "RCSH",
+  retail_store_manager: "RMGR",
   new_role: "NEW"  # <-- Add prefix for auto-code generation
 }.freeze
 ```
@@ -81,7 +156,8 @@ CODE_PREFIXES = {
 resources :pages do
   member do
     get :retail_cashier
-    get :new_role  # <-- Add new action
+    get :launch
+    get :new_role  # <-- Add new action when it gets a real screen
   end
 end
 ```
@@ -90,50 +166,14 @@ end
 
 **File**: `app/controllers/companies/pages_controller.rb`
 
-Follow Shell-First pattern. Scope data to `page.branch_id`:
-
-```ruby
-def new_role
-  page = current_company.pages.includes(:branch).find(params[:id])
-
-  respond_to do |format|
-    format.html { render html: "", layout: true }
-    format.json do
-      # Fetch data scoped to the page's branch
-      products = current_company.products.where(branch_id: page.branch_id).limit(50).map { |p|
-        price = p.price
-        { id: p.id, name: p.name, code: p.code,
-          price: price&.to_f || 0,
-          currency: price&.currency.iso_code || "USD",
-          image_url: p.image_attachments.first&.variant(:thumb)&.processed&.url }
-      }
-      services = current_company.services.where(branch_id: page.branch_id).limit(50).map { |s|
-        { id: s.id, name: s.name, code: s.code,
-          price: 0, currency: "usd",
-          image_url: s.image_attachments.first&.variant(:thumb)&.processed&.url }
-      }
-
-      render json: {
-        page: format_page(page),
-        products: products,
-        services: services
-      }
-    end
-  end
-end
-```
+Follow the Shell-First pattern. Scope data to `page.branch_id`.
 
 ### Step 5: Add policy method
 
 **File**: `app/policies/companies/pages_policy.rb`
 
-The policy method name must match the action name with a `?` suffix (auto-derived by `Companies::Authorizable`):
-
-```ruby
-def new_role?
-  record.can?(:read, Page)
-end
-```
+The policy method name must match the action name with a `?` suffix (auto-derived by
+`Companies::Authorizable`).
 
 ### Step 6: Add URL helper
 
@@ -148,108 +188,30 @@ export const new_role_company_page_path = (companyId, pageId) =>
 
 **File**: `app/javascript/controllers/companies/pages/new_role_controller.js`
 
-```javascript
-import { Controller } from "@hotwired/stimulus"
+Use the standard `Companies_Pages_*` identifier and the Shell-First lifecycle:
+`connect()` → fetch JSON → `renderContent()` → `contentHTML()`.
 
-export default class Companies_Pages_NewRoleController extends Controller {
-  /** @type {any | null} */ page = null
-  /** @type {any[]} */ products = []
-  /** @type {any[]} */ services = []
+### Step 8: Mark the resolution implemented
 
-  async connect() {
-    const pathParts = window.location.pathname.split("/")
-    const companyId = pathParts[2]
-    const pageId = pathParts[4]
+Flip the resolution in the catalog entry’s `implemented` list, then update
+`Companies::PagesController#launch_path_for` so `launch` redirects to the new
+screen.
 
-    const url = `${Helpers.new_role_company_page_path(companyId, pageId)}.json`
-    const response = await fetchJson(url)
-    this.page = response.page
-    this.products = response.products || []
-    this.services = response.services || []
+### Step 9: Update docs
 
-    this.renderContent()
-  }
-
-  renderContent() {
-    this.element.innerHTML = this.contentHTML()
-  }
-
-  contentHTML() {
-    // Render your operating page UI here
-    // See retail_cashier_controller.js for the full POS pattern
-  }
-}
-```
-
-### Step 8: Update docs/MODEL_CALLBACKS.md
-
-If the new page action adds any new callbacks or changes existing ones, update `docs/MODEL_CALLBACKS.md`.
+Update this file, `docs/MOBILE.md` / `docs/MOBILE_FEATURE_MATRIX.md` if mobile
+behavior changed, and `docs/MODEL_CALLBACKS.md` if callbacks changed.
 
 ---
 
-## 5. Stimulus Controller Pattern
+## 7. Seed Defaults
 
-All operating page controllers follow this structure:
+`Seed::PageService.ensure_defaults_for_branch!(branch)` creates every catalog page
+for the branch’s company, once per resolution. It is idempotent and is called from
+`Branch#after_create` (skipped when `Company.skip_init` is on, i.e. in specs).
 
-| Method | Purpose |
-|--------|---------|
-| `connect()` | Extract companyId/pageId from URL, fetch JSON via URL helper, set instance data, render |
-| `renderContent()` | Set `this.element.innerHTML = this.contentHTML()` |
-| `contentHTML()` | Return full page HTML string (Shell-First) |
-| Custom methods | Business logic (addToCart, switchTab, etc.) |
-
-**Identifier naming** follows the standard convention:
-
-| File | Class | Identifier |
-|------|-------|------------|
-| `retail_cashier_controller.js` | `Companies_Pages_RetailCashierController` | `companies--pages--retail-cashier` |
-
----
-
-## 6. Controller Action Pattern
-
-All operating page controller actions follow Shell-First:
-
-```ruby
-def retail_cashier
-  page = current_company.pages.includes(:branch).find(params[:id])
-
-  respond_to do |format|
-    format.html { render html: "", layout: true }
-    format.json do
-      # Fetch data scoped to page.branch_id
-      # Return: { page: {...}, products: [...], services: [...] }
-    end
-  end
-end
-```
-
-**JSON response includes `image_url`** (first attached image's `thumb` variant) for both products and services. Returns `null` when no image is attached — the frontend renders a gradient+icon fallback.
-
-**Policy auto-discovery**: The `Companies::Authorizable` concern auto-derives the query method `"retail_cashier?"` from the action name `"retail_cashier"`. Every operating page action must have a corresponding policy method.
-
----
-
-## 7. Seed Service & Factory
-
-Pages are created via `Seed::PageService`, which auto-generates a `code` from the role prefix + branch ID + random hex (e.g., `CSH-abc12345-1A2B`).
-
-**FactoryBot** (for specs):
-
-```ruby
-factory :page do
-  association :company
-  branch { association :branch, company: company }
-  target_role { :retail_cashier }
-
-  initialize_with do
-    Seed::PageService.new(
-      company: company, branch: branch,
-      target_role: target_role
-    )
-  end
-end
-```
+A fresh seed therefore creates the full page list. Branch creation and the seed
+services are the only creation paths.
 
 ---
 
@@ -263,7 +225,7 @@ t.index ["branch_id", "target_role", "target_resolution", "code"],
   name: "idx_on_branch_id_target_role_target_resolution_code_6c16dc00fe"
 ```
 
-This ensures only one page per branch + role + resolution + code combination.
+The model additionally enforces one record per branch + role + resolution.
 
 ---
 

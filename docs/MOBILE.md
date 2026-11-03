@@ -22,6 +22,7 @@ authentication.
 | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `mobile/companies/employees/show` (Profile) |
 | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `mobile/companies/attendance_months/show` |
 | `GET /mobile/companies/:company_id/operations` | `Mobile::Companies::OperationsController#index` | `mobile/companies/operations/index` |
+| `GET /mobile/companies/:company_id/pages/:id` | `Mobile::Companies::PagesController#show` | `mobile/companies/pages/show` |
 | `GET /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#new` | `mobile/companies/payroll_unlocks/new` |
 | `POST /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#create` | redirect / 422 re-render |
 | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `mobile/companies/payrolls/show` |
@@ -36,8 +37,8 @@ is never treated as authorization.
 
 ### Authorization
 
-Company-level screens use ABAC: Operations requires `Page` read, Notifications
-requires `Notification` read, and attendance requests require
+Company-level screens use ABAC: Operations and Page detail require `Page` read,
+Notifications requires `Notification` read, and attendance requests require
 `AttendanceRequest` create. Self-service screens (Home, Profile, Attendance
 month, Payroll/unlock, check-in) are membership-scoped instead: the controller
 always resolves `@employee` from `current_user` + `company_id`, so they can only
@@ -254,8 +255,8 @@ request feature spec sets them through the DOM with `set_native_field`.
   form/history, announcement management UI, or payslip/PDF download. Payroll
   money and seeded leave/notice data are real; the remaining items are not
   modelled yet.
-- Operations is a read-only Page list. Opening a page, filtering, and page
-  actions are not built yet.
+- Operations is a read-only Page list with page detail (Coming soon for
+  placeholders). Filtering and admin page actions are not built yet.
 - Mobile ERB remains English-only; `dictionary.js` covers the new JS toasts
   (`Copied to clipboard`, copy failure).
 - A suspended company sees a 403 page on mobile; there is no mobile top-up flow
@@ -273,7 +274,7 @@ request feature spec sets them through the DOM with `set_native_field`.
 ```
 app/views/layouts/mobile.html.erb
 app/views/mobile/sessions/
-app/views/mobile/companies/{home,employees,attendance_months,operations,payrolls,payroll_unlocks,attendance_requests}/
+app/views/mobile/companies/{home,employees,attendance_months,operations,pages,payrolls,payroll_unlocks,attendance_requests}/
 app/views/mobile/shared/
 app/helpers/mobile_helper.rb
 app/controllers/mobile/{base,sessions,home}_controller.rb

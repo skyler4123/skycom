@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       post "payroll/unlock", to: "payroll_unlocks#create"
       get "payroll", to: "payrolls#show"
       post "attendances", to: "attendances#create"
+      resources :pages, only: %i[show]
       resources :attendance_requests, only: %i[new create]
     end
   end
@@ -200,6 +201,7 @@ Rails.application.routes.draw do
       resources :pages do
         member do
           get :retail_cashier
+          get :launch
         end
       end
 

@@ -45,18 +45,18 @@ Source files for the inventory:
 | Attendance | 🟡 | Own month summary, daily rows, month navigation, check-in | No check-out, geofence, QR, request history, or PDF |
 | Requests | 🟡 | Create attendance request with validation, group managers listed from employee teams | No inbox, status, or attachments |
 | Payroll | 🟡 | Password gate, own status/step, period, worked hours, present days, overtime, salary/allowance/tax/net money; 5-minute unlock | No payslip/PDF |
-| Operations | 🟡 | Read-only list of company Page records with branch, type, role, resolution, and statuses | No page detail, filtering, or actions |
+| Operations | 🟡 | Mobile Page list with total/desktop/mobile counts, branch, type, role, resolution, statuses, and page detail / Coming soon screens | No filtering or admin actions |
 | Notifications | ⛔ | — | No inbox, unread badge, mark-read, push, or preferences |
 | Leave | 🟡 | Paid-leave balance and pending days on Home, seeded leave requests | No leave request form or history |
 | Schedule | 🟡 | Today/next shift read | No roster, shift list, or swap |
 | Documents and help desk | ⛔ | — | Web-only; future candidates |
 | Native shell | 🟡 | Five tabs, pull-to-refresh, edge-to-edge safe area, dark mode | No GPS, camera, biometrics, push, offline, or deep links |
 
-**Headline:** 8 mobile screens (including the payroll password gate and
-Operations), 5 native tabs, 3 write endpoints (check-in, request create,
-sign-out), and 4 read surfaces (profile, attendance month, payroll,
-operations). The web has **69 sidebar items** across 16 active groups plus
-3 coming-soon groups.
+**Headline:** 9 mobile screens (including the payroll password gate,
+Operations, and Page detail), 5 native tabs, 3 write endpoints (check-in,
+request create, sign-out), and 5 read surfaces (profile, attendance month,
+payroll, operations, page detail). The web has **69 sidebar items** across 16
+active groups plus 3 coming-soon groups.
 
 **Biggest blockers**
 
@@ -82,8 +82,9 @@ operations). The web has **69 sidebar items** across 16 active groups plus
 | 4 | Attendance month | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `AttendanceMonth`, `AttendanceDay` | — | Read-only; no PDF, collect, or request list |
 | 5 | Payroll password gate | `GET/POST /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#new/create` | `User` password, session | Password confirmation | Five-minute company-scoped unlock; every Profile entry asks again |
 | 6 | Payroll | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `Payroll` (money), `AttendanceMonth` | — | Password-gated; no payslip download |
-| 7 | Operations | `GET /mobile/companies/:company_id/operations` | `Mobile::Companies::OperationsController#index` | `Page` (branch, type, role, resolution, statuses) | — | Read-only list only; no detail or actions |
-| 8 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee` (group managers), `AttendanceRequest` | Create request | No attachments |
+| 7 | Operations | `GET /mobile/companies/:company_id/operations` | `Mobile::Companies::OperationsController#index` | Mobile `Page` records (branch, type, role, resolution, statuses) + counts | — | Read-only list; no filtering or admin actions |
+| 8 | Page detail | `GET /mobile/companies/:company_id/pages/:id` | `Mobile::Companies::PagesController#show` | `Page` (branch, role, resolution, status) | — | Coming soon placeholder unless the mobile resolution is implemented |
+| 9 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee` (group managers), `AttendanceRequest` | Create request | No attachments |
 
 `GET /mobile/home` remains the signed-in no-employee fallback and renders
 without a company id. Every tenant page asserts membership through
@@ -221,7 +222,7 @@ status.
 | Dynamic Tables | ⛔ | Admin |
 | Table Config Logs | ⛔ | Admin audit |
 | Workflows | ⛔ | Admin |
-| Pages | 🟡 | Read-only company Page list on the Operations tab; no admin actions |
+| Pages | 🟡 | Mobile Page list + Coming soon detail on the Operations tab; no admin actions |
 | Documents | ⛔ | Future candidate (employee documents) |
 | Migrations | ⛔ | Admin |
 | Payment Methods | ⛔ | Admin |

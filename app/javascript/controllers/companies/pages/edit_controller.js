@@ -2,6 +2,8 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_Pages_EditController extends Companies_LayoutController {
   /** @type {any | null} */ page = null
+  /** @type {{ name: string, value: string }[]} */ targetRoles = []
+  /** @type {string | null} */ businessType = null
 
   async connect() {
     super.connect()
@@ -13,6 +15,8 @@ export default class Companies_Pages_EditController extends Companies_LayoutCont
     try {
       const response = await fetchJson(`${Helpers.company_page_path(companyId, recordId)}.json`)
       this.page = response.page
+      this.targetRoles = response.target_roles || []
+      this.businessType = response.page?.business_type
 
       poll(() => {
         if (this.hasContentTarget) {
@@ -39,17 +43,9 @@ export default class Companies_Pages_EditController extends Companies_LayoutCont
     const companyId = window.location.pathname.split("/")[2]
     const branches = currentBranches()
 
-    const targetRoles = [
-      { name: translate("Retail Cashier"), value: "retail_cashier" },
-      { name: translate("Retail Store Manager"), value: "retail_store_manager" }
-    ]
     const targetResolutions = [
-      { name: translate("Mobile Portrait"), value: "mobile_portrait" },
-      { name: translate("Tablet Landscape"), value: "tablet_landscape" },
-      { name: translate("Desktop Widescreen"), value: "desktop_widescreen" }
-    ]
-    const businessTypes = [
-      { name: translate("Retail"), value: "retail" }
+      { name: translate("Mobile"), value: "mobile" },
+      { name: translate("Desktop"), value: "desktop" }
     ]
     const workflowStatuses = [
       { name: translate("Approved"), value: "approved" },
@@ -86,10 +82,8 @@ export default class Companies_Pages_EditController extends Companies_LayoutCont
 
           <div class="space-y-1">
             <label class="text-xs font-medium text-muted-foreground">${translate("Business Type")}</label>
-            <select name="page[business_type]"
-              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
-              ${selectOptionsHTML(businessTypes, p.business_type || 'retail')}
-            </select>
+            <input type="text" value="${Helpers.capitalize(this.businessType || p.business_type || '')}" disabled
+              class="w-full px-3 py-2 border border-line rounded-lg bg-background text-sm text-muted-foreground">
           </div>
 
           <div class="space-y-1">
@@ -103,7 +97,7 @@ export default class Companies_Pages_EditController extends Companies_LayoutCont
             <label class="text-xs font-medium text-muted-foreground">${translate("Target Role")}</label>
             <select name="page[target_role]"
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
-              ${selectOptionsHTML(targetRoles, p.target_role)}
+              ${selectOptionsHTML(this.targetRoles.map(role => ({ ...role, name: translate(role.name) })), p.target_role)}
             </select>
           </div>
 

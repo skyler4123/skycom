@@ -4,6 +4,7 @@ export default class Companies_Pages_IndexController extends Companies_LayoutCon
   static targets = ["branchSelect", "pagesList"]
 
   /** @type {any[]} */ pages = []
+  /** @type {{ total: number, desktop: number, mobile: number }} */ summary = { total: 0, desktop: 0, mobile: 0 }
   /** @type {string | null} */ branchIdValue = null
 
   async connect() {
@@ -14,6 +15,7 @@ export default class Companies_Pages_IndexController extends Companies_LayoutCon
     try {
       const response = await fetchJson({ params: { branch_id: this.branchIdValue || undefined } })
       this.pages = response.pages || []
+      this.summary = response.summary || { total: 0, desktop: 0, mobile: 0 }
     } catch (error) {
       const __errDetail = error.errors?.join(", ") || error.message
       toast({ type: "error", message: `${ translate("Failed to load pages") }${__errDetail ? ": " + __errDetail : ""}` })
@@ -34,6 +36,12 @@ export default class Companies_Pages_IndexController extends Companies_LayoutCon
     return `
       <div class="p-4 overflow-y-auto">
         <div class="p-4 bg-card rounded-xl border border-line flex flex-col">
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6" data-pages-summary>
+            ${this.summaryCard("Total Pages", this.summary.total, "apps", "bg-primary/10 text-primary")}
+            ${this.summaryCard("Desktop Pages", this.summary.desktop, "desktop_windows", "bg-muted text-foreground")}
+            ${this.summaryCard("Mobile Pages", this.summary.mobile, "tablet_android", "bg-muted text-foreground")}
+          </div>
 
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div class="flex flex-col gap-1">
@@ -72,7 +80,7 @@ export default class Companies_Pages_IndexController extends Companies_LayoutCon
               </thead>
               <tbody data-${this.identifier}-target="pagesList">
                 ${this.pages.length === 0
-                  ? `<tr><td colspan="8" class="py-8 text-center text-muted-foreground">${translate("No pages found.")}</td></tr>`
+                  ? `<tr><td colspan="8" class="py-8 text-center text-muted-foreground">${this.summary.total === 0 ? translate("No pages found.") : translate("No desktop pages found.")}</td></tr>`
                   : this.pages.map(p => `
                     <tr class="border-b border-line hover:bg-muted/50">
                       <td class="py-4 px-6">
@@ -82,10 +90,11 @@ export default class Companies_Pages_IndexController extends Companies_LayoutCon
                         </a>
                       </td>
                       <td class="py-4 px-6 whitespace-nowrap">
-                        <a href="${Helpers.retail_cashier_company_page_path(currentCompany().id, p.id)}"
-                          class="inline-flex items-center justify-center p-2 text-success hover:text-success hover:bg-success/10 rounded-lg cursor-pointer"
-                          title="${translate("Launch Cashier")}">
-                          <span class="material-symbols-outlined text-[20px]">open_in_new</span>
+                        <a href="${Helpers.launch_company_page_path(currentCompany().id, p.id)}"
+                          class="inline-flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold ${p.placeholder ? "bg-muted text-muted-foreground hover:bg-muted/80" : "bg-success/10 text-success hover:bg-success/20"} cursor-pointer"
+                          title="${p.placeholder ? translate("Coming soon") : translate("Launch")}">
+                          <span class="material-symbols-outlined text-[18px]">${p.placeholder ? "schedule" : "open_in_new"}</span>
+                          ${p.placeholder ? translate("Coming soon") : translate("Launch")}
                         </a>
                       </td>
                       <td class="py-4 px-6">
@@ -116,12 +125,27 @@ export default class Companies_Pages_IndexController extends Companies_LayoutCon
     `
   }
 
+  summaryCard(label, value, icon, tone) {
+    return `
+      <div class="flex items-center gap-3 rounded-xl border border-line bg-background p-4">
+        <span class="flex size-10 shrink-0 items-center justify-center rounded-lg ${tone}">
+          <span class="material-symbols-outlined text-[20px]">${icon}</span>
+        </span>
+        <div class="min-w-0">
+          <p class="text-xs font-medium text-muted-foreground">${translate(label)}</p>
+          <p class="text-xl font-bold text-foreground">${value ?? 0}</p>
+        </div>
+      </div>
+    `
+  }
+
   onBranchChange(event) {
     this.branchIdValue = event.target.value || null
     this.pages = []
     fetchJson({ params: { branch_id: this.branchIdValue || undefined } })
       .then(response => {
         this.pages = response.pages || []
+        this.summary = response.summary || { total: 0, desktop: 0, mobile: 0 }
         this.renderContent()
       })
   }

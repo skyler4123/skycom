@@ -1,8 +1,24 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_Pages_NewController extends Companies_LayoutController {
-  connect() {
+  /** @type {any[]} */ branches = []
+  /** @type {{ name: string, value: string }[]} */ targetRoles = []
+  /** @type {string | null} */ businessType = null
+
+  async connect() {
     super.connect()
+
+    const companyId = window.location.pathname.split("/")[2]
+
+    try {
+      const response = await fetchJson(`${Helpers.new_company_page_path(companyId)}.json`)
+      this.branches = response.branches || []
+      this.targetRoles = response.target_roles || []
+      this.businessType = response.business_type
+    } catch (error) {
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${translate("Failed to load page.")}${__errDetail ? ": " + __errDetail : ""}` })
+    }
 
     poll(() => {
       if (this.hasContentTarget) {
@@ -14,18 +30,9 @@ export default class Companies_Pages_NewController extends Companies_LayoutContr
   }
 
   contentHTML() {
-    const branches = currentBranches()
-    const targetRoles = [
-      { name: translate("Retail Cashier"), value: "retail_cashier" },
-      { name: translate("Retail Store Manager"), value: "retail_store_manager" }
-    ]
     const targetResolutions = [
-      { name: translate("Mobile Portrait"), value: "mobile_portrait" },
-      { name: translate("Tablet Landscape"), value: "tablet_landscape" },
-      { name: translate("Desktop Widescreen"), value: "desktop_widescreen" }
-    ]
-    const businessTypes = [
-      { name: translate("Retail"), value: "retail" }
+      { name: translate("Mobile"), value: "mobile" },
+      { name: translate("Desktop"), value: "desktop" }
     ]
 
     const fields = `
@@ -35,8 +42,9 @@ export default class Companies_Pages_NewController extends Companies_LayoutContr
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
             <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Page Name")}</label>
-            <input type="text" name="page[name]" required placeholder="${translate("e.g. Cashier Dashboard")}"
+            <input type="text" name="page[name]" required placeholder="${translate("e.g. Retail POS")}"
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground">
+            <p class="text-xs text-muted-foreground">${translate("The Mobile or Desktop suffix is added automatically.")}</p>
           </div>
 
           <div class="space-y-1">
@@ -44,23 +52,21 @@ export default class Companies_Pages_NewController extends Companies_LayoutContr
             <select name="page[branch_id]" required
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               <option value="">${translate("Select Branch")}</option>
-              ${branches.map(b => `<option value="${b.id}">${b.name}</option>`).join('')}
+              ${this.branches.map(b => `<option value="${b.id}">${b.name}</option>`).join('')}
             </select>
           </div>
 
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Business Type")}</label>
-            <select name="page[business_type]"
-              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
-              ${selectOptionsHTML(businessTypes, 'retail')}
-            </select>
+            <input type="text" value="${Helpers.capitalize(this.businessType || '')}" disabled
+              class="w-full px-3 py-2 border border-line rounded-lg bg-background text-sm text-muted-foreground">
           </div>
 
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Target Role")}</label>
             <select name="page[target_role]"
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
-              ${selectOptionsHTML(targetRoles)}
+              ${selectOptionsHTML(this.targetRoles.map(role => ({ ...role, name: translate(role.name) })))}
             </select>
           </div>
 
@@ -68,7 +74,7 @@ export default class Companies_Pages_NewController extends Companies_LayoutContr
             <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Target Resolution")}</label>
             <select name="page[target_resolution]"
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
-              ${selectOptionsHTML(targetResolutions, 'desktop_widescreen')}
+              ${selectOptionsHTML(targetResolutions, 'desktop')}
             </select>
           </div>
 

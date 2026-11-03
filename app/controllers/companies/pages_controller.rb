@@ -1,20 +1,26 @@
 # app/controllers/companies/pages_controller.rb
 # Companies::PagesController — Operating Pages (Shell-First). Standard CRUD for
 # Page records plus retail_cashier: branch-scoped product/service catalog
-# hydrated for the POS. See docs/OPERATING_PAGES.md, docs/ORDER_PROCESSING_V1.md.
-# Serves Stimulus: Companies_Pages_RetailCashierController (hydrate: products/services/payment_methods)
-# Endpoint: GET retail_cashier — see Helpers.retail_cashier_company_page_path
+# hydrated for the POS, and launch: the device-aware entry point for every page.
+# See docs/OPERATING_PAGES.md, docs/ORDER_PROCESSING_V1.md.
+# Serves Stimulus: Companies_Pages_IndexController (index: desktop pages + counts),
+#                  Companies_Pages_LaunchController (placeholder: coming soon),
+#                  Companies_Pages_RetailCashierController (hydrate: products/services/payment_methods)
+# Endpoints: GET index, launch — see Helpers.company_pages_path / launch_company_page_path
 class Companies::PagesController < Companies::ApplicationController
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        scope = current_company.pages.includes(:branch)
+        scope = current_company.pages
+          .includes(:branch)
+          .where(business_type: current_company.business_type)
         scope = scope.where(branch_id: params[:branch_id]) if params[:branch_id].present?
 
         render json: {
-          pages: format_pages(scope),
-          branches: current_company.branches.select(:id, :name).as_json
+          pages: format_pages(scope.where(target_resolution: :desktop).order(:name)),
+          branches: current_company.branches.select(:id, :name).as_json,
+          summary: resolution_summary(scope)
         }
       end
     end
@@ -25,14 +31,20 @@ class Companies::PagesController < Companies::ApplicationController
 
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { page: format_page(page) } }
+      format.json { render json: { page: format_page(page), target_roles: target_role_options } }
     end
   end
 
   def new
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { branches: current_company.branches.select(:id, :name).as_json } }
+      format.json do
+        render json: {
+          branches: current_company.branches.select(:id, :name).as_json,
+          business_type: current_company.business_type,
+          target_roles: target_role_options
+        }
+      end
     end
   end
 
@@ -73,12 +85,35 @@ class Companies::PagesController < Companies::ApplicationController
     end
   end
 
+  # GET /companies/:company_id/pages/:id/launch(.json)
+  # Device-aware entry point. Implemented pages redirect to their real screen;
+  # everything else renders the shared Coming Soon shell.
+  def launch
+    page = current_company.pages.includes(:branch).find(params[:id])
+    launch_path = launch_path_for(page)
+
+    respond_to do |format|
+      format.html do
+        if launch_path.present?
+          redirect_to launch_path
+        else
+          render html: "", layout: true
+        end
+      end
+      format.json do
+        payload = { page: format_page(page), placeholder: launch_path.blank? }
+        payload[:launch_path] = launch_path if launch_path.present?
+        render json: payload
+      end
+    end
+  end
+
   def edit
     page = current_company.pages.includes(:branch).find(params[:id])
 
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { page: format_page(page) } }
+      format.json { render json: { page: format_page(page), target_roles: target_role_options } }
     end
   end
 
@@ -110,8 +145,32 @@ class Companies::PagesController < Companies::ApplicationController
   def page_params
     params.require(:page).permit(
       :name, :description, :branch_id, :target_role, :target_resolution,
-      :business_type, :lifecycle_status, :workflow_status, metadata: {}
+      :lifecycle_status, :workflow_status, metadata: {}
     )
+  end
+
+  def resolution_summary(scope)
+    {
+      "total" => scope.count,
+      "desktop" => scope.where(target_resolution: :desktop).count,
+      "mobile" => scope.where(target_resolution: :mobile).count
+    }
+  end
+
+  def target_role_options
+    Page.target_roles_for(current_company.business_type).map do |role|
+      {
+        value: role.to_s,
+        name: Page.label_for(business_type: current_company.business_type, target_role: role)
+      }
+    end
+  end
+
+  def launch_path_for(page)
+    case page.target_role
+    when "retail_cashier"
+      retail_cashier_company_page_path(current_company, page) unless page.placeholder?
+    end
   end
 
   def format_page(page)
@@ -119,7 +178,8 @@ class Companies::PagesController < Companies::ApplicationController
       id name code description target_role target_resolution
       business_type lifecycle_status workflow_status metadata
     ]).merge(
-      branch: { id: page.branch_id, name: page.branch.name }
+      "placeholder" => page.placeholder?,
+      "branch" => { id: page.branch_id, name: page.branch.name }
     )
   end
 
