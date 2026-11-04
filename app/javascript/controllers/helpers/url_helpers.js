@@ -145,11 +145,27 @@ export const new_company_order_path = (companyId) => `/companies/${companyId}/or
 export const edit_company_order_path = (companyId, orderId) => `/companies/${companyId}/orders/${orderId}/edit`
 
 export const company_pages_path = (companyId) => `/companies/${companyId}/pages`
-export const create_company_pages_path = (companyId) => `/companies/${companyId}/pages`
-export const company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}`
-export const new_company_page_path = (companyId) => `/companies/${companyId}/pages/new`
-export const edit_company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}/edit`
-export const retail_cashier_company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}/retail_cashier`
+export const company_page_configs_path = (companyId) => `/companies/${companyId}/page_configs`
+export const company_page_config_path = (companyId, pageConfigId) => `/companies/${companyId}/page_configs/${pageConfigId}`
+export const launch_company_page_path = (companyId, pageId, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `/companies/${companyId}/pages/${pageId}/launch${query ? `?${query}` : ""}`
+}
+export const branch_page_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/branch_page_appointments/${appointmentId}`
+export const page_warehouse_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/page_warehouse_appointments/${appointmentId}`
+
+const operationPagePath = (kind, companyId, pageId, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `/companies/${companyId}/pages/${kind}/${pageId}${query ? `?${query}` : ""}`
+}
+
+export const pos_company_page_path = (companyId, pageId, params = {}) => operationPagePath("pos", companyId, pageId, params)
+export const booking_company_page_path = (companyId, pageId, params = {}) => operationPagePath("booking", companyId, pageId, params)
+export const inventory_company_page_path = (companyId, pageId, params = {}) => operationPagePath("inventory", companyId, pageId, params)
+export const reception_company_page_path = (companyId, pageId, params = {}) => operationPagePath("reception", companyId, pageId, params)
+export const kitchen_company_page_path = (companyId, pageId, params = {}) => operationPagePath("kitchen", companyId, pageId, params)
+export const housekeeping_company_page_path = (companyId, pageId, params = {}) => operationPagePath("housekeeping", companyId, pageId, params)
+export const store_manager_company_page_path = (companyId, pageId, params = {}) => operationPagePath("store_manager", companyId, pageId, params)
 
 export const order_processing_v1_checkout_path = (companyId) => `/companies/${companyId}/order_processing/v1/checkout`
 export const order_processing_v1_pay_path = (companyId) => `/companies/${companyId}/order_processing/v1/pay`

@@ -1,15 +1,16 @@
 import { Controller } from "@hotwired/stimulus"
 
-export default class Companies_Pages_RetailCashierController extends Controller {
-  // Retail Cashier POS — Cart (tabs[].items[] in memory) → ORDER → pay → receipt.
+export default class Companies_Pages_Pos_ShowController extends Controller {
+  // POS — Cart (tabs[].items[] in memory) → ORDER → pay → receipt.
   // Click card → addToCart mutates local cart only; ORDER flushes to Order+OrderProductAppointment; pay reads DB snapshots.
-  // Depends on BE: Companies::PagesController#retail_cashier (hydrate products/services/payment_methods),
+  // Depends on BE: Companies::Pages::PosController#show (hydrate products/services/payment_methods),
   //               Companies::OrderProcessing::V1Controller#checkout|pay|pay_cancel,
   //               Companies::OrdersController#receipt,
   //               Webhooks::Payments::MockQrGatewayController (QR webhook → WS pos_payment_completed)
-  // Endpoints: Helpers.retail_cashier_company_page_path, order_processing_v1_*_path, receipt_company_order_path
+  // Endpoints: Helpers.pos_company_page_path, order_processing_v1_*_path, receipt_company_order_path
   // Docs: docs/ORDER_PROCESSING_V1.md
   /** @type {any | null} */ page = null
+  /** @type {any | null} */ appointment = null
   /** @type {any[]} */ products = []
   /** @type {any[]} */ services = []
   /** @type {{ id: number, name: string, items: { id: number, name: string, price: number, qty: number, stockId?: string }[] }[]} */ tabs = []
@@ -26,12 +27,15 @@ export default class Companies_Pages_RetailCashierController extends Controller 
   async connect() {
     const pathParts = window.location.pathname.split("/")
     const companyId = pathParts[2]
-    const pageId = pathParts[4]
+    const pageId = pathParts[5]
 
     try {
-      const url = `${Helpers.retail_cashier_company_page_path(companyId, pageId)}.json`
+      const branchId = new URLSearchParams(window.location.search).get("branch_id")
+      const baseUrl = `${Helpers.pos_company_page_path(companyId, pageId)}.json`
+      const url = branchId ? `${baseUrl}?branch_id=${encodeURIComponent(branchId)}` : baseUrl
       const response = await fetchJson(url)
       this.page = response.page
+      this.appointment = response.appointment
       this.products = response.products || []
       this.services = response.services || []
       this.paymentMethods = response.payment_methods || []
@@ -151,7 +155,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     try {
       const res = await fetchJson(Helpers.order_processing_v1_checkout_path(companyId), {
         method: 'POST',
-        body: { branch_id: this.page.branch.id, items }
+        body: { branch_id: this.appointment.branch.id, items }
       })
       this.orderId = res.order_id
       this.orderTotal = res.total_price || 0

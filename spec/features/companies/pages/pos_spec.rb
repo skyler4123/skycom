@@ -2,13 +2,14 @@
 
 require "rails_helper"
 
-RSpec.feature "Companies::Pages::RetailCashier", type: :feature, js: true do
+RSpec.feature "Companies::Pages::Pos", type: :feature, js: true do
   let(:company_user) { create(:user, :company_owner) }
   let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :education).tap(&:save!) }
   let(:owner) { company.user }
   let(:branch) { create(:branch, company: company) }
   let(:warehouse) { create(:warehouse, company: company, branch: branch) }
-  let(:page_record) { create(:page, company: company, branch: branch, target_role: :retail_cashier) }
+  let(:page_record) { create(:page, company: company, branch: branch, page_type: :pos) }
+  let(:pos_path) { "/companies/#{company.id}/pages/pos/#{page_record.id}?branch_id=#{branch.id}" }
 
   let!(:product_a) { create(:product, company: company, branch: branch, name: "Widget Alpha") }
   let!(:product_b) { create(:product, company: company, branch: branch, name: "Widget Beta") }
@@ -60,7 +61,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   end
 
   scenario "page loads and displays products gallery" do
-    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+    visit pos_path
 
     expect(page).to have_content(/Products Gallery/i, wait: 10)
     expect(page).to have_selector('[data-action*="addToCart"]', minimum: 3, wait: 10)
@@ -71,7 +72,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   end
 
   scenario "adding and removing items from cart" do
-    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+    visit pos_path
 
     first('[data-action*="addToCart"]', wait: 10).click
     expect(page).to have_content(product_a.name)
@@ -83,7 +84,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   end
 
   scenario "ORDER creates pending order and switches to COMPLETE PAYMENT" do
-    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+    visit pos_path
 
     first('[data-action*="addToCart"]', wait: 10).click
 
@@ -96,7 +97,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   end
 
   scenario "Cancel after ORDER returns to ORDER state" do
-    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+    visit pos_path
 
     first('[data-action*="addToCart"]', wait: 10).click
     click_button "ORDER"
@@ -110,7 +111,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   end
 
   scenario "COMPLETE PAYMENT processes order and shows the receipt" do
-    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+    visit pos_path
 
     first('[data-action*="addToCart"]', wait: 10).click
     click_button "ORDER"
@@ -135,7 +136,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   end
 
   scenario "cart is locked after ORDER is placed" do
-    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+    visit pos_path
 
     first('[data-action*="addToCart"]', wait: 10).click
     expect(page).to have_content(product_a.name)
@@ -149,7 +150,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   end
 
   scenario "ORDER with insufficient stock shows error" do
-    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+    visit pos_path
 
     all('[data-action*="addToCart"]', wait: 10).last.click
     click_button "ORDER"
@@ -160,7 +161,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   end
 
   scenario "ORDER with empty cart shows warning" do
-    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+    visit pos_path
 
     click_button "ORDER"
 
@@ -170,7 +171,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   end
 
   scenario "shows the branch-appointed payment methods instead of hardcoded Card" do
-    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+    visit pos_path
 
     expect(page).to have_button("Cash", wait: 10)
     expect(page).to have_button("Mock QR")
@@ -182,7 +183,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
       double(call: { success: true, gateway_reference: "MOCK_QR_FE", gateway_payload: { "qr_string" => "FEQRDATA" } })
     )
 
-    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+    visit pos_path
 
     first('[data-action*="addToCart"]', wait: 10).click
     click_button "Mock QR"
@@ -236,7 +237,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
       double(call: { success: true, gateway_reference: "MOCK_QR_FE2", gateway_payload: { "qr_string" => "FEQRDATA2" } })
     )
 
-    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+    visit pos_path
 
     first('[data-action*="addToCart"]', wait: 10).click
     click_button "Mock QR"
