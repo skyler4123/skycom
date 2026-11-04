@@ -16,8 +16,8 @@ RSpec.describe PageWarehouseAppointment, type: :model do
   describe "validations" do
     it "derives company_id from the page" do
       company = create(:company)
-      page = create(:page, company: company, page_type: :inventory)
       warehouse = create(:warehouse, company: company)
+      page = create(:page, company: company, page_type: :inventory)
       appointment = described_class.new(page: page, warehouse: warehouse)
 
       expect(appointment).to be_valid
@@ -37,8 +37,8 @@ RSpec.describe PageWarehouseAppointment, type: :model do
 
     it "requires a unique warehouse per company and page" do
       company = create(:company)
-      page = create(:page, company: company, page_type: :inventory)
       warehouse = create(:warehouse, company: company)
+      page = create(:page, company: company, page_type: :inventory)
       create(:page_warehouse_appointment, company: company, page: page, warehouse: warehouse)
       duplicate = build(:page_warehouse_appointment, company: company, page: page, warehouse: warehouse)
 
@@ -50,10 +50,11 @@ RSpec.describe PageWarehouseAppointment, type: :model do
   describe ".active" do
     it "returns only active appointments" do
       company = create(:company)
-      page = create(:page, company: company, page_type: :inventory)
       warehouse = create(:warehouse, company: company)
+      other_warehouse = create(:warehouse, company: company)
+      page = create(:page, company: company, page_type: :inventory)
       active = create(:page_warehouse_appointment, company: company, page: page, warehouse: warehouse)
-      create(:page_warehouse_appointment, :inactive, company: company, page: page, warehouse: create(:warehouse, company: company))
+      create(:page_warehouse_appointment, :inactive, company: company, page: page, warehouse: other_warehouse)
 
       expect(described_class.active).to contain_exactly(active)
     end

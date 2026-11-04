@@ -327,6 +327,7 @@ class Company < ApplicationRecord
         Seed::HotelInitService.call(company: self)
       end
 
+      Seed::PageService.seed_defaults!(company: self)
       setup_payment_method_appointments
     end
 

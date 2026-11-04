@@ -121,12 +121,19 @@ class Branch < ApplicationRecord
 
   after_initialize :set_defaults_from_company, if: :new_record?
   after_create :initialize_payment_methods
+  after_create :initialize_page_appointments
 
   def subscription_buyer
     self.company.user
   end
 
   private
+
+  def initialize_page_appointments
+    return unless company
+
+    Seed::PageService.ensure_appointments_for_branch!(self)
+  end
 
   def initialize_payment_methods
     return unless company
