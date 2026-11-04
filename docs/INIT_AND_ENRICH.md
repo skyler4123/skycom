@@ -44,8 +44,8 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Brands | 50 |
 | Suppliers | 12 (retail) / 8 (hospital enrich) |
 | Branches | 2 |
-| Pages | 7 (full purpose catalog per company) + branch/warehouse appointments |
-| Page appointments | Branch creation creates one per branch-scoped Page; warehouse creation creates one for Inventory |
+| Operations | 7 (full purpose catalog per company) + branch/warehouse appointments |
+| Operation appointments | Branch creation creates one per branch-scoped Operation; warehouse creation creates one for Inventory |
 | Departments | 4 |
 | Employees | ~76 (across 2 branches) |
 | Compensation / teams | Every employee: salary, allowance, company-aligned `currency`, contract `expiration_date`; branch teams + Leadership `EmployeeGroup` with `employee_groups.manager_id`; owner attached to the first branch |
@@ -172,7 +172,7 @@ pairwise appointments, and ABAC policies. Two companies with different
 
 At this time `business_type` only matters for seeding:
 
-- page display labels,
+- operation display labels,
 - seed defaults for modules that still use it.
 
 Do not introduce runtime `if company.business_type_*?` branching for

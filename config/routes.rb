@@ -197,24 +197,24 @@ Rails.application.routes.draw do
       resources :property_mappings
       resources :table_configs
       resources :table_config_logs, only: [ :index, :show ]
-      resources :pages, only: [ :index ] do
+      resources :operations, only: [ :index ] do
         member do
           get :launch
         end
 
         collection do
-          get "pos/:page_id", to: "pages/pos#show", as: :pos
-          get "booking/:page_id", to: "pages/booking#show", as: :booking
-          get "inventory/:page_id", to: "pages/inventory#show", as: :inventory
-          get "reception/:page_id", to: "pages/reception#show", as: :reception
-          get "kitchen/:page_id", to: "pages/kitchen#show", as: :kitchen
-          get "housekeeping/:page_id", to: "pages/housekeeping#show", as: :housekeeping
-          get "store_manager/:page_id", to: "pages/store_manager#show", as: :store_manager
+          get "pos/:operation_id", to: "operations/pos#show", as: :pos
+          get "booking/:operation_id", to: "operations/booking#show", as: :booking
+          get "inventory/:operation_id", to: "operations/inventory#show", as: :inventory
+          get "reception/:operation_id", to: "operations/reception#show", as: :reception
+          get "kitchen/:operation_id", to: "operations/kitchen#show", as: :kitchen
+          get "housekeeping/:operation_id", to: "operations/housekeeping#show", as: :housekeeping
+          get "store_manager/:operation_id", to: "operations/store_manager#show", as: :store_manager
         end
       end
-      resources :page_configs, only: %i[index update]
-      resources :branch_page_appointments, only: [ :update ]
-      resources :page_warehouse_appointments, only: [ :update ]
+      resources :operation_configs, only: %i[index update]
+      resources :branch_operation_appointments, only: [ :update ]
+      resources :operation_warehouse_appointments, only: [ :update ]
 
       get "analytics", to: "analytics#index"
 

@@ -14,7 +14,7 @@ Cart (local state) → checkout (create Order) → pay (reserve stock + invoice)
 
 | Layer | Location | Responsibility |
 |-------|----------|----------------|
-| **Frontend** | `controllers/companies/pages/pos/show_controller.js` | Cart state machine, two-phase ORDER/COMPLETE PAYMENT buttons |
+| **Frontend** | `controllers/companies/operations/pos/show_controller.js` | Cart state machine, two-phase ORDER/COMPLETE PAYMENT buttons |
 | **Controller** | `controllers/companies/order_processing/v1_controller.rb` | HTTP API for checkout + pay |
 | **Services** | `services/order_processing_v1/` | 7 services forming the pipeline |
 | **Job** | `jobs/order_processing_v1/finalize_job.rb` | Async finalization after payment |
@@ -117,8 +117,8 @@ pay_cancel()                       PAY CANCEL (abandoned QR)
 
 ## 3. Frontend — POS Controller
 
-**File**: `app/javascript/controllers/companies/pages/pos/show_controller.js`
-**Class**: `Companies_Pages_RetailCashierController`
+**File**: `app/javascript/controllers/companies/operations/pos/show_controller.js`
+**Class**: `Companies_Operations_Pos_ShowController`
 **Extends**: `Controller` (standalone, not layout)
 
 ### 3.1 Cart → Order Link (click item to DB)
@@ -568,7 +568,7 @@ export const receipt_company_order_path = (companyId, orderId) =>
 | `spec/services/order_processing_v1/write_stock_ledger_service_spec.rb` | Ledger rows + callback-driven quantity mutation, hold consumption, stock_id / branch-scoped / legacy fallbacks | Paid order, stock records per product |
 | `spec/services/order_processing_v1/finalize_order_service_spec.rb` | Creates stock exports with sale business_type, links to Order via appoint_for | Paid order with order_product_appointments |
 | `spec/requests/companies/order_processing/v1_controller_spec.rb` | Checkout success, insufficient stock, missing fields, multiple items, string quantity, non-existent order pay, full checkout+pay flow | Company, branch, products, stock |
-| `spec/features/companies/pages/pos_spec.rb` | Page load, add/remove cart, ORDER → COMPLETE PAYMENT, Cancel, cart locked, insufficient stock, empty cart guard | Company, branch, products, stock, Page + branch appointment |
+| `spec/features/companies/operations/pos_spec.rb` | Operation screen load, add/remove cart, ORDER → COMPLETE PAYMENT, Cancel, cart locked, insufficient stock, empty cart guard | Company, branch, products, stock, Operation + branch appointment |
 
 ---
 

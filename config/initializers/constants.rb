@@ -302,7 +302,7 @@ MIGRATION_PREVIEW_ROW_LIMIT = 10
 # Rows persisted per batch during import/rollback.
 MIGRATION_IMPORT_BATCH_SIZE = 500
 
-# Per-run cap on stored error samples (details page).
+# Per-run cap on stored error samples (details operation).
 MIGRATION_ERROR_SAMPLES_LIMIT = 20
 
 # System notification tag owner notifications for a migration carry.
@@ -346,7 +346,7 @@ IMPORT_MAX_ROWS = 20_000
 # Rows written per audit-log/progress batch.
 IMPORT_BATCH_SIZE = 500
 
-# Latest records rendered under the resolved headers on the show page.
+# Latest records rendered under the resolved headers on the show operation.
 IMPORT_PREVIEW_ROW_LIMIT = 10
 
 # Per-run cap on stored row error samples.
@@ -396,15 +396,15 @@ IMPORTABLE_RESOURCES = {
 # =============================================================================
 # Export (index pages → CSV). Skycom-level toggle: applies to every company.
 # =============================================================================
-# Operating page catalog
+# Operation catalog
 #
-# A Page is company-level and keyed by purpose. Every company receives one Page
-# per entry. `appointment_scope` is a seed-time hint only: branch-scoped pages
-# get BranchPageAppointment rows on branch creation, warehouse-scoped pages get
-# PageWarehouseAppointment rows on warehouse creation. See
-# docs/OPERATING_PAGES.md.
+# An Operation is company-level and keyed by purpose. Every company receives one Operation
+# per entry. `appointment_scope` is a seed-time hint only: branch-scoped operations
+# get BranchOperationAppointment rows on branch creation, warehouse-scoped operations get
+# OperationWarehouseAppointment rows on warehouse creation. See
+# docs/OPERATIONS.md.
 # =============================================================================
-PAGE_TYPES = {
+OPERATION_TYPES = {
   pos: { label: "POS", code_prefix: "POS", appointment_scope: :branch }.freeze,
   booking: { label: "Booking", code_prefix: "BKG", appointment_scope: :branch }.freeze,
   inventory: { label: "Inventory", code_prefix: "INV", appointment_scope: :warehouse }.freeze,
@@ -414,8 +414,8 @@ PAGE_TYPES = {
   store_manager: { label: "Store Manager", code_prefix: "MGR", appointment_scope: :branch }.freeze
 }.freeze
 
-# Seed-time display labels. Missing page types fall back to PAGE_TYPES[label].
-PAGE_LABELS_BY_BUSINESS_TYPE = {
+# Seed-time display labels. Missing operation types fall back to OPERATION_TYPES[label].
+OPERATION_LABELS_BY_BUSINESS_TYPE = {
   retail: {
     pos: "Retail POS",
     store_manager: "Store Manager",
@@ -454,8 +454,8 @@ PAGE_LABELS_BY_BUSINESS_TYPE = {
 }.freeze
 
 # Resource keys (URL/controller name) listed here have the "Export" button on
-# their index page and accept `?export=1` to return the full filtered record set.
-# Add/remove a key to enable/disable export for that page globally.
+# their index operation and accept `?export=1` to return the full filtered record set.
+# Add/remove a key to enable/disable export for that operation globally.
 # =============================================================================
 # analytics is intentionally excluded: its JSON is a nested report, not a flat
 # index array, so the generic index CSV exporter would produce an empty file.

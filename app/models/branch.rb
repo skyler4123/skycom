@@ -70,8 +70,8 @@ class Branch < ApplicationRecord
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy
   has_many :branch_payment_method_appointments, dependent: :destroy
-  has_many :branch_page_appointments, dependent: :destroy
-  has_many :pages, through: :branch_page_appointments
+  has_many :branch_operation_appointments, dependent: :destroy
+  has_many :operations, through: :branch_operation_appointments
   has_many :branch_event_appointments, dependent: :destroy
   has_many :events, through: :branch_event_appointments
   has_many :scheduled_shifts, dependent: :destroy
@@ -121,7 +121,7 @@ class Branch < ApplicationRecord
 
   after_initialize :set_defaults_from_company, if: :new_record?
   after_create :initialize_payment_methods
-  after_create :initialize_page_appointments
+  after_create :initialize_operation_appointments
 
   def subscription_buyer
     self.company.user
@@ -129,10 +129,10 @@ class Branch < ApplicationRecord
 
   private
 
-  def initialize_page_appointments
+  def initialize_operation_appointments
     return unless company
 
-    Seed::PageService.ensure_appointments_for_branch!(self)
+    Seed::OperationService.ensure_appointments_for_branch!(self)
   end
 
   def initialize_payment_methods

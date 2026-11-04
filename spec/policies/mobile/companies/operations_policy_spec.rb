@@ -7,14 +7,14 @@ RSpec.describe Mobile::Companies::OperationsPolicy do
 
   let(:employee) { double("employee") }
 
-  it "requires Page read" do
-    expect(employee).to receive(:can?).with(:read, Page).and_return(true)
+  it "requires Operation read" do
+    expect(employee).to receive(:can?).with(:read, Operation).and_return(true)
 
     expect(policy.index?).to be(true)
   end
 
-  it "denies employees without Page read" do
-    expect(employee).to receive(:can?).with(:read, Page).and_return(false)
+  it "denies employees without Operation read" do
+    expect(employee).to receive(:can?).with(:read, Operation).and_return(false)
 
     expect(policy.index?).to be(false)
   end

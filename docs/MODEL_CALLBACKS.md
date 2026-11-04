@@ -32,7 +32,7 @@ Callbacks defined directly in the model file (not inherited from a concern).
 |----------|------|--------|-------------|
 | `after_initialize :set_defaults_from_company, if: :new_record?` | 97 | `set_defaults_from_company` | Copies `timezone` and `currency_code` from parent `Company` to new Branch records (only on new record creation, not on find). |
 | `after_create :initialize_payment_methods` | 107 | `initialize_payment_methods` | Auto-creates a `BranchPaymentMethodAppointment` for each **active** `company.company_payment_method_appointments` row (`lifecycle_status: :active`). Copies the company appointment's name (suffixed `" for #{branch.name}"`), code (suffixed `-BR-<hex>`), `business_type`, `workflow_status`, and merchant fields; sets `lifecycle_status: :active`. Ensures every new branch inherits the company's payment methods. |
-| `after_create :initialize_page_appointments` | — | `initialize_page_appointments` | Calls `Seed::PageService.ensure_appointments_for_branch!(self)` so a branch created after the company page catalog receives an active `BranchPageAppointment` for every branch-scoped Page. Idempotent. |
+| `after_create :initialize_operation_appointments` | — | `initialize_operation_appointments` | Calls `Seed::OperationService.ensure_appointments_for_branch!(self)` so a branch created after the company operation catalog receives an active `BranchOperationAppointment` for every branch-scoped Operation. Idempotent. |
 
 ---
 
@@ -50,7 +50,7 @@ Callbacks defined directly in the model file (not inherited from a concern).
 |----------|------|--------|-------------|
 | `before_validation :assign_currency_from_country` | — | `assign_currency_from_country` | Maps `country` to `currency` via `COUNTRY_CURRENCY_MAP` (`us → usd`, `vn → vnd`) whenever the country has a mapping. Keeps currency in step with the user-chosen country on the New Company page (`company[country]`); `currency` is never permittable. |
 | `after_create :setup_owner_records` | 104 | `setup_owner_records` | Creates owner infrastructure: (1) Owner `Role` with `business_type: :owner`, (2) "Owner All Access" `Policy` with `resource: "all"` / `action: "all"`, (3) Owner `Employee` linked to the creating user, (4) Both `PolicyAppointment` and `RoleAppointment` with `business_type: :owner`, (5) Sets `user.system_role` to `company_owner` so `accessible_companies` returns the new company. |
-| `after_create :initialize_company` | 136 | `initialize_company` | Seeds the company's purpose-keyed page catalog (`Seed::PageService.seed_defaults!`), creates the company's `CompanyWallet` with `main_credit_balance: 0` and `promo_credit_balance: SIGNUP_PROMO_CREDITS` (1,000 for every company, including `system_owned`), then calls `sync_credit_status!` so a positive signup promo starts `active` and a zero balance starts `suspend`. The wallet is the chain's bottom node: `CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`. (Sidebar config seeding was removed 2026-09-22 — sidebar control is FE-only, see `docs/SIDEBAR.md`.) Finally enqueues `Companies::WelcomeNotificationJob` with `WELCOME_NOTIFICATION_DELAY` (10 min, ID only — no-ops if the company/owner is gone; throttled idempotent). When the company is marked `system_owned` (created by `System#ensure_company!`), business-type seeding/page seeding/payment-method setup and the owner user's `system_role` demotion are skipped, while the wallet still receives the signup promo; `sync_credit_status!` keeps system companies exempt from suspension. |
+| `after_create :initialize_company` | 136 | `initialize_company` | Seeds the company's purpose-keyed operation catalog (`Seed::OperationService.seed_defaults!`), creates the company's `CompanyWallet` with `main_credit_balance: 0` and `promo_credit_balance: SIGNUP_PROMO_CREDITS` (1,000 for every company, including `system_owned`), then calls `sync_credit_status!` so a positive signup promo starts `active` and a zero balance starts `suspend`. The wallet is the chain's bottom node: `CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`. (Sidebar config seeding was removed 2026-09-22 — sidebar control is FE-only, see `docs/SIDEBAR.md`.) Finally enqueues `Companies::WelcomeNotificationJob` with `WELCOME_NOTIFICATION_DELAY` (10 min, ID only — no-ops if the company/owner is gone; throttled idempotent). When the company is marked `system_owned` (created by `System#ensure_company!`), business-type seeding/operation seeding/payment-method setup and the owner user's `system_role` demotion are skipped, while the wallet still receives the signup promo; `sync_credit_status!` keeps system companies exempt from suspension. |
 | `after_commit :refresh_cache, on: [:create, :update]` | — | `refresh_cache` | Writes the company attributes hash to `Rails.sync_cache` under `CacheKeyService.company(id)` (TTL `CACHE_DEFAULT_EXPIRY` = 1 hour) and deletes `CacheKeyService.user_companies_max_updated_at(user_id)`. |
 | `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `CacheKeyService.company(id)`, `CacheKeyService.user_companies_max_updated_at(user_id)`, and `CacheKeyService.company_suspended(id)` from `Rails.sync_cache` (pub/sub evicts other instances). |
 | `after_update :write_suspended_cache, if: :saved_change_to_workflow_status?` | — | `write_suspended_cache` | Writes the `Company#suspended?` boolean to `Rails.ram_cache` immediately so the same process (and transactional tests) sees the new gate. |
@@ -63,13 +63,13 @@ Callbacks defined directly in the model file (not inherited from a concern).
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `after_create :initialize_page_appointments` | — | `initialize_page_appointments` | Calls `Seed::PageService.ensure_appointments_for_warehouse!(self)` so a warehouse created after the company page catalog receives an active `PageWarehouseAppointment` for every warehouse-scoped Page (currently Inventory). Idempotent. |
+| `after_create :initialize_operation_appointments` | — | `initialize_operation_appointments` | Calls `Seed::OperationService.ensure_appointments_for_warehouse!(self)` so a warehouse created after the company operation catalog receives an active `OperationWarehouseAppointment` for every warehouse-scoped Operation (currently Inventory). Idempotent. |
 
 ---
 
-### BranchPageAppointment / PageWarehouseAppointment
+### BranchOperationAppointment / OperationWarehouseAppointment
 
-_No callbacks._ `company_id` derives from `branch`/`page` via `SetDefaultCompanyConcern`; status changes are plain updates.
+_No callbacks._ `company_id` derives from `branch`/`operation` via `SetDefaultCompanyConcern`; status changes are plain updates.
 
 ---
 

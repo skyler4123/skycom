@@ -59,7 +59,7 @@
       <% end %>
     </div>
     <div data-controller="<%= stimulus_controller %>"
-      <% if @operation_page.present? %>data-operation-page-id="<%= @operation_page.id %>" data-operation-page-type="<%= @operation_page.page_type %>"<% end %>>
+      <% if @operation.present? %>data-operation-id="<%= @operation.id %>" data-operation-type="<%= @operation.operation_type %>"<% end %>>
       <%= yield %>
     </div>
   </body>

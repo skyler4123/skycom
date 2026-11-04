@@ -58,26 +58,26 @@ Skycom only stores and displays the result; it never applies rates or formulas.
 
 ---
 
-## Operation Pages — new page_type backfill (out of scope for the pages refactor)
+## Operations — new operation_type backfill (out of scope for the operations refactor)
 
-Adding a value to `Page.page_type` / `PAGE_TYPES` is not enough for existing
+Adding a value to `Operation.operation_type` / `OPERATION_TYPES` is not enough for existing
 companies:
 
-- Page Configs has no create action, so existing companies won't get the new
-  Page record.
+- Operation Configs has no create action, so existing companies won't get the new
+  Operation record.
 - Existing branches/warehouses won't get the new appointment rows.
 - Launch/route/controller/FE wiring must also be added.
 
 Future task:
 
-- Add `Seed::PageService.sync_catalog!(company:)` — idempotent upsert of every
-  `PAGE_TYPES` key for one company.
+- Add `Seed::OperationService.sync_catalog!(company:)` — idempotent upsert of every
+  `OPERATION_TYPES` key for one company.
 - Run it for all companies in a data migration or rake task.
-- It must create the Page record (business-type label, desktop resolution) and
+- It must create the Operation record (business-type label, desktop resolution) and
   active appointments for every existing branch/warehouse whose
   `appointment_scope` matches.
-- Add the enum value, `Companies::Pages::<Type>Controller`, route,
-  `PageLaunchService` mapping, FE Stimulus controller, and `PAGE_TYPES` entry.
+- Add the enum value, `Companies::Operations::<Type>Controller`, route,
+  `OperationLaunchService` mapping, FE Stimulus controller, and `OPERATION_TYPES` entry.
 
 ## Company#business_type is seed-only
 
@@ -85,7 +85,7 @@ Future task:
 dynamic, atomic system; use categories, properties, appointments, and ABAC
 policies for per-company differences.
 
-At this time `business_type` only matters for seeding (including page display
+At this time `business_type` only matters for seeding (including operation display
 labels). Do not add runtime `business_type_*?` branches.
 
 ## 1. Comment image variants → async preprocessing

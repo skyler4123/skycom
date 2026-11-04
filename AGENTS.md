@@ -53,7 +53,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 |---|---|
 | Any modal (create / edit / show) | `docs/MODAL_PATTERN.md` — index action + modal controller + `form()` helper |
 | Index/table pages with filtering or dynamic properties | `docs/DYNAMIC_TABLE.md` — three resolutions + category filtering + rollout recipe |
-| A new operating page end-to-end | `docs/OPERATING_PAGES.md` — seed service, factory, controller patterns |
+| A new operation end-to-end | `docs/OPERATIONS.md` — seed service, factory, controller patterns |
 | Resource dashboard pages | `docs/DASHBOARD_PATTERN.md` — backend implementation, no hardcoded paths |
 | Sidebar items, settings, custom groups | `docs/SIDEBAR.md` |
 | Marketing homepage, sign-in/up, company page | `docs/HOMEPAGE.md` — caching contract + SEO rules, read before touching |

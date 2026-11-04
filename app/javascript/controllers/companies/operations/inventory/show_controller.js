@@ -1,0 +1,3 @@
+import PlaceholderController from "controllers/companies/operations/placeholder_controller"
+
+export default class Companies_Operations_Inventory_ShowController extends PlaceholderController {}

@@ -164,7 +164,7 @@ RSpec.feature "Companies::ToastMessages", type: :feature, js: true do
 
   describe "POS toasts" do
     let(:warehouse) { create(:warehouse, company: company, branch: branch) }
-    let(:page_record) { create(:page, company: company, branch: branch, page_type: :pos) }
+    let(:operation_record) { create(:operation, company: company, branch: branch, operation_type: :pos) }
     let!(:product_a) { create(:product, company: company, branch: branch, name: "Widget Alpha") }
     let!(:stock_a) do
       cat = product_a.category
@@ -174,7 +174,7 @@ RSpec.feature "Companies::ToastMessages", type: :feature, js: true do
 
     # ORDER creates pending order — shows "Order created"
     scenario "ORDER shows toast with order message" do
-      visit "/companies/#{company.id}/pages/pos/#{page_record.id}?branch_id=#{branch.id}"
+      visit "/companies/#{company.id}/operations/pos/#{operation_record.id}?branch_id=#{branch.id}"
 
       first('[data-action*="addToCart"]', wait: 10).click
       click_button "ORDER"
@@ -184,7 +184,7 @@ RSpec.feature "Companies::ToastMessages", type: :feature, js: true do
 
     # Empty cart — shows "Cart is empty"
     scenario "order with empty cart shows warning toast" do
-      visit "/companies/#{company.id}/pages/pos/#{page_record.id}?branch_id=#{branch.id}"
+      visit "/companies/#{company.id}/operations/pos/#{operation_record.id}?branch_id=#{branch.id}"
 
       click_button "ORDER"
 

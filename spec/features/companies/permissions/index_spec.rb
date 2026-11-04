@@ -98,7 +98,7 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
     company.clear_permissions_cache
   end
 
-  scenario "can access Permissions Page after signed in" do
+  scenario "can access Permissions screen after signed in" do
     sign_in(owner)
     visit company_permissions_path(company)
 

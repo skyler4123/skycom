@@ -36,7 +36,7 @@ is never treated as authorization.
 
 ### Authorization
 
-Company-level screens use ABAC: Operations requires `Page` read, Notifications
+Company-level screens use ABAC: Operations requires `Operation` read, Notifications
 requires `Notification` read, and attendance requests require
 `AttendanceRequest` create. Self-service screens (Home, Profile, Attendance
 month, Payroll/unlock, check-in) are membership-scoped instead: the controller
@@ -44,7 +44,7 @@ always resolves `@employee` from `current_user` + `company_id`, so they can only
 reach the signed-in employee's own records. Payroll still requires the password
 unlock before its data is rendered.
 
-Existing companies seeded before the `Page` grant was added need a re-seed (or
+Existing companies seeded before the `Operation` grant was added need a re-seed (or
 a policy-appointment backfill) before staff roles can open the Operations tab;
 new companies receive it from their init service.
 
@@ -129,13 +129,13 @@ Small Stimulus controllers live in `app/javascript/controllers/mobile/`:
 Every value is read from persisted data. If the schema has no value yet, the
 screen shows an empty/dash state instead of fabricated content.
 
-| Page | Real data |
+| Operation | Real data |
 |---|---|
 | Sign-in | email/password auth, errors |
 | Home | greeting, company/branch/code, live clock, multi check-in state/times, today's shift/logs, monthly attendance %, worked time, overtime, pending requests, paid-leave balance and pending days, latest published company announcement |
 | Profile | name/code/type/roles/category, email, phone, company, branch, departments, next shift, monthly attendance, group managers, contract renewal (`expiration_date`), Payroll entry point |
 | Attendance | month summary (worked/present/absent/overtime), daily in/out/duration/status |
-| Operations | every accessible page appointment for the company: Page name/code/type, branch or warehouse location, resolution, page workflow status, appointment workflow status |
+| Operations | every accessible operation appointment for the company: Operation name/code/type, branch or warehouse location, resolution, operation workflow status, appointment workflow status |
 | Payroll unlock | signed-in user's password; success sets a five-minute server-side unlock for the current company |
 | Payroll | month, status/step, period days, worked hours, present days, overtime minutes, salary/allowance/overtime/tax/social/net amounts; only after password confirmation |
 | New request | employee/branch, date, type, times, reason, validation, group managers listed from `EmployeeGroup#manager` (owner fallback) |
@@ -231,7 +231,7 @@ Coverage:
 | `spec/features/mobile/check_in_spec.rb` | log creation, employee/company stamping, multiple check-ins, company-local day/timezone |
 | `spec/features/mobile/employee_info_spec.rb` | Profile title, sections, Payroll gate entry, group managers/contract, disabled editor, back/sign-out |
 | `spec/features/mobile/attendance_month_spec.rb` | summary, daily rows, prev/next, empty state |
-| `spec/features/mobile/operations_spec.rb` | current-company page list, another company's records hidden, empty state, auth |
+| `spec/features/mobile/operations_spec.rb` | current-company operation list, another company's records hidden, empty state, auth |
 | `spec/features/mobile/payroll_spec.rb` | password gate, every-entry prompt, wrong password, status, real money amounts, timesheet link, disabled payslip, month switch |
 | `spec/features/mobile/attendance_request_spec.rb` | valid submit, group managers, validation errors, future date, auth |
 | `spec/requests/mobile/attendances_controller_spec.rb` | check-in, multiple check-ins, cross-tenant 404 |
@@ -254,8 +254,8 @@ request feature spec sets them through the DOM with `set_native_field`.
   form/history, announcement management UI, or payslip/PDF download. Payroll
   money and seeded leave/notice data are real; the remaining items are not
   modelled yet.
-- Operations is a read-only page-appointment list. Opening a page, filtering,
-  and page actions are not built yet.
+- Operations is a read-only operation-appointment list. Opening an operation, filtering,
+  and operation actions are not built yet.
 - Mobile ERB remains English-only; `dictionary.js` covers the new JS toasts
   (`Copied to clipboard`, copy failure).
 - A suspended company sees a 403 page on mobile; there is no mobile top-up flow

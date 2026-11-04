@@ -362,7 +362,7 @@ class Seed::HotelInitService
     full_crud = { create: true, read: true, update: true, delete: true }
     role_definitions = {
       Receptionist: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "Customer" => { create: true, read: true, update: true, delete: false },
@@ -378,7 +378,7 @@ class Seed::HotelInitService
         "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Housekeeper: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "Facility" => { read: true, update: true },
@@ -387,7 +387,7 @@ class Seed::HotelInitService
         "Event" => { read: true }
       },
       Concierge: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "Customer" => { create: true, read: true, update: true },
@@ -397,7 +397,7 @@ class Seed::HotelInitService
         "Event" => { create: true, read: true }
       },
       Chef: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "Order" => { read: true },
@@ -408,7 +408,7 @@ class Seed::HotelInitService
       Manager: {
         "KpiConfig" => { read: true },
         "Product" => full_crud,
-        "Page" => full_crud,
+        "Operation" => full_crud,
         "ShiftTemplate" => full_crud,
         "ScheduledShift" => full_crud,
         "AttendanceConfig" => full_crud,
@@ -457,7 +457,7 @@ class Seed::HotelInitService
       },
       Admin: {
         "Product" => full_crud,
-        "Page" => full_crud,
+        "Operation" => full_crud,
         "ShiftTemplate" => full_crud,
         "ScheduledShift" => full_crud,
         "AttendanceConfig" => full_crud,
