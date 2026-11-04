@@ -47,7 +47,7 @@ class Companies::Operations::BaseController < Companies::ApplicationController
   end
 
   def authorize_operation_roles!
-    return if @operation.accessible_by?(current_employee)
+    return if @operation.accessible_by?(current_employee, appointment: @appointment)
 
     render_operation_error("You do not have access to this operation.", status: :forbidden)
   end

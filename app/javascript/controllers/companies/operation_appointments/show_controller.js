@@ -54,7 +54,7 @@ export default class Companies_OperationAppointments_ShowController extends Comp
 
     const companyId = window.location.pathname.split("/")[2]
     const operation = appointment.operation || {}
-    const roles = Array.isArray(operation.metadata?.roles) ? operation.metadata.roles : []
+    const roles = Array.isArray(appointment.access_roles) ? appointment.access_roles : []
     const metadata = JSON.stringify(appointment.metadata || {}, null, 2)
     const effectiveConfig = JSON.stringify(appointment.effective_config || {}, null, 2)
     const canLaunch = appointment.workflow_status === "active" && appointment.accessible
@@ -84,7 +84,7 @@ export default class Companies_OperationAppointments_ShowController extends Comp
           </div>
 
           <div class="rounded-lg border border-line bg-muted/40 p-3 text-xs text-muted-foreground mb-6">
-            ${translate("Operation config overrides every appointment config.")}
+            ${translate("Appointment config overrides Operation config. Company saves reset this local config.")}
           </div>
 
           <div class="grid grid-cols-1 gap-4 border-t border-line pt-6 sm:grid-cols-2 lg:grid-cols-3">

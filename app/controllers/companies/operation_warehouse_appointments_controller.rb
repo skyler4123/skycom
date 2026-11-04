@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-# Companies::OperationWarehouseAppointmentsController — warehouse-level operation toggles
-# and metadata. Operation config overrides this row's metadata when effective config is
-# built. Show/edit/update are shared via Companies::OperationAppointmentsController.
+# Companies::OperationWarehouseAppointmentsController — warehouse-level operation
+# toggles and metadata. This row's metadata overrides the Operation config when
+# effective config is built. Show/edit/update are shared via
+# Companies::OperationAppointmentsController.
 # Serves Stimulus: Companies_Operations_IndexController (index links),
 #                  Companies_OperationWarehouseAppointments_ShowController (show),
 #                  Companies_OperationWarehouseAppointments_EditController (edit, update)

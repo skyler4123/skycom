@@ -340,6 +340,7 @@ Per the `docs/CONSTANTS.md` convention, single-file constants live at their usag
 |----------|-------|------------|---------|
 | `CACHE_DEFAULT_EXPIRY` | 1 hour | `config/initializers/constants.rb` | Default TTL for app-owned keys (§7). TTL is a backstop; freshness comes from deletes and touches |
 | `DASHBOARD_CACHE_EXPIRY` | 5 minutes | `app/controllers/companies/dashboards_controller.rb` | TTL for the full dashboard JSON payload (§7). Deliberately shorter because the payload includes fast-moving operational and wallet data |
+| `OPERATIONS_CACHE_EXPIRY` | 1 day | `config/initializers/constants.rb` | TTL for the Operations and Operation Configs index payloads. Explicit deletes keep them fresh |
 | `COOKIE_EXPIRY` | 1 day | `app/controllers/concerns/application_controller/cookie_concern.rb` | Session and client cache cookie lifetime |
 
 The former per-domain constants (`SESSION_CACHE_EXPIRY`, `PERMISSIONS_CACHE_EXPIRY`,
@@ -386,6 +387,8 @@ Two key families:
 | `employee_unread_notifications(id)` | `employee:<id>:notifications:unread` | `sync_cache` | 1 hour | notification create / mark-read / mark-all-read / prune |
 | `company_analytics(id, period)` | `company:<id>:analytics:<period>` | `sync_cache` | 1 hour | TTL only — clear manually for an immediate refresh |
 | `company_dashboard(id, can_view_financials:)` | `company:<id>:dashboards:<financial or operational>` | `sync_cache` | 5 minutes | TTL only — full payload includes wallet data, so staleness is bounded to 5 minutes |
+| `company_operation_appointments(id)` | `company:<id>:operations:appointments` | `sync_cache` | 1 day | `OperationPageCacheConcern` on Operation / BranchOperationAppointment / OperationWarehouseAppointment / Branch / Warehouse save/destroy |
+| `company_operation_configs(id)` | `company:<id>:operations:configs` | `sync_cache` | 1 day | `OperationPageCacheConcern` on Operation / BranchOperationAppointment / OperationWarehouseAppointment / Branch / Warehouse save/destroy |
 | `company_storage_statistics(id)` | `company:<id>:storage_statistics` | `sync_cache` | 1 hour | TTL only — uploads/deletes intentionally do not bust it |
 | `stock_available(id)` | `stock:<id>:available` | Kredis | none | never delete — data-bearing counter |
 | `company_credit_usage(id)` | `companies:<id>:credit_usage` | Kredis | none | never delete — data-bearing delta counter |

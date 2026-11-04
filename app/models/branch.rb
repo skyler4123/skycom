@@ -7,9 +7,9 @@
 # unit that owns employees, catalog, orders, stock, and payment methods, so each
 # location can be filtered and authorized independently (see docs/ABAC.md).
 # How it works: inherits timezone/currency defaults from the company on
-# initialize and seeds branch-level payment methods from the company's active
-# methods on create. Addresses, tags, categories, and dynamic properties come
-# from the shared concerns.
+# initialize, seeds branch-level payment methods on create, and receives the full
+# operation catalog through OperationAppointmentConcern. Addresses, tags,
+# categories, and dynamic properties come from the shared concerns.
 # Main associations: belongs_to :company (touch), :category, :property_mapping;
 # has_many :employees, :roles, :orders, :warehouses, :stocks, :stock_imports,
 # :stock_exports, :stock_transfers, :scheduled_shifts (dependent: :destroy);
@@ -22,6 +22,8 @@ class Branch < ApplicationRecord
   include AddressConcern
   include TagConcern
   include Branch::ImageConcern
+  include OperationAppointmentConcern
+  include OperationPageCacheConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Enums ---
@@ -52,6 +54,11 @@ class Branch < ApplicationRecord
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
+
+  # --- Macros ---
+  operation_appointments_for BranchOperationAppointment, scope: :branch, foreign_key: :branch
+
+  # --- Associations ---
   belongs_to :company, touch: true
   belongs_to :category
   belongs_to :property_mapping
@@ -121,19 +128,12 @@ class Branch < ApplicationRecord
 
   after_initialize :set_defaults_from_company, if: :new_record?
   after_create :initialize_payment_methods
-  after_create :initialize_operation_appointments
 
   def subscription_buyer
     self.company.user
   end
 
   private
-
-  def initialize_operation_appointments
-    return unless company
-
-    Seed::OperationService.ensure_appointments_for_branch!(self)
-  end
 
   def initialize_payment_methods
     return unless company

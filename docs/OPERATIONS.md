@@ -28,13 +28,22 @@ seeds one `desktop` Operation per purpose.
 
 ```ruby
 operation.config_for(appointment)
-# => (appointment.metadata || {}).deep_merge(operation.metadata || {})
+# => (operation.metadata || {}).deep_merge(appointment.metadata || {})
 ```
 
-**Operation wins.** An Operation config is company-wide and overrides every
-appointment config. Appointment metadata only supplies keys the Operation does not define.
-`Operation#accessible_by?` reads `operation.metadata["roles"]` only; appointment-level
-roles are intentionally ignored.
+**Appointment wins locally.** Every appointment is created with a deep copy of the
+Operation metadata. Saving the Operation config copies the new metadata onto every
+branch/warehouse appointment (`update_all`), so local-only keys are discarded and
+each local row starts from the new company config. An appointment may then override
+keys locally until the next company save.
+
+`roles` is constrained. `Operation#effective_roles(appointment)` uses the local
+roles when present (intersected with the Operation roles) and falls back to the
+Operation roles when local roles are empty. Appointment roles are validated as a
+subset of the Operation roles — or of the company roles when the Operation allows
+all roles. Local roles can therefore narrow access but never widen it. At the
+Operation level, empty roles means “all roles”; at the appointment level, empty
+local roles inherit the Operation roles.
 
 ---
 
@@ -73,6 +82,9 @@ Display names are the catalog labels: every business type seeds the same `POS`,
 Seed::OperationService.seed_defaults!(company:)
 Seed::OperationService.ensure_appointments_for_branch!(branch)
 Seed::OperationService.ensure_appointments_for_warehouse!(warehouse)
+Seed::OperationService.ensure_appointments_for!(
+  location:, appointment_class:, operation_scope:, foreign_key:
+)
 Seed::OperationService.ensure_appointments_for_operation!(operation)
 Seed::OperationService.create(company:, operation_type:, ...)
 ```
@@ -80,8 +92,11 @@ Seed::OperationService.create(company:, operation_type:, ...)
 - `seed_defaults!` creates one `desktop` Operation per `OPERATION_TYPES` key for the
   company, then materializes appointments for every existing branch/warehouse.
 - `Company#initialize_company` calls it for every non-system company.
-- `Branch#after_create` / `Warehouse#after_create` call the matching ensure
-  method, so locations added later get appointments automatically.
+- `Branch` and `Warehouse` include `OperationAppointmentConcern`; its `after_create`
+  calls `Seed::OperationService.ensure_appointments_for!` with the location model's
+  atomic appointment class, operation scope, and foreign key. A future location model
+  opts in with one `operation_appointments_for` declaration.
+- New appointments start with a deep copy of the Operation metadata (see §2).
 - Idempotent: `find_or_initialize_by` / `find_or_create_by!`.
 - Code format: catalog prefix + company id short + random hex, e.g.
   `POS-abc12345-1A2B`.
@@ -94,9 +109,9 @@ All appointments start `active`. Companies disable the ones they do not use.
 
 | Method | Path | Controller#action | Purpose |
 |---|---|---|---|
-| GET | `/companies/:company_id/operations` | `Companies::OperationsController#index` | List branch + warehouse appointments |
+| GET | `/companies/:company_id/operations` | `Companies::OperationsController#index` | List branch + warehouse appointments (filters: `q`, `operation_type`, `workflow_status`, `location`; 1-day cache) |
 | GET | `/companies/:company_id/operations/:id/launch` | `Companies::OperationsController#launch` | Resolve appointment and redirect |
-| GET | `/companies/:company_id/operation_configs` | `Companies::OperationConfigsController#index` | List company Operation records |
+| GET | `/companies/:company_id/operation_configs` | `Companies::OperationConfigsController#index` | List company Operation records (filters: `q`, `operation_type`, `workflow_status`, `resolution`; 1-day cache) |
 | GET | `/companies/:company_id/operation_configs/:id` | `Companies::OperationConfigsController#show` | Operation config details |
 | GET | `/companies/:company_id/operation_configs/:id/edit` | `Companies::OperationConfigsController#edit` | Operation config edit page |
 | PATCH | `/companies/:company_id/operation_configs/:id` | `Companies::OperationConfigsController#update` | Update Operation metadata only |
@@ -114,6 +129,11 @@ All appointments start `active`. Companies disable the ones they do not use.
 | GET | `/companies/:company_id/operations/housekeeping/:operation_id` | `Companies::Operations::HousekeepingController#show` | Placeholder |
 | GET | `/companies/:company_id/operations/store_manager/:operation_id` | `Companies::Operations::StoreManagerController#show` | Placeholder |
 
+Both index payloads are cached per company in `Rails.sync_cache` for
+`OPERATIONS_CACHE_EXPIRY` (1 day). `OperationPageCacheConcern` deletes the keys on
+Operation, appointment, Branch, and Warehouse saves/destroys, so the TTL is only a
+backstop. The employee-specific `accessible` flag is computed after the cache read.
+
 There is **no** create/new/show/edit/update route for `Operation` records themselves.
 Operations are seeded; the UI edits config only, through the `operation_configs`
 show/edit pages.
@@ -130,14 +150,24 @@ appointment's location param.
 ## 6. Authorization
 
 1. Outer gate: `can?(:read, Operation)` / `can?(:update, Operation)` policies.
-2. Operation-level gate: `operation.accessible_by?(employee)` using
-   `operation.metadata["roles"]`.
+2. Appointment-level gate: `operation.accessible_by?(employee, appointment:)` using
+   `effective_roles(appointment)`.
 3. Owner bypasses both.
 4. Appointment must be `workflow_status_active?` to launch.
 
-Empty/missing `metadata["roles"]` means every employee with Operation read can
-access the operation. Role names are stored as strings; renaming a role requires
-updating operation configs.
+Empty/missing Operation `metadata["roles"]` means every employee with Operation read
+can access it. Appointment local roles may only narrow that set: they must be company
+roles and, when the Operation defines roles, a subset of the Operation roles. Empty
+local roles inherit the Operation roles. Role names are stored as strings; renaming a
+role requires updating operation configs.
+
+Role names are edited through the **Access Roles** multi-select on the Operation
+config edit page (`/companies/:company_id/operation_configs/:id/edit`). The picker
+reads the company's roles from the client cache. The appointment edit page gets a
+**Local Access Roles** picker restricted to the Operation roles (or all company roles
+when the Operation allows all); its JSON textarea edits only the non-role metadata.
+Only `metadata["roles"]` is editable on the Operation config; every other key already
+present in `operation.metadata` is preserved when the form is saved.
 
 ---
 
@@ -153,11 +183,20 @@ updating operation configs.
 | Placeholders | `Companies_Operations_<Type>_ShowController` | `Companies::Operations::<Type>Controller#show` |
 
 The Operations pages use **full-page show + edit** pages, never modals. The two list
-pages link the row name to the show page and the edit icon to the edit page.
-The Operations index has no Add button. It lists appointments; Launch is disabled
-when the appointment is inactive or the employee lacks the operation role. Operation
-Configs has no Add button and warns that Operation config overrides every
-appointment config.
+pages link the row name to the show page and the edit icon to the edit page. Both
+list pages have GET filter bars:
+
+- Operations: keyword, operation type, status, location
+- Operation Configs: keyword, operation type, status, resolution
+
+The Operation config edit page edits company access roles with a multi-select role
+picker (the company's roles come from the client cache); it never exposes raw JSON.
+The appointment edit page has a **Local Access Roles** picker restricted to the
+Operation roles (or all company roles when the Operation allows all) and a JSON
+textarea for the remaining local metadata. The Operations index has no Add button.
+It lists appointments; Launch is disabled when the appointment is inactive or the
+employee lacks the effective appointment roles. Operation Configs has no Add button
+and warns that saving an Operation resets every branch/warehouse appointment config.
 
 ---
 
@@ -181,8 +220,9 @@ A new operation type touches six layers:
 - `operations`: unique `(company_id, operation_type, resolution)`; unique `code`.
 - `branch_operation_appointments`: unique `(company_id, branch_id, operation_id)`.
 - `operation_warehouse_appointments`: unique `(company_id, operation_id, warehouse_id)`.
-- Both appointment tables carry the standard System Fields block and default
-  `metadata = {}`.
+- Both appointment tables carry the standard System Fields block; the column default
+  is `metadata = {}`, while `Seed::OperationService` copies the Operation metadata
+  onto every new appointment.
 
 ---
 

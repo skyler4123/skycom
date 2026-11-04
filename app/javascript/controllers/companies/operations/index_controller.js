@@ -2,16 +2,20 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 
 // Companies_Operations_IndexController — operation appointment list.
 // Depends on BE: Companies::OperationsController#index
-// Endpoints: GET /companies/:company_id/operations(.json)
+// Endpoints: GET /companies/:company_id/operations(.json?q=&operation_type=&workflow_status=&location=)
 export default class Companies_Operations_IndexController extends Companies_LayoutController {
   /** @type {any[]} */ appointments = []
+
+  /** @type {any} */ filters = {}
 
   async connect() {
     super.connect()
 
     try {
-      const response = await fetchJson(`${pathname()}.json`)
+      const urlParams = new URLSearchParams(window.location.search)
+      const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
       this.appointments = response.operation_appointments || []
+      this.filters = response.filters || {}
     } catch (error) {
       const detail = error.errors?.join(", ") || error.message
       toast({ type: "error", message: `${translate("Failed to load operation appointments")}${detail ? ": " + detail : ""}` })
@@ -26,14 +30,53 @@ export default class Companies_Operations_IndexController extends Companies_Layo
     })
   }
 
+  translatedOptions(options) {
+    return (options || []).map(option => ({ value: option.value, name: translate(option.name) }))
+  }
+
   contentHTML() {
+    const urlParams = new URLSearchParams(window.location.search)
+    const locationOptions = (this.filters.locations || []).map(location => ({
+      value: location.value,
+      name: `${Helpers.escapeHtml(location.name)} (${translate(location.kind === "branch" ? "Branch" : "Warehouse")})`
+    }))
+
     return `
       <div class="p-4 overflow-y-auto">
         <div class="p-4 bg-card rounded-xl border border-line flex flex-col gap-5">
           <div class="flex flex-col gap-1">
             <h2 class="text-xl font-bold text-foreground">${translate("Operation Appointments")}</h2>
-            <p class="text-sm text-muted-foreground">${translate("Appointments connect an operation to a branch or warehouse. Operation Configs override these values.")}</p>
+            <p class="text-sm text-muted-foreground">${translate("Appointments connect an operation to a branch or warehouse. Appointment configs override Operation configs.")}</p>
           </div>
+
+          <form method="get" action="${pathname()}" class="flex flex-wrap items-end gap-3">
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Search")}</label>
+              <input type="text" name="q" value="${Helpers.escapeHtml(urlParams.get("q") || "")}" placeholder="${translate("Search operation appointments...")}" class="pl-3 pr-3 py-2 text-sm border border-line rounded-lg bg-card text-foreground">
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Type")}</label>
+              <select name="operation_type" class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
+                ${selectOptionsHTML(this.translatedOptions(this.filters.operation_types), urlParams.get("operation_type"), translate("All"))}
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Status")}</label>
+              <select name="workflow_status" class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
+                ${selectOptionsHTML(this.translatedOptions(this.filters.statuses), urlParams.get("workflow_status"), translate("All"))}
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Location")}</label>
+              <select name="location" class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
+                ${selectOptionsHTML(locationOptions, urlParams.get("location"), translate("All"))}
+              </select>
+            </div>
+            <button type="submit" class="h-[38px] px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]!">search</span>
+              ${translate("Search")}
+            </button>
+          </form>
 
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -80,7 +123,7 @@ export default class Companies_Operations_IndexController extends Companies_Layo
     const launchReason = !appointment.accessible
       ? translate("You do not have access to this operation.")
       : translate("This operation appointment is inactive.")
-    const roles = Array.isArray(operation.metadata?.roles) ? operation.metadata.roles : []
+    const roles = Array.isArray(appointment.access_roles) ? appointment.access_roles : []
 
     return `
       <tr class="border-b border-line hover:bg-muted/50">

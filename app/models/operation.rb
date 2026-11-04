@@ -7,12 +7,14 @@
 # catalog and enables the operations it uses per branch or warehouse.
 # How it works: an Operation is company-level and uniquely identified by
 # (company, operation_type, resolution). Location connections live in
-# BranchOperationAppointment / OperationWarehouseAppointment; the appointment metadata is
-# deep-merged with this Operation's metadata (Operation wins) to produce the effective
-# config.
+# BranchOperationAppointment / OperationWarehouseAppointment; appointment metadata
+# overrides this Operation's metadata to produce the effective config. Saving this
+# Operation's metadata resets every appointment to a copy of it.
 # Main associations: belongs_to :company; has_many :branch_operation_appointments /
 # :operation_warehouse_appointments (and branches/warehouses through them).
 class Operation < ApplicationRecord
+  include OperationPageCacheConcern
+
   # --- Attributes ---
   attribute :permission_resource_name, :string, default: "Operation"
 
@@ -48,22 +50,70 @@ class Operation < ApplicationRecord
   validate :metadata_must_be_a_hash
   validate :roles_metadata_must_be_strings
 
-  # Effective config for one appointment. Operation metadata wins on every conflict.
+  # --- Callbacks ---
+  after_update :copy_metadata_to_appointments, if: :saved_change_to_metadata?
+
+  # Effective config for one appointment. Appointment metadata wins, except roles
+  # which are always constrained to the operation roles.
   def config_for(appointment)
-    (appointment.metadata || {}).deep_merge(metadata || {})
+    config = (metadata || {}).deep_merge(appointment.metadata || {})
+    return config unless metadata&.key?("roles") || appointment.metadata&.key?("roles")
+
+    config["roles"] = effective_roles(appointment)
+    config
+  end
+
+  # Local roles may narrow access but never widen it. Empty local roles inherit
+  # the operation roles.
+  def effective_roles(appointment = nil)
+    operation_roles = metadata_roles(metadata)
+    return operation_roles if appointment.nil?
+
+    local_roles = metadata_roles(appointment.metadata)
+    return operation_roles if local_roles.empty?
+    return local_roles if operation_roles.empty?
+
+    local_roles & operation_roles
   end
 
   # Empty/missing roles means every employee with Operation read can access it.
-  def accessible_by?(employee)
+  # An appointment with local roles can narrow that set, never widen it.
+  def accessible_by?(employee, appointment: nil)
     return true if employee.owner_role?
 
-    allowed = Array(metadata.is_a?(Hash) ? metadata["roles"] : nil).map(&:to_s)
+    local_roles = appointment && metadata_roles(appointment.metadata)
+    allowed = effective_roles(appointment)
+    return false if allowed.empty? && local_roles.present?
     return true if allowed.empty?
 
     employee.roles.where(name: allowed).exists?
   end
 
+  # Fast role check for already-serialized appointments (cached index rows).
+  def self.roles_allow_access?(roles:, employee:, role_names: nil)
+    return true if employee.owner_role?
+
+    allowed = Array(roles).map(&:to_s)
+    return true if allowed.empty?
+
+    names = role_names || employee.roles.pluck(:name)
+    (names.map(&:to_s) & allowed).any?
+  end
+
   private
+
+  def copy_metadata_to_appointments
+    attributes = { metadata: metadata, updated_at: Time.current }
+    branch_operation_appointments.update_all(attributes)
+    operation_warehouse_appointments.update_all(attributes)
+  end
+
+  def metadata_roles(source)
+    return [] unless source.is_a?(Hash)
+
+    roles = source["roles"]
+    roles.is_a?(Array) ? roles.map(&:to_s) : []
+  end
 
   def metadata_must_be_a_hash
     if metadata.nil?

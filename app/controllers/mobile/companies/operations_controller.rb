@@ -4,7 +4,7 @@ class Mobile::Companies::OperationsController < Mobile::Companies::BaseControlle
     warehouse_appointments = @company.operation_warehouse_appointments.includes(:operation, :warehouse).to_a
 
     @appointments = (branch_appointments + warehouse_appointments)
-      .select { |appointment| appointment.operation.accessible_by?(@employee) }
+      .select { |appointment| appointment.operation.accessible_by?(@employee, appointment: appointment) }
       .sort_by do |appointment|
         [
           appointment.operation.name.to_s.downcase,

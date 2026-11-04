@@ -69,7 +69,7 @@ export default class Companies_OperationConfigs_ShowController extends Companies
           </div>
 
           <div class="rounded-lg border border-warning/20 bg-warning/10 p-3 text-xs text-warning mb-6">
-            ${translate("This config is company-wide and overrides every branch/warehouse appointment config.")}
+            ${translate("Saving this config resets every branch/warehouse appointment config.")}
           </div>
 
           <div class="grid grid-cols-1 gap-4 border-t border-line pt-6 sm:grid-cols-2 lg:grid-cols-3">

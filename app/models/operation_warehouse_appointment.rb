@@ -7,10 +7,12 @@
 # same deployable-operation contract as branch operations without putting a warehouse_id
 # on the Operation itself.
 # How it works: company_id derives from the operation via SetDefaultCompanyConcern.
-# Operation config overrides this row's metadata when effective config is built.
+# This row's metadata overrides the Operation metadata when effective config is
+# built; local roles may narrow operation roles but never widen them.
 # Main associations: belongs_to :company, :operation, :warehouse.
 class OperationWarehouseAppointment < ApplicationRecord
   include SetDefaultCompanyConcern
+  include OperationPageCacheConcern
 
   # --- Attributes ---
   attribute :metadata, default: -> { {} }
@@ -33,8 +35,29 @@ class OperationWarehouseAppointment < ApplicationRecord
   validate :operation_must_belong_to_company
   validate :warehouse_must_belong_to_company
   validate :metadata_must_be_a_hash
+  validate :roles_metadata_must_be_within_company_and_operation, on: :update
 
   private
+
+  def roles_metadata_must_be_within_company_and_operation
+    return unless metadata.is_a?(Hash) && metadata.key?("roles")
+
+    roles = metadata["roles"]
+    unless roles.is_a?(Array) && roles.all? { |role| role.is_a?(String) }
+      errors.add(:metadata, "roles must be an array of strings")
+      return
+    end
+    return if roles.empty?
+
+    company_roles = company&.roles&.pluck(:name) || []
+    if (roles - company_roles).any?
+      errors.add(:metadata, "roles must be company roles")
+      return
+    end
+
+    operation_roles = Array(operation&.metadata&.[]("roles")).map(&:to_s)
+    errors.add(:metadata, "roles must be included in the operation roles") if operation_roles.any? && (roles - operation_roles).any?
+  end
 
   def operation_must_belong_to_company
     return if operation.blank? || company_id.blank?

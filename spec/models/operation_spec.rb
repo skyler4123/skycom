@@ -76,7 +76,7 @@ RSpec.describe Operation, type: :model do
   end
 
   describe "#config_for" do
-    it "deep-merges appointment metadata with operation metadata, operation winning" do
+    it "deep-merges operation metadata with appointment metadata, appointment winning" do
       operation = build(
         :operation,
         metadata: {
@@ -92,8 +92,8 @@ RSpec.describe Operation, type: :model do
       )
 
       expect(operation.config_for(appointment)).to eq(
-        "layout" => { "columns" => 12, "sidebar" => "operation", "theme" => "dark" },
-        "roles" => []
+        "layout" => { "columns" => 6, "sidebar" => "appointment", "theme" => "dark" },
+        "roles" => [ "Cashier" ]
       )
     end
 
@@ -102,6 +102,46 @@ RSpec.describe Operation, type: :model do
       appointment = BranchOperationAppointment.new(metadata: {})
 
       expect(operation.config_for(appointment)).to eq("roles" => [ "Cashier" ])
+    end
+
+    it "inherits operation roles when the appointment roles are empty" do
+      operation = build(:operation, metadata: { "roles" => [ "Manager" ], "layout" => { "columns" => 12 } })
+      appointment = BranchOperationAppointment.new(metadata: { "roles" => [], "layout" => { "columns" => 6 } })
+
+      expect(operation.config_for(appointment)).to eq(
+        "roles" => [ "Manager" ],
+        "layout" => { "columns" => 6 }
+      )
+    end
+
+    it "does not let an appointment widen operation roles" do
+      operation = build(:operation, metadata: { "roles" => [ "Manager" ] })
+      appointment = BranchOperationAppointment.new(metadata: { "roles" => [ "Cashier" ] })
+
+      expect(operation.config_for(appointment)).to eq("roles" => [])
+    end
+  end
+
+  describe "#effective_roles" do
+    it "uses appointment roles when they narrow the operation roles" do
+      operation = build(:operation, metadata: { "roles" => [ "Manager", "Cashier" ] })
+      appointment = BranchOperationAppointment.new(metadata: { "roles" => [ "Cashier" ] })
+
+      expect(operation.effective_roles(appointment)).to eq([ "Cashier" ])
+    end
+
+    it "falls back to operation roles when appointment roles are empty" do
+      operation = build(:operation, metadata: { "roles" => [ "Manager" ] })
+      appointment = BranchOperationAppointment.new(metadata: { "roles" => [] })
+
+      expect(operation.effective_roles(appointment)).to eq([ "Manager" ])
+    end
+
+    it "returns the intersection when appointment roles are outside the operation roles" do
+      operation = build(:operation, metadata: { "roles" => [ "Manager" ] })
+      appointment = BranchOperationAppointment.new(metadata: { "roles" => [ "Cashier" ] })
+
+      expect(operation.effective_roles(appointment)).to eq([])
     end
   end
 
@@ -136,6 +176,72 @@ RSpec.describe Operation, type: :model do
       operation = create(:operation, company: company, branch: branch, metadata: { "roles" => [ "Manager" ] })
 
       expect(operation.accessible_by?(owner)).to be(true)
+    end
+
+    it "narrows access when the appointment local roles exclude the employee" do
+      employee.attach_role("Cashier")
+      operation = create(:operation, company: company, branch: branch, metadata: { "roles" => [ "Manager", "Cashier" ] })
+      appointment = BranchOperationAppointment.new(operation: operation, branch: branch, metadata: { "roles" => [ "Manager" ] })
+
+      expect(operation.accessible_by?(employee, appointment: appointment)).to be(false)
+    end
+
+    it "allows access when the appointment local roles include the employee" do
+      employee.attach_role("Cashier")
+      operation = create(:operation, company: company, branch: branch, metadata: { "roles" => [ "Manager", "Cashier" ] })
+      appointment = BranchOperationAppointment.new(operation: operation, branch: branch, metadata: { "roles" => [ "Cashier" ] })
+
+      expect(operation.accessible_by?(employee, appointment: appointment)).to be(true)
+    end
+
+    it "does not widen access when local roles fall outside the operation roles" do
+      employee.attach_role("Cashier")
+      operation = create(:operation, company: company, branch: branch, metadata: { "roles" => [ "Manager" ] })
+      appointment = BranchOperationAppointment.new(operation: operation, branch: branch, metadata: { "roles" => [ "Cashier" ] })
+
+      expect(operation.accessible_by?(employee, appointment: appointment)).to be(false)
+    end
+  end
+
+  describe "company metadata reset" do
+    it "copies operation metadata to every branch appointment when metadata changes" do
+      company = create(:company)
+      branch = create(:branch, company: company)
+      Seed::OperationService.seed_defaults!(company: company)
+      operation = company.operations.find_by!(operation_type: :pos)
+      appointment = branch.branch_operation_appointments.find_by!(operation: operation)
+      appointment.update!(metadata: { "layout" => { "columns" => 6 } })
+
+      operation.update!(metadata: { "roles" => [ "Manager" ], "layout" => { "columns" => 12 } })
+
+      expect(appointment.reload.metadata).to eq(operation.metadata)
+    end
+
+    it "copies operation metadata to every warehouse appointment when metadata changes" do
+      company = create(:company)
+      branch = create(:branch, company: company)
+      warehouse = create(:warehouse, company: company, branch: branch)
+      Seed::OperationService.seed_defaults!(company: company)
+      operation = company.operations.find_by!(operation_type: :inventory)
+      appointment = warehouse.operation_warehouse_appointments.find_by!(operation: operation)
+      appointment.update!(metadata: { "bin" => "A1" })
+
+      operation.update!(metadata: { "roles" => [ "Manager" ], "bin" => "B2" })
+
+      expect(appointment.reload.metadata).to eq(operation.metadata)
+    end
+
+    it "does not reset appointments when a non-metadata attribute changes" do
+      company = create(:company)
+      branch = create(:branch, company: company)
+      Seed::OperationService.seed_defaults!(company: company)
+      operation = company.operations.find_by!(operation_type: :pos)
+      appointment = branch.branch_operation_appointments.find_by!(operation: operation)
+      appointment.update!(metadata: { "layout" => { "columns" => 6 } })
+
+      operation.update!(description: "Updated description")
+
+      expect(appointment.reload.metadata).to eq("layout" => { "columns" => 6 })
     end
   end
 end

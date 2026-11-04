@@ -58,6 +58,44 @@ RSpec.describe Seed::OperationService do
       expect(warehouse.operation_warehouse_appointments.count).to eq(1)
       expect(warehouse.operations.pluck(:operation_type)).to eq([ "inventory" ])
     end
+
+    it "copies the operation metadata into branch appointments created with the branch" do
+      company = create(:company)
+      metadata = { "roles" => [ "Cashier" ], "layout" => { "columns" => 6 } }
+      operation = described_class.create(company: company, operation_type: :pos, metadata: metadata)
+
+      branch = create(:branch, company: company)
+
+      appointment = branch.branch_operation_appointments.find_by!(operation: operation)
+      expect(appointment.metadata).to eq(metadata)
+    end
+
+    it "copies the operation metadata into warehouse appointments created with the warehouse" do
+      company = create(:company)
+      metadata = { "roles" => [ "Manager" ], "bin" => "A1" }
+      operation = described_class.create(company: company, operation_type: :inventory, metadata: metadata)
+      branch = create(:branch, company: company)
+
+      warehouse = create(:warehouse, company: company, branch: branch)
+
+      appointment = warehouse.operation_warehouse_appointments.find_by!(operation: operation)
+      expect(appointment.metadata).to eq(metadata)
+    end
+
+    it "still creates appointments when the operation roles no longer match company roles" do
+      company = create(:company)
+      operation = described_class.create(
+        company: company,
+        operation_type: :pos,
+        metadata: { "roles" => [ "Renamed Role" ] }
+      )
+
+      branch = create(:branch, company: company)
+
+      appointment = branch.branch_operation_appointments.find_by!(operation: operation)
+      expect(appointment).to be_persisted
+      expect(appointment.metadata).to eq("roles" => [ "Renamed Role" ])
+    end
   end
 
   describe ".ensure_appointments_for_branch!" do

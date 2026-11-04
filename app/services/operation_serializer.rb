@@ -14,25 +14,26 @@ class OperationSerializer
       operation.as_json(only: OPERATION_ATTRIBUTES)
     end
 
-    def appointment(appointment, employee:, launch_path: nil)
+    def appointment(appointment, employee: nil, launch_path: nil)
       record = appointment.operation
       payload = {
-        id: appointment.id,
-        kind: appointment.is_a?(BranchOperationAppointment) ? "branch" : "warehouse",
-        operation: operation(record),
-        location: location(appointment),
-        metadata: appointment.metadata,
-        effective_config: record.config_for(appointment),
-        workflow_status: appointment.workflow_status,
-        lifecycle_status: appointment.lifecycle_status,
-        accessible: record.accessible_by?(employee),
-        launch_path: launch_path
+        "id" => appointment.id,
+        "kind" => appointment.is_a?(BranchOperationAppointment) ? "branch" : "warehouse",
+        "operation" => operation(record),
+        "location" => location(appointment),
+        "metadata" => appointment.metadata,
+        "effective_config" => record.config_for(appointment),
+        "access_roles" => record.effective_roles(appointment),
+        "workflow_status" => appointment.workflow_status,
+        "lifecycle_status" => appointment.lifecycle_status,
+        "launch_path" => launch_path
       }
+      payload["accessible"] = record.accessible_by?(employee, appointment: appointment) if employee
 
       if appointment.is_a?(BranchOperationAppointment)
-        payload[:branch] = { id: appointment.branch_id, name: appointment.branch.name }
+        payload["branch"] = { "id" => appointment.branch_id, "name" => appointment.branch.name }
       else
-        payload[:warehouse] = { id: appointment.warehouse_id, name: appointment.warehouse.name }
+        payload["warehouse"] = { "id" => appointment.warehouse_id, "name" => appointment.warehouse.name }
       end
 
       payload
@@ -40,9 +41,9 @@ class OperationSerializer
 
     def location(appointment)
       if appointment.is_a?(BranchOperationAppointment)
-        { id: appointment.branch_id, name: appointment.branch.name }
+        { "id" => appointment.branch_id, "name" => appointment.branch.name }
       else
-        { id: appointment.warehouse_id, name: appointment.warehouse.name }
+        { "id" => appointment.warehouse_id, "name" => appointment.warehouse.name }
       end
     end
   end

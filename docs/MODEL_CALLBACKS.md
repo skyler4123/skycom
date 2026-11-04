@@ -32,7 +32,8 @@ Callbacks defined directly in the model file (not inherited from a concern).
 |----------|------|--------|-------------|
 | `after_initialize :set_defaults_from_company, if: :new_record?` | 97 | `set_defaults_from_company` | Copies `timezone` and `currency_code` from parent `Company` to new Branch records (only on new record creation, not on find). |
 | `after_create :initialize_payment_methods` | 107 | `initialize_payment_methods` | Auto-creates a `BranchPaymentMethodAppointment` for each **active** `company.company_payment_method_appointments` row (`lifecycle_status: :active`). Copies the company appointment's name (suffixed `" for #{branch.name}"`), code (suffixed `-BR-<hex>`), `business_type`, `workflow_status`, and merchant fields; sets `lifecycle_status: :active`. Ensures every new branch inherits the company's payment methods. |
-| `after_create :initialize_operation_appointments` | — | `initialize_operation_appointments` | Calls `Seed::OperationService.ensure_appointments_for_branch!(self)` so a branch created after the company operation catalog receives an active `BranchOperationAppointment` for every branch-scoped Operation. Idempotent. |
+
+> Operation appointments are created by `OperationAppointmentConcern`; operations-page cache invalidation is handled by `OperationPageCacheConcern` (both below).
 
 ---
 
@@ -61,15 +62,26 @@ Callbacks defined directly in the model file (not inherited from a concern).
 
 ### Warehouse (`app/models/warehouse.rb`)
 
-| Callback | Line | Method | Description |
-|----------|------|--------|-------------|
-| `after_create :initialize_operation_appointments` | — | `initialize_operation_appointments` | Calls `Seed::OperationService.ensure_appointments_for_warehouse!(self)` so a warehouse created after the company operation catalog receives an active `OperationWarehouseAppointment` for every warehouse-scoped Operation (currently Inventory). Idempotent. |
+_No direct callbacks._ Operation appointments are created by `OperationAppointmentConcern`; operations-page cache invalidation is handled by `OperationPageCacheConcern` (both below).
+
+---
+
+### Operation (`app/models/operation.rb`)
+
+| Callback | Method | Description |
+|----------|--------|-------------|
+| `after_update :copy_metadata_to_appointments, if: :saved_change_to_metadata?` | `copy_metadata_to_appointments` | Copies the Operation's `metadata` onto every `BranchOperationAppointment` and `OperationWarehouseAppointment` with `update_all` (including `updated_at`). This is the company-level reset: local appointment-only keys are discarded. |
+| `after_save :clear_operation_page_caches` + `after_destroy :clear_operation_page_caches` | `clear_operation_page_caches` | Inherited from `OperationPageCacheConcern`; deletes the company's Operations and Operation Configs index cache keys. |
 
 ---
 
 ### BranchOperationAppointment / OperationWarehouseAppointment
 
-_No callbacks._ `company_id` derives from `branch`/`operation` via `SetDefaultCompanyConcern`; status changes are plain updates.
+`company_id` derives from `branch`/`operation` via `SetDefaultCompanyConcern`. Status and metadata changes are plain updates with one roles validation (`roles` must be company roles and, when the Operation has roles, a subset of them).
+
+| Callback | Method | Description |
+|----------|--------|-------------|
+| `after_save :clear_operation_page_caches` + `after_destroy :clear_operation_page_caches` | `clear_operation_page_caches` | Inherited from `OperationPageCacheConcern`; deletes the company's Operations and Operation Configs index cache keys. |
 
 ---
 
@@ -414,6 +426,34 @@ Auto-derives `company_id` on atomic pairwise Appointment records from the associ
 
 ---
 
+### OperationAppointmentConcern (`app/models/concerns/operation_appointment_concern.rb`)
+
+Gives a location model the company's full operation catalog as atomic appointment rows. The includer declares its appointment model, operation scope, and foreign key:
+
+```ruby
+operation_appointments_for BranchOperationAppointment, scope: :branch, foreign_key: :branch
+```
+
+| Callback | Method | Description |
+|----------|--------|-------------|
+| `after_create :ensure_operation_appointments` | `ensure_operation_appointments` | Calls `Seed::OperationService.ensure_appointments_for!` with the includer's appointment model/scope/foreign key. Idempotent. Returns early when `company` is blank. |
+
+**Included in (2 models):** `Branch`, `Warehouse`.
+
+---
+
+### OperationPageCacheConcern (`app/models/concerns/operation_page_cache_concern.rb`)
+
+Deletes the company-level Operations and Operation Configs index cache keys whenever an operation-domain row changes.
+
+| Callback | Method | Description |
+|----------|--------|-------------|
+| `after_save :clear_operation_page_caches` + `after_destroy :clear_operation_page_caches` | `clear_operation_page_caches` | Deletes `CacheKeyService.company_operation_appointments(company_id)` and `CacheKeyService.company_operation_configs(company_id)` through `Rails.sync_cache`. Delete-only, so it is safe inside transactional tests. |
+
+**Included in (5 models):** `Operation`, `BranchOperationAppointment`, `OperationWarehouseAppointment`, `Branch`, `Warehouse`.
+
+---
+
 ### CategoryConcern (`app/models/concerns/category_concern.rb`)
 
 Auto-assigns a default category on create if none is provided. Ensures every resource record has a category for dynamic property resolution and ABAC permission evaluation.
@@ -494,9 +534,11 @@ Each concern defines the same callback:
 | `before_validation` | 5 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 19 models), (PropertyMappingConcern → 43 models) |
 | `after_initialize` | 1 | Branch |
 | `before_create` | 1 | Session |
-| `after_create` | 8 | Category, Company, Branch (2), Warehouse, PolicyAppointment, PropertyMapping, RoleAppointment |
+| `after_create` | 6 | Category, Company, Branch (1), PolicyAppointment, PropertyMapping, RoleAppointment (plus OperationAppointmentConcern → Branch, Warehouse) |
 | `belongs_to :company, touch: true` | 6 | Branch, Department, Category, PropertyMapping, TableConfig, Role |
-| `after_update` (conditional) | 3 | Company (`workflow_status` suspension cache), CompanyPaymentMethodAppointment, PolicyAppointment |
+| `after_update` (conditional) | 4 | Company (`workflow_status` suspension cache), CompanyPaymentMethodAppointment, PolicyAppointment, Operation (`metadata` reset) |
+| `after_save` | 5 | (OperationPageCacheConcern → Operation, BranchOperationAppointment, OperationWarehouseAppointment, Branch, Warehouse) |
+| `after_destroy` | 5 | (OperationPageCacheConcern → Operation, BranchOperationAppointment, OperationWarehouseAppointment, Branch, Warehouse) |
 | `before_update` | 3 | PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_destroy` | 5 | Employee, System, PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_discard` | 1 | Employee |
@@ -505,10 +547,10 @@ Each concern defines the same callback:
 | `after_rollback` | 1 | Company (`workflow_status` suspension cache cleanup) |
 | `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 45 models), (PropertyMappingConcern → 45 models), (ImageAttachmentsConcern → 6 models + Product) |
 
-**Total unique callback declarations: ~34 directly across 15 model files + 7 concern files propagating to ~63+ models.**
+**Total unique callback declarations: ~36 directly across 15 model files + 9 concern files propagating to ~70+ models.**
 
 > **Note:** `ImageAttachmentsConcern` in the validate row covers the 6 per-model ImageConcern files (Branch, Brand, Customer, Department, Employee, Service) + the pre-existing `Product::ImageConcern`, all of which define the same `validate :acceptable_image_attachments` callback.
 
 ---
 
-*Last updated: 2026-08-10. Auto-generated by codebase exploration.*
+*Last updated: 2026-11-04. Auto-generated by codebase exploration.*

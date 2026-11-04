@@ -135,6 +135,10 @@ AVATAR_PROFILE_DIMENSIONS = [ 300, 300 ].freeze
 # TTL is a backstop: freshness comes from explicit deletes or record touches.
 CACHE_DEFAULT_EXPIRY = 1.hour
 
+# The Operations and Operation Configs index payloads are company-level and
+# change rarely. Explicit deletes keep them fresh; the TTL is a backstop.
+OPERATIONS_CACHE_EXPIRY = 1.day
+
 # =============================================================================
 # Owner Role Constants (ABAC)
 # Magic-string values used across the permission system to identify

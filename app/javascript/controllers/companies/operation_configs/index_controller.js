@@ -2,16 +2,20 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 
 // Companies_OperationConfigs_IndexController — company-wide Operation config list.
 // Depends on BE: Companies::OperationConfigsController#index
-// Endpoints: GET /companies/:company_id/operation_configs(.json)
+// Endpoints: GET /companies/:company_id/operation_configs(.json?q=&operation_type=&workflow_status=&resolution=)
 export default class Companies_OperationConfigs_IndexController extends Companies_LayoutController {
   /** @type {any[]} */ operationConfigs = []
+
+  /** @type {any} */ filters = {}
 
   async connect() {
     super.connect()
 
     try {
-      const response = await fetchJson(`${pathname()}.json`)
+      const urlParams = new URLSearchParams(window.location.search)
+      const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
       this.operationConfigs = response.operation_configs || []
+      this.filters = response.filters || {}
     } catch (error) {
       const detail = error.errors?.join(", ") || error.message
       toast({ type: "error", message: `${translate("Failed to load operation configs")}${detail ? ": " + detail : ""}` })
@@ -26,14 +30,49 @@ export default class Companies_OperationConfigs_IndexController extends Companie
     })
   }
 
+  translatedOptions(options) {
+    return (options || []).map(option => ({ value: option.value, name: translate(option.name) }))
+  }
+
   contentHTML() {
+    const urlParams = new URLSearchParams(window.location.search)
+
     return `
       <div class="p-4 overflow-y-auto">
         <div class="p-4 bg-card rounded-xl border border-line flex flex-col gap-5">
           <div class="flex flex-col gap-1">
             <h2 class="text-xl font-bold text-foreground">${translate("Operation Configs")}</h2>
-            <p class="text-sm text-muted-foreground">${translate("Operation config overrides every appointment config.")}</p>
+            <p class="text-sm text-muted-foreground">${translate("Appointment configs override Operation configs. Saving an Operation resets every appointment config.")}</p>
           </div>
+
+          <form method="get" action="${pathname()}" class="flex flex-wrap items-end gap-3">
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Search")}</label>
+              <input type="text" name="q" value="${Helpers.escapeHtml(urlParams.get("q") || "")}" placeholder="${translate("Search operation configs...")}" class="pl-3 pr-3 py-2 text-sm border border-line rounded-lg bg-card text-foreground">
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Type")}</label>
+              <select name="operation_type" class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
+                ${selectOptionsHTML(this.translatedOptions(this.filters.operation_types), urlParams.get("operation_type"), translate("All"))}
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Status")}</label>
+              <select name="workflow_status" class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
+                ${selectOptionsHTML(this.translatedOptions(this.filters.statuses), urlParams.get("workflow_status"), translate("All"))}
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Resolution")}</label>
+              <select name="resolution" class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
+                ${selectOptionsHTML(this.translatedOptions(this.filters.resolutions), urlParams.get("resolution"), translate("All"))}
+              </select>
+            </div>
+            <button type="submit" class="h-[38px] px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]!">search</span>
+              ${translate("Search")}
+            </button>
+          </form>
 
           <div class="overflow-x-auto">
             <table class="w-full text-sm">

@@ -17,12 +17,53 @@ RSpec.feature "Companies::Operations index", type: :feature, js: true do
     visit company_operations_path(company)
 
     expect(page).to have_content("Operation Appointments", wait: 10)
-    expect(page).to have_content("Appointments connect an operation to a branch or warehouse. Operation Configs override these values.")
+    expect(page).to have_content("Appointments connect an operation to a branch or warehouse. Appointment configs override Operation configs.")
     expect(page).to have_content("POS")
     expect(page).to have_content("Main Branch")
     expect(page).to have_content("Inventory")
     expect(page).to have_content("Main Warehouse")
     expect(page).not_to have_link("Add")
+  end
+
+  scenario "filters operation appointments by type and location" do
+    visit company_operations_path(company)
+
+    expect(page).to have_select("operation_type", wait: 10)
+    select "POS", from: "operation_type"
+    select "#{branch.name} (Branch)", from: "location"
+    click_button "Search"
+
+    expect(page).to have_current_path(/operation_type=pos/, wait: 10)
+
+    within("tbody") do
+      expect(page).to have_content("POS")
+      expect(page).not_to have_content("Booking")
+      expect(page).not_to have_content("Main Warehouse")
+    end
+  end
+
+  scenario "narrows local access roles for one appointment" do
+    %w[Manager Cashier].each do |name|
+      company.roles.find_by(name: name) || Seed::RoleService.create(company: company, name: name)
+    end
+    operation = company.operations.find_by!(operation_type: :pos)
+    operation.update!(metadata: { "roles" => %w[Manager Cashier] })
+    appointment = branch.branch_operation_appointments.find_by!(operation: operation)
+
+    visit company_operations_path(company)
+
+    within(find("tr", text: "POS", wait: 10)) { find("a[href$='/edit']").click }
+
+    expect(page).to have_content("Local Access Roles", wait: 10)
+    find("button[aria-haspopup='listbox']").click
+    uncheck "Cashier"
+    find("h2", text: "Appointment config").click
+    click_button "Save"
+
+    expect(page).to have_current_path(company_branch_operation_appointment_path(company, appointment), wait: 10)
+    expect(page).to have_content("Manager", wait: 10)
+    expect(page).not_to have_content("Cashier")
+    expect(appointment.reload.metadata["roles"]).to eq([ "Manager" ])
   end
 
   scenario "opens the appointment show page from the operation name" do
@@ -31,7 +72,7 @@ RSpec.feature "Companies::Operations index", type: :feature, js: true do
     within(find("tr", text: "POS", wait: 10)) { click_link "POS" }
 
     expect(page).to have_content(/Appointment config/i, wait: 10)
-    expect(page).to have_content("Operation config overrides every appointment config.")
+    expect(page).to have_content("Appointment config overrides Operation config. Company saves reset this local config.")
     expect(page).to have_content(/Effective Config/i)
     expect(page).to have_content("Main Branch")
     expect(page).to have_link("Edit Config")

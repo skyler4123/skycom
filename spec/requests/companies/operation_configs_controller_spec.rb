@@ -36,6 +36,71 @@ RSpec.describe "Companies::OperationConfigsController", type: :request do
       inventory = body.fetch("operation_configs").find { |operation| operation.fetch("operation_type") == "inventory" }
       expect(inventory.fetch("operation_warehouse_appointment_count")).to eq(1)
     end
+
+    it "filters operation configs by operation type" do
+      get company_operation_configs_path(company, operation_type: "pos"), as: :json
+
+      configs = JSON.parse(response.body).fetch("operation_configs")
+      expect(configs).not_to be_empty
+      expect(configs).to all(satisfy { |config| config.fetch("operation_type") == "pos" })
+    end
+
+    it "filters operation configs by status" do
+      operation = company.operations.find_by!(operation_type: :pos)
+      operation.update!(workflow_status: :deployed)
+
+      get company_operation_configs_path(company, workflow_status: "approved"), as: :json
+
+      configs = JSON.parse(response.body).fetch("operation_configs")
+      expect(configs).not_to be_empty
+      expect(configs).to all(satisfy { |config| config.fetch("workflow_status") == "approved" })
+      expect(configs.map { |config| config.fetch("id") }).not_to include(operation.id)
+    end
+
+    it "filters operation configs by resolution" do
+      operation = company.operations.find_by!(operation_type: :pos)
+      operation.update!(resolution: :mobile)
+
+      get company_operation_configs_path(company, resolution: "desktop"), as: :json
+
+      configs = JSON.parse(response.body).fetch("operation_configs")
+      expect(configs).not_to be_empty
+      expect(configs).to all(satisfy { |config| config.fetch("resolution") == "desktop" })
+      expect(configs.map { |config| config.fetch("id") }).not_to include(operation.id)
+    end
+
+    it "filters operation configs by keyword" do
+      get company_operation_configs_path(company, q: "POS"), as: :json
+
+      configs = JSON.parse(response.body).fetch("operation_configs")
+      expect(configs).not_to be_empty
+      expect(configs).to all(satisfy { |config| config.fetch("name").to_s.downcase.include?("pos") })
+    end
+
+    it "returns filter options for the index page" do
+      get company_operation_configs_path(company), as: :json
+
+      filters = JSON.parse(response.body).fetch("filters")
+      expect(filters.fetch("operation_types")).to include("value" => "pos", "name" => "POS")
+      expect(filters.fetch("statuses").map { |status| status.fetch("value") }).to include("approved")
+      expect(filters.fetch("resolutions").map { |resolution| resolution.fetch("value") }).to include("desktop")
+    end
+
+    it "caches the index payload and invalidates it when an operation changes" do
+      get company_operation_configs_path(company), as: :json
+
+      cache_key = CacheKeyService.company_operation_configs(company.id)
+      expect(Rails.sync_cache.read(cache_key)).to be_present
+
+      operation = company.operations.find_by!(operation_type: :pos)
+      operation.update!(metadata: { "roles" => [ "Cashier" ] })
+
+      expect(Rails.sync_cache.read(cache_key)).to be_nil
+
+      get company_operation_configs_path(company), as: :json
+      row = JSON.parse(response.body).fetch("operation_configs").find { |config| config.fetch("id") == operation.id }
+      expect(row.fetch("metadata").fetch("roles")).to eq([ "Cashier" ])
+    end
   end
 
   describe "GET #show" do
@@ -87,6 +152,7 @@ RSpec.describe "Companies::OperationConfigsController", type: :request do
         "layout" => { "columns" => 8 }
       )
       expect(operation.reload.metadata).to eq("roles" => [ "Cashier" ], "layout" => { "columns" => 8 })
+      expect(branch.branch_operation_appointments.find_by!(operation: operation).metadata).to eq(operation.metadata)
     end
 
     it "ignores non-metadata params" do

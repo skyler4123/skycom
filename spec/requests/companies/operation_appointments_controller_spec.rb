@@ -118,6 +118,24 @@ RSpec.describe "Company operation appointment updates", type: :request do
       expect(JSON.parse(response.body).fetch("errors")).to include("Invalid workflow status")
     end
 
+    it "rejects local roles outside the operation roles" do
+      %w[Manager Cashier].each do |name|
+        company.roles.find_by(name: name) || Seed::RoleService.create(company: company, name: name)
+      end
+      operation = company.operations.find_by!(operation_type: :pos)
+      operation.update!(metadata: { "roles" => [ "Manager" ] })
+      appointment = branch.branch_operation_appointments.find_by!(operation: operation)
+
+      patch company_branch_operation_appointment_path(company, appointment), params: {
+        branch_operation_appointment: {
+          metadata: { "roles" => [ "Cashier" ] }
+        }
+      }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body).fetch("errors")).to include("Metadata roles must be included in the operation roles")
+    end
+
     it "does not update another company's appointment" do
       other_company = create(:company)
       other_branch = create(:branch, company: other_company)

@@ -168,6 +168,28 @@ class CacheKeyService
     "company:#{company_id}:dashboards:#{scope}"
   end
 
+  # Pattern: company:<company_id>:operations:appointments
+  # Purpose: the company-level serialized operation appointments for the
+  #   Operations index before per-employee accessibility is applied.
+  # Store: Rails.sync_cache
+  # TTL: OPERATIONS_CACHE_EXPIRY (1 day)
+  # Written by: Companies::OperationsController#index
+  # Cleared by: OperationPageCacheConcern on Operation, appointment, Branch, and Warehouse saves
+  def self.company_operation_appointments(company_id)
+    "company:#{company_id}:operations:appointments"
+  end
+
+  # Pattern: company:<company_id>:operations:configs
+  # Purpose: the company-level serialized Operation configs for the Operation
+  #   Configs index.
+  # Store: Rails.sync_cache
+  # TTL: OPERATIONS_CACHE_EXPIRY (1 day)
+  # Written by: Companies::OperationConfigsController#index
+  # Cleared by: OperationPageCacheConcern on Operation and appointment saves
+  def self.company_operation_configs(company_id)
+    "company:#{company_id}:operations:configs"
+  end
+
   # Pattern: company:<company_id>:storage_statistics
   # Purpose: aggregated storage usage for the storage statistics page.
   # Store: Rails.sync_cache

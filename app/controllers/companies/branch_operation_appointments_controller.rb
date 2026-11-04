@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # Companies::BranchOperationAppointmentsController — branch-level operation toggles and
-# metadata. Operation config overrides this row's metadata when effective config is
-# built. Show/edit/update are shared via Companies::OperationAppointmentsController.
+# metadata. This row's metadata overrides the Operation config when effective config
+# is built. Show/edit/update are shared via Companies::OperationAppointmentsController.
 # Serves Stimulus: Companies_Operations_IndexController (index links),
 #                  Companies_BranchOperationAppointments_ShowController (show),
 #                  Companies_BranchOperationAppointments_EditController (edit, update)

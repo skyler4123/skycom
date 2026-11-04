@@ -30,34 +30,36 @@ class Seed::OperationService
       company.operations.order(:operation_type).to_a
     end
 
-    def ensure_appointments_for_branch!(branch)
-      company = branch.company
+    def ensure_appointments_for!(location:, appointment_class:, operation_scope:, foreign_key:)
+      company = location.company
       return [] unless company
 
-      operations_for_scope(company, :branch).map do |operation|
-        BranchOperationAppointment.find_or_create_by!(
-          company: company,
-          branch: branch,
-          operation: operation
-        ) do |appointment|
-          apply_appointment_defaults(appointment, operation, branch)
+      operations_for_scope(company, operation_scope).map do |operation|
+        attributes = { company: company, operation: operation }
+        attributes[foreign_key] = location
+
+        appointment_class.find_or_create_by!(attributes) do |appointment|
+          apply_appointment_defaults(appointment, operation, location)
         end
       end
     end
 
-    def ensure_appointments_for_warehouse!(warehouse)
-      company = warehouse.company
-      return [] unless company
+    def ensure_appointments_for_branch!(branch)
+      ensure_appointments_for!(
+        location: branch,
+        appointment_class: BranchOperationAppointment,
+        operation_scope: :branch,
+        foreign_key: :branch
+      )
+    end
 
-      operations_for_scope(company, :warehouse).map do |operation|
-        OperationWarehouseAppointment.find_or_create_by!(
-          company: company,
-          operation: operation,
-          warehouse: warehouse
-        ) do |appointment|
-          apply_appointment_defaults(appointment, operation, warehouse)
-        end
-      end
+    def ensure_appointments_for_warehouse!(warehouse)
+      ensure_appointments_for!(
+        location: warehouse,
+        appointment_class: OperationWarehouseAppointment,
+        operation_scope: :warehouse,
+        foreign_key: :warehouse
+      )
     end
 
     def ensure_appointments_for_operation!(operation)
@@ -135,7 +137,7 @@ class Seed::OperationService
       appointment.lifecycle_status = :active
       appointment.workflow_status = :active
       appointment.permission_resource_name = "Operation"
-      appointment.metadata = {}
+      appointment.metadata = (operation.metadata || {}).deep_dup
     end
   end
 end
