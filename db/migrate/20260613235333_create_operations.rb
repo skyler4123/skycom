@@ -3,7 +3,6 @@ class CreateOperations < ActiveRecord::Migration[8.0]
     create_table :operations, id: :uuid do |t|
       # --- Multi-Tenant Scope ---
       t.references :company, null: false, foreign_key: true, type: :uuid
-      t.references :branch,  null: false, foreign_key: true, type: :uuid
 
       # --- Identity ---
       t.string :email, null: true, index: { unique: true }
@@ -15,10 +14,11 @@ class CreateOperations < ActiveRecord::Migration[8.0]
       t.integer :country
       t.integer :timezone
 
+      # --- Purpose ---
+      t.integer :operation_type, null: false
+      t.integer :resolution,     null: false
+
       # --- System Configurations (Enums) ---
-      t.integer :business_type,      null: false, index: true
-      t.integer :target_role,        null: false, index: true
-      t.integer :target_resolution,  null: false, index: true
       t.string :external_id, index: true
       t.integer :lifecycle_status,   null: false, index: true
       t.integer :workflow_status,    null: false, index: true
@@ -33,7 +33,7 @@ class CreateOperations < ActiveRecord::Migration[8.0]
       t.datetime :discarded_at, index: true
       t.timestamps
     end
-    add_index :operations, [ :branch_id, :target_role, :target_resolution, :code ], unique: true,
-      name: "idx_operations_branch_role_resolution_code"
+    add_index :operations, [ :company_id, :operation_type, :resolution ], unique: true,
+      name: "index_operations_on_company_type_resolution"
   end
 end
