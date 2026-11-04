@@ -12,7 +12,7 @@ class Seed::OperationService
           next unless operation.new_record?
 
           operation.assign_attributes(
-            name: label_for(company: company, operation_type: operation_type),
+            name: label_for(operation_type: operation_type),
             description: "#{OPERATION_TYPES.dig(operation_type, :label)} operation for #{company.name}",
             code: generate_code(company: company, operation_type: operation_type),
             metadata: { "roles" => [] },
@@ -92,7 +92,7 @@ class Seed::OperationService
       operation = company.operations.find_or_initialize_by(operation_type: operation_type, resolution: resolution)
       if operation.new_record?
         operation.assign_attributes(
-          name: name || label_for(company: company, operation_type: operation_type),
+          name: name || label_for(operation_type: operation_type),
           description: description || "#{OPERATION_TYPES.dig(operation_type.to_sym, :label)} operation for #{company.name}",
           code: code || generate_code(company: company, operation_type: operation_type),
           metadata: metadata,
@@ -114,11 +114,8 @@ class Seed::OperationService
       OPERATION_TYPES.dig(operation_type.to_sym, :appointment_scope)
     end
 
-    def label_for(company:, operation_type:)
-      OPERATION_LABELS_BY_BUSINESS_TYPE
-        .dig(company.business_type&.to_sym, operation_type.to_sym) ||
-        OPERATION_TYPES.dig(operation_type.to_sym, :label) ||
-        operation_type.to_s.humanize
+    def label_for(operation_type:)
+      OPERATION_TYPES.dig(operation_type.to_sym, :label) || operation_type.to_s.humanize
     end
 
     def generate_code(company:, operation_type:)

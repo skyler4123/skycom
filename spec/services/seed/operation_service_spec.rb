@@ -14,15 +14,15 @@ RSpec.describe Seed::OperationService do
       expect(company.operations.pluck(:resolution).uniq).to eq([ "desktop" ])
     end
 
-    it "uses the business-type display label and falls back to the catalog label" do
+    it "uses the catalog label for every business type" do
       retail = create(:company, business_type: :retail)
       hotel = create(:company, business_type: :hotel)
 
       described_class.seed_defaults!(company: retail)
       described_class.seed_defaults!(company: hotel)
 
-      expect(retail.operations.find_by!(operation_type: :pos).name).to eq("Retail POS")
-      expect(hotel.operations.find_by!(operation_type: :pos).name).to eq("Front Desk POS")
+      expect(retail.operations.find_by!(operation_type: :pos).name).to eq("POS")
+      expect(hotel.operations.find_by!(operation_type: :pos).name).to eq("POS")
       expect(hotel.operations.find_by!(operation_type: :kitchen).name).to eq("Kitchen")
     end
 

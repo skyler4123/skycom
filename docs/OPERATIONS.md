@@ -56,11 +56,11 @@ Source of truth: `OPERATION_TYPES` in `config/initializers/constants.rb`.
 appointments for `:branch` operations; warehouse creation creates warehouse
 appointments for `:warehouse` operations. It does not scope the Operation record.
 
-Display names are seeded from `OPERATION_LABELS_BY_BUSINESS_TYPE` (e.g. retail POS
-vs front-desk POS), falling back to the catalog label.
+Display names are the catalog labels: every business type seeds the same `POS`,
+`Booking`, `Inventory`, … names.
 
-> Every company receives the **entire** catalog on init. `business_type` only
-> changes display names; it never selects a subset of operation types and never
+> Every company receives the **entire** catalog on init. `business_type` never
+> selects a subset of operation types, never changes display names, and never
 > changes runtime behavior.
 
 ---

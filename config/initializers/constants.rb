@@ -401,8 +401,8 @@ IMPORTABLE_RESOURCES = {
 # An Operation is company-level and keyed by purpose. Every company receives one Operation
 # per entry. `appointment_scope` is a seed-time hint only: branch-scoped operations
 # get BranchOperationAppointment rows on branch creation, warehouse-scoped operations get
-# OperationWarehouseAppointment rows on warehouse creation. See
-# docs/OPERATIONS.md.
+# OperationWarehouseAppointment rows on warehouse creation. `label` is the seeded
+# display name and is identical for every business type. See docs/OPERATIONS.md.
 # =============================================================================
 OPERATION_TYPES = {
   pos: { label: "POS", code_prefix: "POS", appointment_scope: :branch }.freeze,
@@ -412,45 +412,6 @@ OPERATION_TYPES = {
   kitchen: { label: "Kitchen", code_prefix: "KIT", appointment_scope: :branch }.freeze,
   housekeeping: { label: "Housekeeping", code_prefix: "HSK", appointment_scope: :branch }.freeze,
   store_manager: { label: "Store Manager", code_prefix: "MGR", appointment_scope: :branch }.freeze
-}.freeze
-
-# Seed-time display labels. Missing operation types fall back to OPERATION_TYPES[label].
-OPERATION_LABELS_BY_BUSINESS_TYPE = {
-  retail: {
-    pos: "Retail POS",
-    store_manager: "Store Manager",
-    inventory: "Inventory"
-  }.freeze,
-  restaurant: {
-    pos: "Restaurant POS",
-    kitchen: "Kitchen Display",
-    store_manager: "Store Manager",
-    inventory: "Inventory"
-  }.freeze,
-  hotel: {
-    pos: "Front Desk POS",
-    booking: "Room Booking",
-    reception: "Reception Desk",
-    housekeeping: "Housekeeping",
-    inventory: "Inventory"
-  }.freeze,
-  hospital: {
-    pos: "Clinic POS",
-    booking: "Appointment Booking",
-    reception: "Reception Desk",
-    inventory: "Pharmacy Inventory"
-  }.freeze,
-  education: {
-    pos: "Campus POS",
-    reception: "Reception Desk",
-    inventory: "Inventory"
-  }.freeze,
-  fitness: {
-    pos: "Front Desk POS",
-    booking: "Class Booking",
-    store_manager: "Store Manager",
-    inventory: "Inventory"
-  }.freeze
 }.freeze
 
 # Resource keys (URL/controller name) listed here have the "Export" button on

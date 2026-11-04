@@ -71,7 +71,7 @@ RSpec.feature "Companies::Operations index", type: :feature, js: true do
     sign_in(employee_user)
     visit company_operations_path(company)
 
-    row = find("tr", text: "Retail POS", wait: 10)
+    row = find("tr", text: "POS", wait: 10)
     expect(row).to have_content("You do not have access to this operation.")
     expect(row).not_to have_selector("a[href*='/launch']")
   end

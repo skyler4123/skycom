@@ -170,10 +170,8 @@ dynamic system built from atomic resources: categories, dynamic properties,
 pairwise appointments, and ABAC policies. Two companies with different
 `business_type` values run the same code paths.
 
-At this time `business_type` only matters for seeding:
-
-- operation display labels,
-- seed defaults for modules that still use it.
+At this time `business_type` only matters for seed defaults for modules that still
+use it.
 
 Do not introduce runtime `if company.business_type_*?` branching for
 operational behavior. Model the difference with categories, properties,

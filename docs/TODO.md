@@ -73,7 +73,7 @@ Future task:
 - Add `Seed::OperationService.sync_catalog!(company:)` — idempotent upsert of every
   `OPERATION_TYPES` key for one company.
 - Run it for all companies in a data migration or rake task.
-- It must create the Operation record (business-type label, desktop resolution) and
+- It must create the Operation record (catalog label, desktop resolution) and
   active appointments for every existing branch/warehouse whose
   `appointment_scope` matches.
 - Add the enum value, `Companies::Operations::<Type>Controller`, route,
@@ -85,8 +85,8 @@ Future task:
 dynamic, atomic system; use categories, properties, appointments, and ABAC
 policies for per-company differences.
 
-At this time `business_type` only matters for seeding (including operation display
-labels). Do not add runtime `business_type_*?` branches.
+At this time `business_type` only matters for seed defaults for modules that still
+use it. Do not add runtime `business_type_*?` branches.
 
 ## 1. Comment image variants → async preprocessing
 
