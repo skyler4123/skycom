@@ -66,7 +66,11 @@ class Page < ApplicationRecord
   private
 
   def metadata_must_be_a_hash
-    return if metadata.nil? || metadata.is_a?(Hash)
+    if metadata.nil?
+      errors.add(:metadata, :blank)
+      return
+    end
+    return if metadata.is_a?(Hash)
 
     errors.add(:metadata, "must be a hash")
   end

@@ -12,6 +12,7 @@ class BranchPageAppointment < ApplicationRecord
   include SetDefaultCompanyConcern
 
   # --- Attributes ---
+  attribute :metadata, default: -> { {} }
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Enums ---
@@ -49,7 +50,11 @@ class BranchPageAppointment < ApplicationRecord
   end
 
   def metadata_must_be_a_hash
-    return if metadata.nil? || metadata.is_a?(Hash)
+    if metadata.nil?
+      errors.add(:metadata, :blank)
+      return
+    end
+    return if metadata.is_a?(Hash)
 
     errors.add(:metadata, "must be a hash")
   end

@@ -39,6 +39,13 @@ RSpec.describe Page, type: :model do
     it { should validate_presence_of(:page_type) }
     it { should validate_presence_of(:resolution) }
 
+    it "requires metadata" do
+      page = build(:page, metadata: nil)
+
+      expect(page).not_to be_valid
+      expect(page.errors[:metadata]).to include("can't be blank")
+    end
+
     it "requires roles metadata to be an array of strings" do
       page = build(:page, metadata: { "roles" => "cashier" })
 

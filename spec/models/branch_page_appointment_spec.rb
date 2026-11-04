@@ -46,6 +46,16 @@ RSpec.describe BranchPageAppointment, type: :model do
       expect(appointment.errors[:page]).to include("does not belong to this company")
     end
 
+    it "requires metadata" do
+      company = create(:company)
+      branch = create(:branch, company: company)
+      page = create(:page, company: company)
+      appointment = build(:branch_page_appointment, company: company, branch: branch, page: page, metadata: nil)
+
+      expect(appointment).not_to be_valid
+      expect(appointment.errors[:metadata]).to include("can't be blank")
+    end
+
     it "requires a unique branch per company and page" do
       company = create(:company)
       branch = create(:branch, company: company)
