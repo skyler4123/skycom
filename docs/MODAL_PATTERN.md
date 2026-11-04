@@ -2,6 +2,8 @@
 
 This document describes how to add modals using the Shell-First pattern. Modals are triggered from index controllers but rendered by dedicated modal controllers.
 
+> **Exception — Operations pages.** The `Operations` and `Operation Configs` admin pages use full-page show + edit pages instead of modals. See `docs/OPERATIONS.md` §7. Modals remain the pattern for other resources.
+
 ## Overview
 
 The modal pattern consists of three parts:

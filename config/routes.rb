@@ -212,9 +212,9 @@ Rails.application.routes.draw do
           get "store_manager/:operation_id", to: "operations/store_manager#show", as: :store_manager
         end
       end
-      resources :operation_configs, only: %i[index update]
-      resources :branch_operation_appointments, only: [ :update ]
-      resources :operation_warehouse_appointments, only: [ :update ]
+      resources :operation_configs, only: %i[index show edit update]
+      resources :branch_operation_appointments, only: %i[show edit update]
+      resources :operation_warehouse_appointments, only: %i[show edit update]
 
       get "analytics", to: "analytics#index"
 

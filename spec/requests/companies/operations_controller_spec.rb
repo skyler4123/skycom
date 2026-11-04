@@ -38,7 +38,6 @@ RSpec.describe "Companies::OperationsController", type: :request do
       )
       expect(appointment.fetch("launch_path")).to include("/operations/#{pos_operation.id}/launch")
       expect(appointment.fetch("accessible")).to be(true)
-      expect(body.fetch("roles")).to be_an(Array)
     end
 
     it "does not expose another company's appointments" do

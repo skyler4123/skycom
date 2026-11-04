@@ -23,17 +23,28 @@ RSpec.feature "Companies::OperationConfigs index", type: :feature, js: true do
     expect(page).not_to have_link("Add")
   end
 
-  scenario "edits operation metadata and warns about the override" do
+  scenario "opens the operation config show page from the row name" do
     visit company_operation_configs_path(company)
 
-    row = find("tr", text: "POS", wait: 10)
-    within(row) { find("button[data-action*='openEditModal']").click }
+    within(find("tr", text: "POS", wait: 10)) { click_link "POS" }
+
+    expect(page).to have_content(/Operation Config/i, wait: 10)
+    expect(page).to have_content("This config is company-wide and overrides every branch/warehouse appointment config.")
+    expect(page).to have_content(/Metadata \(JSON\)/i)
+    expect(page).to have_link("Edit Config")
+  end
+
+  scenario "edits operation metadata on a full page and returns to show" do
+    visit company_operation_configs_path(company)
+
+    within(find("tr", text: "POS", wait: 10)) { find("a[href$='/edit']").click }
 
     expect(page).to have_content("This config is company-wide and overrides every branch/warehouse appointment config.", wait: 10)
     find("textarea[name='metadata']").set('{"roles":["Cashier"]}')
     click_button "Save"
 
     expect(page).to have_content("Operation config updated.", wait: 10)
-    expect(find("tr", text: "POS")).to have_content("Cashier")
+    expect(page).to have_content(/Operation Config/i, wait: 10)
+    expect(page).to have_content("Cashier")
   end
 end

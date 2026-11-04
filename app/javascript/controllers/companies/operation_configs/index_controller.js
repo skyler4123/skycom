@@ -1,8 +1,10 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
+// Companies_OperationConfigs_IndexController — company-wide Operation config list.
+// Depends on BE: Companies::OperationConfigsController#index
+// Endpoints: GET /companies/:company_id/operation_configs(.json)
 export default class Companies_OperationConfigs_IndexController extends Companies_LayoutController {
   /** @type {any[]} */ operationConfigs = []
-  /** @type {{ id: string, name: string }[]} */ roles = []
 
   async connect() {
     super.connect()
@@ -10,7 +12,6 @@ export default class Companies_OperationConfigs_IndexController extends Companie
     try {
       const response = await fetchJson(`${pathname()}.json`)
       this.operationConfigs = response.operation_configs || []
-      this.roles = response.roles || []
     } catch (error) {
       const detail = error.errors?.join(", ") || error.message
       toast({ type: "error", message: `${translate("Failed to load operation configs")}${detail ? ": " + detail : ""}` })
@@ -60,13 +61,17 @@ export default class Companies_OperationConfigs_IndexController extends Companie
   }
 
   rowHTML(operationConfig) {
+    const companyId = currentCompany().id
     const roles = Array.isArray(operationConfig.metadata?.roles) ? operationConfig.metadata.roles : []
     const appointmentCount = (operationConfig.branch_appointment_count || 0) + (operationConfig.operation_warehouse_appointment_count || 0)
 
     return `
       <tr class="border-b border-line hover:bg-muted/50">
         <td class="py-4 px-6">
-          <p class="font-medium text-foreground">${Helpers.escapeHtml(operationConfig.name || translate("Unnamed Operation"))}</p>
+          <a href="${Helpers.company_operation_config_path(companyId, operationConfig.id)}"
+            class="font-medium text-foreground hover:text-primary transition-colors cursor-pointer">
+            ${Helpers.escapeHtml(operationConfig.name || translate("Unnamed Operation"))}
+          </a>
           <p class="font-mono text-xs text-muted-foreground">${Helpers.escapeHtml(operationConfig.code || "—")}</p>
         </td>
         <td class="py-4 px-6 text-muted-foreground">${Helpers.escapeHtml((operationConfig.operation_type || "—").replace(/_/g, " ").toUpperCase())}</td>
@@ -79,20 +84,12 @@ export default class Companies_OperationConfigs_IndexController extends Companie
         <td class="py-4 px-6">${Helpers.statusBadge(operationConfig.workflow_status)}</td>
         <td class="py-4 px-6 text-muted-foreground">${appointmentCount}</td>
         <td class="py-4 px-6 text-right whitespace-nowrap">
-          <button type="button" data-action="click->${this.identifier}#openEditModal" data-${this.identifier}-operation-config-id-param="${operationConfig.id}"
+          <a href="${Helpers.edit_company_operation_config_path(companyId, operationConfig.id)}"
             class="inline-flex items-center justify-center p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer" ${tooltip(translate("Edit Config"))}>
             <span class="material-symbols-outlined text-[20px]">edit</span>
-          </button>
+          </a>
         </td>
       </tr>
     `
-  }
-
-  openEditModal(event) {
-    const operationConfig = this.operationConfigs.find(operation => operation.id === event.params.operationConfigId)
-    if (!operationConfig) return
-
-    window.currentOperationConfig = operationConfig
-    openModal({ html: `<div data-controller="companies--operation-configs--edit-modal"></div>` })
   }
 }

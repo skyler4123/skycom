@@ -3,8 +3,13 @@
 # Companies::OperationConfigsController — company-wide Operation configuration.
 # Operations are seeded, never created here. Update permits metadata only; the Operation
 # metadata wins over every appointment's metadata when effective config is built.
-# Serves Stimulus: Companies_OperationConfigs_IndexController (index, update modal)
-# Endpoints: GET /companies/:company_id/operation_configs, PATCH /companies/:company_id/operation_configs/:id
+# Serves Stimulus: Companies_OperationConfigs_IndexController (index),
+#                  Companies_OperationConfigs_ShowController (show),
+#                  Companies_OperationConfigs_EditController (edit, update)
+# Endpoints: GET /companies/:company_id/operation_configs(.json),
+#            GET /companies/:company_id/operation_configs/:id(.json),
+#            GET /companies/:company_id/operation_configs/:id/edit,
+#            PATCH /companies/:company_id/operation_configs/:id
 # Docs: docs/OPERATIONS.md
 class Companies::OperationConfigsController < Companies::ApplicationController
   def index
@@ -16,19 +21,36 @@ class Companies::OperationConfigsController < Companies::ApplicationController
           .order(:operation_type)
 
         render json: {
-          operation_configs: operations.map { |operation| format_operation_config(operation) },
-          roles: current_company.roles.order(:name).map { |role| { id: role.id, name: role.name } }
+          operation_configs: operations.map { |operation| format_operation_config(operation) }
         }
       end
     end
   end
 
+  def show
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: { operation_config: format_operation_config(find_operation) } }
+    end
+  end
+
+  def edit
+    find_operation
+
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+    end
+  end
+
   def update
-    operation = current_company.operations.find(params[:id])
+    operation = find_operation
 
     if operation.update(operation_config_params)
       respond_to do |format|
-        format.html { redirect_to company_operation_configs_path(current_company), notice: "Operation config updated." }
+        format.html do
+          redirect_to company_operation_config_path(current_company, operation),
+            notice: "Operation config updated."
+        end
         format.json do
           render json: {
             operation: OperationSerializer.operation(operation),
@@ -39,7 +61,7 @@ class Companies::OperationConfigsController < Companies::ApplicationController
     else
       respond_to do |format|
         format.html do
-          redirect_to company_operation_configs_path(current_company),
+          redirect_to edit_company_operation_config_path(current_company, operation),
             alert: operation.errors.full_messages.to_sentence
         end
         format.json { render json: { errors: operation.errors.full_messages }, status: :unprocessable_content }
@@ -48,6 +70,12 @@ class Companies::OperationConfigsController < Companies::ApplicationController
   end
 
   private
+
+  def find_operation
+    current_company.operations
+      .includes(:branch_operation_appointments, :operation_warehouse_appointments)
+      .find(params[:id])
+  end
 
   def operation_config_params
     params.require(:operation).permit(metadata: {})

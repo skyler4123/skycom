@@ -147,12 +147,15 @@ export const edit_company_order_path = (companyId, orderId) => `/companies/${com
 export const company_operations_path = (companyId) => `/companies/${companyId}/operations`
 export const company_operation_configs_path = (companyId) => `/companies/${companyId}/operation_configs`
 export const company_operation_config_path = (companyId, operationConfigId) => `/companies/${companyId}/operation_configs/${operationConfigId}`
+export const edit_company_operation_config_path = (companyId, operationConfigId) => `/companies/${companyId}/operation_configs/${operationConfigId}/edit`
 export const launch_company_operation_path = (companyId, operationId, params = {}) => {
   const query = new URLSearchParams(params).toString()
   return `/companies/${companyId}/operations/${operationId}/launch${query ? `?${query}` : ""}`
 }
 export const branch_operation_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/branch_operation_appointments/${appointmentId}`
+export const edit_company_branch_operation_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/branch_operation_appointments/${appointmentId}/edit`
 export const operation_warehouse_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/operation_warehouse_appointments/${appointmentId}`
+export const edit_company_operation_warehouse_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/operation_warehouse_appointments/${appointmentId}/edit`
 
 const operationPath = (kind, companyId, operationId, params = {}) => {
   const query = new URLSearchParams(params).toString()

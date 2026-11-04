@@ -38,6 +38,39 @@ RSpec.describe "Companies::OperationConfigsController", type: :request do
     end
   end
 
+  describe "GET #show" do
+    it "returns the operation config with appointment counts" do
+      operation = company.operations.find_by!(operation_type: :pos)
+
+      get company_operation_config_path(company, operation), as: :json
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body).fetch("operation_config")
+      expect(body.fetch("operation_type")).to eq("pos")
+      expect(body.fetch("branch_appointment_count")).to eq(1)
+      expect(body.fetch("operation_warehouse_appointment_count")).to eq(0)
+    end
+
+    it "does not expose another company's operation" do
+      other_company = create(:company)
+      other_operation = create(:operation, company: other_company)
+
+      get company_operation_config_path(company, other_operation), as: :json
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "GET #edit" do
+    it "renders the edit page shell" do
+      operation = company.operations.find_by!(operation_type: :pos)
+
+      get edit_company_operation_config_path(company, operation)
+
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
   describe "PATCH #update" do
     it "updates metadata and returns the operation" do
       operation = company.operations.find_by!(operation_type: :pos)
@@ -89,6 +122,18 @@ RSpec.describe "Companies::OperationConfigsController", type: :request do
       }, as: :json
 
       expect(response).to have_http_status(:not_found)
+    end
+
+    it "redirects to the show page after an HTML update" do
+      operation = company.operations.find_by!(operation_type: :pos)
+
+      patch company_operation_config_path(company, operation), params: {
+        operation: { metadata: { "roles" => [ "Cashier" ] } }
+      }
+
+      expect(response).to redirect_to(company_operation_config_path(company, operation))
+      expect(flash[:notice]).to eq("Operation config updated.")
+      expect(operation.reload.metadata).to eq("roles" => [ "Cashier" ])
     end
   end
 end

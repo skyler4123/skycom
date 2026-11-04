@@ -1,8 +1,10 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
+// Companies_Operations_IndexController — operation appointment list.
+// Depends on BE: Companies::OperationsController#index
+// Endpoints: GET /companies/:company_id/operations(.json)
 export default class Companies_Operations_IndexController extends Companies_LayoutController {
   /** @type {any[]} */ appointments = []
-  /** @type {{ id: string, name: string }[]} */ roles = []
 
   async connect() {
     super.connect()
@@ -10,7 +12,6 @@ export default class Companies_Operations_IndexController extends Companies_Layo
     try {
       const response = await fetchJson(`${pathname()}.json`)
       this.appointments = response.operation_appointments || []
-      this.roles = response.roles || []
     } catch (error) {
       const detail = error.errors?.join(", ") || error.message
       toast({ type: "error", message: `${translate("Failed to load operation appointments")}${detail ? ": " + detail : ""}` })
@@ -59,7 +60,20 @@ export default class Companies_Operations_IndexController extends Companies_Layo
     `
   }
 
+  appointmentPath(companyId, appointment) {
+    return appointment.kind === "branch"
+      ? Helpers.branch_operation_appointment_path(companyId, appointment.id)
+      : Helpers.operation_warehouse_appointment_path(companyId, appointment.id)
+  }
+
+  editAppointmentPath(companyId, appointment) {
+    return appointment.kind === "branch"
+      ? Helpers.edit_company_branch_operation_appointment_path(companyId, appointment.id)
+      : Helpers.edit_company_operation_warehouse_appointment_path(companyId, appointment.id)
+  }
+
   rowHTML(appointment) {
+    const companyId = currentCompany().id
     const operation = appointment.operation || {}
     const active = appointment.workflow_status === "active"
     const canLaunch = active && appointment.accessible
@@ -71,7 +85,10 @@ export default class Companies_Operations_IndexController extends Companies_Layo
     return `
       <tr class="border-b border-line hover:bg-muted/50">
         <td class="py-4 px-6">
-          <p class="font-medium text-foreground">${Helpers.escapeHtml(operation.name || translate("Unnamed Operation"))}</p>
+          <a href="${this.appointmentPath(companyId, appointment)}"
+            class="font-medium text-foreground hover:text-primary transition-colors cursor-pointer">
+            ${Helpers.escapeHtml(operation.name || translate("Unnamed Operation"))}
+          </a>
           <p class="font-mono text-xs text-muted-foreground">${Helpers.escapeHtml(operation.code || "—")}</p>
         </td>
         <td class="py-4 px-6 text-muted-foreground">${Helpers.escapeHtml((operation.operation_type || "—").replace(/_/g, " ").toUpperCase())}</td>
@@ -92,20 +109,12 @@ export default class Companies_Operations_IndexController extends Companies_Layo
                  <span class="material-symbols-outlined text-[20px]">open_in_new</span>
                  <span class="sr-only">${launchReason}</span>
                </span>`}
-          <button type="button" data-action="click->${this.identifier}#openEditModal" data-${this.identifier}-appointment-id-param="${appointment.id}"
+          <a href="${this.editAppointmentPath(companyId, appointment)}"
             class="inline-flex items-center justify-center p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer" ${tooltip(translate("Edit Config"))}>
             <span class="material-symbols-outlined text-[20px]">edit</span>
-          </button>
+          </a>
         </td>
       </tr>
     `
-  }
-
-  openEditModal(event) {
-    const appointment = this.appointments.find(a => a.id === event.params.appointmentId)
-    if (!appointment) return
-
-    window.currentOperationAppointment = appointment
-    openModal({ html: `<div data-controller="companies--operations--appointment-config-modal"></div>` })
   }
 }

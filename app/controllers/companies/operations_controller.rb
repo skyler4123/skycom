@@ -12,8 +12,7 @@ class Companies::OperationsController < Companies::ApplicationController
       format.html { render html: "", layout: true }
       format.json do
         render json: {
-          operation_appointments: format_appointments(operation_appointments),
-          roles: current_company.roles.order(:name).map { |role| { id: role.id, name: role.name } }
+          operation_appointments: format_appointments(operation_appointments)
         }
       end
     end

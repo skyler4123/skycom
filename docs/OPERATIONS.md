@@ -97,8 +97,14 @@ All appointments start `active`. Companies disable the ones they do not use.
 | GET | `/companies/:company_id/operations` | `Companies::OperationsController#index` | List branch + warehouse appointments |
 | GET | `/companies/:company_id/operations/:id/launch` | `Companies::OperationsController#launch` | Resolve appointment and redirect |
 | GET | `/companies/:company_id/operation_configs` | `Companies::OperationConfigsController#index` | List company Operation records |
+| GET | `/companies/:company_id/operation_configs/:id` | `Companies::OperationConfigsController#show` | Operation config details |
+| GET | `/companies/:company_id/operation_configs/:id/edit` | `Companies::OperationConfigsController#edit` | Operation config edit page |
 | PATCH | `/companies/:company_id/operation_configs/:id` | `Companies::OperationConfigsController#update` | Update Operation metadata only |
+| GET | `/companies/:company_id/branch_operation_appointments/:id` | `Companies::BranchOperationAppointmentsController#show` | Branch appointment details |
+| GET | `/companies/:company_id/branch_operation_appointments/:id/edit` | `Companies::BranchOperationAppointmentsController#edit` | Branch appointment edit page |
 | PATCH | `/companies/:company_id/branch_operation_appointments/:id` | `Companies::BranchOperationAppointmentsController#update` | Update branch metadata/status |
+| GET | `/companies/:company_id/operation_warehouse_appointments/:id` | `Companies::OperationWarehouseAppointmentsController#show` | Warehouse appointment details |
+| GET | `/companies/:company_id/operation_warehouse_appointments/:id/edit` | `Companies::OperationWarehouseAppointmentsController#edit` | Warehouse appointment edit page |
 | PATCH | `/companies/:company_id/operation_warehouse_appointments/:id` | `Companies::OperationWarehouseAppointmentsController#update` | Update warehouse metadata/status |
 | GET | `/companies/:company_id/operations/pos/:operation_id` | `Companies::Operations::PosController#show` | POS |
 | GET | `/companies/:company_id/operations/booking/:operation_id` | `Companies::Operations::BookingController#show` | Placeholder |
@@ -108,8 +114,9 @@ All appointments start `active`. Companies disable the ones they do not use.
 | GET | `/companies/:company_id/operations/housekeeping/:operation_id` | `Companies::Operations::HousekeepingController#show` | Placeholder |
 | GET | `/companies/:company_id/operations/store_manager/:operation_id` | `Companies::Operations::StoreManagerController#show` | Placeholder |
 
-There is **no** create/new/show/edit/update route for Operation records. Operations are
-seeded; the UI edits config only.
+There is **no** create/new/show/edit/update route for `Operation` records themselves.
+Operations are seeded; the UI edits config only, through the `operation_configs`
+show/edit pages.
 
 Operation routes accept `branch_id` or `warehouse_id` query params. If omitted,
 the resolver falls back to the employee's branch (branch operations) or a warehouse
@@ -139,12 +146,14 @@ updating operation configs.
 | Surface | Stimulus controller | Backend |
 |---|---|---|
 | Operation Appointments | `Companies_Operations_IndexController` (`companies--operations--index`) | `Companies::OperationsController#index/launch` |
-| Appointment config modal | `Companies_Operations_AppointmentConfigModalController` | `BranchOperationAppointmentsController` / `OperationWarehouseAppointmentsController` |
-| Operation Configs | `Companies_OperationConfigs_IndexController` (`companies--operation-configs--index`) | `Companies::OperationConfigsController#index/update` |
-| Operation config modal | `Companies_OperationConfigs_EditModalController` | `Companies::OperationConfigsController#update` |
+| Appointment details / edit | `Companies_BranchOperationAppointments_ShowController` / `Companies_BranchOperationAppointments_EditController` (and the warehouse pair) | `BranchOperationAppointmentsController` / `OperationWarehouseAppointmentsController` |
+| Operation Configs | `Companies_OperationConfigs_IndexController` (`companies--operation-configs--index`) | `Companies::OperationConfigsController#index` |
+| Operation config details / edit | `Companies_OperationConfigs_ShowController` / `Companies_OperationConfigs_EditController` | `Companies::OperationConfigsController#show/edit/update` |
 | POS | `Companies_Operations_Pos_ShowController` (`companies--operations--pos--show`) | `Companies::Operations::PosController#show` |
 | Placeholders | `Companies_Operations_<Type>_ShowController` | `Companies::Operations::<Type>Controller#show` |
 
+The Operations pages use **full-page show + edit** pages, never modals. The two list
+pages link the row name to the show page and the edit icon to the edit page.
 The Operations index has no Add button. It lists appointments; Launch is disabled
 when the appointment is inactive or the employee lacks the operation role. Operation
 Configs has no Add button and warns that Operation config overrides every

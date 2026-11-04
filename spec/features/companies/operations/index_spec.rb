@@ -25,11 +25,22 @@ RSpec.feature "Companies::Operations index", type: :feature, js: true do
     expect(page).not_to have_link("Add")
   end
 
-  scenario "edits appointment metadata and status" do
+  scenario "opens the appointment show page from the operation name" do
     visit company_operations_path(company)
 
-    row = find("tr", text: "POS", wait: 10)
-    within(row) { find("button[data-action*='openEditModal']").click }
+    within(find("tr", text: "POS", wait: 10)) { click_link "POS" }
+
+    expect(page).to have_content(/Appointment config/i, wait: 10)
+    expect(page).to have_content("Operation config overrides every appointment config.")
+    expect(page).to have_content(/Effective Config/i)
+    expect(page).to have_content("Main Branch")
+    expect(page).to have_link("Edit Config")
+  end
+
+  scenario "edits appointment metadata and status on a full page" do
+    visit company_operations_path(company)
+
+    within(find("tr", text: "POS", wait: 10)) { find("a[href$='/edit']").click }
 
     expect(page).to have_content("Appointment config", wait: 10)
     find("textarea[name='metadata']").set('{"layout":{"columns":6}}')
@@ -37,7 +48,25 @@ RSpec.feature "Companies::Operations index", type: :feature, js: true do
     click_button "Save"
 
     expect(page).to have_content("Operation appointment updated.", wait: 10)
-    expect(find("tr", text: "POS")).to have_content("Inactive")
+    expect(page).to have_content(/Appointment config/i, wait: 10)
+    expect(page).to have_content("Inactive")
+    expect(page).to have_content("columns")
+  end
+
+  scenario "edits a warehouse appointment on a full page" do
+    visit company_operations_path(company)
+
+    within(find("tr", text: "Inventory", wait: 10)) { find("a[href$='/edit']").click }
+
+    expect(page).to have_content("Appointment config", wait: 10)
+    expect(page).to have_content("Warehouse")
+    find("textarea[name='metadata']").set('{"bin":"A1"}')
+    click_button "Save"
+
+    expect(page).to have_content("Operation appointment updated.", wait: 10)
+    expect(page).to have_content(/Appointment config/i, wait: 10)
+    expect(page).to have_content("Main Warehouse")
+    expect(page).to have_content("bin")
   end
 
   scenario "launches the POS operation with the branch appointment" do
