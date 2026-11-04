@@ -37,4 +37,6 @@ class Warehouse < ApplicationRecord
   belongs_to :address, optional: true
   has_many :stocks, dependent: :destroy
   has_many :stock_pendings, dependent: :restrict_with_error
+  has_many :page_warehouse_appointments, dependent: :destroy
+  has_many :pages, through: :page_warehouse_appointments
 end
