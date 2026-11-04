@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_04_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -595,6 +595,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
     t.index ["external_id"], name: "index_branch_event_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_branch_event_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_branch_event_appointments_on_workflow_status"
+  end
+
+  create_table "branch_operation_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id", null: false
+    t.uuid "operation_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.string "external_id"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_branch_operation_appointments_on_branch_id"
+    t.index ["company_id", "branch_id", "operation_id"], name: "idx_branch_operation_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_branch_operation_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_branch_operation_appointments_on_discarded_at"
+    t.index ["operation_id"], name: "index_branch_operation_appointments_on_operation_id"
   end
 
   create_table "branch_payment_method_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -4297,6 +4321,61 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
     t.index ["workflow_status"], name: "index_notifications_on_workflow_status"
   end
 
+  create_table "operation_warehouse_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "operation_id", null: false
+    t.uuid "warehouse_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.string "external_id"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "operation_id", "warehouse_id"], name: "idx_operation_warehouse_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_operation_warehouse_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_operation_warehouse_appointments_on_discarded_at"
+    t.index ["operation_id"], name: "index_operation_warehouse_appointments_on_operation_id"
+    t.index ["warehouse_id"], name: "index_operation_warehouse_appointments_on_warehouse_id"
+  end
+
+  create_table "operations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "email"
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency"
+    t.integer "country"
+    t.integer "timezone"
+    t.string "external_id"
+    t.integer "lifecycle_status", null: false
+    t.integer "workflow_status", null: false
+    t.jsonb "metadata", null: false
+    t.string "permission_resource_name", null: false
+    t.datetime "expiration_date"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "operation_type", null: false
+    t.integer "resolution", null: false
+    t.index ["code"], name: "index_operations_on_code", unique: true
+    t.index ["company_id", "operation_type", "resolution"], name: "index_operations_on_company_type_resolution", unique: true
+    t.index ["company_id"], name: "index_operations_on_company_id"
+    t.index ["discarded_at"], name: "index_operations_on_discarded_at"
+    t.index ["email"], name: "index_operations_on_email", unique: true
+    t.index ["external_id"], name: "index_operations_on_external_id"
+    t.index ["lifecycle_status"], name: "index_operations_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_operations_on_workflow_status"
+  end
+
   create_table "order_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "order_group_id", null: false
@@ -4657,43 +4736,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
     t.index ["lifecycle_status"], name: "index_orders_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_orders_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_orders_on_workflow_status"
-  end
-
-  create_table "pages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id", null: false
-    t.string "email"
-    t.string "name"
-    t.text "description"
-    t.string "code"
-    t.string "phone_number"
-    t.integer "currency"
-    t.integer "country"
-    t.integer "timezone"
-    t.integer "business_type", null: false
-    t.integer "target_role", null: false
-    t.integer "target_resolution", null: false
-    t.string "external_id"
-    t.integer "lifecycle_status", null: false
-    t.integer "workflow_status", null: false
-    t.jsonb "metadata", null: false
-    t.string "permission_resource_name", null: false
-    t.datetime "expiration_date"
-    t.datetime "discarded_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id", "target_role", "target_resolution", "code"], name: "idx_on_branch_id_target_role_target_resolution_code_6c16dc00fe", unique: true
-    t.index ["branch_id"], name: "index_pages_on_branch_id"
-    t.index ["business_type"], name: "index_pages_on_business_type"
-    t.index ["code"], name: "index_pages_on_code", unique: true
-    t.index ["company_id"], name: "index_pages_on_company_id"
-    t.index ["discarded_at"], name: "index_pages_on_discarded_at"
-    t.index ["email"], name: "index_pages_on_email", unique: true
-    t.index ["external_id"], name: "index_pages_on_external_id"
-    t.index ["lifecycle_status"], name: "index_pages_on_lifecycle_status"
-    t.index ["target_resolution"], name: "index_pages_on_target_resolution"
-    t.index ["target_role"], name: "index_pages_on_target_role"
-    t.index ["workflow_status"], name: "index_pages_on_workflow_status"
   end
 
   create_table "payment_methods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -7804,6 +7846,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
   add_foreign_key "branch_event_appointments", "branches"
   add_foreign_key "branch_event_appointments", "companies"
   add_foreign_key "branch_event_appointments", "events"
+  add_foreign_key "branch_operation_appointments", "branches"
+  add_foreign_key "branch_operation_appointments", "companies"
+  add_foreign_key "branch_operation_appointments", "operations"
   add_foreign_key "branch_payment_method_appointments", "branches"
   add_foreign_key "branch_payment_method_appointments", "companies"
   add_foreign_key "branch_payment_method_appointments", "payment_methods"
@@ -8120,6 +8165,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
   add_foreign_key "notification_tag_appointments", "notifications"
   add_foreign_key "notification_tags", "companies"
   add_foreign_key "notifications", "companies"
+  add_foreign_key "operation_warehouse_appointments", "companies"
+  add_foreign_key "operation_warehouse_appointments", "operations"
+  add_foreign_key "operation_warehouse_appointments", "warehouses"
+  add_foreign_key "operations", "companies"
   add_foreign_key "order_group_tag_appointments", "companies"
   add_foreign_key "order_group_tag_appointments", "order_groups"
   add_foreign_key "order_group_tag_appointments", "tags"
@@ -8157,8 +8206,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_01_000005) do
   add_foreign_key "orders", "customers"
   add_foreign_key "orders", "employees", on_delete: :nullify
   add_foreign_key "orders", "property_mappings"
-  add_foreign_key "pages", "branches"
-  add_foreign_key "pages", "companies"
   add_foreign_key "payroll_configs", "companies"
   add_foreign_key "payrolls", "attendance_months"
   add_foreign_key "payrolls", "branches"

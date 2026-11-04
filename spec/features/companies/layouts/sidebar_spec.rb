@@ -45,7 +45,7 @@ RSpec.feature "Sidebar favourites", type: :feature, js: true do
       expect(page).to have_selector('[data-sidebar-favourites]', visible: :all, wait: 10)
       expect(page).to have_selector("p", text: "Click the star on any item to pin it here", visible: :all, wait: 10)
 
-      %w[general catalog sales organization platform attendance inventory authorization chat_help_desk email_marketing ai_assistant system].each do |group|
+      %w[general catalog sales organization platform operations attendance inventory authorization chat_help_desk email_marketing ai_assistant system].each do |group|
         expect(page).to have_selector("details[data-sidebar-group='#{group}']", visible: :all, wait: 10)
         expect(page).to have_no_selector("details[data-sidebar-group='#{group}'][open]", visible: :all)
       end
@@ -78,6 +78,16 @@ RSpec.feature "Sidebar favourites", type: :feature, js: true do
 
       labels = all("a p", visible: :all).map { |label| label.text.strip }
       expect(labels.index("Employee Groups")).to eq(labels.index("Employees") + 1)
+    end
+  end
+
+  scenario "operations group lists Operations and Operation Configs" do
+    visit company_dashboards_path(company)
+
+    find("details[data-sidebar-group='operations'] summary", visible: :all).click
+    within("details[data-sidebar-group='operations']", visible: :all) do
+      expect(page).to have_link("Operations", href: %r{/operations}, visible: :all, wait: 10)
+      expect(page).to have_link("Operation Configs", href: %r{/operation_configs}, visible: :all)
     end
   end
 

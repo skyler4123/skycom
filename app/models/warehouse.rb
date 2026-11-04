@@ -7,7 +7,8 @@
 # duplicating address data.
 # How it works: a physical/logical holding point that owns Stock rows (one per
 # product) and is referenced by every movement document
-# (imports/exports/transfers/adjustments). It holds no quantities itself.
+# (imports/exports/transfers/adjustments). It holds no quantities itself and
+# receives warehouse-scoped operation appointments on create.
 # Main associations: belongs_to :company, :category, :property_mapping (required),
 # :branch and :address (optional); has_many :stocks (dependent: :destroy),
 # :stock_pendings (restrict_with_error).
@@ -16,6 +17,8 @@ class Warehouse < ApplicationRecord
   include PropertyMappingConcern
   include DynamicSearchConcern
   include TagConcern
+  include OperationAppointmentConcern
+  include OperationPageCacheConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
@@ -30,6 +33,11 @@ class Warehouse < ApplicationRecord
     fulfillment: 2,
     cold_storage: 3
   }
+
+  # --- Macros ---
+  operation_appointments_for OperationWarehouseAppointment, scope: :warehouse, foreign_key: :warehouse
+
+  # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :category
@@ -37,4 +45,6 @@ class Warehouse < ApplicationRecord
   belongs_to :address, optional: true
   has_many :stocks, dependent: :destroy
   has_many :stock_pendings, dependent: :restrict_with_error
+  has_many :operation_warehouse_appointments, dependent: :destroy
+  has_many :operations, through: :operation_warehouse_appointments
 end

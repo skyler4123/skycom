@@ -58,6 +58,36 @@ Skycom only stores and displays the result; it never applies rates or formulas.
 
 ---
 
+## Operations — new operation_type backfill (out of scope for the operations refactor)
+
+Adding a value to `Operation.operation_type` / `OPERATION_TYPES` is not enough for existing
+companies:
+
+- Operation Configs has no create action, so existing companies won't get the new
+  Operation record.
+- Existing branches/warehouses won't get the new appointment rows.
+- Launch/route/controller/FE wiring must also be added.
+
+Future task:
+
+- Add `Seed::OperationService.sync_catalog!(company:)` — idempotent upsert of every
+  `OPERATION_TYPES` key for one company.
+- Run it for all companies in a data migration or rake task.
+- It must create the Operation record (catalog label, desktop resolution) and
+  active appointments for every existing branch/warehouse whose
+  `appointment_scope` matches.
+- Add the enum value, `Companies::Operations::<Type>Controller`, route,
+  `OperationLaunchService` mapping, FE Stimulus controller, and `OPERATION_TYPES` entry.
+
+## Company#business_type is seed-only
+
+`Company#business_type` does not change runtime business logic. Skycom is a
+dynamic, atomic system; use categories, properties, appointments, and ABAC
+policies for per-company differences.
+
+At this time `business_type` only matters for seed defaults for modules that still
+use it. Do not add runtime `business_type_*?` branches.
+
 ## 1. Comment image variants → async preprocessing
 
 - **Trigger**: first view of a comment image stalls (variant is processed

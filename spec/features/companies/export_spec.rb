@@ -81,7 +81,7 @@ RSpec.feature "Skycom Index Export", type: :feature, js: true do
     expect(page).to have_button("Export", wait: 10)
     click_button "Export"
 
-    # Page should remain usable after triggering export
+    # Index should remain usable after triggering export
     expect(page).to have_selector("table", wait: 10)
   end
 

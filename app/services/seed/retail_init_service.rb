@@ -688,7 +688,7 @@ class Seed::RetailInitService
       Admin: {
         "Appointment" => { create: true, read: true, update: true, delete: true },
         "Brand" => { create: true, read: true, update: true, delete: true },
-        "Page" => { create: true, read: true, update: true, delete: true },
+        "Operation" => { create: true, read: true, update: true, delete: true },
         "ShiftTemplate" => { create: true, read: true, update: true, delete: true },
         "ScheduledShift" => { create: true, read: true, update: true, delete: true },
         "AttendanceConfig" => { create: true, read: true, update: true, delete: true },
@@ -751,7 +751,7 @@ class Seed::RetailInitService
         "KpiConfig" => { read: true },
         "Appointment" => { create: true, read: true, update: true, delete: true },
         "Brand" => { create: true, read: true, update: true, delete: true },
-        "Page" => { create: true, read: true, update: true, delete: true },
+        "Operation" => { create: true, read: true, update: true, delete: true },
         "ShiftTemplate" => { create: true, read: true, update: true, delete: true },
         "ScheduledShift" => { create: true, read: true, update: true, delete: true },
         "AttendanceConfig" => { create: true, read: true, update: true, delete: true },
@@ -810,7 +810,7 @@ class Seed::RetailInitService
         "Student" => { create: true, read: true, update: true, delete: true }
       },
       Cashier: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -829,7 +829,7 @@ class Seed::RetailInitService
         "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Seller: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -848,7 +848,7 @@ class Seed::RetailInitService
         "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Security: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -861,7 +861,7 @@ class Seed::RetailInitService
         "Order" => { create: false, read: true, update: false, delete: false }
       },
       Doctor: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -877,7 +877,7 @@ class Seed::RetailInitService
         "Facility" => { create: true, read: true, update: true, delete: false }
       },
       Therapist: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -890,7 +890,7 @@ class Seed::RetailInitService
         "Facility" => { create: false, read: true, update: false, delete: false }
       },
       Consultant: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },

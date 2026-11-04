@@ -197,11 +197,24 @@ Rails.application.routes.draw do
       resources :property_mappings
       resources :table_configs
       resources :table_config_logs, only: [ :index, :show ]
-      resources :pages do
+      resources :operations, only: [ :index ] do
         member do
-          get :retail_cashier
+          get :launch
+        end
+
+        collection do
+          get "pos/:operation_id", to: "operations/pos#show", as: :pos
+          get "booking/:operation_id", to: "operations/booking#show", as: :booking
+          get "inventory/:operation_id", to: "operations/inventory#show", as: :inventory
+          get "reception/:operation_id", to: "operations/reception#show", as: :reception
+          get "kitchen/:operation_id", to: "operations/kitchen#show", as: :kitchen
+          get "housekeeping/:operation_id", to: "operations/housekeeping#show", as: :housekeeping
+          get "store_manager/:operation_id", to: "operations/store_manager#show", as: :store_manager
         end
       end
+      resources :operation_configs, only: %i[index show edit update]
+      resources :branch_operation_appointments, only: %i[show edit update]
+      resources :operation_warehouse_appointments, only: %i[show edit update]
 
       get "analytics", to: "analytics#index"
 

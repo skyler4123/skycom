@@ -135,6 +135,10 @@ AVATAR_PROFILE_DIMENSIONS = [ 300, 300 ].freeze
 # TTL is a backstop: freshness comes from explicit deletes or record touches.
 CACHE_DEFAULT_EXPIRY = 1.hour
 
+# The Operations and Operation Configs index payloads are company-level and
+# change rarely. Explicit deletes keep them fresh; the TTL is a backstop.
+OPERATIONS_CACHE_EXPIRY = 1.day
+
 # =============================================================================
 # Owner Role Constants (ABAC)
 # Magic-string values used across the permission system to identify
@@ -302,7 +306,7 @@ MIGRATION_PREVIEW_ROW_LIMIT = 10
 # Rows persisted per batch during import/rollback.
 MIGRATION_IMPORT_BATCH_SIZE = 500
 
-# Per-run cap on stored error samples (details page).
+# Per-run cap on stored error samples (details operation).
 MIGRATION_ERROR_SAMPLES_LIMIT = 20
 
 # System notification tag owner notifications for a migration carry.
@@ -346,7 +350,7 @@ IMPORT_MAX_ROWS = 20_000
 # Rows written per audit-log/progress batch.
 IMPORT_BATCH_SIZE = 500
 
-# Latest records rendered under the resolved headers on the show page.
+# Latest records rendered under the resolved headers on the show operation.
 IMPORT_PREVIEW_ROW_LIMIT = 10
 
 # Per-run cap on stored row error samples.
@@ -395,9 +399,28 @@ IMPORTABLE_RESOURCES = {
 
 # =============================================================================
 # Export (index pages → CSV). Skycom-level toggle: applies to every company.
+# =============================================================================
+# Operation catalog
+#
+# An Operation is company-level and keyed by purpose. Every company receives one Operation
+# per entry. `appointment_scope` is a seed-time hint only: branch-scoped operations
+# get BranchOperationAppointment rows on branch creation, warehouse-scoped operations get
+# OperationWarehouseAppointment rows on warehouse creation. `label` is the seeded
+# display name and is identical for every business type. See docs/OPERATIONS.md.
+# =============================================================================
+OPERATION_TYPES = {
+  pos: { label: "POS", code_prefix: "POS", appointment_scope: :branch }.freeze,
+  booking: { label: "Booking", code_prefix: "BKG", appointment_scope: :branch }.freeze,
+  inventory: { label: "Inventory", code_prefix: "INV", appointment_scope: :warehouse }.freeze,
+  reception: { label: "Reception", code_prefix: "RCP", appointment_scope: :branch }.freeze,
+  kitchen: { label: "Kitchen", code_prefix: "KIT", appointment_scope: :branch }.freeze,
+  housekeeping: { label: "Housekeeping", code_prefix: "HSK", appointment_scope: :branch }.freeze,
+  store_manager: { label: "Store Manager", code_prefix: "MGR", appointment_scope: :branch }.freeze
+}.freeze
+
 # Resource keys (URL/controller name) listed here have the "Export" button on
-# their index page and accept `?export=1` to return the full filtered record set.
-# Add/remove a key to enable/disable export for that page globally.
+# their index operation and accept `?export=1` to return the full filtered record set.
+# Add/remove a key to enable/disable export for that operation globally.
 # =============================================================================
 # analytics is intentionally excluded: its JSON is a nested report, not a flat
 # index array, so the generic index CSV exporter would produce an empty file.
@@ -408,7 +431,7 @@ EXPORT_ENABLED_RESOURCES = %w[
   customers customer_subprofiles departments discount_groups discounts
   documents employee_profiles employees employee_subprofiles event_configs
   events facilities folders invoices notifications notification_tags orders
-  pages permission_logs permissions policies products property_mappings
+  permission_logs permissions policies products property_mappings
   purchases roles scheduled_shifts services shift_templates stock_adjustments
   stock_exports stock_imports stock_pendings stocks stock_transfers storage_statistics
   suppliers table_config_logs table_configs warehouses workflows

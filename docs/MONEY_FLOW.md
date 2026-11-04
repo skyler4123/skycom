@@ -302,7 +302,7 @@ end
 **File**: `docs/ORDER_PROCESSING_V1.md` — full pipeline. Summary:
 
 ```
-Frontend (Retail Cashier)
+Frontend (POS)
   │  cart (local state) → checkout (create Order) → pay (reserve stock + invoice) → finalize (async)
   ▼
 Companies::OrderProcessing::V1Controller#checkout

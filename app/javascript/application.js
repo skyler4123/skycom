@@ -59,6 +59,7 @@ window.addOpenTrigger = Helpers.addOpenTrigger
 window.addOpenListener = Helpers.addOpenListener
 window.reloadThenToast = Helpers.reloadThenToast
 window.reloadThenToasts = Helpers.reloadThenToasts
+window.navigateThenToast = Helpers.navigateThenToast
 window.renderQrCode = Helpers.renderQrCode
 window.clearClientCache = Helpers.clearClientCache
 window.clearClientCacheAndReload = Helpers.clearClientCacheAndReload

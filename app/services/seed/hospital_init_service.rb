@@ -352,7 +352,7 @@ class Seed::HospitalInitService
   def assign_policies_to_roles
     role_definitions = {
       Receptionist: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -372,7 +372,7 @@ class Seed::HospitalInitService
         "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Dentist: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -390,7 +390,7 @@ class Seed::HospitalInitService
         "Appointment" => { read: true, update: true }
       },
       DentalAssistant: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -406,7 +406,7 @@ class Seed::HospitalInitService
         "Appointment" => { read: true }
       },
       Hygienist: {
-        "Page" => { read: true },
+        "Operation" => { read: true },
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
@@ -423,7 +423,7 @@ class Seed::HospitalInitService
       Manager: {
         "KpiConfig" => { read: true },
         "Product" => { create: true, read: true, update: true, delete: true },
-        "Page" => { create: true, read: true, update: true, delete: true },
+        "Operation" => { create: true, read: true, update: true, delete: true },
         "ShiftTemplate" => { create: true, read: true, update: true, delete: true },
         "ScheduledShift" => { create: true, read: true, update: true, delete: true },
         "AttendanceConfig" => { create: true, read: true, update: true, delete: true },
@@ -482,7 +482,7 @@ class Seed::HospitalInitService
       },
       Admin: {
         "Product" => { create: true, read: true, update: true, delete: true },
-        "Page" => { create: true, read: true, update: true, delete: true },
+        "Operation" => { create: true, read: true, update: true, delete: true },
         "ShiftTemplate" => { create: true, read: true, update: true, delete: true },
         "ScheduledShift" => { create: true, read: true, update: true, delete: true },
         "AttendanceConfig" => { create: true, read: true, update: true, delete: true },

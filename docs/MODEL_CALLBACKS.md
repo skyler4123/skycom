@@ -33,6 +33,8 @@ Callbacks defined directly in the model file (not inherited from a concern).
 | `after_initialize :set_defaults_from_company, if: :new_record?` | 97 | `set_defaults_from_company` | Copies `timezone` and `currency_code` from parent `Company` to new Branch records (only on new record creation, not on find). |
 | `after_create :initialize_payment_methods` | 107 | `initialize_payment_methods` | Auto-creates a `BranchPaymentMethodAppointment` for each **active** `company.company_payment_method_appointments` row (`lifecycle_status: :active`). Copies the company appointment's name (suffixed `" for #{branch.name}"`), code (suffixed `-BR-<hex>`), `business_type`, `workflow_status`, and merchant fields; sets `lifecycle_status: :active`. Ensures every new branch inherits the company's payment methods. |
 
+> Operation appointments are created by `OperationAppointmentConcern`; operations-page cache invalidation is handled by `OperationPageCacheConcern` (both below).
+
 ---
 
 ### Category (`app/models/category.rb`)
@@ -49,12 +51,37 @@ Callbacks defined directly in the model file (not inherited from a concern).
 |----------|------|--------|-------------|
 | `before_validation :assign_currency_from_country` | — | `assign_currency_from_country` | Maps `country` to `currency` via `COUNTRY_CURRENCY_MAP` (`us → usd`, `vn → vnd`) whenever the country has a mapping. Keeps currency in step with the user-chosen country on the New Company page (`company[country]`); `currency` is never permittable. |
 | `after_create :setup_owner_records` | 104 | `setup_owner_records` | Creates owner infrastructure: (1) Owner `Role` with `business_type: :owner`, (2) "Owner All Access" `Policy` with `resource: "all"` / `action: "all"`, (3) Owner `Employee` linked to the creating user, (4) Both `PolicyAppointment` and `RoleAppointment` with `business_type: :owner`, (5) Sets `user.system_role` to `company_owner` so `accessible_companies` returns the new company. |
-| `after_create :initialize_company` | 136 | `initialize_company` | Creates the company's `CompanyWallet` with `main_credit_balance: 0` and `promo_credit_balance: SIGNUP_PROMO_CREDITS` (1,000 for every company, including `system_owned`), then calls `sync_credit_status!` so a positive signup promo starts `active` and a zero balance starts `suspend`. The wallet is the chain's bottom node: `CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`. (Sidebar config seeding was removed 2026-09-22 — sidebar control is FE-only, see `docs/SIDEBAR.md`.) Finally enqueues `Companies::WelcomeNotificationJob` with `WELCOME_NOTIFICATION_DELAY` (10 min, ID only — no-ops if the company/owner is gone; throttled idempotent). When the company is marked `system_owned` (created by `System#ensure_company!`), business-type seeding/payment-method setup and the owner user's `system_role` demotion are skipped, while the wallet still receives the signup promo; `sync_credit_status!` keeps system companies exempt from suspension. |
+| `after_create :initialize_company` | 136 | `initialize_company` | Seeds the company's purpose-keyed operation catalog (`Seed::OperationService.seed_defaults!`), creates the company's `CompanyWallet` with `main_credit_balance: 0` and `promo_credit_balance: SIGNUP_PROMO_CREDITS` (1,000 for every company, including `system_owned`), then calls `sync_credit_status!` so a positive signup promo starts `active` and a zero balance starts `suspend`. The wallet is the chain's bottom node: `CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`. (Sidebar config seeding was removed 2026-09-22 — sidebar control is FE-only, see `docs/SIDEBAR.md`.) Finally enqueues `Companies::WelcomeNotificationJob` with `WELCOME_NOTIFICATION_DELAY` (10 min, ID only — no-ops if the company/owner is gone; throttled idempotent). When the company is marked `system_owned` (created by `System#ensure_company!`), business-type seeding/operation seeding/payment-method setup and the owner user's `system_role` demotion are skipped, while the wallet still receives the signup promo; `sync_credit_status!` keeps system companies exempt from suspension. |
 | `after_commit :refresh_cache, on: [:create, :update]` | — | `refresh_cache` | Writes the company attributes hash to `Rails.sync_cache` under `CacheKeyService.company(id)` (TTL `CACHE_DEFAULT_EXPIRY` = 1 hour) and deletes `CacheKeyService.user_companies_max_updated_at(user_id)`. |
 | `after_commit :remove_cache, on: :destroy` | — | `remove_cache` | Deletes `CacheKeyService.company(id)`, `CacheKeyService.user_companies_max_updated_at(user_id)`, and `CacheKeyService.company_suspended(id)` from `Rails.sync_cache` (pub/sub evicts other instances). |
 | `after_update :write_suspended_cache, if: :saved_change_to_workflow_status?` | — | `write_suspended_cache` | Writes the `Company#suspended?` boolean to `Rails.ram_cache` immediately so the same process (and transactional tests) sees the new gate. |
 | `after_commit :broadcast_suspended_cache, on: :update, if: :saved_change_to_workflow_status?` | — | `broadcast_suspended_cache` | Deletes `CacheKeyService.company_suspended(id)` through `Rails.sync_cache`; the pub/sub listener evicts the ram_cache key on every web instance. |
 | `after_rollback :delete_suspended_cache` | — | `delete_suspended_cache` | Removes the locally written suspension boolean when the status update rolls back. |
+
+---
+
+### Warehouse (`app/models/warehouse.rb`)
+
+_No direct callbacks._ Operation appointments are created by `OperationAppointmentConcern`; operations-page cache invalidation is handled by `OperationPageCacheConcern` (both below).
+
+---
+
+### Operation (`app/models/operation.rb`)
+
+| Callback | Method | Description |
+|----------|--------|-------------|
+| `after_update :copy_metadata_to_appointments, if: :saved_change_to_metadata?` | `copy_metadata_to_appointments` | Copies the Operation's `metadata` onto every `BranchOperationAppointment` and `OperationWarehouseAppointment` with `update_all` (including `updated_at`). This is the company-level reset: local appointment-only keys are discarded. |
+| `after_save :clear_operation_page_caches` + `after_destroy :clear_operation_page_caches` | `clear_operation_page_caches` | Inherited from `OperationPageCacheConcern`; deletes the company's Operations and Operation Configs index cache keys. |
+
+---
+
+### BranchOperationAppointment / OperationWarehouseAppointment
+
+`company_id` derives from `branch`/`operation` via `SetDefaultCompanyConcern`. Status and metadata changes are plain updates with one roles validation (`roles` must be company roles and, when the Operation has roles, a subset of them).
+
+| Callback | Method | Description |
+|----------|--------|-------------|
+| `after_save :clear_operation_page_caches` + `after_destroy :clear_operation_page_caches` | `clear_operation_page_caches` | Inherited from `OperationPageCacheConcern`; deletes the company's Operations and Operation Configs index cache keys. |
 
 ---
 
@@ -399,6 +426,34 @@ Auto-derives `company_id` on atomic pairwise Appointment records from the associ
 
 ---
 
+### OperationAppointmentConcern (`app/models/concerns/operation_appointment_concern.rb`)
+
+Gives a location model the company's full operation catalog as atomic appointment rows. The includer declares its appointment model, operation scope, and foreign key:
+
+```ruby
+operation_appointments_for BranchOperationAppointment, scope: :branch, foreign_key: :branch
+```
+
+| Callback | Method | Description |
+|----------|--------|-------------|
+| `after_create :ensure_operation_appointments` | `ensure_operation_appointments` | Calls `Seed::OperationService.ensure_appointments_for!` with the includer's appointment model/scope/foreign key. Idempotent. Returns early when `company` is blank. |
+
+**Included in (2 models):** `Branch`, `Warehouse`.
+
+---
+
+### OperationPageCacheConcern (`app/models/concerns/operation_page_cache_concern.rb`)
+
+Deletes the company-level Operations and Operation Configs index cache keys whenever an operation-domain row changes.
+
+| Callback | Method | Description |
+|----------|--------|-------------|
+| `after_save :clear_operation_page_caches` + `after_destroy :clear_operation_page_caches` | `clear_operation_page_caches` | Deletes `CacheKeyService.company_operation_appointments(company_id)` and `CacheKeyService.company_operation_configs(company_id)` through `Rails.sync_cache`. Delete-only, so it is safe inside transactional tests. |
+
+**Included in (5 models):** `Operation`, `BranchOperationAppointment`, `OperationWarehouseAppointment`, `Branch`, `Warehouse`.
+
+---
+
 ### CategoryConcern (`app/models/concerns/category_concern.rb`)
 
 Auto-assigns a default category on create if none is provided. Ensures every resource record has a category for dynamic property resolution and ABAC permission evaluation.
@@ -479,9 +534,11 @@ Each concern defines the same callback:
 | `before_validation` | 5 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 19 models), (PropertyMappingConcern → 43 models) |
 | `after_initialize` | 1 | Branch |
 | `before_create` | 1 | Session |
-| `after_create` | 6 | Category, Company, Branch, PolicyAppointment, PropertyMapping, RoleAppointment |
+| `after_create` | 6 | Category, Company, Branch (1), PolicyAppointment, PropertyMapping, RoleAppointment (plus OperationAppointmentConcern → Branch, Warehouse) |
 | `belongs_to :company, touch: true` | 6 | Branch, Department, Category, PropertyMapping, TableConfig, Role |
-| `after_update` (conditional) | 3 | Company (`workflow_status` suspension cache), CompanyPaymentMethodAppointment, PolicyAppointment |
+| `after_update` (conditional) | 4 | Company (`workflow_status` suspension cache), CompanyPaymentMethodAppointment, PolicyAppointment, Operation (`metadata` reset) |
+| `after_save` | 5 | (OperationPageCacheConcern → Operation, BranchOperationAppointment, OperationWarehouseAppointment, Branch, Warehouse) |
+| `after_destroy` | 5 | (OperationPageCacheConcern → Operation, BranchOperationAppointment, OperationWarehouseAppointment, Branch, Warehouse) |
 | `before_update` | 3 | PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_destroy` | 5 | Employee, System, PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_discard` | 1 | Employee |
@@ -490,10 +547,10 @@ Each concern defines the same callback:
 | `after_rollback` | 1 | Company (`workflow_status` suspension cache cleanup) |
 | `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 45 models), (PropertyMappingConcern → 45 models), (ImageAttachmentsConcern → 6 models + Product) |
 
-**Total unique callback declarations: ~34 directly across 15 model files + 7 concern files propagating to ~63+ models.**
+**Total unique callback declarations: ~36 directly across 15 model files + 9 concern files propagating to ~70+ models.**
 
 > **Note:** `ImageAttachmentsConcern` in the validate row covers the 6 per-model ImageConcern files (Branch, Brand, Customer, Department, Employee, Service) + the pre-existing `Product::ImageConcern`, all of which define the same `validate :acceptable_image_attachments` callback.
 
 ---
 
-*Last updated: 2026-08-10. Auto-generated by codebase exploration.*
+*Last updated: 2026-11-04. Auto-generated by codebase exploration.*

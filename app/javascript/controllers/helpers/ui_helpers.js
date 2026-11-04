@@ -436,6 +436,25 @@ export const reloadThenToast = (toastObj) => {
 };
 
 /**
+ * Queues a toast in localStorage, then navigates to the given URL so the toast
+ * renders on the destination page instead of being destroyed by navigation.
+ * @param {string} url - Destination path.
+ * @param {ToastOptions} toastObj - The toast configuration object.
+ * @returns {void}
+ */
+export const navigateThenToast = (url, toastObj) => {
+  let existing = []
+  try {
+    existing = JSON.parse(localStorage.getItem(PENDING_TOASTS_KEY) || "[]")
+  } catch (e) {
+    console.error("Corrupted pending toasts, resetting:", e)
+    localStorage.removeItem(PENDING_TOASTS_KEY)
+  }
+  localStorage.setItem(PENDING_TOASTS_KEY, JSON.stringify([...existing, toastObj]))
+  window.location.href = url
+};
+
+/**
  * Clears all client-cached data from localStorage.
  * On next page load, ClientCacheController.sync() detects no cache
  * and automatically re-fetches fresh data from /client_cache.

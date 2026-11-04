@@ -4,7 +4,7 @@
 # create/update are HTML redirects; receipt is JSON-only for the retail-cashier panel.
 # index additionally supports the TableConfig-driven dynamic search/filter
 # (?q= / ?filters[key]= → Meilisearch via Orders::SearchQueryService; plain DB path otherwise).
-# Serves Stimulus: Companies_Pages_RetailCashierController#showReceipt (GET receipt),
+# Serves Stimulus: Companies_Operations_Pos_ShowController#showReceipt (GET receipt),
 #                  Companies_Orders_IndexController (index/show; index JSON incl. q/filters passthrough)
 # Endpoint: GET receipt — see config/routes.rb:36 + Helpers.receipt_company_order_path
 # Docs: docs/DYNAMIC_TABLE.md §2.5, docs/MEILISEARCH.md

@@ -99,6 +99,16 @@ RSpec.describe CacheKeyService do
       expect(described_class.company_dashboard(3, can_view_financials: false))
         .to eq("company:3:dashboards:operational")
     end
+
+    it "builds the operation appointments index key" do
+      expect(described_class.company_operation_appointments(3))
+        .to eq("company:3:operations:appointments")
+    end
+
+    it "builds the operation configs index key" do
+      expect(described_class.company_operation_configs(3))
+        .to eq("company:3:operations:configs")
+    end
   end
 
   describe "versioned caches" do
@@ -181,6 +191,8 @@ RSpec.describe CacheKeyService do
         described_class.current_address(employee),
         described_class.customer_membership_of_type(customer, :primary),
         described_class.company_analytics(1, "last_6_months"),
+        described_class.company_operation_appointments(1),
+        described_class.company_operation_configs(1),
         described_class.admin_open_ticket_count,
         described_class.stock_available(1)
       ]

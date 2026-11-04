@@ -65,7 +65,7 @@ the sidebar re-renders from the fresh client cache.
 
 | File | Purpose |
 |------|---------|
-| `app/javascript/controllers/companies/sidebar_items.js` | Static registry |
+| `app/javascript/controllers/companies/sidebar_items.js` | Static registry (`Operations` → operation appointments, `Operation Configs` → company-wide Operation metadata) |
 | `app/javascript/controllers/companies/sidebar_custom.js` | Dynamic reader (active `sidebar_groups` record, key namespacing) |
 | `app/javascript/controllers/companies/sidebar_storage.js` | localStorage helpers |
 | `app/javascript/controllers/companies/sidebars/show_controller.js` | Renderer (custom groups above static) |

@@ -41,7 +41,7 @@ class Company < ApplicationRecord
     DiscountGroup Discount
     Patient Appointment Course Student Exam
     Membership
-    Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
+    Operation CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
     AttendanceConfig AttendanceLog AttendanceDay AttendanceMonth AttendanceRequest
     Payroll
     KpiConfig
@@ -68,6 +68,10 @@ class Company < ApplicationRecord
 
   # --- Enums ---
   enum :country, COUNTRY_CODES, prefix: true
+  # business_type is a seeding/labeling hint only. Skycom is a dynamic,
+  # atomic system: categories, properties, appointments, and ABAC policies
+  # define runtime behavior. Companies with different business_type values
+  # use the same code paths. Do not add runtime `business_type_*?` branches.
   enum :business_type, {
     retail: 0,
     restaurant: 1000,
@@ -176,7 +180,9 @@ class Company < ApplicationRecord
   has_many :categories, dependent: :destroy
   has_many :subscription_plans, dependent: :destroy
   has_many :departments, dependent: :destroy
-  has_many :pages, dependent: :destroy
+  has_many :operations, dependent: :destroy
+  has_many :branch_operation_appointments, dependent: :destroy
+  has_many :operation_warehouse_appointments, dependent: :destroy
   has_many :company_settings, dependent: :destroy
   has_one :company_wallet, dependent: :destroy
   has_many :company_wallet_logs, dependent: :destroy
@@ -325,6 +331,7 @@ class Company < ApplicationRecord
         Seed::HotelInitService.call(company: self)
       end
 
+      Seed::OperationService.seed_defaults!(company: self)
       setup_payment_method_appointments
     end
 

@@ -74,7 +74,7 @@ RSpec.feature "Sidebar search", type: :feature, js: true do
 
     within("aside", visible: :all) do
       fill_in "sidebar_search", with: "t"
-      expect(page).to have_link("Trang", wait: 10)
+      expect(page).to have_link("Thẻ", wait: 10)
       expect(page).to have_link("Tài liệu", wait: 10)
     end
   end

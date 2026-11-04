@@ -115,7 +115,7 @@ RSpec.feature "Darkmode across sidebar pages", type: :feature, js: true do
       company_property_mappings_path(company),
       company_table_configs_path(company),
       company_workflows_path(company),
-      company_pages_path(company),
+      company_operations_path(company),
       company_documents_path(company),
       company_calendar_path(company),
       company_events_path(company),

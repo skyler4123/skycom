@@ -1,0 +1,229 @@
+# Skycom Operations System
+
+## 1. Overview
+
+Operations are full-screen interfaces keyed by **purpose**, not industry or
+role: POS, Booking, Inventory, Reception, Kitchen, Housekeeping, Store Manager.
+A hospital and a hotel use the same POS operation; their differences live in
+categories, dynamic properties, location appointments, and ABAC policies.
+
+`Operation` is company-level. Branch and warehouse connections live in atomic
+appointment tables. Operation config (company-wide) wins over appointment config
+(location-specific).
+
+---
+
+## 2. Three layers
+
+| Layer | Table / model | Purpose |
+|---|---|---|
+| **Operation** | `operations` / `Operation` | One deployable purpose + resolution for a company. Seeded, never created from the UI. |
+| **Branch appointment** | `branch_operation_appointments` / `BranchOperationAppointment` | Binds an Operation to a Branch with branch metadata and active/inactive status. |
+| **Warehouse appointment** | `operation_warehouse_appointments` / `OperationWarehouseAppointment` | Binds an Operation to a Warehouse with warehouse metadata and active/inactive status. |
+
+`Operation` is unique per `(company, operation_type, resolution)`. The catalog currently
+seeds one `desktop` Operation per purpose.
+
+### Config override direction
+
+```ruby
+operation.config_for(appointment)
+# => (operation.metadata || {}).deep_merge(appointment.metadata || {})
+```
+
+**Appointment wins locally.** Every appointment is created with a deep copy of the
+Operation metadata. Saving the Operation config copies the new metadata onto every
+branch/warehouse appointment (`update_all`), so local-only keys are discarded and
+each local row starts from the new company config. An appointment may then override
+keys locally until the next company save.
+
+`roles` is constrained. `Operation#effective_roles(appointment)` uses the local
+roles when present (intersected with the Operation roles) and falls back to the
+Operation roles when local roles are empty. Appointment roles are validated as a
+subset of the Operation roles — or of the company roles when the Operation allows
+all roles. Local roles can therefore narrow access but never widen it. At the
+Operation level, empty roles means “all roles”; at the appointment level, empty
+local roles inherit the Operation roles.
+
+---
+
+## 3. Operation catalog
+
+Source of truth: `OPERATION_TYPES` in `config/initializers/constants.rb`.
+
+| `operation_type` | Label | Code prefix | Appointment scope |
+|---|---|---|---|
+| `pos` | POS | `POS` | branch |
+| `booking` | Booking | `BKG` | branch |
+| `inventory` | Inventory | `INV` | warehouse |
+| `reception` | Reception | `RCP` | branch |
+| `kitchen` | Kitchen | `KIT` | branch |
+| `housekeeping` | Housekeeping | `HSK` | branch |
+| `store_manager` | Store Manager | `MGR` | branch |
+
+`appointment_scope` is a **seed-time hint**: branch creation creates branch
+appointments for `:branch` operations; warehouse creation creates warehouse
+appointments for `:warehouse` operations. It does not scope the Operation record.
+
+Display names are the catalog labels: every business type seeds the same `POS`,
+`Booking`, `Inventory`, … names.
+
+> Every company receives the **entire** catalog on init. `business_type` never
+> selects a subset of operation types, never changes display names, and never
+> changes runtime behavior.
+
+---
+
+## 4. Seeding
+
+`Seed::OperationService`:
+
+```ruby
+Seed::OperationService.seed_defaults!(company:)
+Seed::OperationService.ensure_appointments_for_branch!(branch)
+Seed::OperationService.ensure_appointments_for_warehouse!(warehouse)
+Seed::OperationService.ensure_appointments_for!(
+  location:, appointment_class:, operation_scope:, foreign_key:
+)
+Seed::OperationService.ensure_appointments_for_operation!(operation)
+Seed::OperationService.create(company:, operation_type:, ...)
+```
+
+- `seed_defaults!` creates one `desktop` Operation per `OPERATION_TYPES` key for the
+  company, then materializes appointments for every existing branch/warehouse.
+- `Company#initialize_company` calls it for every non-system company.
+- `Branch` and `Warehouse` include `OperationAppointmentConcern`; its `after_create`
+  calls `Seed::OperationService.ensure_appointments_for!` with the location model's
+  atomic appointment class, operation scope, and foreign key. A future location model
+  opts in with one `operation_appointments_for` declaration.
+- New appointments start with a deep copy of the Operation metadata (see §2).
+- Idempotent: `find_or_initialize_by` / `find_or_create_by!`.
+- Code format: catalog prefix + company id short + random hex, e.g.
+  `POS-abc12345-1A2B`.
+
+All appointments start `active`. Companies disable the ones they do not use.
+
+---
+
+## 5. Routes and controllers
+
+| Method | Path | Controller#action | Purpose |
+|---|---|---|---|
+| GET | `/companies/:company_id/operations` | `Companies::OperationsController#index` | List branch + warehouse appointments (filters: `q`, `operation_type`, `workflow_status`, `location`; 1-day cache) |
+| GET | `/companies/:company_id/operations/:id/launch` | `Companies::OperationsController#launch` | Resolve appointment and redirect |
+| GET | `/companies/:company_id/operation_configs` | `Companies::OperationConfigsController#index` | List company Operation records (filters: `q`, `operation_type`, `workflow_status`, `resolution`; 1-day cache) |
+| GET | `/companies/:company_id/operation_configs/:id` | `Companies::OperationConfigsController#show` | Operation config details |
+| GET | `/companies/:company_id/operation_configs/:id/edit` | `Companies::OperationConfigsController#edit` | Operation config edit page |
+| PATCH | `/companies/:company_id/operation_configs/:id` | `Companies::OperationConfigsController#update` | Update Operation metadata only |
+| GET | `/companies/:company_id/branch_operation_appointments/:id` | `Companies::BranchOperationAppointmentsController#show` | Branch appointment details |
+| GET | `/companies/:company_id/branch_operation_appointments/:id/edit` | `Companies::BranchOperationAppointmentsController#edit` | Branch appointment edit page |
+| PATCH | `/companies/:company_id/branch_operation_appointments/:id` | `Companies::BranchOperationAppointmentsController#update` | Update branch metadata/status |
+| GET | `/companies/:company_id/operation_warehouse_appointments/:id` | `Companies::OperationWarehouseAppointmentsController#show` | Warehouse appointment details |
+| GET | `/companies/:company_id/operation_warehouse_appointments/:id/edit` | `Companies::OperationWarehouseAppointmentsController#edit` | Warehouse appointment edit page |
+| PATCH | `/companies/:company_id/operation_warehouse_appointments/:id` | `Companies::OperationWarehouseAppointmentsController#update` | Update warehouse metadata/status |
+| GET | `/companies/:company_id/operations/pos/:operation_id` | `Companies::Operations::PosController#show` | POS |
+| GET | `/companies/:company_id/operations/booking/:operation_id` | `Companies::Operations::BookingController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/inventory/:operation_id` | `Companies::Operations::InventoryController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/reception/:operation_id` | `Companies::Operations::ReceptionController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/kitchen/:operation_id` | `Companies::Operations::KitchenController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/housekeeping/:operation_id` | `Companies::Operations::HousekeepingController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/store_manager/:operation_id` | `Companies::Operations::StoreManagerController#show` | Placeholder |
+
+Both index payloads are cached per company in `Rails.sync_cache` for
+`OPERATIONS_CACHE_EXPIRY` (1 day). `OperationPageCacheConcern` deletes the keys on
+Operation, appointment, Branch, and Warehouse saves/destroys, so the TTL is only a
+backstop. The employee-specific `accessible` flag is computed after the cache read.
+
+There is **no** create/new/show/edit/update route for `Operation` records themselves.
+Operations are seeded; the UI edits config only, through the `operation_configs`
+show/edit pages.
+
+Operation routes accept `branch_id` or `warehouse_id` query params. If omitted,
+the resolver falls back to the employee's branch (branch operations) or a warehouse
+under that branch (warehouse operations).
+
+`OperationLaunchService` maps an operation type to its operation route and adds the
+appointment's location param.
+
+---
+
+## 6. Authorization
+
+1. Outer gate: `can?(:read, Operation)` / `can?(:update, Operation)` policies.
+2. Appointment-level gate: `operation.accessible_by?(employee, appointment:)` using
+   `effective_roles(appointment)`.
+3. Owner bypasses both.
+4. Appointment must be `workflow_status_active?` to launch.
+
+Empty/missing Operation `metadata["roles"]` means every employee with Operation read
+can access it. Appointment local roles may only narrow that set: they must be company
+roles and, when the Operation defines roles, a subset of the Operation roles. Empty
+local roles inherit the Operation roles. Role names are stored as strings; renaming a
+role requires updating operation configs.
+
+Role names are edited through the **Access Roles** multi-select on the Operation
+config edit page (`/companies/:company_id/operation_configs/:id/edit`). The picker
+reads the company's roles from the client cache. The appointment edit page gets a
+**Local Access Roles** picker restricted to the Operation roles (or all company roles
+when the Operation allows all); its JSON textarea edits only the non-role metadata.
+Only `metadata["roles"]` is editable on the Operation config; every other key already
+present in `operation.metadata` is preserved when the form is saved.
+
+---
+
+## 7. Frontend
+
+| Surface | Stimulus controller | Backend |
+|---|---|---|
+| Operation Appointments | `Companies_Operations_IndexController` (`companies--operations--index`) | `Companies::OperationsController#index/launch` |
+| Appointment details / edit | `Companies_BranchOperationAppointments_ShowController` / `Companies_BranchOperationAppointments_EditController` (and the warehouse pair) | `BranchOperationAppointmentsController` / `OperationWarehouseAppointmentsController` |
+| Operation Configs | `Companies_OperationConfigs_IndexController` (`companies--operation-configs--index`) | `Companies::OperationConfigsController#index` |
+| Operation config details / edit | `Companies_OperationConfigs_ShowController` / `Companies_OperationConfigs_EditController` | `Companies::OperationConfigsController#show/edit/update` |
+| POS | `Companies_Operations_Pos_ShowController` (`companies--operations--pos--show`) | `Companies::Operations::PosController#show` |
+| Placeholders | `Companies_Operations_<Type>_ShowController` | `Companies::Operations::<Type>Controller#show` |
+
+The Operations pages use **full-page show + edit** pages, never modals. The two list
+pages link the row name to the show page and the edit icon to the edit page. Both
+list pages have GET filter bars:
+
+- Operations: keyword, operation type, status, location
+- Operation Configs: keyword, operation type, status, resolution
+
+The Operation config edit page edits company access roles with a multi-select role
+picker (the company's roles come from the client cache); it never exposes raw JSON.
+The appointment edit page has a **Local Access Roles** picker restricted to the
+Operation roles (or all company roles when the Operation allows all) and a JSON
+textarea for the remaining local metadata. The Operations index has no Add button.
+It lists appointments; Launch is disabled when the appointment is inactive or the
+employee lacks the effective appointment roles. Operation Configs has no Add button
+and warns that saving an Operation resets every branch/warehouse appointment config.
+
+---
+
+## 8. Adding a new operation type
+
+A new operation type touches six layers:
+
+1. Add the enum value to `Operation.operation_type`.
+2. Add the `OPERATION_TYPES` entry (label, prefix, scope).
+3. Add a `Companies::Operations::<Type>Controller` + route + policy.
+4. Add the route helper to `OperationLaunchService`.
+5. Add the FE Stimulus controller (or placeholder subclass).
+6. **Backfill existing companies** — see `docs/TODO.md` "Operations —
+   new operation_type backfill". Adding the value alone does not create Operation records
+   or appointments for existing companies.
+
+---
+
+## 9. Database
+
+- `operations`: unique `(company_id, operation_type, resolution)`; unique `code`.
+- `branch_operation_appointments`: unique `(company_id, branch_id, operation_id)`.
+- `operation_warehouse_appointments`: unique `(company_id, operation_id, warehouse_id)`.
+- Both appointment tables carry the standard System Fields block; the column default
+  is `metadata = {}`, while `Seed::OperationService` copies the Operation metadata
+  onto every new appointment.
+
+---
+
+*End of documentation*
