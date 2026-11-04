@@ -71,24 +71,24 @@ export default class Companies_Pages_IndexController extends Companies_LayoutCon
     return `
       <tr class="border-b border-line hover:bg-muted/50">
         <td class="py-4 px-6">
-          <p class="font-medium text-foreground">${page.name || translate("Unnamed Page")}</p>
-          <p class="font-mono text-xs text-muted-foreground">${page.code || "—"}</p>
+          <p class="font-medium text-foreground">${Helpers.escapeHtml(page.name || translate("Unnamed Page"))}</p>
+          <p class="font-mono text-xs text-muted-foreground">${Helpers.escapeHtml(page.code || "—")}</p>
         </td>
-        <td class="py-4 px-6 text-muted-foreground">${(page.page_type || "—").replace(/_/g, " ").toUpperCase()}</td>
-        <td class="py-4 px-6 text-muted-foreground">${appointment.location?.name || "—"}</td>
-        <td class="py-4 px-6 text-muted-foreground">${page.resolution || "—"}</td>
+        <td class="py-4 px-6 text-muted-foreground">${Helpers.escapeHtml((page.page_type || "—").replace(/_/g, " ").toUpperCase())}</td>
+        <td class="py-4 px-6 text-muted-foreground">${Helpers.escapeHtml(appointment.location?.name || "—")}</td>
+        <td class="py-4 px-6 text-muted-foreground">${Helpers.escapeHtml(page.resolution || "—")}</td>
         <td class="py-4 px-6">${Helpers.statusBadge(appointment.workflow_status)}</td>
         <td class="py-4 px-6">
           ${roles.length === 0
             ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-line">${translate("All roles")}</span>`
-            : roles.map(role => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary mr-1">${role}</span>`).join("")}
+            : roles.map(role => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary mr-1">${Helpers.escapeHtml(role)}</span>`).join("")}
         </td>
         <td class="py-4 px-6 text-right whitespace-nowrap">
           ${canLaunch
-            ? `<a href="${appointment.launch_path}" class="inline-flex items-center justify-center p-2 text-success hover:bg-success/10 rounded-lg cursor-pointer" ${tooltip(translate("Launch"))}>
+            ? `<a href="${Helpers.escapeHtml(appointment.launch_path)}" class="inline-flex items-center justify-center p-2 text-success hover:bg-success/10 rounded-lg cursor-pointer" ${tooltip(translate("Launch"))}>
                  <span class="material-symbols-outlined text-[20px]">open_in_new</span>
                </a>`
-            : `<span class="inline-flex items-center justify-center p-2 text-muted-foreground/40 cursor-not-allowed" title="${launchReason}" ${tooltip(launchReason)}>
+            : `<span class="inline-flex items-center justify-center p-2 text-muted-foreground/40 cursor-not-allowed" title="${Helpers.escapeHtml(launchReason)}" ${tooltip(launchReason)}>
                  <span class="material-symbols-outlined text-[20px]">open_in_new</span>
                  <span class="sr-only">${launchReason}</span>
                </span>`}

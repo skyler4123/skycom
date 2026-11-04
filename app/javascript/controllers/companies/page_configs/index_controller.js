@@ -66,15 +66,15 @@ export default class Companies_PageConfigs_IndexController extends Companies_Lay
     return `
       <tr class="border-b border-line hover:bg-muted/50">
         <td class="py-4 px-6">
-          <p class="font-medium text-foreground">${pageConfig.name || translate("Unnamed Page")}</p>
-          <p class="font-mono text-xs text-muted-foreground">${pageConfig.code || "—"}</p>
+          <p class="font-medium text-foreground">${Helpers.escapeHtml(pageConfig.name || translate("Unnamed Page"))}</p>
+          <p class="font-mono text-xs text-muted-foreground">${Helpers.escapeHtml(pageConfig.code || "—")}</p>
         </td>
-        <td class="py-4 px-6 text-muted-foreground">${(pageConfig.page_type || "—").replace(/_/g, " ").toUpperCase()}</td>
-        <td class="py-4 px-6 text-muted-foreground">${pageConfig.resolution || "—"}</td>
+        <td class="py-4 px-6 text-muted-foreground">${Helpers.escapeHtml((pageConfig.page_type || "—").replace(/_/g, " ").toUpperCase())}</td>
+        <td class="py-4 px-6 text-muted-foreground">${Helpers.escapeHtml(pageConfig.resolution || "—")}</td>
         <td class="py-4 px-6">
           ${roles.length === 0
             ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-line">${translate("All roles")}</span>`
-            : roles.map(role => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary mr-1">${role}</span>`).join("")}
+            : roles.map(role => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary mr-1">${Helpers.escapeHtml(role)}</span>`).join("")}
         </td>
         <td class="py-4 px-6">${Helpers.statusBadge(pageConfig.workflow_status)}</td>
         <td class="py-4 px-6 text-muted-foreground">${appointmentCount}</td>

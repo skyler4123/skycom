@@ -17,17 +17,17 @@ export default class Companies_PageConfigs_EditModalController extends Controlle
       <div class="space-y-5">
         <div>
           <h2 class="text-xl font-bold text-foreground">${translate("Edit Config")}</h2>
-          <p class="text-sm text-muted-foreground">${pageConfig.name || ""}</p>
+          <p class="text-sm text-muted-foreground">${Helpers.escapeHtml(pageConfig.name || "")}</p>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div class="rounded-lg border border-line bg-card p-3">
             <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Type")}</p>
-            <p class="text-sm font-semibold text-foreground">${(pageConfig.page_type || "—").replace(/_/g, " ").toUpperCase()}</p>
+            <p class="text-sm font-semibold text-foreground">${Helpers.escapeHtml((pageConfig.page_type || "—").replace(/_/g, " ").toUpperCase())}</p>
           </div>
           <div class="rounded-lg border border-line bg-card p-3">
             <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Resolution")}</p>
-            <p class="text-sm font-semibold text-foreground">${pageConfig.resolution || "—"}</p>
+            <p class="text-sm font-semibold text-foreground">${Helpers.escapeHtml(pageConfig.resolution || "—")}</p>
           </div>
         </div>
 
@@ -38,7 +38,7 @@ export default class Companies_PageConfigs_EditModalController extends Controlle
         <div class="space-y-1">
           <label class="text-xs font-medium text-muted-foreground">${translate("Metadata (JSON)")}</label>
           <textarea name="metadata" rows="8"
-            class="w-full px-3 py-2 font-mono text-xs border border-line rounded-lg bg-card text-foreground focus:ring-2 focus:ring-primary outline-none">${metadata}</textarea>
+            class="w-full px-3 py-2 font-mono text-xs border border-line rounded-lg bg-card text-foreground focus:ring-2 focus:ring-primary outline-none">${Helpers.escapeHtml(metadata)}</textarea>
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
