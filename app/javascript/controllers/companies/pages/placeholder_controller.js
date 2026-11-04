@@ -10,7 +10,14 @@ export default class Companies_Pages_PlaceholderController extends Controller {
 
   async connect() {
     try {
-      const response = await fetchJson(`${window.location.pathname}.json${window.location.search}`)
+      const pathParts = window.location.pathname.split("/")
+      const companyId = pathParts[2]
+      const pageId = this.element.dataset.operationPageId
+      const pageType = this.element.dataset.operationPageType
+      const url = pageId && pageType
+        ? `/companies/${companyId}/pages/${pageType}/${pageId}.json${window.location.search}`
+        : `${window.location.pathname}.json${window.location.search}`
+      const response = await fetchJson(url)
       this.page = response.page
       this.appointment = response.appointment
       this.config = response.config

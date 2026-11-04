@@ -416,7 +416,7 @@ export const dictionary = () => {
     "Back to Page Appointments": { vi: "Quay lại lịch hẹn trang" },
     "Failed to load page.": { vi: "Không thể tải trang." },
 
-    // === POS / Retail Cashier ===
+    // === POS ===
     "Cashier": { vi: "Thu ngân" },
     "Admin User": { vi: "Người dùng quản trị" },
     "Administrator": { vi: "Quản trị viên" },
@@ -465,11 +465,6 @@ export const dictionary = () => {
     "Restaurant": { vi: "Nhà hàng" },
     "Shop": { vi: "Cửa hàng" },
     "Fitness": { vi: "Thể hình" },
-    "Retail Cashier": { vi: "Thu ngân bán lẻ" },
-    "Retail Store Manager": { vi: "Quản lý cửa hàng" },
-    "Mobile Portrait": { vi: "Dọc di động" },
-    "Tablet Landscape": { vi: "Ngang máy tính bảng" },
-    "Desktop Widescreen": { vi: "Màn hình rộng" },
 
     // === Employees ===
     "Full Time": { vi: "Toàn thời gian" },
@@ -506,7 +501,6 @@ export const dictionary = () => {
 
     // === Other ===
     "Search for products, customers...": { vi: "Tìm kiếm sản phẩm, khách hàng..." },
-    "Launch Cashier": { vi: "Mở thu ngân" },
     "Service": { vi: "Dịch vụ" },
     "Roles": { vi: "Vai trò" },
     "New Role": { vi: "Vai trò mới" },

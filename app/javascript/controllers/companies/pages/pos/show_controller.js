@@ -27,7 +27,7 @@ export default class Companies_Pages_Pos_ShowController extends Controller {
   async connect() {
     const pathParts = window.location.pathname.split("/")
     const companyId = pathParts[2]
-    const pageId = pathParts[5]
+    const pageId = this.element.dataset.operationPageId || pathParts[5]
 
     try {
       const branchId = new URLSearchParams(window.location.search).get("branch_id")

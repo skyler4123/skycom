@@ -36,15 +36,7 @@ class Companies::PageWarehouseAppointmentsController < Companies::ApplicationCon
   private
 
   def appointment_params
-    raw = params.require(:page_warehouse_appointment).permit!
-    attrs = {}
-    attrs[:workflow_status] = raw[:workflow_status] if raw.key?(:workflow_status)
-    if raw.key?(:metadata)
-      metadata = raw[:metadata]
-      metadata = metadata.to_unsafe_h if metadata.respond_to?(:to_unsafe_h)
-      attrs[:metadata] = metadata
-    end
-    attrs
+    params.require(:page_warehouse_appointment).permit(:workflow_status, metadata: {})
   end
 
   def valid_workflow_status?

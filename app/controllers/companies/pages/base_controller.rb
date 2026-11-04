@@ -31,6 +31,7 @@ class Companies::Pages::BaseController < Companies::ApplicationController
 
   def set_page
     @page = current_company.pages.find_by!(id: params[:page_id], page_type: expected_page_type)
+    @operation_page = @page
   end
 
   def set_appointment

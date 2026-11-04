@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-# Companies::Pages::PosController — the POS operation page (formerly the
-# retail_cashier action). Hydrates the branch-scoped product/service catalog and
-# the branch's non-redirect payment methods.
+# Companies::Pages::PosController — the POS operation page. Hydrates the
+# branch-scoped product/service catalog and the branch's non-redirect payment
+# methods for the resolved BranchPageAppointment.
 # Serves Stimulus: Companies_Pages_Pos_ShowController (hydrate)
 # Endpoints: GET /companies/:company_id/pages/pos/:page_id
 # Docs: docs/OPERATING_PAGES.md, docs/ORDER_PROCESSING_V1.md

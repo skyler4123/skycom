@@ -50,12 +50,7 @@ class Companies::PageConfigsController < Companies::ApplicationController
   private
 
   def page_config_params
-    raw = params.require(:page).permit!
-    return {} unless raw.key?(:metadata)
-
-    metadata = raw[:metadata]
-    metadata = metadata.to_unsafe_h if metadata.respond_to?(:to_unsafe_h)
-    { metadata: metadata }
+    params.require(:page).permit(metadata: {})
   end
 
   def format_page_config(page)

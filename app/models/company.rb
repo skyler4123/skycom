@@ -68,6 +68,10 @@ class Company < ApplicationRecord
 
   # --- Enums ---
   enum :country, COUNTRY_CODES, prefix: true
+  # business_type is a seeding/labeling hint only. Skycom is a dynamic,
+  # atomic system: categories, properties, appointments, and ABAC policies
+  # define runtime behavior. Companies with different business_type values
+  # use the same code paths. Do not add runtime `business_type_*?` branches.
   enum :business_type, {
     retail: 0,
     restaurant: 1000,

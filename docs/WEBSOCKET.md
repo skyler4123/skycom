@@ -222,7 +222,7 @@ EVENTS: {
 |----------------------------|------------|-------------------|----------------|
 | `test` | `"test"` | None (dev only) | `{ test: true }` |
 | `top_up_completed` | `"top_up_completed"` | `top_ups/new_controller.js` | `{ amount_cents, transaction_id }` |
-| `pos_payment_completed` | `"pos_payment_completed"` | `companies/pages/retail_cashier_controller.js` | `{ transaction_token, order_id }` |
+| `pos_payment_completed` | `"pos_payment_completed"` | `companies/pages/pos/show_controller.js` | `{ transaction_token, order_id }` |
 | `notification_created` | `"notification_created"` | bell/header controllers | `{ notification_id, title }` |
 | `company_ticket_created` | `"company_ticket_created"` | Help Center index, Admin pool | `{ name, priority }` |
 | `company_ticket_commented` | `"company_ticket_commented"` | Help Center show, Admin detail | `{ message_preview, author_type }` |

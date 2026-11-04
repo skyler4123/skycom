@@ -58,7 +58,8 @@
         <p class="w-full text-center py-2 px-3 bg-danger/10 text-danger font-medium rounded-md inline-block" id="alert"><%= alert %></p>
       <% end %>
     </div>
-    <div data-controller="<%= stimulus_controller %>">
+    <div data-controller="<%= stimulus_controller %>"
+      <% if @operation_page.present? %>data-operation-page-id="<%= @operation_page.id %>" data-operation-page-type="<%= @operation_page.page_type %>"<% end %>>
       <%= yield %>
     </div>
   </body>

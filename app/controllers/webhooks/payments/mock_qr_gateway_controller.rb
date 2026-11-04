@@ -6,7 +6,7 @@
 # Transactions. Completion side-effects live in the models/services — this
 # controller never touches balances directly.
 # Serves Stimulus: Companies_TopUps_NewController (top_up_completed),
-#                  Companies_Pages_RetailCashierController (pos_payment_completed)
+#                  Companies_Pages_Pos_ShowController (pos_payment_completed)
 # Subscribed via: window.WEBSOCKET.subscribe(channelName, eventKey, (data) => ...)
 # Docs: docs/WEBSOCKET.md, docs/ORDER_PROCESSING_V1.md
 module Webhooks

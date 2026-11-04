@@ -136,7 +136,7 @@ per `docs/ATOMIC_PURPOSE.md`.
 ## 6. POS Integration Sequence
 
 ```
-Retail Cashier → POST /companies/:id/order_processing/v1/pay
+POS → POST /companies/:id/order_processing/v1/pay
                    { order_id, payment_method_appointment_id, discount_code? }
       │
       ▼

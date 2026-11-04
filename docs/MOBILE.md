@@ -135,7 +135,7 @@ screen shows an empty/dash state instead of fabricated content.
 | Home | greeting, company/branch/code, live clock, multi check-in state/times, today's shift/logs, monthly attendance %, worked time, overtime, pending requests, paid-leave balance and pending days, latest published company announcement |
 | Profile | name/code/type/roles/category, email, phone, company, branch, departments, next shift, monthly attendance, group managers, contract renewal (`expiration_date`), Payroll entry point |
 | Attendance | month summary (worked/present/absent/overtime), daily in/out/duration/status |
-| Operations | every `Page` for the company: name/code, branch, business type, target role, target resolution, lifecycle/workflow status |
+| Operations | every accessible page appointment for the company: Page name/code/type, branch or warehouse location, resolution, page workflow status, appointment workflow status |
 | Payroll unlock | signed-in user's password; success sets a five-minute server-side unlock for the current company |
 | Payroll | month, status/step, period days, worked hours, present days, overtime minutes, salary/allowance/overtime/tax/social/net amounts; only after password confirmation |
 | New request | employee/branch, date, type, times, reason, validation, group managers listed from `EmployeeGroup#manager` (owner fallback) |
@@ -254,8 +254,8 @@ request feature spec sets them through the DOM with `set_native_field`.
   form/history, announcement management UI, or payslip/PDF download. Payroll
   money and seeded leave/notice data are real; the remaining items are not
   modelled yet.
-- Operations is a read-only Page list. Opening a page, filtering, and page
-  actions are not built yet.
+- Operations is a read-only page-appointment list. Opening a page, filtering,
+  and page actions are not built yet.
 - Mobile ERB remains English-only; `dictionary.js` covers the new JS toasts
   (`Copied to clipboard`, copy failure).
 - A suspended company sees a 403 page on mobile; there is no mobile top-up flow

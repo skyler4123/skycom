@@ -44,7 +44,8 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Brands | 50 |
 | Suppliers | 12 (retail) / 8 (hospital enrich) |
 | Branches | 2 |
-| Pages | 4 (2 per branch) |
+| Pages | 7 (full purpose catalog per company) + branch/warehouse appointments |
+| Page appointments | Branch creation creates one per branch-scoped Page; warehouse creation creates one for Inventory |
 | Departments | 4 |
 | Employees | ~76 (across 2 branches) |
 | Compensation / teams | Every employee: salary, allowance, company-aligned `currency`, contract `expiration_date`; branch teams + Leadership `EmployeeGroup` with `employee_groups.manager_id`; owner attached to the first branch |
@@ -161,6 +162,22 @@ cover all categories in practice.
 
 Hospital enrich also creates pharmacy **invoices** (round-robin across the 3
 hospital invoice categories) alongside appointments.
+
+## Company#business_type
+
+`Company#business_type` does not change runtime business logic. Skycom is a
+dynamic system built from atomic resources: categories, dynamic properties,
+pairwise appointments, and ABAC policies. Two companies with different
+`business_type` values run the same code paths.
+
+At this time `business_type` only matters for seeding:
+
+- page display labels,
+- seed defaults for modules that still use it.
+
+Do not introduce runtime `if company.business_type_*?` branching for
+operational behavior. Model the difference with categories, properties,
+appointments, or policies instead.
 
 ## Key Benefits
 

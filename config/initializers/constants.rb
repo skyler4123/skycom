@@ -466,7 +466,7 @@ EXPORT_ENABLED_RESOURCES = %w[
   customers customer_subprofiles departments discount_groups discounts
   documents employee_profiles employees employee_subprofiles event_configs
   events facilities folders invoices notifications notification_tags orders
-  pages permission_logs permissions policies products property_mappings
+  permission_logs permissions policies products property_mappings
   purchases roles scheduled_shifts services shift_templates stock_adjustments
   stock_exports stock_imports stock_pendings stocks stock_transfers storage_statistics
   suppliers table_config_logs table_configs warehouses workflows
