@@ -1,30 +1,11 @@
-# app/policies/companies/pages_policy.rb
+# frozen_string_literal: true
+
 class Companies::PagesPolicy < ApplicationPolicy
   def index?
     record.can?(:read, Page)
   end
 
-  def show?
+  def launch?
     record.can?(:read, Page)
-  end
-
-  def new?
-    record.can?(:create, Page)
-  end
-
-  def retail_cashier?
-    record.can?(:read, Page)
-  end
-
-  def create?
-    record.can?(:create, Page)
-  end
-
-  def edit?
-    record.can?(:update, Page)
-  end
-
-  def update?
-    record.can?(:update, Page)
   end
 end

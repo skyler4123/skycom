@@ -1,129 +1,89 @@
-# app/controllers/companies/pages_controller.rb
-# Companies::PagesController — Operating Pages (Shell-First). Standard CRUD for
-# Page records plus retail_cashier: branch-scoped product/service catalog
-# hydrated for the POS. See docs/OPERATING_PAGES.md, docs/ORDER_PROCESSING_V1.md.
-# Serves Stimulus: Companies_Pages_RetailCashierController (hydrate: products/services/payment_methods)
-# Endpoint: GET retail_cashier — see Helpers.retail_cashier_company_page_path
+# frozen_string_literal: true
+
+# Companies::PagesController — operating-page appointments (Shell-First).
+# Index lists every branch and warehouse appointment for the company; launch
+# resolves the appointment and redirects to the purpose-specific operation page.
+# Serves Stimulus: Companies_Pages_IndexController (index, launch)
+# Endpoints: GET /companies/:company_id/pages, GET /companies/:company_id/pages/:id/launch
+# Docs: docs/OPERATING_PAGES.md
 class Companies::PagesController < Companies::ApplicationController
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        scope = current_company.pages.includes(:branch)
-        scope = scope.where(branch_id: params[:branch_id]) if params[:branch_id].present?
-
         render json: {
-          pages: format_pages(scope),
-          branches: current_company.branches.select(:id, :name).as_json
+          page_appointments: format_appointments(page_appointments),
+          roles: current_company.roles.order(:name).map { |role| { id: role.id, name: role.name } }
         }
       end
     end
   end
 
-  def show
-    page = current_company.pages.includes(:branch).find(params[:id])
-
-    respond_to do |format|
-      format.html { render html: "", layout: true }
-      format.json { render json: { page: format_page(page) } }
-    end
-  end
-
-  def new
-    respond_to do |format|
-      format.html { render html: "", layout: true }
-      format.json { render json: { branches: current_company.branches.select(:id, :name).as_json } }
-    end
-  end
-
-  # GET /companies/:company_id/pages/:id/retail_cashier(.json)
-  # Hydrates the retail-cashier POS: products/services limited to page.branch
-  # (50 each, thumb variants) and the branch's appointed payment methods.
-  # Payment methods: only active branch-level appointments where !redirect?
-  # (POS can't handle hosted redirects); serialized as {id} + payment_method.slice.
-  def retail_cashier
-    page = current_company.pages.includes(:branch).find(params[:id])
-
-    respond_to do |format|
-      format.html { render html: "", layout: true }
-      format.json do
-        warehouse_ids = page.branch.warehouse_ids
-        products = current_company.products.where(branch_id: page.branch_id).limit(50).map { |p|
-          price = p.price
-          stock = Stock.find_by(product_id: p.id, warehouse_id: warehouse_ids)
-          { id: p.id, name: p.name, code: p.code, stock_id: stock&.id, price: price&.to_f || 0, currency: price&.currency.iso_code || "USD", image_url: p.image_attachments.first&.variant(:thumb)&.processed&.url }
-        }
-        services = current_company.services.where(branch_id: page.branch_id).limit(50).map { |s|
-          { id: s.id, name: s.name, code: s.code, price: 0, currency: "usd", image_url: s.image_attachments.first&.variant(:thumb)&.processed&.url }
-        }
-
-        payment_methods = page.branch.branch_payment_method_appointments
-          .includes(:payment_method)
-          .where(lifecycle_status: LIFECYCLE_STATUS.fetch(:active))
-          .reject { |appointment| appointment.payment_method.redirect? }
-          .map { |appointment| { id: appointment.id }.merge(appointment.payment_method.slice(:name, :code, :payment_mode, :strategy)) }
-
-        render json: {
-          page: format_page(page),
-          products: products,
-          services: services,
-          payment_methods: payment_methods
-        }
-      end
-    end
-  end
-
-  def edit
-    page = current_company.pages.includes(:branch).find(params[:id])
-
-    respond_to do |format|
-      format.html { render html: "", layout: true }
-      format.json { render json: { page: format_page(page) } }
-    end
-  end
-
-  def create
-    page = current_company.pages.new(page_params)
-    page.permission_resource_name = "Page"
-
-    if page.save
-      redirect_to company_page_path(current_company, page), notice: "Page created successfully."
-    else
-      redirect_to new_company_page_path(current_company),
-        alert: page.errors.full_messages.to_sentence
-    end
-  end
-
-  def update
+  def launch
     page = current_company.pages.find(params[:id])
+    appointment = Pages::AppointmentResolver.call(
+      company: current_company,
+      page: page,
+      employee: current_employee,
+      branch_id: params[:branch_id],
+      warehouse_id: params[:warehouse_id]
+    )
 
-    if page.update(page_params)
-      redirect_to company_page_path(current_company, page), notice: "Page updated successfully."
-    else
-      redirect_to edit_company_page_path(current_company, page),
-        alert: page.errors.full_messages.to_sentence
+    return render_launch_error("No active page appointment found for this location.") unless appointment
+    return render_launch_error("This page appointment is inactive.") unless appointment.workflow_status_active?
+    return render_launch_error("You do not have access to this page.", status: :forbidden) unless page.accessible_by?(current_employee)
+
+    launch_path = PageLaunchService.call(
+      company: current_company,
+      page: page,
+      appointment: appointment
+    )
+
+    respond_to do |format|
+      format.html { redirect_to launch_path }
+      format.json { render json: { launch_path: launch_path } }
     end
   end
 
   private
 
-  def page_params
-    params.require(:page).permit(
-      :name, :description, :branch_id, :target_role, :target_resolution,
-      :business_type, :lifecycle_status, :workflow_status, metadata: {}
-    )
+  def page_appointments
+    branch_appointments = current_company.branch_page_appointments.includes(:page, :branch).to_a
+    warehouse_appointments = current_company.page_warehouse_appointments.includes(:page, :warehouse).to_a
+
+    (branch_appointments + warehouse_appointments).sort_by do |appointment|
+      [
+        appointment.page.name.to_s.downcase,
+        appointment.is_a?(BranchPageAppointment) ? 0 : 1,
+        PageSerializer.location(appointment)[:name].to_s.downcase
+      ]
+    end
   end
 
-  def format_page(page)
-    page.as_json(only: %i[
-      id name code description target_role target_resolution
-      business_type lifecycle_status workflow_status metadata
-    ]).merge(
-      branch: { id: page.branch_id, name: page.branch.name }
-    )
+  def format_appointments(appointments)
+    appointments.map do |appointment|
+      PageSerializer.appointment(
+        appointment,
+        employee: current_employee,
+        launch_path: launch_path_for(appointment)
+      )
+    end
   end
 
-  def format_pages(pages)
-    pages.map { |page| format_page(page) }
+  def launch_path_for(appointment)
+    if appointment.is_a?(BranchPageAppointment)
+      launch_company_page_path(current_company, appointment.page, branch_id: appointment.branch_id)
+    else
+      launch_company_page_path(current_company, appointment.page, warehouse_id: appointment.warehouse_id)
+    end
+  end
+
+  def render_launch_error(message, status: :unprocessable_content)
+    respond_to do |format|
+      format.html do
+        redirect_to company_pages_path(current_company), alert: message
+      end
+      format.json { render json: { errors: [ message ] }, status: status }
+    end
   end
 end
