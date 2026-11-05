@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "bigdecimal/util"
-
 # PropertySlotValidationConcern — Atomic purpose: validates every configured
 # property_* slot against the limits of its real database column.
 #
@@ -13,6 +11,8 @@ require "bigdecimal/util"
 # range, decimal precision/scale, boolean inclusion, datetime validity).
 # Main associations: none directly; requires the includer to respond to
 # :property_mapping and the property_* columns.
+require "bigdecimal/util"
+
 module PropertySlotValidationConcern
   extend ActiveSupport::Concern
 
