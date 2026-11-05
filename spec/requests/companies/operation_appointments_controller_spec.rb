@@ -90,7 +90,7 @@ RSpec.describe "Company operation appointment updates", type: :request do
 
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
-      expect(body.fetch("message")).to eq("Operation appointment updated.")
+      expect(body.fetch("message")).to eq("Operation updated.")
       expect(body.fetch("appointment").fetch("workflow_status")).to eq("inactive")
       expect(appointment.reload.metadata).to eq("layout" => { "columns" => 6 })
       expect(appointment).to be_workflow_status_inactive
@@ -104,7 +104,7 @@ RSpec.describe "Company operation appointment updates", type: :request do
       }
 
       expect(response).to redirect_to(company_branch_operation_appointment_path(company, appointment))
-      expect(flash[:notice]).to eq("Operation appointment updated.")
+      expect(flash[:notice]).to eq("Operation updated.")
     end
 
     it "rejects an unknown workflow status" do

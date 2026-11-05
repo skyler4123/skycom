@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_04_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_04_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -4355,6 +4355,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000001) do
     t.integer "currency"
     t.integer "country"
     t.integer "timezone"
+    t.integer "operation_type", null: false
+    t.integer "resolution", null: false
     t.string "external_id"
     t.integer "lifecycle_status", null: false
     t.integer "workflow_status", null: false
@@ -4364,8 +4366,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000001) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "operation_type", null: false
-    t.integer "resolution", null: false
     t.index ["code"], name: "index_operations_on_code", unique: true
     t.index ["company_id", "operation_type", "resolution"], name: "index_operations_on_company_type_resolution", unique: true
     t.index ["company_id"], name: "index_operations_on_company_id"

@@ -25,11 +25,11 @@ class Companies::OperationAppointmentsController < Companies::ApplicationControl
 
     if appointment.update(appointment_params)
       respond_to do |format|
-        format.html { redirect_to appointment_path, notice: "Operation appointment updated." }
+        format.html { redirect_to appointment_path, notice: "Operation updated." }
         format.json do
           render json: {
             appointment: appointment_payload,
-            message: "Operation appointment updated."
+            message: "Operation updated."
           }
         end
       end

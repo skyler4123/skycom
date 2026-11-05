@@ -107,7 +107,7 @@ RSpec.describe "Company operations", type: :request do
       get pos_company_operations_path(company, operation, branch_id: branch.id), as: :json
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(JSON.parse(response.body).fetch("errors")).to include("This operation appointment is inactive.")
+      expect(JSON.parse(response.body).fetch("errors")).to include("This operation is inactive.")
     end
 
     it "rejects an operation type that does not match the route" do

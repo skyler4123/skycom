@@ -42,8 +42,8 @@ class Companies::Operations::BaseController < Companies::ApplicationController
       warehouse_id: params[:warehouse_id]
     )
 
-    return render_operation_error("No active operation appointment found for this location.") unless @appointment
-    render_operation_error("This operation appointment is inactive.") unless @appointment.workflow_status_active?
+    return render_operation_error("No active operation found for this location.") unless @appointment
+    render_operation_error("This operation is inactive.") unless @appointment.workflow_status_active?
   end
 
   def authorize_operation_roles!

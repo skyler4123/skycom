@@ -13,11 +13,11 @@ RSpec.feature "Companies::Operations index", type: :feature, js: true do
     sign_in(owner)
   end
 
-  scenario "lists branch and warehouse appointments without an Add button" do
+  scenario "lists operations for branches and warehouses without an Add button" do
     visit company_operations_path(company)
 
-    expect(page).to have_content("Operation Appointments", wait: 10)
-    expect(page).to have_content("Appointments connect an operation to a branch or warehouse. Appointment configs override Operation configs.")
+    expect(page).to have_selector("h2", exact_text: "Operations", wait: 10)
+    expect(page).to have_content("Each operation is available at your branches and warehouses. Launch it, or edit the settings for that location.")
     expect(page).to have_content("POS")
     expect(page).to have_content("Main Branch")
     expect(page).to have_content("Inventory")
@@ -25,7 +25,7 @@ RSpec.feature "Companies::Operations index", type: :feature, js: true do
     expect(page).not_to have_link("Add")
   end
 
-  scenario "filters operation appointments by type and location" do
+  scenario "filters operations by type and location" do
     visit company_operations_path(company)
 
     expect(page).to have_select("operation_type", wait: 10)
@@ -42,7 +42,7 @@ RSpec.feature "Companies::Operations index", type: :feature, js: true do
     end
   end
 
-  scenario "narrows local access roles for one appointment" do
+  scenario "narrows access roles for one location" do
     %w[Manager Cashier].each do |name|
       company.roles.find_by(name: name) || Seed::RoleService.create(company: company, name: name)
     end
@@ -54,10 +54,11 @@ RSpec.feature "Companies::Operations index", type: :feature, js: true do
 
     within(find("tr", text: "POS", wait: 10)) { find("a[href$='/edit']").click }
 
-    expect(page).to have_content("Local Access Roles", wait: 10)
+    expect(page).to have_content("Access Roles", wait: 10)
+    expect(page).not_to have_content(/Local Access Roles/i)
     find("button[aria-haspopup='listbox']").click
     uncheck "Cashier"
-    find("h2", text: "Appointment config").click
+    find("h2", exact_text: "Operation").click
     click_button "Save"
 
     expect(page).to have_current_path(company_branch_operation_appointment_path(company, appointment), wait: 10)
@@ -66,48 +67,59 @@ RSpec.feature "Companies::Operations index", type: :feature, js: true do
     expect(appointment.reload.metadata["roles"]).to eq([ "Manager" ])
   end
 
-  scenario "opens the appointment show page from the operation name" do
+  scenario "opens the operation show page from the operation name" do
     visit company_operations_path(company)
 
     within(find("tr", text: "POS", wait: 10)) { click_link "POS" }
 
-    expect(page).to have_content(/Appointment config/i, wait: 10)
-    expect(page).to have_content("Appointment config overrides Operation config. Company saves reset this local config.")
-    expect(page).to have_content(/Effective Config/i)
+    expect(page).to have_content(/Operation · Branch/i, wait: 10)
+    expect(page).to have_content("Settings here apply to this location. Saving the Operation config resets them.")
+    expect(page).not_to have_content(/Metadata \(JSON\)/i)
+    expect(page).not_to have_content(/Effective Config/i)
     expect(page).to have_content("Main Branch")
     expect(page).to have_link("Edit Config")
   end
 
-  scenario "edits appointment metadata and status on a full page" do
+  scenario "edits status without exposing metadata JSON" do
+    operation = company.operations.find_by!(operation_type: :pos)
+    appointment = branch.branch_operation_appointments.find_by!(operation: operation)
+    appointment.update!(metadata: appointment.metadata.merge("layout" => { "columns" => 6 }))
+
     visit company_operations_path(company)
 
     within(find("tr", text: "POS", wait: 10)) { find("a[href$='/edit']").click }
 
-    expect(page).to have_content("Appointment config", wait: 10)
-    find("textarea[name='metadata']").set('{"layout":{"columns":6}}')
+    find("h2", exact_text: "Operation", wait: 10)
+    expect(page).not_to have_content(/Other metadata \(JSON\)/i)
+    expect(page).not_to have_selector("textarea[name='metadata']")
     select "Inactive", from: "workflow_status"
     click_button "Save"
 
-    expect(page).to have_content("Operation appointment updated.", wait: 10)
-    expect(page).to have_content(/Appointment config/i, wait: 10)
+    expect(page).to have_current_path(company_branch_operation_appointment_path(company, appointment), wait: 10)
+    expect(page).to have_content("Operation updated.", wait: 10)
     expect(page).to have_content("Inactive")
-    expect(page).to have_content("columns")
+    expect(appointment.reload.metadata["layout"]).to eq({ "columns" => 6 })
   end
 
-  scenario "edits a warehouse appointment on a full page" do
+  scenario "edits a warehouse operation status and preserves hidden metadata" do
+    operation = company.operations.find_by!(operation_type: :inventory)
+    appointment = warehouse.operation_warehouse_appointments.find_by!(operation: operation)
+    appointment.update!(metadata: appointment.metadata.merge("bin" => "A1"))
+
     visit company_operations_path(company)
 
     within(find("tr", text: "Inventory", wait: 10)) { find("a[href$='/edit']").click }
 
-    expect(page).to have_content("Appointment config", wait: 10)
+    find("h2", exact_text: "Operation", wait: 10)
     expect(page).to have_content("Warehouse")
-    find("textarea[name='metadata']").set('{"bin":"A1"}')
+    expect(page).not_to have_selector("textarea[name='metadata']")
+    select "Inactive", from: "workflow_status"
     click_button "Save"
 
-    expect(page).to have_content("Operation appointment updated.", wait: 10)
-    expect(page).to have_content(/Appointment config/i, wait: 10)
-    expect(page).to have_content("Main Warehouse")
-    expect(page).to have_content("bin")
+    expect(page).to have_current_path(company_operation_warehouse_appointment_path(company, appointment), wait: 10)
+    expect(page).to have_content("Operation updated.", wait: 10)
+    expect(page).to have_content("Inactive")
+    expect(appointment.reload.metadata["bin"]).to eq("A1")
   end
 
   scenario "launches the POS operation with the branch appointment" do

@@ -42,7 +42,7 @@ export default class Companies_OperationConfigs_IndexController extends Companie
         <div class="p-4 bg-card rounded-xl border border-line flex flex-col gap-5">
           <div class="flex flex-col gap-1">
             <h2 class="text-xl font-bold text-foreground">${translate("Operation Configs")}</h2>
-            <p class="text-sm text-muted-foreground">${translate("Appointment configs override Operation configs. Saving an Operation resets every appointment config.")}</p>
+            <p class="text-sm text-muted-foreground">${translate("Company-wide operation settings. Saving a config here resets every branch and warehouse config.")}</p>
           </div>
 
           <form method="get" action="${pathname()}" class="flex flex-wrap items-end gap-3">
@@ -83,7 +83,7 @@ export default class Companies_OperationConfigs_IndexController extends Companie
                   <th class="text-left py-4 px-6 font-semibold text-foreground">${translate("Resolution")}</th>
                   <th class="text-left py-4 px-6 font-semibold text-foreground">${translate("Access Roles")}</th>
                   <th class="text-left py-4 px-6 font-semibold text-foreground">${translate("Status")}</th>
-                  <th class="text-left py-4 px-6 font-semibold text-foreground">${translate("Appointments")}</th>
+                  <th class="text-left py-4 px-6 font-semibold text-foreground">${translate("Locations")}</th>
                   <th class="text-right py-4 px-6 font-semibold text-foreground w-24">${translate("Actions")}</th>
                 </tr>
               </thead>

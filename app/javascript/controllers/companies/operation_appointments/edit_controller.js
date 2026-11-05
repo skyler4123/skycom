@@ -1,8 +1,8 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 // Shared edit page for branch and warehouse operation appointments.
-// Local roles may narrow the Operation roles; other metadata is edited as JSON.
-// Subclasses provide recordPath()/payloadKey().
+// Roles may narrow the Operation roles; other metadata is preserved but never
+// exposed as raw JSON. Subclasses provide recordPath()/payloadKey().
 // Depends on BE: Companies::BranchOperationAppointmentsController#show/#update,
 //                Companies::OperationWarehouseAppointmentsController#show/#update
 export default class Companies_OperationAppointments_EditController extends Companies_LayoutController {
@@ -36,7 +36,7 @@ export default class Companies_OperationAppointments_EditController extends Comp
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load operation appointment.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load operation.")}</div>`
           return true
         }
         return false
@@ -124,7 +124,7 @@ export default class Companies_OperationAppointments_EditController extends Comp
 
     return `
       <div class="space-y-1">
-        <label class="text-xs font-medium text-muted-foreground">${translate("Local Access Roles")}</label>
+        <label class="text-xs font-medium text-muted-foreground">${translate("Access Roles")}</label>
         <div class="relative" data-${this.identifier}-target="rolesPicker">
           <div class="flex min-h-10 w-full flex-wrap items-center gap-2 rounded-lg border border-line bg-card px-3 py-2 text-sm text-foreground focus-within:ring-2 focus-within:ring-primary" data-action="click->${this.identifier}#toggleRolesMenu">
             <div class="flex flex-1 flex-wrap items-center gap-1" data-${this.identifier}-target="rolesSummary">
@@ -134,7 +134,7 @@ export default class Companies_OperationAppointments_EditController extends Comp
               type="button"
               aria-haspopup="listbox"
               aria-expanded="false"
-              aria-label="${translate("Local Access Roles")}"
+              aria-label="${translate("Access Roles")}"
               data-${this.identifier}-target="rolesTrigger"
               class="inline-flex items-center justify-center rounded-md p-0.5 text-muted-foreground hover:bg-muted cursor-pointer"
             >
@@ -145,7 +145,7 @@ export default class Companies_OperationAppointments_EditController extends Comp
             ${optionsHTML}
           </div>
         </div>
-        <p class="text-xs text-muted-foreground">${translate("Local roles can only narrow access. Leave empty to inherit the Operation roles.")}</p>
+        <p class="text-xs text-muted-foreground">${translate("Roles can only narrow access. Leave empty to inherit the Operation roles.")}</p>
       </div>
     `
   }
@@ -179,34 +179,25 @@ export default class Companies_OperationAppointments_EditController extends Comp
 
   contentHTML() {
     const appointment = this.appointment
-    if (!appointment) return `<div class="p-8 text-center">${translate("Operation appointment not found.")}</div>`
+    if (!appointment) return `<div class="p-8 text-center">${translate("Operation not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
     const operation = appointment.operation || {}
-    const otherMetadata = { ...(appointment.metadata || {}) }
-    delete otherMetadata.roles
-    const metadata = JSON.stringify(otherMetadata, null, 2)
     const selectedRoles = this.initialRoles()
     const status = appointment.workflow_status || "active"
 
     const fields = `
       <div class="space-y-5">
         <div>
-          <h2 class="text-xl font-bold text-foreground">${translate("Appointment config")}</h2>
+          <h2 class="text-xl font-bold text-foreground">${translate("Operation")}</h2>
           <p class="text-sm text-muted-foreground">${Helpers.escapeHtml(operation.name || "")} · ${Helpers.escapeHtml(appointment.location?.name || "")}</p>
         </div>
 
         <div class="rounded-lg border border-line bg-muted/40 p-3 text-xs text-muted-foreground">
-          ${translate("Appointment config overrides Operation config. Company saves reset this local config.")}
+          ${translate("Settings here apply to this location. Saving the Operation config resets them.")}
         </div>
 
         ${this.rolePickerHTML(selectedRoles)}
-
-        <div class="space-y-1">
-          <label class="text-xs font-medium text-muted-foreground">${translate("Other metadata (JSON)")}</label>
-          <textarea name="metadata" rows="8"
-            class="w-full px-3 py-2 font-mono text-xs border border-line rounded-lg bg-card text-foreground focus:ring-2 focus:ring-primary outline-none">${Helpers.escapeHtml(metadata)}</textarea>
-        </div>
 
         <div class="space-y-1">
           <label for="workflow_status" class="text-xs font-medium text-muted-foreground">${translate("Status")}</label>
@@ -246,18 +237,10 @@ export default class Companies_OperationAppointments_EditController extends Comp
     event.preventDefault()
 
     const formData = new FormData(event.target)
-    let metadata
-    try {
-      metadata = JSON.parse(formData.get("metadata") || "{}")
-    } catch {
-      toast({ type: "error", message: translate("Invalid JSON") })
-      return
+    const metadata = {
+      ...(this.appointment?.metadata || {}),
+      roles: formData.getAll("operation_appointment_roles[]")
     }
-    if (!metadata || Array.isArray(metadata) || typeof metadata !== "object") {
-      toast({ type: "error", message: translate("Metadata must be a JSON object") })
-      return
-    }
-    metadata.roles = formData.getAll("operation_appointment_roles[]")
 
     const pathParts = window.location.pathname.split("/")
     const companyId = pathParts[2]
@@ -279,7 +262,7 @@ export default class Companies_OperationAppointments_EditController extends Comp
         message: response.message
       })
     } catch (error) {
-      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to update operation appointment.") })
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to update operation.") })
     }
   }
 }

@@ -175,7 +175,7 @@ RSpec.describe "Companies::OperationsController", type: :request do
       get launch_company_operation_path(company, pos_operation, branch_id: branch.id), as: :json
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(JSON.parse(response.body).fetch("errors")).to include("This operation appointment is inactive.")
+      expect(JSON.parse(response.body).fetch("errors")).to include("This operation is inactive.")
     end
 
     it "rejects an operation whose roles do not match the employee" do

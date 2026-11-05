@@ -16,7 +16,7 @@ RSpec.feature "Mobile Operations", type: :feature, js: true do
     )
   end
 
-  scenario "lists every accessible operation appointment for the current company" do
+  scenario "lists every accessible operation for the current company" do
     sign_in(user)
     visit mobile_company_operations_path(company)
 
@@ -31,7 +31,7 @@ RSpec.feature "Mobile Operations", type: :feature, js: true do
     expect(page).not_to have_content("Retail cashier")
   end
 
-  scenario "does not list another company's operation appointments" do
+  scenario "does not list another company's operations" do
     other_company = create(:company)
     other_branch = create(:branch, company: other_company, name: "Other Branch")
     other_operation = create(:operation, company: other_company, branch: other_branch, name: "Other Company Operation")
@@ -44,14 +44,14 @@ RSpec.feature "Mobile Operations", type: :feature, js: true do
     expect(page).not_to have_content("Other Branch")
   end
 
-  scenario "shows an empty state when the company has no operation appointments" do
+  scenario "shows an empty state when the company has no operations" do
     empty_company = create(:company)
     sign_in(empty_company.user)
 
     visit mobile_company_operations_path(empty_company)
 
-    expect(page).to have_content("No operation appointments yet")
-    expect(page).to have_content("Appointments are created when branches or warehouses are added.")
+    expect(page).to have_content("No operations yet")
+    expect(page).to have_content("Add a branch or warehouse to start using operations.")
   end
 
   scenario "redirects an employee without Operation read to home" do

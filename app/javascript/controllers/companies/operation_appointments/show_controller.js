@@ -32,7 +32,7 @@ export default class Companies_OperationAppointments_ShowController extends Comp
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load operation appointment.")}</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-danger">${translate("Failed to load operation.")}</div>`
           return true
         }
         return false
@@ -50,13 +50,11 @@ export default class Companies_OperationAppointments_ShowController extends Comp
 
   contentHTML() {
     const appointment = this.appointment
-    if (!appointment) return `<div class="p-8 text-center">${translate("Operation appointment not found.")}</div>`
+    if (!appointment) return `<div class="p-8 text-center">${translate("Operation not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
     const operation = appointment.operation || {}
     const roles = Array.isArray(appointment.access_roles) ? appointment.access_roles : []
-    const metadata = JSON.stringify(appointment.metadata || {}, null, 2)
-    const effectiveConfig = JSON.stringify(appointment.effective_config || {}, null, 2)
     const canLaunch = appointment.workflow_status === "active" && appointment.accessible
 
     return `
@@ -64,7 +62,7 @@ export default class Companies_OperationAppointments_ShowController extends Comp
         <div class="p-6 bg-card rounded-xl border border-line">
           <a href="${Helpers.company_operations_path(companyId)}" class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
             <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
-            ${translate("Back to Operation Appointments")}
+            ${translate("Back to Operations")}
           </a>
 
           <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
@@ -73,7 +71,7 @@ export default class Companies_OperationAppointments_ShowController extends Comp
                 <span class="material-symbols-outlined text-3xl">${this.kind === "branch" ? "storefront" : "warehouse"}</span>
               </div>
               <div>
-                <p class="text-xs font-bold uppercase text-muted-foreground">${translate("Appointment config")} · ${translate(this.kind === "branch" ? "Branch" : "Warehouse")}</p>
+                <p class="text-xs font-bold uppercase text-muted-foreground">${translate("Operation")} · ${translate(this.kind === "branch" ? "Branch" : "Warehouse")}</p>
                 <h2 class="text-2xl font-black text-foreground">${Helpers.escapeHtml(operation.name || translate("Unnamed Operation"))}</h2>
                 <p class="font-mono text-sm text-muted-foreground">${Helpers.escapeHtml(operation.code || "—")} · ${Helpers.escapeHtml(appointment.location?.name || "—")}</p>
               </div>
@@ -84,7 +82,7 @@ export default class Companies_OperationAppointments_ShowController extends Comp
           </div>
 
           <div class="rounded-lg border border-line bg-muted/40 p-3 text-xs text-muted-foreground mb-6">
-            ${translate("Appointment config overrides Operation config. Company saves reset this local config.")}
+            ${translate("Settings here apply to this location. Saving the Operation config resets them.")}
           </div>
 
           <div class="grid grid-cols-1 gap-4 border-t border-line pt-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -110,18 +108,6 @@ export default class Companies_OperationAppointments_ShowController extends Comp
                   ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-line">${translate("All roles")}</span>`
                   : roles.map(role => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">${Helpers.escapeHtml(role)}</span>`).join("")}
               </div>
-            </div>
-          </div>
-
-          <div class="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <div class="rounded-lg border border-line bg-muted/30 p-4">
-              <p class="text-[10px] font-bold uppercase text-muted-foreground">${translate("Metadata (JSON)")}</p>
-              <pre class="mt-2 overflow-x-auto text-xs font-mono text-foreground">${Helpers.escapeHtml(metadata)}</pre>
-            </div>
-
-            <div class="rounded-lg border border-line bg-muted/30 p-4">
-              <p class="text-[10px] font-bold uppercase text-muted-foreground">${translate("Effective Config")}</p>
-              <pre class="mt-2 overflow-x-auto text-xs font-mono text-foreground">${Helpers.escapeHtml(effectiveConfig)}</pre>
             </div>
           </div>
 

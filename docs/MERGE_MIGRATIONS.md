@@ -12,7 +12,7 @@ A **merge migration** is *not* a Rails feature. It is a manual housekeeping comm
 2. **Deletes** the now-redundant incremental migration file(s).
 3. **Rewinds** `db/schema.rb`'s `define(version:)` to the newest *surviving* migration timestamp.
 
-Result: the table's full definition lives in **one place**, not scattered across `create_*` + several `add_*` patches. `db/migrate` stays lean (currently 217 files) and readable.
+Result: the table's full definition lives in **one place**, not scattered across `create_*` + several `add_*` patches. `db/migrate` stays lean (currently 219 files) and readable.
 
 | Before merge | After merge |
 |---|---|
@@ -167,6 +167,7 @@ In CI, clear the DB cache or force `db:schema:load` so `schema_migrations` match
 | `6e567cd4` (2026-07-13) | `add_billing_enums_to_invoices` (`movement_type`, `target_balance`, `created_by` + indexes) | Folded into `create_billing_invoices.rb` above System Fields; `add_*` deleted, `schema.rb` version rewound `2026_07_12_101603` → `2026_07_02_190003`. |
 | `05e8c0e2` (2026-10-17) | `add_external_id_to_all_tables` (201 tables) + `add_profile_name_uniqueness` + `add_title_body_to_promo_campaigns` + `rename_notification_title_body` + dead settings migrations | `external_id` folded into every app `create_*` (pinned short index name kept for `subscription_group_subscription_plan_appointments`); profile/subprofile unique indexes, promo `title`/`body` and notifications `name`/`description` folded into their creates; dead settings creates + drop migration removed; `schema.rb` version rewound `2026_10_17_000001` → `2026_10_16_000004`; reset via `db:migrate:primary` + `db:schema:load:{queue,cable,cache}` (read-only guard, §5). |
 | uncommitted (2026-11-02) | `add_manager_to_employee_groups`, `remove_manager_from_employees`, `remove_debt_from_company_wallets`, `adjust_import_foreign_keys`, `add_employee_to_orders` | manager folded into `create_employee_groups`; its FK lives in `create_employees` because `employee_groups` is created first; `employees.manager_id` removed; wallet `debt_credit_balance` removed; import creator/category FKs nullify; order employee ref + composite index folded into `create_orders`. `schema.rb` version unchanged (`2026_11_01_000005`). Empty-DB schema auto-load discovered (§5). |
+| uncommitted (2026-11-04) | `refactor_operations_to_company_purpose` (`operations` branch/role config → `operation_type`/`resolution`; new branch/warehouse appointment tables) | operations final shape folded into `create_operations` above System Fields; the two appointment tables split into `create_branch_operation_appointments` / `create_operation_warehouse_appointments`; refactor migration deleted; `schema.rb` version `2026_11_04_000001` → `2026_11_04_000002`. |
 
 ---
 
