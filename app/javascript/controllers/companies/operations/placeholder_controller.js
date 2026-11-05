@@ -45,7 +45,7 @@ export default class Companies_Operations_PlaceholderController extends Controll
           </div>
 
           <div class="rounded-lg border border-line bg-background p-4 text-sm text-muted-foreground">
-            ${translate("This operation is scaffolded. The operation type, appointment, access roles and config are already wired.")}
+            ${translate("This operation is scaffolded. The operation type, access roles and config are already wired.")}
           </div>
 
           <div class="grid grid-cols-2 gap-3">
@@ -62,7 +62,7 @@ export default class Companies_Operations_PlaceholderController extends Controll
           <a href="${Helpers.company_operations_path(window.location.pathname.split("/")[2])}"
             class="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline cursor-pointer">
             <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-            ${translate("Back to Operation Appointments")}
+            ${translate("Back to Operations")}
           </a>
         </div>
       </div>

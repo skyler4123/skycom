@@ -163,11 +163,11 @@ role requires updating operation configs.
 
 Role names are edited through the **Access Roles** multi-select on the Operation
 config edit page (`/companies/:company_id/operation_configs/:id/edit`). The picker
-reads the company's roles from the client cache. The appointment edit page gets a
-**Local Access Roles** picker restricted to the Operation roles (or all company roles
-when the Operation allows all); its JSON textarea edits only the non-role metadata.
-Only `metadata["roles"]` is editable on the Operation config; every other key already
-present in `operation.metadata` is preserved when the form is saved.
+reads the company's roles from the client cache. The location edit page gets an
+**Access Roles** picker restricted to the Operation roles (or all company roles
+when the Operation allows all), plus a status selector. Only `metadata["roles"]`
+is editable there; every other key already present in the appointment metadata is
+preserved when the form is saved. Raw metadata is never exposed in the UI.
 
 ---
 
@@ -175,8 +175,8 @@ present in `operation.metadata` is preserved when the form is saved.
 
 | Surface | Stimulus controller | Backend |
 |---|---|---|
-| Operation Appointments | `Companies_Operations_IndexController` (`companies--operations--index`) | `Companies::OperationsController#index/launch` |
-| Appointment details / edit | `Companies_BranchOperationAppointments_ShowController` / `Companies_BranchOperationAppointments_EditController` (and the warehouse pair) | `BranchOperationAppointmentsController` / `OperationWarehouseAppointmentsController` |
+| Operations (one row per location) | `Companies_Operations_IndexController` (`companies--operations--index`) | `Companies::OperationsController#index/launch` |
+| Operation details / edit (branch and warehouse) | `Companies_BranchOperationAppointments_ShowController` / `Companies_BranchOperationAppointments_EditController` (and the warehouse pair) | `BranchOperationAppointmentsController` / `OperationWarehouseAppointmentsController` |
 | Operation Configs | `Companies_OperationConfigs_IndexController` (`companies--operation-configs--index`) | `Companies::OperationConfigsController#index` |
 | Operation config details / edit | `Companies_OperationConfigs_ShowController` / `Companies_OperationConfigs_EditController` | `Companies::OperationConfigsController#show/edit/update` |
 | POS | `Companies_Operations_Pos_ShowController` (`companies--operations--pos--show`) | `Companies::Operations::PosController#show` |
@@ -191,12 +191,13 @@ list pages have GET filter bars:
 
 The Operation config edit page edits company access roles with a multi-select role
 picker (the company's roles come from the client cache); it never exposes raw JSON.
-The appointment edit page has a **Local Access Roles** picker restricted to the
-Operation roles (or all company roles when the Operation allows all) and a JSON
-textarea for the remaining local metadata. The Operations index has no Add button.
-It lists appointments; Launch is disabled when the appointment is inactive or the
-employee lacks the effective appointment roles. Operation Configs has no Add button
-and warns that saving an Operation resets every branch/warehouse appointment config.
+The location edit page has an **Access Roles** picker restricted to the Operation
+roles (or all company roles when the Operation allows all) plus a status selector.
+It never exposes raw JSON; other metadata keys are preserved but not editable.
+The Operations index has no Add button. It lists one row per branch/warehouse
+location; Launch is disabled when the location is inactive or the employee lacks
+the effective roles. Operation Configs has no Add button and warns that saving a
+config here resets every branch and warehouse config.
 
 ---
 

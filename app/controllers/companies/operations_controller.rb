@@ -35,8 +35,8 @@ class Companies::OperationsController < Companies::ApplicationController
       warehouse_id: params[:warehouse_id]
     )
 
-    return render_launch_error("No active operation appointment found for this location.") unless appointment
-    return render_launch_error("This operation appointment is inactive.") unless appointment.workflow_status_active?
+    return render_launch_error("No active operation found for this location.") unless appointment
+    return render_launch_error("This operation is inactive.") unless appointment.workflow_status_active?
     return render_launch_error("You do not have access to this operation.", status: :forbidden) unless operation.accessible_by?(current_employee, appointment: appointment)
 
     launch_path = OperationLaunchService.call(

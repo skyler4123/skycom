@@ -18,7 +18,7 @@ RSpec.feature "Companies::OperationConfigs index", type: :feature, js: true do
     visit company_operation_configs_path(company)
 
     expect(page).to have_content("Operation Configs", wait: 10)
-    expect(page).to have_content("Appointment configs override Operation configs. Saving an Operation resets every appointment config.")
+    expect(page).to have_content("Company-wide operation settings. Saving a config here resets every branch and warehouse config.")
     expect(page).to have_content("POS")
     expect(page).to have_content("Inventory")
     expect(page).not_to have_link("Add")
@@ -46,8 +46,9 @@ RSpec.feature "Companies::OperationConfigs index", type: :feature, js: true do
     within(find("tr", text: "POS", wait: 10)) { click_link "POS" }
 
     expect(page).to have_content(/Operation Config/i, wait: 10)
-    expect(page).to have_content("Saving this config resets every branch/warehouse appointment config.")
-    expect(page).to have_content(/Metadata \(JSON\)/i)
+    expect(page).to have_content("Saving config here resets every branch and warehouse config.")
+    expect(page).to have_content(/Locations/i)
+    expect(page).not_to have_content(/Metadata \(JSON\)/i)
     expect(page).to have_link("Edit Config")
   end
 
@@ -59,7 +60,7 @@ RSpec.feature "Companies::OperationConfigs index", type: :feature, js: true do
 
     within(find("tr", text: "POS", wait: 10)) { find("a[href$='/edit']").click }
 
-    expect(page).to have_content("Saving this config resets every branch/warehouse appointment config.", wait: 10)
+    expect(page).to have_content("Saving config here resets every branch and warehouse config.", wait: 10)
     expect(page).to have_content("Leave empty to allow every role to use this operation.")
     find("button[aria-haspopup='listbox']").click
     check "Config Auditor"

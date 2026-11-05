@@ -97,6 +97,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - **Constants** — All app-wide constants must be in `config/initializers/constants.rb`, never hardcoded inline. See `docs/CONSTANTS.md`.
 - **Client cache** — If any mutation affects data stored in `currentCompany()` (branches, roles, categories, permissions, features, etc.), call `clearClientCacheAndReload()` after the server confirms the change, OR call `clearClientCache()` followed by a page reload.
 - **Language (mandatory)** — Every new or changed user-facing string must be added to `app/javascript/controllers/helpers/dictionary.js` with a Vietnamese translation. See `docs/LANGUAGE.md`. Missing entries break `translate()` output.
+- **Metadata editing** — Never edit JSON/metadata through a textarea in a user-facing form. Give every editable metadata key its own typed input (text, number, select, checkbox, …) and preserve keys the form does not own. See "Metadata & JSON editing" below.
 - **Semantic colors (mandatory)** — Use only the semantic tokens (`bg-card`, `text-foreground`, `text-muted-foreground`, `border-line`, `bg-primary`, `text-danger`, …). Never raw palette classes (`bg-white`, `text-slate-500`, `border-slate-200`, `text-white`) and never `dark:` on a themed color — the CSS variable switches itself. `bin/check_colors --strict` enforces this. See `docs/STYLING_GUIDELINES.md`.
 - **Dark mode & grouping** — Every UI group (title+value, card, dropdown, table, section) must have a border (`border border-line`) or distinct background (`bg-card` / `bg-muted`). One class covers both modes; do not add `dark:` variants. See `docs/STYLING_GUIDELINES.md` §3 and §5.
 - **BE↔FE link** — When you add, remove, or change an endpoint, update the file-header link comments in **both** the BE controller (`Serves Stimulus:`) and the FE Stimulus controller (`Depends on BE:` / `Endpoints:`). See the template in `V1Controller`, `OrdersController`, `PagesController`, `MockQrGatewayController`, `RetailCashierController`. Links are living — remove stale pairs, add new ones per feature.
@@ -125,6 +126,12 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - Each controller owns `handleSubmit(event)`: `preventDefault` → `FormData` reads → `fetchJson` → `toast` / `closeModal()` / `reloadThenToast()`. There is no central form controller and no `form:success` event
 - **API Errors** — Backend must return `errors` (plural array) key, never `error` (singular). See `docs/API_ERROR_FORMAT.md`.
 - **Toast messages** — Never use generic hardcoded messages. Always use the server's response (e.g., `response.message` for success, `error.errors` for failure). The message must describe the exact action completed so the client knows what happened. Prefer messages returned from the Backend (BE).
+
+### Metadata & JSON editing
+- **Never** expose a raw JSON textarea in a user-facing create/edit form. Give every editable metadata key its own typed input (text, number, select, checkbox, …) with a label and validation, so users click instead of writing JSON.
+- Preserve metadata keys the form does not own — load the existing hash and replace only the edited keys on save.
+- Raw JSON `<pre>` blocks belong on developer/debug surfaces only, not normal detail pages.
+- Existing JSON textareas outside this feature area are grandfathered until their feature is next touched — do not refactor unrelated code just for this rule.
 
 ## Database
 - Check `db/schema.rb` first for columns/indexes

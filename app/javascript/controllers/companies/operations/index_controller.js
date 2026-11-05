@@ -1,6 +1,6 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
-// Companies_Operations_IndexController — operation appointment list.
+// Companies_Operations_IndexController — operation list, one row per branch/warehouse location.
 // Depends on BE: Companies::OperationsController#index
 // Endpoints: GET /companies/:company_id/operations(.json?q=&operation_type=&workflow_status=&location=)
 export default class Companies_Operations_IndexController extends Companies_LayoutController {
@@ -18,7 +18,7 @@ export default class Companies_Operations_IndexController extends Companies_Layo
       this.filters = response.filters || {}
     } catch (error) {
       const detail = error.errors?.join(", ") || error.message
-      toast({ type: "error", message: `${translate("Failed to load operation appointments")}${detail ? ": " + detail : ""}` })
+      toast({ type: "error", message: `${translate("Failed to load operations")}${detail ? ": " + detail : ""}` })
     }
 
     poll(() => {
@@ -45,14 +45,14 @@ export default class Companies_Operations_IndexController extends Companies_Layo
       <div class="p-4 overflow-y-auto">
         <div class="p-4 bg-card rounded-xl border border-line flex flex-col gap-5">
           <div class="flex flex-col gap-1">
-            <h2 class="text-xl font-bold text-foreground">${translate("Operation Appointments")}</h2>
-            <p class="text-sm text-muted-foreground">${translate("Appointments connect an operation to a branch or warehouse. Appointment configs override Operation configs.")}</p>
+            <h2 class="text-xl font-bold text-foreground">${translate("Operations")}</h2>
+            <p class="text-sm text-muted-foreground">${translate("Each operation is available at your branches and warehouses. Launch it, or edit the settings for that location.")}</p>
           </div>
 
           <form method="get" action="${pathname()}" class="flex flex-wrap items-end gap-3">
             <div class="flex flex-col gap-1">
               <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Search")}</label>
-              <input type="text" name="q" value="${Helpers.escapeHtml(urlParams.get("q") || "")}" placeholder="${translate("Search operation appointments...")}" class="pl-3 pr-3 py-2 text-sm border border-line rounded-lg bg-card text-foreground">
+              <input type="text" name="q" value="${Helpers.escapeHtml(urlParams.get("q") || "")}" placeholder="${translate("Search operations...")}" class="pl-3 pr-3 py-2 text-sm border border-line rounded-lg bg-card text-foreground">
             </div>
             <div class="flex flex-col gap-1">
               <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Type")}</label>
@@ -93,7 +93,7 @@ export default class Companies_Operations_IndexController extends Companies_Layo
               </thead>
               <tbody>
                 ${this.appointments.length === 0
-                  ? `<tr><td colspan="7" class="py-8 text-center text-muted-foreground">${translate("No operation appointments found.")}</td></tr>`
+                  ? `<tr><td colspan="7" class="py-8 text-center text-muted-foreground">${translate("No operations found.")}</td></tr>`
                   : this.appointments.map(appointment => this.rowHTML(appointment)).join("")}
               </tbody>
             </table>
@@ -122,7 +122,7 @@ export default class Companies_Operations_IndexController extends Companies_Layo
     const canLaunch = active && appointment.accessible
     const launchReason = !appointment.accessible
       ? translate("You do not have access to this operation.")
-      : translate("This operation appointment is inactive.")
+      : translate("This operation is inactive.")
     const roles = Array.isArray(appointment.access_roles) ? appointment.access_roles : []
 
     return `

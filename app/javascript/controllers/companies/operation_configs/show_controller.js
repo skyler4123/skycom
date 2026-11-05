@@ -41,7 +41,6 @@ export default class Companies_OperationConfigs_ShowController extends Companies
 
     const companyId = window.location.pathname.split("/")[2]
     const roles = Array.isArray(c.metadata?.roles) ? c.metadata.roles : []
-    const metadata = JSON.stringify(c.metadata || {}, null, 2)
     const appointmentCount = (c.branch_appointment_count || 0) + (c.operation_warehouse_appointment_count || 0)
 
     return `
@@ -69,7 +68,7 @@ export default class Companies_OperationConfigs_ShowController extends Companies
           </div>
 
           <div class="rounded-lg border border-warning/20 bg-warning/10 p-3 text-xs text-warning mb-6">
-            ${translate("Saving this config resets every branch/warehouse appointment config.")}
+            ${translate("Saving config here resets every branch and warehouse config.")}
           </div>
 
           <div class="grid grid-cols-1 gap-4 border-t border-line pt-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -84,7 +83,7 @@ export default class Companies_OperationConfigs_ShowController extends Companies
             </div>
 
             <div class="rounded-lg border border-line bg-background p-4">
-              <p class="text-[10px] font-bold uppercase text-muted-foreground">${translate("Appointments")}</p>
+              <p class="text-[10px] font-bold uppercase text-muted-foreground">${translate("Locations")}</p>
               <p class="text-sm font-semibold text-foreground">${appointmentCount}</p>
             </div>
 
@@ -96,11 +95,6 @@ export default class Companies_OperationConfigs_ShowController extends Companies
                   : roles.map(role => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">${Helpers.escapeHtml(role)}</span>`).join("")}
               </div>
             </div>
-          </div>
-
-          <div class="mt-6 rounded-lg border border-line bg-muted/30 p-4">
-            <p class="text-[10px] font-bold uppercase text-muted-foreground">${translate("Metadata (JSON)")}</p>
-            <pre class="mt-2 overflow-x-auto text-xs font-mono text-foreground">${Helpers.escapeHtml(metadata)}</pre>
           </div>
 
           <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-line">

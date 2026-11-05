@@ -11,7 +11,7 @@
         </span>
         <div class="min-w-0">
           <p class="truncate text-sm font-bold text-foreground"><%= @company.name %></p>
-          <p class="text-xs text-muted-foreground">Operation appointments for this company</p>
+          <p class="text-xs text-muted-foreground">Operations for this company</p>
         </div>
       </div>
       <span class="shrink-0 rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
@@ -57,7 +57,7 @@
         </section>
       <% end %>
     <% else %>
-      <%= render "mobile/shared/empty_state", title: "No operation appointments yet", hint: "Appointments are created when branches or warehouses are added.", icon: "apps" %>
+      <%= render "mobile/shared/empty_state", title: "No operations yet", hint: "Add a branch or warehouse to start using operations.", icon: "apps" %>
     <% end %>
   </div>
 </main>
