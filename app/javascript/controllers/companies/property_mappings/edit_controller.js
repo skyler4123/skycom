@@ -4,7 +4,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
   /** @type {any | null} */
   mapping = null
 
-  /** @type {Array<{key: string, name: string}>} */
+  /** @type {Array<{key: string, name: string, type?: string}>} */
   propertyMetadata = []
 
   async connect() {
@@ -47,46 +47,8 @@ export default class Companies_PropertyMappings_EditController extends Companies
     const allPropertyKeys = this.allPropertySlots()
     const availableSlots = allPropertyKeys.filter(s => !usedKeys.has(s.key))
 
-    const rowsHTML = this.propertyMetadata.map((field, index) => `
-      <tr class="border-b border-line last:border-0">
-        <td class="py-3 px-4 text-sm">
-          <span class="font-mono text-xs bg-muted px-2 py-1 rounded text-muted-foreground">${field.key}</span>
-          <input type="hidden" name="property_mapping[metadata][properties][${index}][key]" value="${field.key}">
-        </td>
-        <td class="py-3 px-4">
-          <input type="text" name="property_mapping[metadata][properties][${index}][name]" value="${field.name || ''}"
-            placeholder="Display Name"
-            class="w-full px-2 py-1 text-sm border border-line rounded bg-card text-foreground">
-        </td>
-        <td class="py-3 px-4">
-          <textarea name="property_mapping[metadata][properties][${index}][validates]" rows="3"
-            class="w-full min-w-[200px] px-2 py-1 text-xs font-mono border border-line rounded bg-card text-foreground resize-y">${JSON.stringify(field.validates || {}, null, 2)}</textarea>
-        </td>
-        <td class="py-3 px-4 text-right">
-          <button type="button" data-action="click->${this.identifier}#removeProperty" data-index="${index}"
-            class="inline-flex items-center justify-center p-1.5 text-danger hover:text-danger hover:bg-danger/10 rounded-lg cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]!">delete</span>
-          </button>
-        </td>
-      </tr>
-    `).join('')
-
-    const extraRowsHTML = this.extraColumns.map((field, index) => `
-      <div class="grid grid-cols-4 gap-2 items-center">
-        <span class="font-mono text-xs bg-muted px-2 py-1 rounded text-muted-foreground">${field.key}</span>
-        <input type="hidden" name="property_mapping[metadata][extra_columns][${index}][key]" value="${field.key}">
-        <input type="text" name="property_mapping[metadata][extra_columns][${index}][name]" value="${field.name || ''}" placeholder="Display Name"
-          class="px-2 py-1 text-sm border border-line rounded bg-card text-foreground">
-        <select name="property_mapping[metadata][extra_columns][${index}][type]"
-          class="px-2 py-1 text-sm border border-line rounded bg-card text-foreground">
-          ${['string','integer','decimal','boolean','datetime'].map(t => `<option value="${t}" ${field.type === t ? 'selected' : ''}>${t}</option>`).join('')}
-        </select>
-        <button type="button" data-action="click->${this.identifier}#removeExtraColumn" data-index="${index}"
-          class="inline-flex items-center justify-center p-1.5 text-danger hover:text-danger hover:bg-danger/10 rounded-lg cursor-pointer">
-          <span class="material-symbols-outlined text-[18px]!">delete</span>
-        </button>
-      </div>
-    `).join('')
+    const rowsHTML = this.propertyMetadata.map((field, index) => this.propertyRowHTML(field, index)).join('')
+    const extraRowsHTML = this.extraColumns.map((field, index) => this.extraRowHTML(field, index)).join('')
 
     const addDropdownHTML = availableSlots.length > 0 ? `
       <div class="flex items-center gap-2 mt-3">
@@ -103,7 +65,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
     const fields = `
       <div class="space-y-6">
         <h2 class="text-xl font-bold text-foreground">${translate("Edit Property Mapping")}</h2>
-        <p class="text-sm text-muted-foreground">${translate("Add, remove, update, or add validation rules for columns of this category.")}</p>
+        <p class="text-sm text-muted-foreground">${translate("Add, remove, or rename the columns for this category. Values are validated against the limits of each column type.")}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
@@ -142,8 +104,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
                 <tr class="text-sm text-muted-foreground bg-muted border-b border-line">
                   <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Key")}</th>
                   <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Name")}</th>
-                  <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Name")}</th>
-                  <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Validates")}</th>
+                  <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Type")}</th>
                   <th class="py-3 px-4 font-medium text-right whitespace-nowrap">${translate("Actions")}</th>
                 </tr>
               </thead>
@@ -195,14 +156,64 @@ export default class Companies_PropertyMappings_EditController extends Companies
     `
   }
 
+  propertyRowHTML(field, index) {
+    const type = field.type || this.typeForKey(field.key)
+
+    return `
+      <tr class="border-b border-line last:border-0">
+        <td class="py-3 px-4 text-sm">
+          <span class="font-mono text-xs bg-muted px-2 py-1 rounded text-muted-foreground">${field.key}</span>
+          <input type="hidden" name="property_mapping[metadata][properties][${index}][key]" value="${field.key}">
+          <input type="hidden" name="property_mapping[metadata][properties][${index}][type]" value="${type}">
+        </td>
+        <td class="py-3 px-4">
+          <input type="text" name="property_mapping[metadata][properties][${index}][name]" value="${field.name || ''}"
+            placeholder="Display Name"
+            class="w-full px-2 py-1 text-sm border border-line rounded bg-card text-foreground">
+        </td>
+        <td class="py-3 px-4">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">${type}</span>
+        </td>
+        <td class="py-3 px-4 text-right">
+          <button type="button" data-action="click->${this.identifier}#removeProperty" data-index="${index}"
+            class="inline-flex items-center justify-center p-1.5 text-danger hover:text-danger hover:bg-danger/10 rounded-lg cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]!">delete</span>
+          </button>
+        </td>
+      </tr>
+    `
+  }
+
+  extraRowHTML(field, index) {
+    return `
+      <div class="grid grid-cols-4 gap-2 items-center">
+        <span class="font-mono text-xs bg-muted px-2 py-1 rounded text-muted-foreground">${field.key}</span>
+        <input type="hidden" name="property_mapping[metadata][extra_columns][${index}][key]" value="${field.key}">
+        <input type="text" name="property_mapping[metadata][extra_columns][${index}][name]" value="${field.name || ''}" placeholder="Display Name"
+          class="px-2 py-1 text-sm border border-line rounded bg-card text-foreground">
+        <select name="property_mapping[metadata][extra_columns][${index}][type]"
+          class="px-2 py-1 text-sm border border-line rounded bg-card text-foreground">
+          ${['string','integer','decimal','boolean','datetime'].map(t => `<option value="${t}" ${field.type === t ? 'selected' : ''}>${t}</option>`).join('')}
+        </select>
+        <button type="button" data-action="click->${this.identifier}#removeExtraColumn" data-index="${index}"
+          class="inline-flex items-center justify-center p-1.5 text-danger hover:text-danger hover:bg-danger/10 rounded-lg cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]!">delete</span>
+        </button>
+      </div>
+    `
+  }
+
   addProperty() {
     const select = document.getElementById('new-property-slot')
     if (!select || !select.value) return
 
+    const slot = this.allPropertySlots().find(s => s.key === select.value)
+    if (!slot) return
+
     this.propertyMetadata.push({
-      key: select.value,
+      key: slot.key,
       name: '',
-      validates: '{}'
+      type: slot.type
     })
 
     this.rerenderEditor()
@@ -225,29 +236,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
     const allKeys = this.allPropertySlots()
     const availableSlots = allKeys.filter(s => !usedKeys.has(s.key))
 
-    tbody.innerHTML = this.propertyMetadata.map((field, index) => `
-      <tr class="border-b border-line last:border-0">
-        <td class="py-3 px-4 text-sm">
-          <span class="font-mono text-xs bg-muted px-2 py-1 rounded text-muted-foreground">${field.key}</span>
-          <input type="hidden" name="property_mapping[metadata][properties][${index}][key]" value="${field.key}">
-        </td>
-        <td class="py-3 px-4">
-          <input type="text" name="property_mapping[metadata][properties][${index}][name]" value="${field.name || ''}"
-            placeholder="Display Name"
-            class="w-full px-2 py-1 text-sm border border-line rounded bg-card text-foreground">
-        </td>
-        <td class="py-3 px-4">
-          <textarea name="property_mapping[metadata][properties][${index}][validates]" rows="3"
-            class="w-full min-w-[200px] px-2 py-1 text-xs font-mono border border-line rounded bg-card text-foreground resize-y">${JSON.stringify(field.validates || {}, null, 2)}</textarea>
-        </td>
-        <td class="py-3 px-4 text-right">
-          <button type="button" data-action="click->${this.identifier}#removeProperty" data-index="${index}"
-            class="inline-flex items-center justify-center p-1.5 text-danger hover:text-danger hover:bg-danger/10 rounded-lg cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]!">delete</span>
-          </button>
-        </td>
-      </tr>
-    `).join('')
+    tbody.innerHTML = this.propertyMetadata.map((field, index) => this.propertyRowHTML(field, index)).join('')
 
     addArea.innerHTML = availableSlots.length > 0 ? `
       <div class="flex items-center gap-2 mt-3">
@@ -264,7 +253,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
 
   addExtraColumn() {
     const next = this.extraColumns.length + 1
-    this.extraColumns.push({ key: `extra_${next}`, name: '', type: 'string', validates: {} })
+    this.extraColumns.push({ key: `extra_${next}`, name: '', type: 'string' })
     this.rerenderExtraColumns()
   }
 
@@ -278,22 +267,11 @@ export default class Companies_PropertyMappings_EditController extends Companies
   rerenderExtraColumns() {
     const container = document.getElementById('extra-columns-body')
     if (!container) return
-    container.innerHTML = this.extraColumns.map((field, index) => `
-      <div class="grid grid-cols-4 gap-2 items-center">
-        <span class="font-mono text-xs bg-muted px-2 py-1 rounded text-muted-foreground">${field.key}</span>
-        <input type="hidden" name="property_mapping[metadata][extra_columns][${index}][key]" value="${field.key}">
-        <input type="text" name="property_mapping[metadata][extra_columns][${index}][name]" value="${field.name || ''}" placeholder="Display Name"
-          class="px-2 py-1 text-sm border border-line rounded bg-card text-foreground">
-        <select name="property_mapping[metadata][extra_columns][${index}][type]"
-          class="px-2 py-1 text-sm border border-line rounded bg-card text-foreground">
-          ${['string','integer','decimal','boolean','datetime'].map(t => `<option value="${t}" ${field.type === t ? 'selected' : ''}>${t}</option>`).join('')}
-        </select>
-        <button type="button" data-action="click->${this.identifier}#removeExtraColumn" data-index="${index}"
-          class="inline-flex items-center justify-center p-1.5 text-danger hover:text-danger hover:bg-danger/10 rounded-lg cursor-pointer">
-          <span class="material-symbols-outlined text-[18px]!">delete</span>
-        </button>
-      </div>
-    `).join('')
+    container.innerHTML = this.extraColumns.map((field, index) => this.extraRowHTML(field, index)).join('')
+  }
+
+  typeForKey(key) {
+    return String(key || '').split('_')[1] || 'string'
   }
 
   allPropertySlots() {

@@ -29,14 +29,14 @@ RSpec.describe Imports::SchemaResolver do
       expect(headers.first).to eq("name")
     end
 
-    it "marks required columns and required property slots" do
+    it "marks required columns and leaves property slots optional" do
       result = resolve
       headers = result[:schema]["headers"].index_by { |entry| entry["header"] }
 
       expect(headers["name"]["required"]).to be(true)
       expect(headers["business_type"]["required"]).to be(true)
       expect(headers["brand_id"]["required"]).to be(false)
-      expect(headers["Skin Type Suitability"]["required"]).to be(true)
+      expect(headers["Skin Type Suitability"]["required"]).to be(false)
     end
 
     it "exposes enum labels and association metadata" do
@@ -79,7 +79,7 @@ RSpec.describe Imports::SchemaResolver do
 
       category.default_property_mapping.update!(
         metadata: { "properties" => [
-          { "key" => "property_string_1", "type" => "string", "name" => "Renamed", "validates" => {} }
+          { "key" => "property_string_1", "type" => "string", "name" => "Renamed" }
         ] }
       )
 

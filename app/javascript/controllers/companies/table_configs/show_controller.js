@@ -54,8 +54,6 @@ export default class Companies_TableConfigs_ShowController extends Companies_Lay
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Key")}</th>
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Name")}</th>
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Visible")}</th>
-                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Align")}</th>
-                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Width")}</th>
               </tr>
             </thead>
             <tbody>
@@ -64,8 +62,6 @@ export default class Companies_TableConfigs_ShowController extends Companies_Lay
                   <td class="py-3 px-4 text-sm font-mono text-foreground">${col.key}</td>
                   <td class="py-3 px-4 text-sm font-medium text-foreground">${col.name}</td>
                   <td class="py-3 px-4">${col.visible !== false ? `<span class="text-success text-sm">${translate("True")}</span>` : `<span class="text-muted-foreground text-sm">${translate("False")}</span>`}</td>
-                  <td class="py-3 px-4 text-sm text-muted-foreground">${col.align || 'left'}</td>
-                  <td class="py-3 px-4 text-sm text-muted-foreground">${col.width || '-'}</td>
                 </tr>
               `).join('')}
             </tbody>

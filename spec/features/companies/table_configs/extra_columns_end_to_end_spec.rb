@@ -9,7 +9,7 @@ RSpec.feature "Companies::TableConfigs extra columns end-to-end", type: :feature
     pm = category.default_property_mapping
     pm.update!(metadata: {
       "properties" => [
-        { "key" => "property_string_1", "name" => "Color", "type" => "string", "validates" => {} }
+        { "key" => "property_string_1", "name" => "Color", "type" => "string" }
       ],
       "extra_columns" => [
         { "key" => "extra_1", "name" => "Extra Demo 1", "type" => "string" }

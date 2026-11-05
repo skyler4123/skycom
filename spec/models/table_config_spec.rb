@@ -90,35 +90,6 @@ RSpec.describe TableConfig, type: :model do
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/visible must be a boolean/))
       end
-
-      it "rejects align with invalid value" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "align" => "top" } ] }
-        expect(config).not_to be_valid
-        expect(config.errors[:metadata]).to include(match(/align/))
-      end
-
-      it "accepts align as left, center, or right" do
-        %w[left center right].each do |val|
-          config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "align" => val } ] }
-          expect(config).to be_valid
-        end
-      end
-
-      it "rejects width when not an integer" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "width" => "auto" } ] }
-        expect(config).not_to be_valid
-        expect(config.errors[:metadata]).to include(match(/width must be an integer/))
-      end
-
-      it "accepts width as nil" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "width" => nil } ] }
-        expect(config).to be_valid
-      end
-
-      it "accepts width as an integer" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "width" => 250 } ] }
-        expect(config).to be_valid
-      end
     end
   end
   describe "search/filter column settings" do

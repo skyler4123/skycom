@@ -76,8 +76,6 @@ export default class Companies_TableConfigLogs_ShowController extends Companies_
                   <th class="py-3 px-4 font-medium">${translate("Key")}</th>
                   <th class="py-3 px-4 font-medium">${translate("Name")}</th>
                   <th class="py-3 px-4 font-medium">${translate("Visible")}</th>
-                  <th class="py-3 px-4 font-medium">${translate("Align")}</th>
-                  <th class="py-3 px-4 font-medium">${translate("Width")}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-line">
@@ -86,9 +84,7 @@ export default class Companies_TableConfigLogs_ShowController extends Companies_
                     <td class="py-3 px-4 text-sm font-mono">${c.key || '—'}</td>
                     <td class="py-3 px-4 text-sm">${c.name || '—'}</td>
                     <td class="py-3 px-4 text-sm">${c.visible ? translate("True") : translate("False")}</td>
-                    <td class="py-3 px-4 text-sm">${c.align || '—'}</td>
-                    <td class="py-3 px-4 text-sm">${c.width ?? '—'}</td>
-                  </tr>`).join('') || `<tr><td colspan="5" class="py-3 px-4 text-sm text-muted-foreground">—</td></tr>`}
+                  </tr>`).join('') || `<tr><td colspan="3" class="py-3 px-4 text-sm text-muted-foreground">—</td></tr>`}
               </tbody>
             </table>
           </div>

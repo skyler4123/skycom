@@ -63,29 +63,7 @@ class Companies::PropertyMappingsController < Companies::ApplicationController
   def update
     mapping = current_company.property_mappings.find(params[:id])
 
-    p_params = property_mapping_params
-    if p_params[:metadata].is_a?(ActionController::Parameters)
-      meta = p_params[:metadata].to_unsafe_h
-      if meta["properties"].is_a?(Hash)
-        meta["properties"] = meta["properties"].values.to_a
-        meta["properties"].each do |entry|
-          if entry["validates"].is_a?(String) && entry["validates"].present?
-            entry["validates"] = JSON.parse(entry["validates"]) rescue {}
-          end
-        end
-      end
-
-      if meta["extra_columns"].is_a?(Hash)
-        meta["extra_columns"] = meta["extra_columns"].values.to_a
-        meta["extra_columns"].each do |entry|
-          if entry["validates"].is_a?(String) && entry["validates"].present?
-            entry["validates"] = JSON.parse(entry["validates"]) rescue {}
-          end
-          entry["key"] = "extra_#{SecureRandom.hex(4)}" if entry["key"].blank?
-        end
-      end
-      p_params[:metadata] = meta
-    end
+    p_params = normalize_metadata(mapping, property_mapping_params)
 
     if mapping.update(p_params)
       redirect_to company_property_mapping_path(current_company, mapping), notice: "Property mapping updated successfully."
@@ -106,6 +84,49 @@ class Companies::PropertyMappingsController < Companies::ApplicationController
   end
 
   private
+
+  # The edit form owns key/name (and type for extra columns). Merge submitted
+  # entries with the existing metadata so settings the form does not render
+  # (input_type, options, placeholder, min, max, ...) survive a save.
+  def normalize_metadata(mapping, p_params)
+    return p_params unless p_params[:metadata].is_a?(ActionController::Parameters)
+
+    meta = p_params[:metadata].to_unsafe_h
+
+    if meta["properties"].is_a?(Hash)
+      meta["properties"] = merge_entries(
+        mapping.properties, meta["properties"].values, derive_type: true
+      )
+    end
+
+    if meta["extra_columns"].is_a?(Hash)
+      meta["extra_columns"] = merge_entries(
+        mapping.metadata&.dig("extra_columns"), meta["extra_columns"].values, derive_type: false
+      )
+    end
+
+    p_params[:metadata] = meta
+    p_params
+  end
+
+  def merge_entries(existing_entries, submitted_entries, derive_type:)
+    existing_by_key = Array(existing_entries).index_by { |entry| entry["key"] }
+
+    submitted_entries.map do |entry|
+      if !derive_type && entry["key"].blank?
+        entry["key"] = "extra_#{SecureRandom.hex(4)}"
+      end
+
+      merged = existing_by_key[entry["key"]] ? existing_by_key[entry["key"]].merge(entry) : entry.dup
+      merged.delete("validates")
+      merged["type"] ||= derive_type ? type_from_key(entry["key"]) : "string"
+      merged
+    end
+  end
+
+  def type_from_key(key)
+    key.to_s.split("_")[1].presence || "string"
+  end
 
   def property_mapping_params
     params.require(:property_mapping).permit(:category_id, :name, :description, metadata: {})

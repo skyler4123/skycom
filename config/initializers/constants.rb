@@ -1,3 +1,7 @@
+# Dynamic property string slots are unbounded varchar in PostgreSQL. Skycom
+# applies the conventional varchar(255) maximum in the model layer.
+PROPERTY_STRING_MAX_LENGTH = 255
+
 # Timezone offsets used by Branch model, Company model, and Product model.
 # Keyed as Rails enum values.
 TIMEZONES = {

@@ -147,7 +147,7 @@ module Imports
           "attribute" => key,
           "kind" => "property",
           "type" => config["type"].presence || key.split("_")[1] || "string",
-          "required" => config.dig("validates", "presence") == true,
+          "required" => false,
           "enum" => nil,
           "association" => nil
         }

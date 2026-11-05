@@ -1,23 +1,20 @@
 # frozen_string_literal: true
 
 # TableConfig — Atomic purpose: per-company/category table layout definition for
-# an index page (columns, widths, visibility, and optional filters).
+# an index page (columns, visibility, and optional filters).
 #
 # Why it exists: lets each tenant shape its grid view for a resource without code
 # changes; the layout is data (metadata.columns) validated against the category's
 # property mapping (see docs/DYNAMIC_TABLE.md).
 # How it works: `columns` is a store_accessor on metadata; after_initialize seeds
 # defaults, and the validation enforces the documented column shape
-# (key/name/visible/width/align/search/filter). Updates are audited in
-# TableConfigLog.
+# (key/name/visible/search/filter). Updates are audited in TableConfigLog.
 # Main associations: belongs_to :company (touch), :category, :property_mapping;
 # has_many :table_config_logs (dependent: :nullify).
 class TableConfig < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
   include DynamicSearchConcern
-  # Valid values for column alignment.
-  ALLOWED_ALIGNS = %w[left center right].freeze
   # Standard columns eligible for keyword search (property_string_* are also searchable).
   SEARCHABLE_STANDARD_KEYS = %w[name description code title].freeze
   # Standard (non-property) numeric metric columns eligible for range filters.
@@ -42,23 +39,19 @@ class TableConfig < ApplicationRecord
   #   {
   #     "key" => "code",
   #     "name" => "Invoice No.",
-  #     "visible" => true,
-  #     "width" => 150,
-  #     "align" => "left"
+  #     "visible" => true
   #   },
   #   {
   #     "key" => "property_string_1",
   #     "name" => "Payment Type",
   #     "visible" => true,
-  #     "width" => 130,
-  #     "align" => "center"
+  #     "search" => true
   #   },
   #   {
   #     "key" => "property_integer_1",
   #     "name" => "Qty Items",
   #     "visible" => true,
-  #     "width" => 100,
-  #     "align" => "right"
+  #     "filter" => { "type" => "range", "active" => true, "buckets" => [[nil, 100], [100, nil]] }
   #   }
   # ]
   # ---------------------------------------------------------------------------
@@ -67,8 +60,6 @@ class TableConfig < ApplicationRecord
   #     key:     String   # Column identifier (e.g. "name", "property_integer_1")
   #     name:    String   # Display name in the table header
   #     visible: Boolean  # true = shown, false = hidden (preserves config)
-  #     width:   Integer  # Column width in pixels (null = auto)
-  #     align:   String   # "left" | "center" | "right"
   #     search:  Boolean  # Optional. Keyword-searchable column (string columns only)
   #     filter:  Hash     # Optional. Dropdown filter config, shape depends on column type.
   #                       # "active" (boolean, REQUIRED) gates the filter — it only applies
@@ -110,9 +101,7 @@ class TableConfig < ApplicationRecord
         errors.add(:metadata, "columns element #{idx}: name is required and must be a non-blank string")
       end
 
-      errors.add(:metadata, "columns element #{idx}: visible must be a boolean")       if field.key?("visible") && ![ true, false ].include?(field["visible"])
-      errors.add(:metadata, "columns element #{idx}: align must be one of #{ALLOWED_ALIGNS}")  if field.key?("align") && field["align"].present? && ALLOWED_ALIGNS.exclude?(field["align"])
-      errors.add(:metadata, "columns element #{idx}: width must be an integer or null") if field.key?("width") && !field["width"].nil? && !field["width"].is_a?(Integer)
+      errors.add(:metadata, "columns element #{idx}: visible must be a boolean") if field.key?("visible") && ![ true, false ].include?(field["visible"])
 
       validate_search_and_filter(field, idx)
 
@@ -128,8 +117,7 @@ class TableConfig < ApplicationRecord
   def set_default_columns
     self.metadata ||= {}
     self.columns ||= [
-      { "key" => "name", "name" => "Name", "visible" => true,
-        "align" => "left", "width" => nil }
+      { "key" => "name", "name" => "Name", "visible" => true }
     ]
   end
 

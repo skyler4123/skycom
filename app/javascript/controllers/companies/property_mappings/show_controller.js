@@ -54,8 +54,6 @@ export default class Companies_PropertyMappings_ShowController extends Companies
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Key")}</th>
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Name")}</th>
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Type")}</th>
-                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Name")}</th>
-                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Validates")}</th>
               </tr>
             </thead>
             <tbody>
@@ -67,10 +65,6 @@ export default class Companies_PropertyMappings_ShowController extends Companies
                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary ">
                       ${field.type || field.key?.replace(/_\d+$/, '').replace('property_', '') || '-'}
                     </span>
-                  </td>
-                  <td class="py-3 px-4 text-sm font-medium text-foreground">${field.name || '-'}</td>
-                  <td class="py-3 px-4 text-sm">
-                    ${this.renderValidates(field.validates)}
                   </td>
                 </tr>
               `).join('')}
@@ -141,11 +135,4 @@ export default class Companies_PropertyMappings_ShowController extends Companies
     `
   }
 
-  renderValidates(validates) {
-    if (!validates || (typeof validates === 'object' && Object.keys(validates).length === 0)) {
-      return '<span class="text-muted-foreground/60">—</span>'
-    }
-    const json = JSON.stringify(validates, null, 2)
-    return `<pre class="text-xs font-mono text-muted-foreground bg-muted/60 p-2 rounded max-w-[300px] overflow-x-auto whitespace-pre-wrap break-all leading-relaxed">${json}</pre>`
-  }
 }

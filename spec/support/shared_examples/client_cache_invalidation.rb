@@ -34,7 +34,7 @@ RSpec.shared_examples "client cache invalidation" do |resource_name:|
 
   before do
     property_mapping.update!(metadata: { "properties" => [
-      { "key" => "property_string_1", "name" => "Original Field", "type" => "string", "validates" => {} }
+      { "key" => "property_string_1", "name" => "Original Field", "type" => "string" }
     ] })
 
     page.execute_script("localStorage.clear()")

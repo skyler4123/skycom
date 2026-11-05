@@ -36,7 +36,7 @@ RSpec.describe Imports::DryRunService do
       expect { dry_run(import) }.not_to change { company.products.count }
     end
 
-    it "does not auto-populate blank property slots with random values" do
+    it "accepts a row with blank optional property slots" do
       csv = import_csv(
         headers: [ "name", "business_type" ],
         rows: [ [ "Sparse Product", "physical" ] ]
@@ -45,8 +45,8 @@ RSpec.describe Imports::DryRunService do
 
       result = dry_run(import)
 
-      expect(result[:success]).to be(false)
-      expect(result[:result]["row_errors"].first["errors"]).to include(/Property string 1/)
+      expect(result[:success]).to be(true)
+      expect(result[:result]["row_errors"]).to be_empty
     end
   end
 

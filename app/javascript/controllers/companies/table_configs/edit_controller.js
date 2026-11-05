@@ -1,12 +1,11 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_TableConfigs_EditController extends Companies_LayoutController {
-  // TableConfig editor — rows carry key/name/visible/search/filter/align/width.
-  // `search` checkbox: string-capable columns only; `filter` textarea: raw JSON
-  // ({type: range|enum|boolean|date, buckets}) — parsed + validated server-side.
+  // TableConfig editor — rows carry key/name/visible/search/filter.
+  // The filter is edited with a type select and typed bucket inputs (no JSON).
   // Depends on BE: Companies::TableConfigsController#show (JSON hydration),
   //               Companies::TableConfigsController#update (form PATCH + normalize_column_types)
-  // Docs: docs/DYNAMIC_TABLE.md, docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md
+  // Docs: docs/DYNAMIC_TABLE.md
   /** @type {any | null} */
   config = null
 
@@ -69,7 +68,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     const fields = `
       <div class="space-y-6">
         <h2 class="text-xl font-bold text-foreground">${translate("Edit Table Config")}</h2>
-        <p class="text-sm text-muted-foreground">${translate("Controls how data is displayed in this table. To show/hide columns, add constraints or validation rules, click the Property Mapping link below.")}</p>
+        <p class="text-sm text-muted-foreground">${translate("Controls how data is displayed in this table. Dynamic property names are managed in the Property Mapping.")}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
@@ -100,7 +99,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
               ${c.property_mapping_id ? `
                 <a href="${Helpers.edit_company_property_mapping_path(companyId, c.property_mapping_id)}"
                   class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-primary hover:text-primary hover:bg-primary/10 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
-                  ${tooltip(translate("Manage property fields: show/hide columns, add constraints or validation rules"))}
+                  ${tooltip(translate("Manage property fields: show/hide columns and rename them"))}
                 >
                   <span class="material-symbols-outlined text-[18px]!">open_in_new</span>
                   ${translate("Edit")}
@@ -130,14 +129,8 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
                     ${tooltip(translate("Include this column in the keyword search box (string columns only)"))}
                   >${translate("Search")}</th>
                   <th class="py-2 px-3 font-medium"
-                    ${tooltip(translate("Filter config JSON — how this column filters (range / enum / boolean / date). The Active checkbox enables it; leave the JSON empty for no filter."))}
+                    ${tooltip(translate("Choose how this column filters. The Active checkbox enables it on the index page."))}
                   >${translate("Filter")}</th>
-                  <th class="py-2 px-3 font-medium"
-                    ${tooltip(translate("Text alignment inside the column: left, center, or right"))}
-                  >${translate("Align")}</th>
-                  <th class="py-2 px-3 font-medium"
-                    ${tooltip(translate("Fixed column width in pixels (leave empty for auto)"))}
-                  >${translate("Width")}</th>
                   <th class="py-2 px-3 font-medium text-right"></th>
                 </tr>
               </thead>
@@ -194,9 +187,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
       key: selectedKey,
       name: this.rawColumnNameFor(selectedKey),
       visible: true,
-      search: false,
-      align: 'left',
-      width: null
+      search: false
     })
 
     const select = document.getElementById('new-column-slot')
@@ -207,7 +198,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   availableColumns() {
     const usedKeys = new Set((this.columnsMetadata || []).map(c => c.key))
     const candidateKeys = [
-      'name', 'description', 'code', 'title',
+      'name', 'description', 'code', 'title', 'quantity', 'pending',
       ...(this.allPropertySlots ? this.allPropertySlots().map(s => s.key) : [])
     ]
     const seen = new Set()
@@ -225,6 +216,8 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     if (key === 'description') return 'Description'
     if (key === 'code') return 'Code'
     if (key === 'title') return 'Title'
+    if (key === 'quantity') return 'Quantity'
+    if (key === 'pending') return 'Pending'
     const entry = this.propertyEntryFor(key)
     if (entry?.name) return entry.name
     const extra = this.extraEntryFor(key)
@@ -308,36 +301,199 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     const pm = (window.currentPropertyMappings?.() || []).find(m => m.id === this.config?.property_mapping_id)
     const extra = (pm?.metadata?.extra_columns || []).find(e => e.key === key)
     if (extra?.type) return extra.type
+    if (["name", "description", "code", "title"].includes(key)) return "string"
+    if (["quantity", "pending"].includes(key)) return "integer"
     const match = /^property_(string|integer|decimal|boolean|datetime)_\d+$/.exec(key)
     return match ? match[1] : null
   }
 
   isSearchableColumn(key) {
     if (!key || key.startsWith("extra_")) return false
-    return key === "name" || key === "description" || key === "code" || key.startsWith("property_string_")
+    return ["name", "description", "code", "title"].includes(key) || key.startsWith("property_string_")
+  }
+
+  filterTypeOptions(key) {
+    const type = this.columnType(key)
+    const options = []
+
+    if (type === "integer") {
+      options.push({ value: "range", label: "Range" })
+      if (this.propertyEntryFor(key)?.input_type === "select") {
+        options.push({ value: "enum", label: "Enum" })
+      }
+    } else if (type === "decimal") {
+      options.push({ value: "range", label: "Range" })
+    } else if (type === "boolean") {
+      options.push({ value: "boolean", label: "Boolean" })
+    } else if (type === "datetime") {
+      options.push({ value: "date", label: "Date" })
+    }
+
+    return options
   }
 
   canFilter(col) {
     if (col.key?.startsWith("extra_")) return false
-    const type = this.columnType(col.key)
-    return type === "integer" || type === "decimal" || type === "boolean" || type === "datetime"
+    return this.filterTypeOptions(col.key).length > 0
   }
 
-  filterSkeleton(col) {
+  defaultBucketsFor(col) {
     const type = this.columnType(col.key)
-    const isEnum = type === "integer" && this.propertyEntryFor(col.key)?.input_type === "select"
-    switch (type) {
-      case 'integer':
-        return isEnum ? '{"type":"enum"}' : '{"type":"range","buckets":[[null,10],[10,null]]}'
-      case 'decimal':
-        return '{"type":"range","buckets":[[null,10.5],[10.5,null]]}'
-      case 'boolean':
-        return '{"type":"boolean"}'
-      case 'datetime':
-        return '{"type":"date","buckets":[[null,2025],[2025,2026],[2026,null]]}'
-      default:
-        return ''
+    if (type === "datetime") {
+      const year = new Date().getFullYear()
+      return [ [ null, year - 1 ], [ year - 1, year ], [ year, null ] ]
     }
+    if (type === "decimal") return [ [ null, 10 ], [ 10, null ] ]
+    return [ [ null, 100 ], [ 100, null ] ]
+  }
+
+  filterCellHTML(col, index) {
+    if (!this.canFilter(col)) return `<span class="text-muted-foreground/60">—</span>`
+
+    const filter = col.filter && typeof col.filter === "object" ? col.filter : {}
+    const options = this.filterTypeOptions(col.key)
+    const selectedType = options.some(o => o.value === filter.type) ? filter.type : ""
+    const active = filter.active !== false
+    const buckets = Array.isArray(filter.buckets) ? filter.buckets : []
+
+    return `
+      <div class="space-y-2 min-w-[220px]">
+        <select id="col-filter-type-${index}" name="table_config[metadata][columns][${index}][filter][type]"
+          data-action="change->${this.identifier}#onFilterTypeChange" data-index="${index}"
+          class="w-full px-2 py-1 text-xs border border-line rounded bg-card text-foreground">
+          <option value="">${translate("None")}</option>
+          ${options.map(o => `<option value="${o.value}" ${selectedType === o.value ? 'selected' : ''}>${translate(o.label)}</option>`).join('')}
+        </select>
+
+        ${selectedType ? `
+          <div class="flex items-center gap-2">
+            <input type="hidden" name="table_config[metadata][columns][${index}][filter][active]" value="false">
+            <input type="checkbox" id="col-filter-active-${index}" name="table_config[metadata][columns][${index}][filter][active]" value="true" ${active ? 'checked' : ''}
+              class="rounded border-line text-primary cursor-pointer"
+              ${tooltip(translate("Enable this filter on the index page"))}>
+            <span class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Active")}</span>
+          </div>
+          ${this.filterBucketsHTML(col, index, selectedType, buckets)}
+        ` : ''}
+      </div>
+    `
+  }
+
+  filterBucketsHTML(col, index, type, buckets) {
+    if (type !== "range" && type !== "date") return ""
+
+    const step = type === "date" ? "1" : (this.columnType(col.key) === "decimal" ? "any" : "1")
+
+    const rows = buckets.map((bucket, bucketIndex) => {
+      const from = Array.isArray(bucket) ? bucket[0] : null
+      const to = Array.isArray(bucket) ? bucket[1] : null
+
+      return `
+        <div class="flex items-center gap-1">
+          <input type="number" step="${step}" id="col-filter-bucket-${index}-${bucketIndex}-from"
+            name="table_config[metadata][columns][${index}][filter][buckets][${bucketIndex}][from]"
+            value="${from ?? ''}" placeholder="${translate("From")}"
+            class="w-20 px-1 py-1 text-xs border border-line rounded bg-card text-foreground">
+          <span class="text-muted-foreground">–</span>
+          <input type="number" step="${step}" id="col-filter-bucket-${index}-${bucketIndex}-to"
+            name="table_config[metadata][columns][${index}][filter][buckets][${bucketIndex}][to]"
+            value="${to ?? ''}" placeholder="${translate("To")}"
+            class="w-20 px-1 py-1 text-xs border border-line rounded bg-card text-foreground">
+          <button type="button" data-action="click->${this.identifier}#removeFilterBucket"
+            data-index="${index}" data-bucket-index="${bucketIndex}"
+            class="inline-flex items-center justify-center p-1 text-danger hover:text-danger hover:bg-danger/10 rounded cursor-pointer"
+            ${tooltip(translate("Remove Bucket"))}>
+            <span class="material-symbols-outlined text-[14px]">remove</span>
+          </button>
+        </div>
+      `
+    }).join('')
+
+    return `
+      <div class="space-y-1">
+        ${rows}
+        <button type="button" data-action="click->${this.identifier}#addFilterBucket" data-index="${index}"
+          class="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary hover:bg-primary/10 rounded px-1 py-0.5 cursor-pointer">
+          <span class="material-symbols-outlined text-[14px]">add</span>
+          ${translate("Add Bucket")}
+        </button>
+      </div>
+    `
+  }
+
+  onFilterTypeChange(event) {
+    const index = parseInt(event.currentTarget.getAttribute("data-index"))
+    const col = this.columnsMetadata[index]
+    if (!col) return
+
+    const type = event.currentTarget.value
+    if (!type) {
+      delete col.filter
+    } else {
+      col.filter = { type, active: col.filter?.active !== false }
+      if (type === "range" || type === "date") {
+        col.filter.buckets = this.defaultBucketsFor(col)
+      }
+    }
+
+    this.rerenderFilterCell(index)
+  }
+
+  addFilterBucket(event) {
+    const index = parseInt(event.currentTarget.getAttribute("data-index"))
+    this.syncFilterCellFromDOM(index)
+
+    const filter = this.columnsMetadata[index]?.filter
+    if (!filter) return
+
+    filter.buckets = Array.isArray(filter.buckets) ? filter.buckets : []
+    filter.buckets.push([ null, null ])
+    this.rerenderFilterCell(index)
+  }
+
+  removeFilterBucket(event) {
+    const index = parseInt(event.currentTarget.getAttribute("data-index"))
+    const bucketIndex = parseInt(event.currentTarget.getAttribute("data-bucket-index"))
+    if (isNaN(index) || isNaN(bucketIndex)) return
+
+    this.syncFilterCellFromDOM(index)
+    this.columnsMetadata[index]?.filter?.buckets?.splice(bucketIndex, 1)
+    this.rerenderFilterCell(index)
+  }
+
+  syncFilterCellFromDOM(index) {
+    const col = this.columnsMetadata[index]
+    if (!col) return
+
+    const type = document.getElementById(`col-filter-type-${index}`)?.value || ""
+    if (!type) {
+      delete col.filter
+      return
+    }
+
+    const activeCheckbox = document.getElementById(`col-filter-active-${index}`)
+    const filter = { type, active: activeCheckbox ? activeCheckbox.checked : true }
+
+    if (type === "range" || type === "date") {
+      const buckets = []
+      const current = Array.isArray(col.filter?.buckets) ? col.filter.buckets : []
+
+      current.forEach((_, bucketIndex) => {
+        const from = document.getElementById(`col-filter-bucket-${index}-${bucketIndex}-from`)?.value
+        const to = document.getElementById(`col-filter-bucket-${index}-${bucketIndex}-to`)?.value
+        buckets.push([ from === "" ? null : from, to === "" ? null : to ])
+      })
+
+      filter.buckets = buckets
+    }
+
+    col.filter = filter
+  }
+
+  rerenderFilterCell(index) {
+    const cell = document.getElementById(`col-filter-cell-${index}`)
+    if (!cell) return
+    cell.innerHTML = this.filterCellHTML(this.columnsMetadata[index], index)
   }
 
   escapeHTML(str) {
@@ -345,7 +501,6 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   }
 
   columnRowHTML(col, index) {
-    const filterValue = col.filter && typeof col.filter === "object" ? JSON.stringify(col.filter) : ""
     const key = col.key || ''
 
     return `
@@ -379,30 +534,8 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
               ${tooltip(translate("Allow keyword search on this column"))}>
           ` : `<span class="text-muted-foreground/60">—</span>`}
         </td>
-        <td class="py-2 px-3">
-          ${this.canFilter(col) ? `
-            <div class="flex items-center gap-2 mb-1">
-              <input type="hidden" name="table_config[metadata][columns][${index}][filter_active]" value="false">
-              <input type="checkbox" id="col-filter-active-${index}" name="table_config[metadata][columns][${index}][filter_active]" value="true" ${col.filter?.active !== false ? 'checked' : ''}
-                class="rounded border-line text-primary cursor-pointer"
-                ${tooltip(translate("Enable this filter on the index page"))}>
-              <span class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Active")}</span>
-            </div>
-            <textarea id="col-filter-${index}" name="table_config[metadata][columns][${index}][filter]" rows="2" placeholder='${this.filterSkeleton(col)}'
-              class="w-44 px-2 py-1 text-xs font-mono border border-line rounded bg-card text-foreground">${this.escapeHTML(filterValue)}</textarea>
-          ` : `<span class="text-muted-foreground/60">—</span>`}
-        </td>
-        <td class="py-2 px-3">
-          <select name="table_config[metadata][columns][${index}][align]"
-            class="w-full px-1 py-1 text-xs border border-line rounded bg-card text-foreground">
-            <option value="left" ${col.align === 'left' ? 'selected' : ''}>left</option>
-            <option value="center" ${col.align === 'center' ? 'selected' : ''}>center</option>
-            <option value="right" ${col.align === 'right' ? 'selected' : ''}>right</option>
-          </select>
-        </td>
-        <td class="py-2 px-3">
-          <input type="number" name="table_config[metadata][columns][${index}][width]" value="${col.width ?? ''}" placeholder="auto"
-            class="w-16 px-1 py-1 text-xs border border-line rounded bg-card text-foreground">
+        <td class="py-2 px-3" id="col-filter-cell-${index}">
+          ${this.filterCellHTML(col, index)}
         </td>
         <td class="py-2 px-3 text-right">
           <button type="button" data-action="click->${this.identifier}#removeColumn" data-index="${index}"

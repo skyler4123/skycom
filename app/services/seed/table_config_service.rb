@@ -6,7 +6,7 @@ class Seed::TableConfigService
   # `active: true` is required in every filter hash (TableConfig validation).
   def self.field_hash(key, name = nil)
     col = { "key" => key.to_s, "name" => name.presence || key.to_s.humanize,
-            "visible" => true, "align" => "left", "width" => nil }
+            "visible" => true }
 
     case key.to_s
     when "name", "description", "code", "title", /\Aproperty_string_/

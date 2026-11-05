@@ -789,7 +789,7 @@ export const responsiveText = (options) => {
  *
  * @param {Object} options
  * @param {Array<Object>} options.rows - Array of record objects
- * @param {Array<{ key: string, label?: string, width?: number, align?: string, visible?: boolean }>} options.columns - Column definitions
+ * @param {Array<{ key: string, name?: string, visible?: boolean }>} options.columns - Column definitions
  * @param {string} options.identifier - Stimulus controller identifier for data-* attrs
  * @param {string} options.target - Stimulus target name for tbody
  * @param {Object<string, { type?: string, label?: string }>} [options.mappingLookup] - Property metadata lookup for type-aware rendering
@@ -804,7 +804,7 @@ export const table = ({
   target,
   mappingLookup = {},
   renderers = {},
-  className = "w-full text-left border-collapse table-auto",
+  className = "w-full border-collapse table-auto",
   renderActions
 }) => {
   const renderCell = (record, col) => {
@@ -840,23 +840,26 @@ export const table = ({
       return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
     }
 
-    return value
+    return escapeHtml(String(value))
   }
 
-  const alignmentClass = (col) => {
-    if (col.align === 'right') return 'text-right'
-    if (col.align === 'center') return 'text-center'
-    return 'text-left'
-  }
+  const textTooltipColumns = [ "name", "description", "code", "title" ]
 
-  const widthStyle = (col) => col.width ? `style="width: ${col.width}px;"` : ''
+  const cellTooltip = (record, col) => {
+    if (col.key === "workflow_status") return ""
+    if (renderers[col.key] && !textTooltipColumns.includes(col.key)) return ""
+
+    const value = record[col.key]
+    if (value === null || value === undefined) return ""
+    return tooltip(escapeHtml(String(value)))
+  }
 
   return `
     <table class="${className}">
       <thead>
         <tr class="text-sm text-muted-foreground bg-muted border-b border-line">
           ${columns.map(col => `
-            <th ${widthStyle(col)} class="py-4 px-6 font-medium whitespace-nowrap ${alignmentClass(col)}">${col.name || "N/A"}</th>
+            <th class="py-4 px-6 font-medium whitespace-nowrap text-center">${col.name || "N/A"}</th>
           `).join('')}
           ${renderActions ? `<th class="py-4 px-6 font-medium text-right whitespace-nowrap w-[100px]">Edit</th>` : ''}
         </tr>
@@ -865,8 +868,10 @@ export const table = ({
         ${rows.map(record => `
           <tr class="hover:bg-muted transition-colors">
             ${columns.map(col => `
-              <td class="py-4 px-6 text-sm ${alignmentClass(col)}">
-                ${renderCell(record, col)}
+              <td class="py-4 px-6 text-sm text-center">
+                <div class="mx-auto max-w-[240px] truncate" ${cellTooltip(record, col)}>
+                  ${renderCell(record, col)}
+                </div>
               </td>
             `).join('')}
             ${renderActions ? renderActions(record, identifier) : ''}

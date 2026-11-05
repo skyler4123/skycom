@@ -11,7 +11,7 @@ The **Category + PropertyMapping + TableConfig** system provides a complete **Dy
 | Table | Purpose | Stores |
 |-------|---------|--------|
 | **Category** | Taxonomy grouping (name, description, resource_name) | — |
-| **PropertyMapping** | Defines what `property_*` database slots mean | **JSONB array** of config objects (name, type, validates) |
+| **PropertyMapping** | Defines what `property_*` database slots mean | **JSONB array** of config objects (key, name, type, input options) |
 | **TableConfig** | Defines visible columns, layout, and permissions | **JSONB array** of column hashes (e.g., `[{ "key": "name", "name": "Name", "visible": true, ... }]`) |
 | **Resource (Product, Employee, etc.)** | Stores actual data | **Typed values** (string, integer, boolean, etc.) in individual `property_*` columns |
 
@@ -45,7 +45,7 @@ create_table "property_mappings", id: :uuid do |t|
   t.string   "resource_name"
 
   # Single JSONB array holding all dynamic property configs
-  # Each element: { "key", "type", "name", "validates" }
+  # Each element: { "key", "type", "name" }
   t.jsonb    "property_metadata", null: false, default: []
 
   # --- System Fields ---
@@ -120,16 +120,16 @@ category = Category.create!(
 
 # Update property names on the mapping (array of config objects)
 category.default_property_mapping.update!(
-  property_metadata: [
+  metadata: { "properties" => [
     { "key" => "property_string_1",
-      "type" => "string", "name" => "Skin Type Suitability", "validates" => {} },
+      "type" => "string", "name" => "Skin Type Suitability" },
     { "key" => "property_string_2",
-      "type" => "string", "name" => "Key Ingredients", "validates" => {} },
+      "type" => "string", "name" => "Key Ingredients" },
     { "key" => "property_integer_1",
-      "type" => "integer", "name" => "Volume (ml)", "validates" => {} },
+      "type" => "integer", "name" => "Volume (ml)" },
     { "key" => "property_boolean_1",
-      "type" => "boolean", "name" => "Organic Certified", "validates" => {} }
-  ]
+      "type" => "boolean", "name" => "Organic Certified" }
+  ] }
 )
 ```
 
@@ -154,16 +154,17 @@ Each Category has a TableConfig that defines which columns are visible, their di
 
 ```ruby
 # TableConfig for the Cosmetics category
-cosmetics_category.default_table_config.columns_metadata
-# => [{ "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => "left", "width" => 250, "roles" => [], "is_virtual" => false, "render_config" => {} },
-#     { "key" => "property_string_1", "name" => "Skin Type Suitability", "visible" => true, "sortable" => true, "align" => "left", ... },
-#     ...]
+cosmetics_category.default_table_config.columns
+# => [{ "key" => "name", "name" => "Name", "visible" => true },
+#     { "key" => "property_string_1", "name" => "Skin Type Suitability", "visible" => true, "search" => true },
+#     { "key" => "property_integer_1", "name" => "Volume (ml)", "visible" => true,
+#       "filter" => { "type" => "range", "active" => true, "buckets" => [[nil, 100], [100, nil]] } }]
 
 # The first item is always "name" (set as default attribute on the model)
 # Columns are rendered in this exact order in the table
 ```
 
-The `columns_metadata` array stores structured column definitions. The frontend reads these directly — no manual merge needed.
+The `metadata.columns` array stores structured column definitions. The frontend reads these directly — no manual merge needed.
 
 ### Step 4: UI Renders Dynamically
 
@@ -219,8 +220,8 @@ TableConfig.columns_metadata        PropertyMapping.property_metadata (array)
          { field: "property_integer_1", title: "Volume (ml)" },
          { field: "workflow_status",    title: "Workflow Status" }]
 
-# Each element in columns_metadata already contains its own name, width, alignment,
-# pinned state, sortability, and roles. The frontend reads `table_config.columns_metadata`
+# Each element in metadata.columns already contains its own name, visibility,
+# search flag, and optional filter. The frontend reads `table_config.metadata.columns`
 # directly — no merge with PropertyMapping names is necessary for the table view.
 ```
 
@@ -281,14 +282,13 @@ Category can define schemas for these resources (via `resource_name`):
 
 ### Per-Config Object Schema
 
-Each element in `property_metadata` is a Hash with these keys:
+Each element in `metadata["properties"]` is a Hash with these keys:
 
 | Key | Type | Description |
 |-----|------|-------------|
 | `key` | String | The resource column this config describes (e.g. `"property_string_1"`). Required. |
 | `type` | String | Data type: `string`, `integer`, `decimal`, `boolean`, or `datetime`. Derivable from the key prefix. |
 | `name` | String | Human-readable display name. Required. |
-| `validates` | Hash | Validation rules (future use, currently `{}`). |
 
 ### Column Count Per Type
 
@@ -337,11 +337,11 @@ METADATA_CATEGORIES = {
 
 ```ruby
 # Seed::CategoryService creates the Category (auto-generates PropertyMapping via callback)
-# then converts the properties hash to the property_metadata array format:
+# then converts the properties hash to the metadata["properties"] array format:
 #
 #   { property_string_1: "Skin Type Suitability" }
 #     → [{ "key" => "property_string_1",
-#          "type" => "string", "name" => "Skin Type Suitability", "validates" => {} }]
+#          "type" => "string", "name" => "Skin Type Suitability" }]
 #
 Seed::CategoryService.create(
   company: company,
@@ -361,9 +361,7 @@ Seed::TableConfigService.create(
   resource_name: "products",
   category: cosmetics_category,
   columns_metadata: %w[name code property_string_1 property_integer_1 property_boolean_1].map { |k|
-    { "key" => k, "name" => k.humanize, "visible" => true, "sortable" => true,
-      "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
-      "is_virtual" => false, "render_config" => {} }
+    Seed::TableConfigService.field_hash(k)
   }
 )
 ```
@@ -393,21 +391,19 @@ for (const config of (mapping.property_metadata || [])) {
 
 ### Three-Table Column Merge
 
-The frontend combines `TableConfig.columns_metadata` with `PropertyMapping` names to render table headers:
+The frontend combines `TableConfig.metadata.columns` with `PropertyMapping` names to render table headers:
 
 ```javascript
 // Load table config + property mapping to build column array
 const config = category.table_configs?.[0]
-const columns = (config?.columns_metadata || []).map(f => ({
+const columns = (config?.metadata?.columns || []).map(f => ({
   field: f.key,
   title: f.name || f.key,
-  width: f.width,
-  align: f.align,
-  pinned: f.pinned,
-  sortable: f.sortable,
+  search: f.search,
+  filter: f.filter,
   visible: f.visible
 }))
-// Result: [{ field: "name", title: "Name", width: 250, align: "left", pinned: "left", ... }, ...]
+// Result: [{ field: "name", title: "Name", visible: true }, ...]
 ```
 
 ### Rendering Dynamic Form
@@ -494,9 +490,9 @@ class PropertyMapping < ApplicationRecord
 
   has_many :table_configs, dependent: :destroy
 
-  # property_metadata stores an array of config hashes:
+  # metadata["properties"] stores an array of config hashes:
   # [{ "key" => "property_string_1",
-  #    "type" => "string", "name" => "Skin Type", "validates" => {} }]
+  #    "type" => "string", "name" => "Skin Type" }]
 end
 ```
 
@@ -505,12 +501,7 @@ end
 ```ruby
 # app/models/table_config.rb
 class TableConfig < ApplicationRecord
-  attribute :permission_resource_name, :string, default: -> { self.name }
-  attribute :columns_metadata, :jsonb, default: -> {
-    [{ "key" => "name", "name" => "Name", "visible" => true, "sortable" => true,
-       "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
-       "is_virtual" => false, "render_config" => {} }]
-  }
+  store_accessor :metadata, :columns
 
   belongs_to :company
   belongs_to :category
