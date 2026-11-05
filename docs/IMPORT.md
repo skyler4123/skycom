@@ -308,9 +308,9 @@ bundle exec parallel_rspec -n 14 spec/features/companies/imports spec/models/imp
   spec/requests/companies/imports_controller_spec.rb
 ```
 
-The shared `DynamicValidationConcern` opt-out is additive (default off); run the
-existing `spec/features/companies/company_migrations` suite as a regression
-check after touching it.
+The shared `PropertyMappingConcern` auto-population opt-out is additive (default
+off); run the existing `spec/features/companies/company_migrations` suite as a
+regression check after touching it.
 
 ---
 

@@ -16,7 +16,7 @@ ProductsController#index
   ClientCache (localStorage)
   ├─ categories[]         — available categories per resource_name
   ├─ property_mappings[]  — property_metadata (name, type per slot)
-  └─ table_configs[]      — columns_metadata (visible columns, order, alignment)
+  └─ table_configs[]      — columns_metadata (visible columns, order, search/filter settings)
         │
         ▼
   IndexController.connect()
@@ -98,6 +98,11 @@ The `name` value from `TableConfig.columns_metadata[].name` is used directly as 
 | `code` key | Monospace badge |
 | `workflow_status` key | `Helpers.statusBadge()` |
 
+**Layout:** all headers and data cells are centered. Each cell is capped at
+`240px` and long values are truncated with an ellipsis plus a hover tooltip.
+`align` and `width` are no longer configurable — they were removed from
+`TableConfig` and the editor.
+
 ### 2.4 Page-Navigation Category Switch
 
 Category filter uses a `<form method="get">` with the Search button for full page navigation:
@@ -138,12 +143,15 @@ everything: the filter only renders/applies while `"active": true`):
 ```
 
 **Editor** (`companies/table_configs/edit_controller.js`): per-row **Search** checkbox
-(disabled for non-string keys) + **Filter** cell = **Active checkbox** (writes `filter.active`,
-legacy configs without the key render as checked) above a **JSON textarea** (type-aware
-skeleton as placeholder). The textarea submits raw JSON text; `TableConfigsController#normalize_column_types`
-parses it back to a hash and merges the checkbox as `active` (checkbox always wins; submissions
-without the checkbox key backfill `active: true` — legacy-safe). Invalid JSON stays a string →
-model validation rejects the save → flash alert. API/JSON writes must include `active` explicitly.
+(disabled for non-string keys) + **Filter** cell = a **Filter Type** select (None / Range /
+Enum / Boolean / Date, depending on the column type), an **Active** checkbox, and — for
+Range/Date — repeatable **From/To** bucket inputs with **Add Bucket** and remove-bucket
+buttons. Blank From/To means an open side. Selecting a type seeds sensible default buckets;
+selecting None removes the filter on save. Enum options still come from the PropertyMapping.
+`TableConfigsController#normalize_column_types` converts the submitted bucket hash into
+`[[from, to], …]`, coerces `active` to a boolean, drops fully blank buckets, and deletes the
+filter when the type is blank. Invalid buckets (both sides open, `from >= to`) are rejected by
+the `TableConfig` model → flash alert. API writes may send the same stored hash shape directly.
 
 **Index page (all 17 dynamic-table pages — Products, Customers, Branches, Brands, Departments,
 Employee Groups, Employees, Facilities, Invoices, Orders, Services, Warehouses, Stocks,

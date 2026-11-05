@@ -62,19 +62,8 @@ class Seed::CategoryService
       {
         "key" => key.to_s,
         "type" => type,
-        "name" => label.to_s,
-        "validates" => build_validates(type)
+        "name" => label.to_s
       }
-    end
-  end
-
-  def self.build_validates(type)
-    case type
-    when "integer" then { "numericality" => { "only_integer" => true, "greater_than_or_equal_to" => 0 } }
-    when "decimal" then { "numericality" => { "greater_than_or_equal_to" => 0 } }
-    when "boolean" then { "inclusion" => { "in" => [ true, false ] } }
-    when "string"  then { "presence" => true }
-    else {}
     end
   end
 

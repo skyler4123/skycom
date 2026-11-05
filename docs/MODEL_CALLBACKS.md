@@ -466,17 +466,15 @@ Auto-assigns a default category on create if none is provided. Ensures every res
 
 ---
 
-### DynamicValidationConcern (`app/models/concerns/dynamic_validation_concern.rb`)
+### PropertySlotValidationConcern (`app/models/concerns/property_slot_validation_concern.rb`)
 
-Reads `validates` hashes from `property_mapping.property_metadata` and applies them as record-level validations on each `property_*` column. Supports `presence`, `numericality` (with `only_integer`, `greater_than`, `greater_than_or_equal_to`, `less_than`, `less_than_or_equal_to`), `inclusion`, `format` (with `with`/`without`), and `length` (with `minimum`/`maximum`). Auto-included via `PropertyMappingConcern`.
+Validates every configured `property_*` slot against the limits of its real database column. There are no user-defined validation rules: strings max 255 characters, integers stay within the column's byte range, decimals obey precision/scale, booleans are true/false, and datetimes must be valid. Blank values are allowed. Auto-included via `PropertyMappingConcern`.
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `validate :dynamic_property_validations` | 12 | `dynamic_property_validations` | Iterates `property_mapping.property_metadata`, reads each entry's `validates` hash, and applies matching Rails validation logic to the corresponding `property_*` column. Empty `validates` (`{}`) is skipped. |
+| `validate :property_slot_type_validations` | 20 | `property_slot_type_validations` | Iterates `property_mapping.properties`, looks up each key in the model's `columns_hash`, and applies the matching column-type rule. Metadata-only `extra_*` keys are skipped. |
 
 **Included in (45 models):** All models including `PropertyMappingConcern` (products, services, branches, employees, customers, etc.)
-
-> **Opt-out for imports**: `before_validation :auto_populate_property_fields` (registered by `PropertyMappingConcern`) fills empty property slots with seed-time random values. Set `record.skip_property_auto_population = true` to skip it. `Imports::DryRunService` and `Imports::RunService` set this flag so blank CSV cells stay blank instead of being invented.
 
 ---
 
@@ -501,6 +499,8 @@ Auto-assigns a default property_mapping on create if none is provided. Derives `
 |----------|------|--------|-------------|
 | `before_validation :ensure_property_mapping, on: :create` | 10 | `ensure_property_mapping` | If `property_mapping` is nil and `category` is present, sets `self.property_mapping = category.default_property_mapping`. Ensures every resource record has a property_mapping for dynamic property resolution. |
 | `validate :category_matches_property_mapping_category` | 11 | `category_matches_property_mapping_category` | Ensures the resource's `category_id` matches the `property_mapping.category_id`. Prevents inconsistency on update or manual assignment. Returns early if either association is blank. |
+
+> **Opt-out for imports**: `before_validation :auto_populate_property_fields` fills empty property slots with seed-time random values. Set `record.skip_property_auto_population = true` to skip it. `Imports::DryRunService` and `Imports::RunService` set this flag so blank CSV cells stay blank instead of being invented.
 
 **Included in (42 models):** All models that include `CategoryConcern` (19 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Event`, `EventGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Question`, `ServiceGroup`, `Task`, `TaskGroup`
 
@@ -545,7 +545,7 @@ Each concern defines the same callback:
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 4 | Session, User, Company, Employee (`refresh_cache`/`remove_cache` for compact record cache) |
 | `after_rollback` | 1 | Company (`workflow_status` suspension cache cleanup) |
-| `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 45 models), (PropertyMappingConcern → 45 models), (ImageAttachmentsConcern → 6 models + Product) |
+| `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (PropertySlotValidationConcern → 45 models), (PropertyMappingConcern → 45 models), (ImageAttachmentsConcern → 6 models + Product) |
 
 **Total unique callback declarations: ~36 directly across 15 model files + 9 concern files propagating to ~70+ models.**
 

@@ -83,8 +83,8 @@ store_accessor :metadata, :gateway_payload, :callback_data
 | Model | JSONB Column | Accessors | Purpose |
 |-------|-------------|-----------|---------|
 | `BillingTransaction` | `metadata` | `gateway_payload` | Gateway response payload (QR string, redirect URL, etc.) |
-| `PropertyMapping` | `metadata` | `properties` | Dynamic property metadata array (key, name, type, validates) |
-| `TableConfig` | `metadata` | `columns` | Column display configuration (key, name, visible, width, align, etc.) |
+| `PropertyMapping` | `metadata` | `properties` | Dynamic property metadata array (key, name, type, input options) |
+| `TableConfig` | `metadata` | `columns` | Column display configuration (key, name, visible, search, filter) |
 | `Policy` | `metadata` | `tag_conditions` | ABAC permission conditions hash (key-value rules) |
 | `CompanyDailyUsage` | `metadata` | `h0`..`h23` | Hourly credit usage (dynamically declared: `store_accessor :metadata, *(0..23).map { |i| "h#{i}" }`) |
 | `CompanyMonthlyUsage` | `metadata` | `d1`..`d31` | Daily credit usage (dynamically declared: `store_accessor :metadata, *(1..31).map { |i| "d#{i}" }`) |

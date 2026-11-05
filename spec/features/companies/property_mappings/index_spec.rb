@@ -101,26 +101,44 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     expect(added['name']).to eq('Texture Type')
   end
 
-  scenario "edit validates hash persists through save" do
+  scenario "edit page shows one Name header, a Type column, and no validates editor" do
     visit edit_company_property_mapping_path(company, property_mapping)
     expect(page).to have_selector('form', wait: 10)
 
-    validates_textarea = page.all('textarea[name*="[validates]"]', wait: 10).first
-    validates_textarea.set('{"presence":true,"numericality":{"only_integer":true}}')
+    headers = page.all('th').map(&:text)
+    expect(headers.count('Name')).to eq(1)
+    expect(headers).to include('Type')
+    expect(page).to have_no_selector('textarea[name*="[validates]"]')
+  end
 
-    click_button 'Save Changes'
-    expect(page).to have_content("Property mapping updated successfully", wait: 10)
+  scenario "show page does not display custom validation rules" do
+    visit company_property_mapping_path(company, property_mapping)
+    expect(page).to have_content(property_mapping.name, wait: 10)
 
-    click_link 'Edit Property Mapping', match: :first
+    expect(page).to have_no_content('Validates')
+    expect(page).to have_no_selector('pre')
+  end
+
+  scenario "editing a property preserves settings the form does not own" do
+    property_mapping.update!(metadata: { "properties" => [
+      { "key" => "property_integer_1", "type" => "integer", "name" => "Tier",
+        "input_type" => "select",
+        "options" => [ { "value" => 1, "label" => "Gold" } ] }
+    ] })
+
+    visit edit_company_property_mapping_path(company, property_mapping)
     expect(page).to have_selector('form', wait: 10)
 
-    textarea = page.all('textarea[name*="[validates]"]').first
-    expect(textarea.value).to include('"presence"')
-    expect(textarea.value).to include('"only_integer"')
+    fill_in "property_mapping[metadata][properties][0][name]", with: "Membership Tier"
+    click_button "Save Changes"
+
+    expect(page).to have_content("Property mapping updated successfully", wait: 10)
 
     property_mapping.reload
     entry = property_mapping.properties.first
-    expect(entry['validates']).to eq({ 'presence' => true, 'numericality' => { 'only_integer' => true } })
+    expect(entry["name"]).to eq("Membership Tier")
+    expect(entry["input_type"]).to eq("select")
+    expect(entry["options"]).to eq([ { "value" => 1, "label" => "Gold" } ])
   end
 
   describe "sync with TableConfig" do

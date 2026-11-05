@@ -2,8 +2,8 @@
 #
 # TableConfig dashboard API + editor form handling.
 # update: metadata[columns] accepts per-column `search` (boolean, string columns) and
-#         `filter` (range/enum/boolean/date hash; submitted as raw JSON text, parsed in
-#         normalize_column_types, shape-validated in TableConfig).
+#         `filter` (range/enum/boolean/date hash; submitted as typed form fields,
+#         normalized in normalize_column_types, shape-validated in TableConfig).
 # Serves Stimulus: Companies_TableConfigs_IndexController|ShowController|NewController|EditController
 # Writes audit: Companies::TableConfigLogsController (explicit log on create/update)
 # Endpoints: GET/POST/PATCH /companies/:company_id/table_configs... — see config/routes.rb
@@ -130,38 +130,61 @@ class Companies::TableConfigsController < Companies::ApplicationController
       h = col.to_h
       h["visible"] = to_boolean(h["visible"]) if h.key?("visible")
       h["search"] = to_boolean(h["search"]) if h.key?("search")
-      h["filter"] = parse_filter_config(h["filter"]) if h.key?("filter")
-      merge_filter_active(h)
-      h.delete("filter") if h["filter"].blank?
-      h["width"] = h["width"].present? ? h["width"].to_i : nil
+      h["filter"] = normalize_filter(h["filter"]) if h.key?("filter")
+      h.delete("filter") if h["filter"].blank? || h["filter"]["type"].blank?
       h["name"] = h["key"].humanize if h["name"].blank?
       h
     end
   end
 
-  # The Filter cell pairs a JSON textarea with an "active" checkbox (temp key filter_active).
-  # The checkbox always wins when present; configs submitted without it (legacy/API) keep
-  # an explicit active and default to enabled when missing.
-  def merge_filter_active(h)
-    h.delete("filter_active").then do |submitted|
-      next unless h["filter"].is_a?(Hash)
+  # The editor submits filter[type], filter[active], and filter[buckets][n][from|to].
+  # Normalize those typed controls into the stored hash shape:
+  # { "type" => "range|enum|boolean|date", "active" => bool, "buckets" => [[from, to], ...] }
+  def normalize_filter(filter)
+    return nil if filter.blank?
+    return filter unless filter.is_a?(Hash)
 
-      h["filter"]["active"] = if submitted.nil?
-        h["filter"].fetch("active", true)
-      else
-        to_boolean(submitted)
-      end
+    normalized = filter.dup
+    normalized["type"] = normalized["type"].to_s
+    normalized["active"] = normalized.key?("active") ? to_boolean(normalized["active"]) : true
+    if normalized.key?("buckets")
+      normalized["buckets"] = normalize_filter_buckets(normalized["buckets"], normalized["type"])
     end
+    normalized
   end
 
-  # The filter cell submits raw JSON text. Parse it back into a hash; invalid JSON stays a
-  # string so the TableConfig model validation rejects the save with a useful error.
-  def parse_filter_config(value)
-    return value if value.is_a?(Hash)
+  def normalize_filter_buckets(buckets, type)
+    pairs = if buckets.is_a?(Array)
+      buckets
+    elsif buckets.is_a?(Hash)
+      buckets.values
+    else
+      []
+    end
+
+    pairs.filter_map do |bucket|
+      if bucket.is_a?(Array)
+        [ normalize_bucket_value(bucket[0], type), normalize_bucket_value(bucket[1], type) ]
+      elsif bucket.is_a?(Hash)
+        [ normalize_bucket_value(bucket["from"], type), normalize_bucket_value(bucket["to"], type) ]
+      end
+    end.reject { |from, to| from.nil? && to.nil? }
+  end
+
+  def normalize_bucket_value(value, type)
+    return value if value.is_a?(Numeric)
     return nil if value.blank?
-    JSON.parse(value)
-  rescue JSON::ParserError
-    value
+
+    str = value.to_s
+    if type == "date"
+      str.match?(/\A\d+\z/) ? str.to_i : str
+    elsif str.match?(/\A-?\d+\z/)
+      str.to_i
+    elsif str.match?(/\A-?\d+\.\d+\z/)
+      str.to_f
+    else
+      str
+    end
   end
 
   def to_boolean(value)

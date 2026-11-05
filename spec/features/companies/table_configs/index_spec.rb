@@ -149,6 +149,9 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('th', text: 'Product Title')
+    expect(page).to have_selector('th.text-center', text: 'Product Title')
+    expect(page).to have_selector('td.text-center')
+    expect(page).to have_selector('td div[class*="max-w-[240px]"]')
   end
 
   scenario "show page has clickable property mapping link" do

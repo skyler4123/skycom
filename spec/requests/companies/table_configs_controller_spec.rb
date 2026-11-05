@@ -34,12 +34,14 @@ RSpec.describe "Companies::TableConfigsController", type: :request do
   end
 
   describe "PATCH #update with search/filter column settings" do
-    it "coerces search to boolean and JSON-parses the filter textarea value" do
+    it "coerces search and normalizes typed filter buckets" do
       patch_columns({ "0" => { "key" => "property_string_1", "name" => "Color", "visible" => "true",
                                "search" => "true", "filter" => "" },
                       "1" => { "key" => "property_integer_1", "name" => "Qty", "visible" => "true",
                                "search" => "false",
-                               "filter" => '{"type":"range","buckets":[[null,100],[100,null]]}' } })
+                               "filter" => { "type" => "range", "active" => "true",
+                                 "buckets" => { "0" => { "from" => "", "to" => "100" },
+                                                "1" => { "from" => "100", "to" => "" } } } } })
 
       cols = config.reload.columns
       expect(cols[0]).to include("search" => true)
@@ -48,36 +50,56 @@ RSpec.describe "Companies::TableConfigsController", type: :request do
         "filter" => { "type" => "range", "buckets" => [ [ nil, 100 ], [ 100, nil ] ], "active" => true })
     end
 
-    it "stores the filter with active: false when the Filter checkbox is off" do
+    it "stores the filter with active: false when the Active checkbox is off" do
       patch_columns({ "0" => { "key" => "property_integer_1", "name" => "Qty", "visible" => "true",
-                               "filter" => '{"type":"range","buckets":[[null,100]]}', "filter_active" => "false" } })
+                               "filter" => { "type" => "range", "active" => "false",
+                                 "buckets" => { "0" => { "from" => "0", "to" => "50" } } } } })
 
-      cols = config.reload.columns
-      expect(cols[0]["filter"]).to eq("type" => "range", "buckets" => [ [ nil, 100 ] ], "active" => false)
-      expect(cols[0]).not_to have_key("filter_active")
+      expect(config.reload.columns[0]["filter"]).to eq(
+        "type" => "range", "buckets" => [ [ 0, 50 ] ], "active" => false
+      )
     end
 
-    it "checkbox wins over an active key inside the JSON text" do
+    it "drops the filter when the Filter Type is blank" do
       patch_columns({ "0" => { "key" => "property_integer_1", "name" => "Qty", "visible" => "true",
-                               "filter" => '{"type":"range","active":true,"buckets":[[null,100]]}',
-                               "filter_active" => "false" } })
+                               "filter" => { "type" => "", "active" => "true",
+                                 "buckets" => { "0" => { "from" => "0", "to" => "50" } } } } })
 
-      expect(config.reload.columns[0]["filter"]["active"]).to eq(false)
+      expect(config.reload.columns[0]).not_to have_key("filter")
     end
 
-    it "rejects invalid filter JSON with a redirect back to the edit page" do
+    it "keeps decimal bucket values as floats" do
+      patch_columns({ "0" => { "key" => "property_decimal_1", "name" => "Price", "visible" => "true",
+                               "filter" => { "type" => "range", "active" => "true",
+                                 "buckets" => { "0" => { "from" => "1.5", "to" => "10.25" } } } } })
+
+      expect(config.reload.columns[0]["filter"]["buckets"]).to eq([ [ 1.5, 10.25 ] ])
+    end
+
+    it "keeps date bucket values as integers" do
+      patch_columns({ "0" => { "key" => "property_datetime_1", "name" => "Released", "visible" => "true",
+                               "filter" => { "type" => "date", "active" => "true",
+                                 "buckets" => { "0" => { "from" => "2024", "to" => "2025" } } } } })
+
+      expect(config.reload.columns[0]["filter"]["buckets"]).to eq([ [ 2024, 2025 ] ])
+    end
+
+    it "drops fully blank buckets and rejects a filter with no usable buckets" do
       expect {
-        patch_columns({ "0" => { "key" => "property_string_1", "name" => "Color", "visible" => "true",
-                                 "filter" => "{invalid json" } })
+        patch_columns({ "0" => { "key" => "property_integer_1", "name" => "Qty", "visible" => "true",
+                                 "filter" => { "type" => "range", "active" => "true",
+                                   "buckets" => { "0" => { "from" => "", "to" => "" } } } } })
       }.not_to change { config.reload.columns }
       expect(response).to redirect_to(edit_company_table_config_path(company, config))
     end
 
-    it "rejects filter config invalid per schema without saving" do
-      patch_columns({ "0" => { "key" => "property_string_1", "name" => "Color", "visible" => "true",
-                               "filter" => '{"type":"range","buckets":[[null,null]]}' } })
+    it "rejects a bucket whose from value is not below its to value" do
+      expect {
+        patch_columns({ "0" => { "key" => "property_integer_1", "name" => "Qty", "visible" => "true",
+                                 "filter" => { "type" => "range", "active" => "true",
+                                   "buckets" => { "0" => { "from" => "500", "to" => "100" } } } } })
+      }.not_to change { config.reload.columns }
       expect(response).to redirect_to(edit_company_table_config_path(company, config))
-      expect(config.reload.columns.first).not_to have_key("filter")
     end
   end
 end

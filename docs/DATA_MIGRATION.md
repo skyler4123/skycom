@@ -91,7 +91,7 @@ Reading it back:
 
 - `Index`, `Last Name`, `Phone 2`, `Subscription Date`, `Country`… are simply not mentioned → ignored.
 - `Customer Id` never appears in `columns` — it is consumed by `identity` (mapping it as a target is forbidden, §2.6).
-- `Company`/`City` land in `property_string_1`/`property_string_2`; the category's `properties` hash is what gives those slots human names and carries their dynamic validations.
+- `Company`/`City` land in `property_string_1`/`property_string_2`; the category's `properties` hash is what gives those slots human names. Values are validated only against the database column type limits.
 - `Website` lands in `customers.metadata` as `{"website": "http://…"}` (metadata values are always strings).
 - `Branch Code` is a foreign key: each row's value is looked up against `branches.external_id` within the company.
 
@@ -127,7 +127,7 @@ Reading it back:
 
 Optional keys (both modes):
 
-- `properties` — `{ "<slot>": "<display name>" }`, e.g. `{ "property_string_1": "Company" }`. Written into the category's PropertyMapping as `property_metadata`, **and this is where dynamic validations come from**: a slot whose property carries `"presence"` will fail rows that don't fill it (the dry run shows this per row). Use it to name every slot your `columns` map.
+- `properties` — `{ "<slot>": "<display name>" }`, e.g. `{ "property_string_1": "Company" }`. Written into the category's PropertyMapping as `metadata["properties"]`. Property slots are optional; values are validated only against the database column type limits (see `docs/PROPERTY_SLOT_VALIDATION.md`). Use it to name every slot your `columns` map.
 - `visible_columns` — array of column keys/slots for the category's TableConfig. `property_*` entries must use the same display name as the PropertyMapping (that's the TableConfig validation), so keep them in sync with `properties`.
 
 Two dry-run side effects worth knowing: the category (and its property mapping / table config) **is created during the dry run** — it is config-level prep, not a target-row write — and nothing is rolled back if you later abandon the migration.

@@ -61,7 +61,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | Any `/mobile/*` page, mobile controller, or Android shell work | `docs/MOBILE.md` — implementation contract; `docs/MOBILE_FEATURE_MATRIX.md` — web parity, backlog, native audit |
 | User-facing strings or translations | `docs/LANGUAGE.md` — **mandatory**: `translate()` usage + dictionary entries in `app/javascript/controllers/helpers/dictionary.js` |
 | User avatars | `docs/AVATAR.md` — helper + controller + concerns |
-| Seed-driven model validations | `docs/DYNAMIC_VALIDATION.md` — supported validators + affected models |
+| Dynamic property slot validation | `docs/PROPERTY_SLOT_VALIDATION.md` — built-in column limits + affected models |
 | Category-bound dynamic properties | `docs/CATEGORY_DYNAMIC_SCHEMA.md` — three-table runtime merge |
 | Addresses | `docs/ADDRESS.md` — fingerprint dedup + immutable record pattern |
 | HR module (tables, resolution engine, permission matrix) | `docs/HR.md` |

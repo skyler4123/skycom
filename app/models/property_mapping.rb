@@ -5,11 +5,10 @@
 #
 # Why it exists: Skycom stores category-specific fields in a fixed set of typed
 # property columns instead of adding database columns; this record defines which
-# slots exist, their display names, types, and validation rules.
+# slots exist and their display names/types.
 # How it works: belongs to company/category; the metadata shape documented below
-# is validated by the model and consumed by CategoryConcern,
-# PropertyMappingConcern, and dynamic validation. Categories create a default
-# mapping on create.
+# is validated by the model and consumed by CategoryConcern and
+# PropertyMappingConcern. Categories create a default mapping on create.
 # Main associations: belongs_to :company (touch), :category (required); has_many
 # :table_configs (dependent: :destroy) and resource records such as products,
 # services, orders, and employees that belong to :property_mapping (restricted
@@ -20,35 +19,22 @@
 #   {
 #     "key" => "property_string_1",
 #     "name" => "payment_method",
-#     "type" => "string",
-#     "validates" => {
-#       "presence" => true,
-#       "inclusion" => { "in" => ["Cash", "Credit Card", "E-Wallet"] }
-#     }
+#     "type" => "string"
 #   },
 #   {
 #     "key" => "property_integer_1",
 #     "name" => "total_items_quantity",
-#     "type" => "integer",
-#     "validates" => {
-#       "numericality" => { "only_integer" => true, "greater_than" => 0 }
-#     }
+#     "type" => "integer"
 #   },
 #   {
 #     "key" => "property_decimal_1",
 #     "name" => "vat_amount_vnd",
-#     "type" => "decimal",
-#     "validates" => {
-#       "numericality" => { "greater_than_or_equal_to" => 0 }
-#     }
+#     "type" => "decimal"
 #   },
 #   {
 #     "key" => "property_boolean_1",
 #     "name" => "is_e_invoice_sent",
-#     "type" => "boolean",
-#     "validates" => {
-#       "inclusion" => { "in" => [true, false] }
-#     }
+#     "type" => "boolean"
 #   }
 # ]
 #
@@ -61,11 +47,13 @@
 #   name:       String  — Human-readable display name. Required.
 #   type:       String  — One of: string, integer, decimal, boolean,
 #                        datetime. Derivable from the key prefix.
-#   validates:  Hash    — Validation rules (future use, currently {}).
+#
+# Values are validated against the real database column limits by
+# PropertySlotValidationConcern. Users cannot define custom validations.
 class PropertyMapping < ApplicationRecord
   include CategoryConcern
 
-  # Allowed metadata keys per property type in #property_metadata.
+  # Allowed metadata keys per property type in metadata["properties"].
   SUPPORTED_KEYS = {
     property_string:  %w[input_type placeholder suffix prefix default].freeze,
     property_integer: %w[input_type placeholder suffix prefix default min max options].freeze,
@@ -167,9 +155,7 @@ class PropertyMapping < ApplicationRecord
         columns << {
           "key" => key,
           "name" => pm_entry["name"],
-          "visible" => true,
-          "align" => "left",
-          "width" => nil
+          "visible" => true
         }
         changed = true
       end
@@ -221,7 +207,7 @@ class PropertyMapping < ApplicationRecord
       supported = SUPPORTED_KEYS[prefix]
 
       if supported
-        unexpected = entry.keys - supported - %w[key type name validates]
+        unexpected = entry.keys - supported - %w[key type name]
         if unexpected.any?
           errors.add(:metadata, "properties element #{idx}: unsupported keys #{unexpected.join(", ")} for #{key}. Supported: #{supported.join(", ")}")
         end

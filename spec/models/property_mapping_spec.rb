@@ -26,6 +26,18 @@ RSpec.describe PropertyMapping, type: :model do
   end
 
   describe "validations" do
+    describe "custom validates metadata" do
+      it "rejects a validates key because custom validation was removed" do
+        property_mapping = create(:property_mapping)
+        property_mapping.properties = [
+          { "key" => "property_string_1", "name" => "Brand", "validates" => { "presence" => true } }
+        ]
+
+        expect(property_mapping).not_to be_valid
+        expect(property_mapping.errors[:metadata].join).to include("unsupported keys validates")
+      end
+    end
+
     describe "must_have_table_config" do
       it "is valid when table_config exists" do
         property_mapping = create(:property_mapping)

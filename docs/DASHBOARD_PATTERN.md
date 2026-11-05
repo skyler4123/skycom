@@ -860,8 +860,8 @@ Some resources (PropertyMapping, TableConfig) store their config as a JSONB arra
 
 | Resource | JSONB Column | Array Entry Shape |
 |----------|-------------|-------------------|
-| PropertyMapping | `property_metadata` | `{key, name, label, type, validates}` |
-| TableConfig | `columns_metadata` | `{key, label, visible, sortable, align, pinned, width, roles, is_virtual, render_config}` |
+| PropertyMapping | `metadata.properties` | `{key, name, type, input options}` |
+| TableConfig | `metadata.columns` | `{key, name, visible, search, filter}` |
 
 ### Pattern: Dynamic Row Table
 
@@ -898,16 +898,16 @@ if p_params[:jsonb_column].is_a?(ActionController::Parameters) && !p_params[:jso
 end
 ```
 
-**2. Type normalization** (TableConfig only) — HTML forms send booleans as `"true"`/`"false"` strings, integers as strings, and arrays as comma-separated strings. Convert each entry:
+**2. Type normalization** (TableConfig only) — HTML forms send booleans as `"true"`/`"false"` strings and filter buckets as a hash of `{from, to}` rows. Convert each entry:
 
 ```ruby
 def normalize_column_types(columns)
   columns.map do |col|
     h = col.to_h
     h["visible"] = to_boolean(h["visible"]) if h.key?("visible")
-    h["sortable"] = to_boolean(h["sortable"]) if h.key?("sortable")
-    h["width"] = h["width"].present? ? h["width"].to_i : nil
-    h["roles"] = h["roles"].present? ? h["roles"].split(",").map(&:strip) : []
+    h["search"] = to_boolean(h["search"]) if h.key?("search")
+    h["filter"] = normalize_filter(h["filter"]) if h.key?("filter")
+    h.delete("filter") if h["filter"].blank? || h["filter"]["type"].blank?
     h
   end
 end
@@ -928,7 +928,8 @@ allPropertySlots() {
 
 addProperty() {
   const select = document.getElementById('new-property-slot')
-  this.propertyMetadata.push({ key: select.value, name: '', label: '' })
+  const slot = this.allPropertySlots().find(s => s.key === select.value)
+  this.propertyMetadata.push({ key: slot.key, name: '', type: slot.type })
   this.rerenderEditor()
 }
 ```

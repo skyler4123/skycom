@@ -108,7 +108,7 @@ RSpec.describe Import, type: :model do
 
       category.default_property_mapping.update!(
         metadata: { "properties" => [
-          { "key" => "property_string_1", "type" => "string", "name" => "Renamed Property", "validates" => {} }
+          { "key" => "property_string_1", "type" => "string", "name" => "Renamed Property" }
         ] }
       )
 
