@@ -39,6 +39,10 @@ default: &default
     class: PromoCampaigns::DueSweeperJob
     queue: default
     schedule: every 5 minutes
+  exams_expire_attempts_job:
+    class: Exams::ExpireAttemptsJob
+    queue: default
+    schedule: every 5 minutes
 
 
 development:
