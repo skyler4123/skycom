@@ -1743,6 +1743,50 @@ const ENUMS = {
       }
     ]
   },
+  "exam": {
+    "workflow_statuses": [
+      {
+        "name": "Draft",
+        "value": "draft"
+      },
+      {
+        "name": "Published",
+        "value": "published"
+      },
+      {
+        "name": "Archived",
+        "value": "archived"
+      }
+    ]
+  },
+  "employee_exam_appointment": {
+    "workflow_statuses": [
+      {
+        "name": "Assigned",
+        "value": "assigned"
+      },
+      {
+        "name": "In progress",
+        "value": "in_progress"
+      },
+      {
+        "name": "Submitted",
+        "value": "submitted"
+      },
+      {
+        "name": "Graded",
+        "value": "graded"
+      },
+      {
+        "name": "Expired",
+        "value": "expired"
+      },
+      {
+        "name": "Cancelled",
+        "value": "cancelled"
+      }
+    ]
+  },
   "workflow": {
     "process_types": [
       {

@@ -261,6 +261,18 @@ export const create_company_questions_path = (companyId) => `/companies/${compan
 export const new_company_question_path = (companyId) => `/companies/${companyId}/questions/new`
 export const company_question_path = (companyId, questionId) => `/companies/${companyId}/questions/${questionId}`
 export const edit_company_question_path = (companyId, questionId) => `/companies/${companyId}/questions/${questionId}/edit`
+export const company_exams_path = (companyId) => `/companies/${companyId}/exams`
+export const create_company_exams_path = (companyId) => `/companies/${companyId}/exams`
+export const new_company_exam_path = (companyId) => `/companies/${companyId}/exams/new`
+export const company_exam_path = (companyId, examId) => `/companies/${companyId}/exams/${examId}`
+export const edit_company_exam_path = (companyId, examId) => `/companies/${companyId}/exams/${examId}/edit`
+export const publish_company_exam_path = (companyId, examId) => `/companies/${companyId}/exams/${examId}/publish`
+export const archive_company_exam_path = (companyId, examId) => `/companies/${companyId}/exams/${examId}/archive`
+export const refresh_summary_company_exam_path = (companyId, examId) => `/companies/${companyId}/exams/${examId}/refresh_summary`
+export const company_exam_assignments_path = (companyId, examId) => `/companies/${companyId}/exams/${examId}/assignments`
+export const company_exam_appointments_path = (companyId, examId) => `/companies/${companyId}/exams/${examId}/appointments`
+export const company_exam_appointment_path = (companyId, examId, appointmentId) => `/companies/${companyId}/exams/${examId}/appointments/${appointmentId}`
+export const grade_company_exam_appointment_path = (companyId, examId, appointmentId) => `/companies/${companyId}/exams/${examId}/appointments/${appointmentId}/grade`
 export const company_announcements_path = (companyId) => `/companies/${companyId}/announcements`
 export const company_events_path = (companyId) => `/companies/${companyId}/events`
 export const new_company_event_path = (companyId) => `/companies/${companyId}/events/new`
