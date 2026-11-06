@@ -100,7 +100,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - **Metadata editing** — Never edit JSON/metadata through a textarea in a user-facing form. Give every editable metadata key its own typed input (text, number, select, checkbox, …) and preserve keys the form does not own. See "Metadata & JSON editing" below.
 - **Semantic colors (mandatory)** — Use only the semantic tokens (`bg-card`, `text-foreground`, `text-muted-foreground`, `border-line`, `bg-primary`, `text-danger`, …). Never raw palette classes (`bg-white`, `text-slate-500`, `border-slate-200`, `text-white`) and never `dark:` on a themed color — the CSS variable switches itself. `bin/check_colors --strict` enforces this. See `docs/STYLING_GUIDELINES.md`.
 - **Dark mode & grouping** — Every UI group (title+value, card, dropdown, table, section) must have a border (`border border-line`) or distinct background (`bg-card` / `bg-muted`). One class covers both modes; do not add `dark:` variants. See `docs/STYLING_GUIDELINES.md` §3 and §5.
-- **BE↔FE link** — When you add, remove, or change an endpoint, update the file-header link comments in **both** the BE controller (`Serves Stimulus:`) and the FE Stimulus controller (`Depends on BE:` / `Endpoints:`). See the template in `V1Controller`, `OrdersController`, `PagesController`, `MockQrGatewayController`, `RetailCashierController`. Links are living — remove stale pairs, add new ones per feature.
+- **BE↔FE link** — When you add, remove, or change an endpoint, update the file-header link comments in **both** the BE controller (`Serves Stimulus:`) and the FE Stimulus controller (`Depends on BE:` / `Endpoints:`). See the template in `V1Controller`, `OrdersController`, `OperationsController`, `MockQrGatewayController`, `Operations::PosController`. Links are living — remove stale pairs, add new ones per feature.
 - **Test priority** — Verify feature tests for the touched area are green before declaring work complete; request/model specs alone are insufficient. See `docs/TEST_PRIORITY.md`.
 
 ## Architecture
@@ -151,7 +151,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - **Never** use low-level `Kredis.redis` or kredis proxy built-ins (`.value`, `.increment`, ...) in services/controllers/jobs. The owning model wraps them behind domain-named methods (e.g., `Stock#available_count`, `Company#record_credit_usage!`) so the backend can swap Kredis ↔ DB without changing callers. See `docs/KREDIS.md`.
 
 ## BE↔FE Documentation
-- Headers are the source of truth for which Stimulus controller calls which BE action. Keep them accurate; delete entries when an endpoint/pair is removed. See `V1Controller`, `OrdersController`, `PagesController`, `MockQrGatewayController`, `RetailCashierController` for the template.
+- Headers are the source of truth for which Stimulus controller calls which BE action. Keep them accurate; delete entries when an endpoint/pair is removed. See `V1Controller`, `OrdersController`, `OperationsController`, `MockQrGatewayController`, `Operations::PosController` for the template.
 
 ## Full Guidelines
 `README.md` is auto-loaded into every session alongside this file (via `.opencode/plugins/skycom-context.js`, since OpenCode V2 ignores the `instructions` field in `opencode.json`). It covers:
