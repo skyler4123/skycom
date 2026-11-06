@@ -70,7 +70,10 @@ export const new_company_department_path = (companyId) => `/companies/${companyI
 export const edit_company_department_path = (companyId, departmentId) => `/companies/${companyId}/departments/${departmentId}/edit`
 
 export const company_categories_path = (companyId) => `/companies/${companyId}/categories`
-export const new_company_category_path = (companyId) => `/companies/${companyId}/categories/new`
+export const new_company_category_path = (companyId, resourceName) => {
+  const path = `/companies/${companyId}/categories/new`
+  return resourceName ? `${path}?resource_name=${encodeURIComponent(resourceName)}` : path
+}
 export const create_company_categories_path = (companyId) => `/companies/${companyId}/categories`
 export const company_category_path = (companyId, categoryId) => `/companies/${companyId}/categories/${categoryId}`
 export const edit_company_category_path = (companyId, categoryId) => `/companies/${companyId}/categories/${categoryId}/edit`

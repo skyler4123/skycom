@@ -109,7 +109,10 @@ export default class Companies_CustomerProfiles_NewController extends Companies_
         <h2 class="text-xl font-bold text-foreground">${translate("New Customer Profile")}</h2>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
+          <div class="flex items-center justify-between">
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
+            ${newCategoryLink(currentCompany().id, "customer_profiles")}
+          </div>
           <select
             name="customer_profile[category_id]"
             data-action="change->${this.identifier}#onCategoryChange"

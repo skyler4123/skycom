@@ -109,7 +109,10 @@ export default class Companies_Services_NewController extends Companies_LayoutCo
         <h2 class="text-xl font-bold text-foreground">${translate("New Service")}</h2>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
+          <div class="flex items-center justify-between">
+            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
+            ${newCategoryLink(currentCompany().id, "services")}
+          </div>
           <select
             name="service[category_id]"
             data-action="change->${this.identifier}#onCategoryChange"

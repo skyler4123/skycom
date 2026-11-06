@@ -389,6 +389,26 @@ for (const config of (mapping.property_metadata || [])) {
 // Result: { property_string_1: "Skin Type Suitability", property_integer_1: "Volume (ml)" }
 ```
 
+### New Category Shortcut (Record Forms)
+
+Every record form whose category is selectable must render a **New Category** link beside the Category label. The link opens the category form with the record's resource preselected, so the user does not have to leave the form, guess the resource name, and start over.
+
+```javascript
+// app/javascript/controllers/companies/products/new_controller.js
+<div class="flex items-center justify-between">
+  <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
+  ${newCategoryLink(currentCompany().id, "products")}
+</div>
+<select name="product[category_id]" ...>
+```
+
+- Helper: `newCategoryLink(companyId, resourceName)` in `ui_helpers.js`
+- URL: `/companies/:company_id/categories/new?resource_name=<resource>`
+- `app/javascript/controllers/companies/categories/new_controller.js` reads `resource_name` and preselects it.
+- `Companies::CategoriesController#create` keeps the resource on validation failure by redirecting with the same `resource_name`.
+- The canonical resource list lives in `app/javascript/controllers/helpers/enums.js` under `category.resource_names`. Add any new category-backed resource there.
+- Config pages (`table_configs/new`, `property_mappings/new`) and the event creation modal are not record forms; they do not render this shortcut.
+
 ### Three-Table Column Merge
 
 The frontend combines `TableConfig.metadata.columns` with `PropertyMapping` names to render table headers:

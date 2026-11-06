@@ -43,6 +43,13 @@ RSpec.feature "Companies::Workflows Edit", type: :feature, js: true do
     expect(find('input[name="workflow[workflow_steps_attributes][0][name]"]').value).to eq('Submit')
   end
 
+  scenario "shows the New Category link for purchase categories" do
+    visit edit_company_workflow_path(company, workflow)
+
+    expected_href = new_company_category_path(company, resource_name: "purchases")
+    expect(page).to have_link(href: expected_href, wait: 10)
+  end
+
   scenario "renames workflow and step, appends a new step" do
     visit edit_company_workflow_path(company, workflow)
     expect(page).to have_selector('input[name="workflow[name]"]', wait: 10)

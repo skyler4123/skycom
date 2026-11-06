@@ -44,6 +44,7 @@ window.openPopover = Helpers.openPopover
 window.form = Helpers.form
 window.toast = Helpers.toast
 window.selectOptionsHTML = Helpers.selectOptionsHTML
+window.newCategoryLink = Helpers.newCategoryLink
 window.table = Helpers.table
 window.dynamicSearchHTML = Helpers.dynamicSearchHTML
 window.dynamicFiltersHTML = Helpers.dynamicFiltersHTML

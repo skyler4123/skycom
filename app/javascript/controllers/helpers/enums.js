@@ -662,7 +662,25 @@ const ENUMS = {
       "customers",
       "services",
       "facilities",
-      "questions"
+      "questions",
+      "orders",
+      "invoices",
+      "warehouses",
+      "documents",
+      "events",
+      "tickets",
+      "purchases",
+      "purchase_items",
+      "stocks",
+      "stock_imports",
+      "stock_exports",
+      "stock_adjustments",
+      "stock_transfers",
+      "customer_profiles",
+      "customer_subprofiles",
+      "employee_profiles",
+      "employee_subprofiles",
+      "employee_groups"
     ]
   },
   "product": {
