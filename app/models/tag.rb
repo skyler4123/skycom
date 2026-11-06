@@ -9,7 +9,7 @@
 # How it works: TagConcern's attach_tag finds or creates the company-scoped Tag,
 # syncs its value, and writes the matching <Record>TagAppointment row. Reads go
 # through `record.tags`; the model exposes many has_many/through associations for
-# each taggable resource (answers, branches, customers, employees, orders, ...).
+# each taggable resource (branches, customers, employees, orders, ...).
 # Main associations: belongs_to :company; has_many :<resource>_tag_appointments
 # (dependent: :destroy) and :<resources> through them for every taggable model.
 class Tag < ApplicationRecord
@@ -17,8 +17,6 @@ class Tag < ApplicationRecord
 
   belongs_to :company
 
-  has_many :answer_tag_appointments, dependent: :destroy
-  has_many :answers, through: :answer_tag_appointments
   has_many :branch_tag_appointments, dependent: :destroy
   has_many :branches, through: :branch_tag_appointments
   has_many :brand_tag_appointments, dependent: :destroy
@@ -41,10 +39,6 @@ class Tag < ApplicationRecord
   has_many :events, through: :event_tag_appointments
   has_many :event_group_tag_appointments, dependent: :destroy
   has_many :event_groups, through: :event_group_tag_appointments
-  has_many :exam_tag_appointments, dependent: :destroy
-  has_many :exams, through: :exam_tag_appointments
-  has_many :exam_group_tag_appointments, dependent: :destroy
-  has_many :exam_groups, through: :exam_group_tag_appointments
   has_many :facility_tag_appointments, dependent: :destroy
   has_many :facilities, through: :facility_tag_appointments
   has_many :facility_group_tag_appointments, dependent: :destroy
@@ -67,8 +61,6 @@ class Tag < ApplicationRecord
   has_many :purchases, through: :purchase_tag_appointments
   has_many :purchase_item_tag_appointments, dependent: :destroy
   has_many :purchase_items, through: :purchase_item_tag_appointments
-  has_many :question_tag_appointments, dependent: :destroy
-  has_many :questions, through: :question_tag_appointments
   has_many :role_tag_appointments, dependent: :destroy
   has_many :roles, through: :role_tag_appointments
   has_many :service_tag_appointments, dependent: :destroy

@@ -26,6 +26,7 @@ class Category < ApplicationRecord
 
   has_many :employee_groups, dependent: :nullify
   has_many :employees, dependent: :nullify
+  has_many :questions, dependent: :restrict_with_error
   has_many :departments, dependent: :nullify
   has_many :products, dependent: :nullify
   has_many :services, dependent: :nullify

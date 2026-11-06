@@ -4,8 +4,6 @@ require 'rails_helper'
 RSpec.describe Tag, type: :model do
   describe "associations" do
     it { should belong_to(:company) }
-    it { should have_many(:answer_tag_appointments).dependent(:destroy) }
-    it { should have_many(:answers).through(:answer_tag_appointments) }
     it { should have_many(:branch_tag_appointments).dependent(:destroy) }
     it { should have_many(:branches).through(:branch_tag_appointments) }
     it { should have_many(:brand_tag_appointments).dependent(:destroy) }
@@ -28,10 +26,6 @@ RSpec.describe Tag, type: :model do
     it { should have_many(:events).through(:event_tag_appointments) }
     it { should have_many(:event_group_tag_appointments).dependent(:destroy) }
     it { should have_many(:event_groups).through(:event_group_tag_appointments) }
-    it { should have_many(:exam_tag_appointments).dependent(:destroy) }
-    it { should have_many(:exams).through(:exam_tag_appointments) }
-    it { should have_many(:exam_group_tag_appointments).dependent(:destroy) }
-    it { should have_many(:exam_groups).through(:exam_group_tag_appointments) }
     it { should have_many(:facility_tag_appointments).dependent(:destroy) }
     it { should have_many(:facilities).through(:facility_tag_appointments) }
     it { should have_many(:facility_group_tag_appointments).dependent(:destroy) }
@@ -54,8 +48,6 @@ RSpec.describe Tag, type: :model do
     it { should have_many(:purchases).through(:purchase_tag_appointments) }
     it { should have_many(:purchase_item_tag_appointments).dependent(:destroy) }
     it { should have_many(:purchase_items).through(:purchase_item_tag_appointments) }
-    it { should have_many(:question_tag_appointments).dependent(:destroy) }
-    it { should have_many(:questions).through(:question_tag_appointments) }
     it { should have_many(:role_tag_appointments).dependent(:destroy) }
     it { should have_many(:roles).through(:role_tag_appointments) }
     it { should have_many(:service_tag_appointments).dependent(:destroy) }

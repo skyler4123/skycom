@@ -10,17 +10,16 @@ class Seed::EmployeeExamAppointmentService
   )
     raise "Cannot create appointment: No company, employee or exam provided." if company.nil? || employee.nil? || exam.nil?
 
-    should_discard = rand(10) == 0
-    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-    name ||= "#{employee.name} Appointment"
-
+    name ||= "#{employee.name} exam attempt"
     EmployeeExamAppointment.new(
       company: company,
       employee: employee,
       exam: exam,
       name: name,
-      description: description || "Employee appointment for #{employee.name}.",
+      description: description || "Exam attempt for #{exam.name}.",
       code: code || "EMP-EXM-#{SecureRandom.hex(4).upcase}",
+      workflow_status: :assigned,
+      attempt_number: 1,
       discarded_at: discarded_at
     )
   end

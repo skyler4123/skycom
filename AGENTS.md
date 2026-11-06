@@ -65,6 +65,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | Category-bound dynamic properties | `docs/CATEGORY_DYNAMIC_SCHEMA.md` — three-table runtime merge |
 | Addresses | `docs/ADDRESS.md` — fingerprint dedup + immutable record pattern |
 | HR module (tables, resolution engine, permission matrix) | `docs/HR.md` |
+| Exams (question bank, assignments, attempts, grading, summaries) | `docs/EXAMS.md` |
 | Per-domain details on Employee/Customer (profiles, personas, histories) | `docs/PROFILE_SUBPROFILE.md` — Profile/SubProfile buckets (full-dynamic resources), not new base-table columns |
 
 ### Platform
