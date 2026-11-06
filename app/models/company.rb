@@ -39,7 +39,7 @@ class Company < ApplicationRecord
     Supplier
     Purchase PurchaseItem Workflow
     DiscountGroup Discount
-    Patient Appointment Course Student Exam
+    Patient Appointment Course Student Exam Question
     Membership
     Operation CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
     AttendanceConfig AttendanceLog AttendanceDay AttendanceMonth AttendanceRequest

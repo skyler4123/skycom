@@ -661,7 +661,8 @@ const ENUMS = {
       "suppliers",
       "customers",
       "services",
-      "facilities"
+      "facilities",
+      "questions"
     ]
   },
   "product": {

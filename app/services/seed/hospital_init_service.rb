@@ -205,6 +205,7 @@ class Seed::HospitalInitService
     create_default_notification_tags
     create_categories
     create_table_configs
+    create_default_question_categories
     create_default_workflows
     create_default_event_configs
     create_default_dynamic_sidebar
@@ -212,6 +213,12 @@ class Seed::HospitalInitService
   end
 
   private
+
+  def create_default_question_categories
+    %w[General Safety Compliance Customer\ Service].each do |name|
+      Category.find_or_create_by!(company: @company, resource_name: "questions", name: name)
+    end
+  end
 
   # Category is the bridge to workflows (docs/PURCHASE_WORKFLOW.md): every purchases
   # category gets its own default "Standard Purchase Process" so purchases in the same
@@ -443,6 +450,7 @@ class Seed::HospitalInitService
         "Course" => { create: true, read: true, update: true, delete: true },
         "Student" => { create: true, read: true, update: true, delete: true },
         "Exam" => { create: true, read: true, update: true, delete: true },
+        "Question" => { create: true, read: true, update: true, delete: true },
         "Customer" => { create: true, read: true, update: true, delete: true },
         "Patient" => { create: true, read: true, update: true, delete: true },
         "Order" => { create: true, read: true, update: true, delete: true },
@@ -502,6 +510,7 @@ class Seed::HospitalInitService
         "Course" => { create: true, read: true, update: true, delete: true },
         "Student" => { create: true, read: true, update: true, delete: true },
         "Exam" => { create: true, read: true, update: true, delete: true },
+        "Question" => { create: true, read: true, update: true, delete: true },
         "Customer" => { create: true, read: true, update: true, delete: true },
         "Patient" => { create: true, read: true, update: true, delete: true },
         "Order" => { create: true, read: true, update: true, delete: true },
