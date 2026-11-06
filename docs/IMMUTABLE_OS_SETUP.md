@@ -1,7 +1,7 @@
 # Skycom on Immutable OS (Distrobox + Docker + VS Code)
 
 > **Scope**: generic Immutable OS (Bazzite, Silverblue, Bluefin, Aurora) with Bazzite callouts.
-> Distrobox container: Ubuntu 22.04. Ruby 3.4.3 via **rbenv**. Follows `COMMANDS.md` + `docker-compose.yml`.
+> Distrobox container: Ubuntu 22.04. Ruby 4.0.7 via **rbenv**. Follows `COMMANDS.md` + `docker-compose.yml`.
 
 ## 0. Why Distrobox
 
@@ -143,7 +143,7 @@ cd ~/Documents/skycom
 
 ### 3.2 System dependencies
 
-Runtime + build deps from `Dockerfile` (plus headers needed to compile Ruby 3.4.3):
+Runtime + build deps from `Dockerfile` (plus headers needed to compile Ruby 4.0.7):
 
 ```bash
 sudo apt update
@@ -156,18 +156,18 @@ sudo apt install -y git curl build-essential pkg-config \
 
 `chromium` covers `selenium-webdriver` system tests (`Gemfile` `:test` group).
 
-### 3.3 Ruby 3.4.3 via rbenv
+### 3.3 Ruby 4.0.7 via rbenv
 
-`.ruby-version` and `Dockerfile` both pin `3.4.3` — Ubuntu 22.04's apt ruby is too old for Rails 8, so use rbenv:
+`.ruby-version` and `Dockerfile` both pin `4.0.7` — Ubuntu 22.04's apt ruby is too old for Rails 8, so use rbenv:
 
 ```bash
 curl -fsSL https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-installer | bash
 echo 'export PATH="$HOME/.rbenv/bin:$HOME/.rbenv/shims:$PATH"' >> ~/.bashrc
 echo 'eval "$(rbenv init - bash)"' >> ~/.bashrc
 exec $SHELL
-rbenv install 3.4.3
-rbenv global 3.4.3
-ruby -v   # => ruby 3.4.3
+rbenv install 4.0.7
+rbenv global 4.0.7
+ruby -v   # => ruby 4.0.7
 gem install bundler foreman
 ```
 
@@ -175,7 +175,7 @@ gem install bundler foreman
 
 ### 3.3b Box-native Ruby for non-root shells
 
-`distrobox enter --root dev` runs as root, so §3.3 installs rbenv into container-local `/root/.rbenv` — compiled against the box's glibc 2.35 / OpenSSL 3.0, and working. But Distrobox shares `$HOME`, so any **non-root** shell in the same box (a second terminal, an agent session) resolves the **host-compiled** `~/.rbenv/versions/3.4.3` instead. That binary's `openssl.so` requires `GLIBC_2.38` + `OPENSSL_3.4.0`, which Ubuntu 22.04 does not have.
+`distrobox enter --root dev` runs as root, so §3.3 installs rbenv into container-local `/root/.rbenv` — compiled against the box's glibc 2.35 / OpenSSL 3.0, and working. But Distrobox shares `$HOME`, so any **non-root** shell in the same box (a second terminal, an agent session) resolves the **host-compiled** `~/.rbenv/versions/4.0.7` instead. That binary's `openssl.so` requires `GLIBC_2.38` + `OPENSSL_3.4.0`, which Ubuntu 22.04 does not have.
 
 Symptom: `ruby -v` prints fine, but any `bundle exec` that loads openssl (e.g. `parallel_rspec`, via `parallel/serializer`) dies with:
 
@@ -195,8 +195,8 @@ Fix — install a box-native Ruby under a **separate** `RBENV_ROOT` (never reins
 ```bash
 export BOX_RBENV="$HOME/<separate-rbenv-root>"   # any path outside ~/.rbenv
 mkdir -p "$BOX_RBENV/versions"
-"$HOME/.rbenv/plugins/ruby-build/bin/ruby-build" 3.4.3 "$BOX_RBENV/versions/3.4.3"
-export PATH="$BOX_RBENV/versions/3.4.3/bin:$PATH"
+"$HOME/.rbenv/plugins/ruby-build/bin/ruby-build" 4.0.7 "$BOX_RBENV/versions/4.0.7"
+export PATH="$BOX_RBENV/versions/4.0.7/bin:$PATH"
 gem install bundler --no-document
 cd ~/Documents/skycom && bundle install
 ```
@@ -326,7 +326,7 @@ bin/dev
 |------|---------------------|
 | `docker-compose.yml` | All infra services, ports, `RAILS_MASTER_KEY` wiring |
 | `docker-compose.rspec-test.yml` / `docker-compose.seed-test.yml` | Test + seed compose variants (`COMMANDS.md:8-10`) |
-| `Dockerfile` | `RUBY_VERSION=3.4.3`, apt deps mirrored in §3.2 |
+| `Dockerfile` | `RUBY_VERSION=4.0.7`, apt deps mirrored in §3.2 |
 | `.ruby-version` | Ruby pin consumed by rbenv |
 | `Gemfile` | Rails 8.0.4, pg/sqlite, selenium (needs chromium) |
 | `config/database.yml` | pg primary/queue (needs postgres :5432), sqlite cache/cable |
