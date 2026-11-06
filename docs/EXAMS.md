@@ -197,6 +197,7 @@ Priority: feature specs → model/service specs → request specs.
 
 - Model: `spec/models/{question,question_option,exam,exam_question_appointment,employee_exam_appointment,employee_question_appointment,exam_summary}_spec.rb`
 - Services/jobs: `spec/services/exams/*`, `spec/jobs/exams/*`
+- Seed: `spec/services/seed/exam_seed_spec.rb`, `spec/services/seed/exam_sample_seed_spec.rb`
 - Requests: `spec/requests/companies/{questions,exams,exam_assignments,exam_appointments,my_exams,my_exam_appointments}_controller_spec.rb`
 - Features: `spec/features/companies/{questions,exams,my_exams,exam_appointments}`
 

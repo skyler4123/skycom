@@ -62,11 +62,12 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Tickets + TicketComments | ~6 tickets per company (with comments; workflow states across phases) |
 | Billing Data | 7 days of metrics + 2 invoices |
 
-After all four enrich services finish, `Seed::ApplicationService` runs two
+After all four enrich services finish, `Seed::ApplicationService` runs these
 cross-company demo steps so the owner's own screens are populated:
 
 | Step | What It Guarantees |
 |------|--------------------|
+| `Seed::ExamSampleService.seed_for` | 12 numbered questions across the question categories, five exams covering `draft`/`published`/`archived`, assignments, attempts across `assigned`/`in_progress`/`submitted`/`graded`/`expired`, and a computed `ExamSummary` per exam. The owner gets one exam in each My Exams tab. |
 | `Seed::PayrollService.ensure_current_month!` | Every active employee (owner included) has a current-month `AttendanceMonth` and draft `Payroll`. Uses resolved attendance when present; otherwise seeds a month-to-date fallback summary. |
 | `Seed::KpiService.create_samples!` | One active company-wide **Orders sold** `KpiConfig` (target 5). The owner gets one paid order per branch in the current month; staff orders are distributed round-robin, and one order stays unattributed so the leaderboard banner remains visible. |
 
@@ -105,6 +106,8 @@ Seed::ApplicationService.run
           products, warehouses, stocks, transfers/imports/exports, stay orders +
           folios, bookings, purchases, discounts, shifts + attendance, credit data
    |
+   +- Demo exams for all 4 companies
+       +- Seed::ExamSampleService.seed_for
    +- Demo payroll + KPI for all 4 companies
        +- Seed::PayrollService.ensure_current_month!
        +- Seed::KpiService.create_samples!

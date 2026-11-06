@@ -107,6 +107,13 @@ class Seed::ApplicationService
     Seed::HospitalEnrichService.new(company: company_3, user: user_2, email: "hospital@company3.com")
     Seed::HotelEnrichService.new(company: company_4, user: user_2, email: "hotel@company4.com")
 
+    # Exam demo rows for every company: question bank, exams across every
+    # workflow status, assignments, attempts across the lifecycle, and cached
+    # summaries. Uses the real exam services so snapshots/scoring stay valid.
+    [ company_1, company_2, company_3, company_4 ].each do |company|
+      Seed::ExamSampleService.seed_for(company: company)
+    end
+
     # Payroll and Performance both open on the current month. Guarantee the
     # owner (and every employee) has a current-month payroll row, and give the
     # owner a paid order plus an active KPI rule so neither page is empty.
