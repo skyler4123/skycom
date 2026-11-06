@@ -257,7 +257,10 @@ export default class Companies_StockTransfers_NewController extends Companies_La
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
+            <div class="flex items-center justify-between">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
+              ${newCategoryLink(currentCompany().id, "stock_transfers")}
+            </div>
             <select name="stock_transfer[category_id]" data-action="change->${this.identifier}#onCategoryChange"
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), this.categoryId)}

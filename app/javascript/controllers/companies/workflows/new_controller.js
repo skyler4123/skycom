@@ -151,7 +151,10 @@ export default class Companies_Workflows_NewController extends Companies_LayoutC
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
+            <div class="flex items-center justify-between">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
+              ${newCategoryLink(currentCompany().id, "purchases")}
+            </div>
             <select name="workflow[category_id]" required
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground">
               ${selectOptionsHTML(cloneNewKey(categories, "id", "value"), categoryValue)}

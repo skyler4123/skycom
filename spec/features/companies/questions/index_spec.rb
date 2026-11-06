@@ -67,6 +67,16 @@ RSpec.feature "Companies::Questions Management", type: :feature, js: true do
     expect(page).not_to have_field("question[options][0][content]")
   end
 
+  scenario "shows the New Category link on new and edit question forms" do
+    expected_href = new_company_category_path(company, resource_name: "questions")
+
+    visit new_company_question_path(company)
+    expect(page).to have_link(href: expected_href, wait: 10)
+
+    visit edit_company_question_path(company, question)
+    expect(page).to have_link(href: expected_href, wait: 10)
+  end
+
   scenario "edits a question" do
     visit edit_company_question_path(company, question)
 

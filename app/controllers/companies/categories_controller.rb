@@ -55,7 +55,8 @@ class Companies::CategoriesController < Companies::ApplicationController
     if category.save
       redirect_to company_category_path(current_company, category), notice: "Category created successfully."
     else
-      redirect_to new_company_category_path(current_company),
+      redirect_params = category.resource_name.present? ? { resource_name: category.resource_name } : {}
+      redirect_to new_company_category_path(current_company, **redirect_params),
         alert: category.errors.full_messages.to_sentence
     end
   end

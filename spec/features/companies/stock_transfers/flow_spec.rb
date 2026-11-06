@@ -49,6 +49,16 @@ RSpec.feature "Companies::StockTransfers Flow", type: :feature, js: true do
     expect(Stock.find_by(warehouse: warehouse_b, product: product_a).quantity).to eq(5)
   end
 
+  scenario "edit page shows the New Category link" do
+    transfer = create(:stock_transfer, company: company, warehouse: warehouse_a,
+      destination_warehouse: warehouse_b)
+
+    visit edit_company_stock_transfer_path(company, transfer)
+
+    expected_href = new_company_category_path(company, resource_name: "stock_transfers")
+    expect(page).to have_link(href: expected_href, wait: 10)
+  end
+
   scenario "received transfer show page has no phase buttons" do
     transfer = create(:stock_transfer, company: company, warehouse: warehouse_a,
       destination_warehouse: warehouse_b)
