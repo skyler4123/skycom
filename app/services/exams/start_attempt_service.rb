@@ -106,6 +106,7 @@ module Exams
       {
         "name" => question.name,
         "description" => question.description,
+        "correct_text" => question.correct_text,
         "options" => options.map do |option|
           {
             "id" => option.id,

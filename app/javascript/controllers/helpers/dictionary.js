@@ -1504,5 +1504,14 @@ export const dictionary = () => {
     "Result not found.": { vi: "Không tìm thấy kết quả." },
     "This exam has no questions.": { vi: "Bài thi chưa có câu hỏi." },
     "Failed to load my exams": { vi: "Không tải được bài thi của tôi" },
+    "Graded": { vi: "Đã chấm" },
+    "Selected": { vi: "Đã chọn" },
+    "Employee Answer": { vi: "Câu trả lời của nhân viên" },
+    "Award points": { vi: "Chấm điểm" },
+    "Save Grades": { vi: "Lưu điểm" },
+    "Attempt not found.": { vi: "Không tìm thấy lượt làm bài." },
+    "No attempts found": { vi: "Không tìm thấy lượt làm bài" },
+    "Failed to load attempts": { vi: "Không tải được danh sách lượt làm" },
+    "Failed to load attempt": { vi: "Không tải được lượt làm bài" },
   }
 }

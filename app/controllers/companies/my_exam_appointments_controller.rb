@@ -174,15 +174,18 @@ class Companies::MyExamAppointmentsController < Companies::ApplicationController
   def result_answer(answer, reveal_correct:)
     snapshot = answer.question_snapshot
 
+    question = {
+      name: snapshot["name"],
+      description: snapshot["description"],
+      options: snapshot_options(answer, include_correct: reveal_correct)
+    }
+    question[:correct_text] = snapshot["correct_text"] if reveal_correct
+
     payload = {
       id: answer.id,
       position: answer.position,
       question_type: answer.question_type,
-      question: {
-        name: snapshot["name"],
-        description: snapshot["description"],
-        options: snapshot_options(answer, include_correct: reveal_correct)
-      },
+      question: question,
       option_order: answer.option_order_ids,
       selected_option_ids: answer.selected_option_ids,
       selected_options: answer.selected_options.map { |option| { "id" => option["id"], "content" => option["content"] } },
