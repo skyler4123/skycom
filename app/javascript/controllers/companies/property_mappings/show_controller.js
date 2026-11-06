@@ -1,5 +1,8 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
+// Property Mapping show page — friendly names/types/setup summaries, no raw keys.
+// Depends on BE: Companies::PropertyMappingsController#show (JSON hydration).
+// Docs: docs/CATEGORY_DYNAMIC_SCHEMA.md
 export default class Companies_PropertyMappings_ShowController extends Companies_LayoutController {
   /** @type {any | null} */
   mapping = null
@@ -51,23 +54,34 @@ export default class Companies_PropertyMappings_ShowController extends Companies
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="text-sm text-muted-foreground bg-muted border-b border-line">
-                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Key")}</th>
-                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Name")}</th>
-                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Type")}</th>
+                <th class="py-3 px-4 font-medium whitespace-nowrap"
+                  ${tooltip(translate("The name your team sees in tables, forms, and reports."))}
+                >${translate("Display Name")}</th>
+                <th class="py-3 px-4 font-medium whitespace-nowrap"
+                  ${tooltip(translate("What kind of value this property stores."))}
+                >${translate("Type")}</th>
+                <th class="py-3 px-4 font-medium whitespace-nowrap"
+                  ${tooltip(translate("Options and limits configured for this property."))}
+                >${translate("Setup")}</th>
               </tr>
             </thead>
             <tbody>
-              ${metadata.map(field => `
-                <tr class="border-b border-line last:border-0 hover:bg-muted/50">
-                  <td class="py-3 px-4 text-sm font-mono text-foreground">${field.key}</td>
-                  <td class="py-3 px-4 text-sm text-muted-foreground">${field.name || '-'}</td>
-                  <td class="py-3 px-4">
-                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary ">
-                      ${field.type || field.key?.replace(/_\d+$/, '').replace('property_', '') || '-'}
-                    </span>
-                  </td>
-                </tr>
-              `).join('')}
+              ${metadata.map(field => {
+                const uiType = Helpers.uiTypeForEntry(field)
+                return `
+                  <tr class="border-b border-line last:border-0 hover:bg-muted/50">
+                    <td class="py-3 px-4 text-sm font-medium text-foreground">${escapeHtml(field.name || '-')}</td>
+                    <td class="py-3 px-4">
+                      <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
+                        ${tooltip(Helpers.propertyTypeTooltip(uiType))}>
+                        <span class="material-symbols-outlined text-[14px]!">${Helpers.propertyTypeIcon(uiType)}</span>
+                        ${Helpers.propertyTypeLabel(uiType)}
+                      </span>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-muted-foreground">${escapeHtml(Helpers.propertySettingsSummary(field))}</td>
+                  </tr>
+                `
+              }).join('')}
             </tbody>
           </table>
         </div>
@@ -90,10 +104,10 @@ export default class Companies_PropertyMappings_ShowController extends Companies
               <span class="material-symbols-outlined text-4xl text-primary ">settings_applications</span>
             </div>
             <div class="flex flex-1 flex-col text-center sm:text-left">
-              <h2 class="text-2xl font-black text-foreground">${m.name}</h2>
-              <p class="font-semibold text-primary ">${m.description || ''}</p>
+              <h2 class="text-2xl font-black text-foreground">${escapeHtml(m.name)}</h2>
+              <p class="font-semibold text-primary ">${escapeHtml(m.description || '')}</p>
               <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
-                <span class="inline-flex items-center rounded-lg bg-primary/10 px-3 py-1 text-xs font-bold text-primary uppercase">${m.resource_name || 'N/A'}</span>
+                <span class="inline-flex items-center rounded-lg bg-primary/10 px-3 py-1 text-xs font-bold text-primary uppercase">${escapeHtml(m.resource_name || 'N/A')}</span>
                 <span class="inline-flex items-center rounded-lg bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">${propsCount} ${translate("fields")}</span>
               </div>
             </div>
@@ -106,7 +120,7 @@ export default class Companies_PropertyMappings_ShowController extends Companies
               </div>
               <div>
                 <p class="text-xs font-medium text-muted-foreground">${translate("Category")}</p>
-                <p class="text-sm font-semibold text-foreground">${category?.name || 'N/A'}</p>
+                <p class="text-sm font-semibold text-foreground">${escapeHtml(category?.name || 'N/A')}</p>
               </div>
             </div>
 
@@ -116,7 +130,7 @@ export default class Companies_PropertyMappings_ShowController extends Companies
               </div>
               <div>
                 <p class="text-xs font-medium text-muted-foreground">${translate("Description")}</p>
-                <p class="text-sm font-semibold text-foreground">${m.description || '-'}</p>
+                <p class="text-sm font-semibold text-foreground">${escapeHtml(m.description || '-')}</p>
               </div>
             </div>
           </div>

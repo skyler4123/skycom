@@ -747,6 +747,334 @@ export const dictionary = () => {
       vi: "Cột ảo — được tính khi hiển thị, không lưu trong cơ sở dữ liệu",
     },
 
+    // === Property Mapping editor (docs/CATEGORY_DYNAMIC_SCHEMA.md) ===
+    "How properties work": { vi: "Cách thuộc tính hoạt động" },
+    "Properties are extra fields for this category. Your team fills them in when creating or editing records. Pick a type, give it a clear name, and configure choices if needed.": {
+      vi: "Thuộc tính là các trường bổ sung cho danh mục này. Đội của bạn điền chúng khi tạo hoặc sửa bản ghi. Hãy chọn loại, đặt tên rõ ràng và cấu hình lựa chọn nếu cần.",
+    },
+    "Add a property": { vi: "Thêm thuộc tính" },
+    "Choose a type. The storage key is assigned automatically.": {
+      vi: "Chọn loại. Khóa lưu trữ được gán tự động.",
+    },
+    "Name it": { vi: "Đặt tên" },
+    "Use words your team understands, e.g. Skin type or Volume (ml).": {
+      vi: "Dùng từ mà đội của bạn hiểu, ví dụ: Loại da hoặc Dung tích (ml).",
+    },
+    "Configure it": { vi: "Cấu hình" },
+    "Add choices, limits, or display options. Nothing is saved until you click Save Changes.": {
+      vi: "Thêm lựa chọn, giới hạn hoặc tùy chọn hiển thị. Không có gì được lưu cho đến khi bạn bấm Lưu thay đổi.",
+    },
+    "Example": { vi: "Ví dụ" },
+    "Choice list “Membership tier” with 1 = Gold, 2 = Silver, 3 = Bronze.": {
+      vi: "Danh sách lựa chọn “Hạng thành viên” với 1 = Vàng, 2 = Bạc, 3 = Đồng.",
+    },
+    "Mapping details": { vi: "Chi tiết ánh xạ" },
+    "These details identify the mapping. The category and resource are fixed after creation.": {
+      vi: "Những chi tiết này nhận diện ánh xạ. Danh mục và tài nguyên được cố định sau khi tạo.",
+    },
+    "Mapping name": { vi: "Tên ánh xạ" },
+    "A short internal name for this configuration. Example: Cosmetics mapping.": {
+      vi: "Tên nội bộ ngắn cho cấu hình này. Ví dụ: Ánh xạ mỹ phẩm.",
+    },
+    "Optional note for admins. This is not shown in tables or forms.": {
+      vi: "Ghi chú tùy chọn cho quản trị viên. Không hiển thị trong bảng hoặc biểu mẫu.",
+    },
+    "Fixed for this mapping. To use a different category, create a new property mapping.": {
+      vi: "Cố định cho ánh xạ này. Để dùng danh mục khác, hãy tạo ánh xạ thuộc tính mới.",
+    },
+    "Fixed for this mapping. The category determines which records these properties belong to.": {
+      vi: "Cố định cho ánh xạ này. Danh mục quyết định các bản ghi mà những thuộc tính này thuộc về.",
+    },
+    "Define the extra fields your team can fill in for this category. The storage key is assigned automatically — you only choose a type and a display name.": {
+      vi: "Định nghĩa các trường bổ sung mà đội của bạn có thể điền cho danh mục này. Khóa lưu trữ được gán tự động — bạn chỉ cần chọn loại và tên hiển thị.",
+    },
+    "Fields shown in tables and forms for this category. The storage key is assigned automatically and never shown.": {
+      vi: "Các trường hiển thị trong bảng và biểu mẫu cho danh mục này. Khóa lưu trữ được gán tự động và không bao giờ hiển thị.",
+    },
+    "Each property uses one typed storage slot. The slot name stays hidden.": {
+      vi: "Mỗi thuộc tính dùng một ô lưu trữ có kiểu. Tên ô được ẩn đi.",
+    },
+    "The name your team sees in tables, forms, and reports. Use clear words, e.g. Skin type or Volume (ml).": {
+      vi: "Tên mà đội của bạn thấy trong bảng, biểu mẫu và báo cáo. Dùng từ rõ ràng, ví dụ: Loại da hoặc Dung tích (ml).",
+    },
+    "The name your team sees in tables, forms, and reports. Example: Skin type or Volume (ml).": {
+      vi: "Tên mà đội của bạn thấy trong bảng, biểu mẫu và báo cáo. Ví dụ: Loại da hoặc Dung tích (ml).",
+    },
+    "The name your team sees in tables, forms, and reports.": {
+      vi: "Tên mà đội của bạn thấy trong bảng, biểu mẫu và báo cáo.",
+    },
+    "Controls what values this property accepts. To change a type, remove the property and add a new one.": {
+      vi: "Kiểm soát giá trị mà thuộc tính này chấp nhận. Để đổi loại, hãy xóa thuộc tính và thêm thuộc tính mới.",
+    },
+    "Extra configuration for this property. For a choice list, this is where you define the choices.": {
+      vi: "Cấu hình bổ sung cho thuộc tính này. Với danh sách lựa chọn, đây là nơi bạn định nghĩa các lựa chọn.",
+    },
+    "Remove this property. The change is applied when you click Save Changes.": {
+      vi: "Xóa thuộc tính này. Thay đổi được áp dụng khi bạn bấm Lưu thay đổi.",
+    },
+    "Remove this property. Existing data stays in the database but will no longer be shown. The change is applied when you save.": {
+      vi: "Xóa thuộc tính này. Dữ liệu hiện có vẫn ở trong cơ sở dữ liệu nhưng sẽ không còn được hiển thị. Thay đổi được áp dụng khi bạn lưu.",
+    },
+    "No properties yet": { vi: "Chưa có thuộc tính nào" },
+    "Add your first property below to start collecting extra information for this category.": {
+      vi: "Thêm thuộc tính đầu tiên bên dưới để bắt đầu thu thập thông tin bổ sung cho danh mục này.",
+    },
+    "Edit choices": { vi: "Sửa lựa chọn" },
+    "Configure": { vi: "Cấu hình" },
+    "No extra settings": { vi: "Không có thiết lập bổ sung" },
+    "No choices yet": { vi: "Chưa có lựa chọn nào" },
+    "choice": { vi: "lựa chọn" },
+    "choices": { vi: "lựa chọn" },
+    "Settings for": { vi: "Thiết lập cho" },
+    "this property": { vi: "thuộc tính này" },
+    "Done": { vi: "Xong" },
+    "Open the setup panel for this property.": { vi: "Mở bảng thiết lập cho thuộc tính này." },
+    "Hide this setup panel. Your changes are kept until you save or cancel.": {
+      vi: "Ẩn bảng thiết lập này. Các thay đổi của bạn được giữ cho đến khi bạn lưu hoặc hủy.",
+    },
+    "These settings are saved with the property. They are used by forms that support them.": {
+      vi: "Các thiết lập này được lưu cùng thuộc tính. Chúng được dùng bởi các biểu mẫu hỗ trợ.",
+    },
+    "Pick what kind of value this property stores. The storage key is assigned automatically.": {
+      vi: "Chọn loại giá trị mà thuộc tính này lưu. Khóa lưu trữ được gán tự động.",
+    },
+    "Property type": { vi: "Loại thuộc tính" },
+    "Choose the type of value this new property will store.": {
+      vi: "Chọn loại giá trị mà thuộc tính mới này sẽ lưu.",
+    },
+    "Adds this property to the list. Nothing is saved until you click Save Changes.": {
+      vi: "Thêm thuộc tính này vào danh sách. Không có gì được lưu cho đến khi bạn bấm Lưu thay đổi.",
+    },
+    "All property slots are in use.": { vi: "Tất cả các ô thuộc tính đã được sử dụng." },
+    "All slots for this type have been used. Remove a property or create a new category mapping.": {
+      vi: "Tất cả các ô cho loại này đã được dùng. Hãy xóa một thuộc tính hoặc tạo ánh xạ danh mục mới.",
+    },
+    "All property slots have been used before. Create a new category mapping to start fresh.": {
+      vi: "Tất cả các ô thuộc tính đã từng được sử dụng. Hãy tạo ánh xạ danh mục mới để bắt đầu lại.",
+    },
+    "slots left": { vi: "ô còn lại" },
+    "full": { vi: "hết chỗ" },
+    "Leave without saving. Unsaved changes are lost.": {
+      vi: "Rời đi mà không lưu. Các thay đổi chưa lưu sẽ bị mất.",
+    },
+    "Applies all property, setup, and extra column changes. Table columns are updated automatically.": {
+      vi: "Áp dụng mọi thay đổi về thuộc tính, thiết lập và cột bổ sung. Các cột trong bảng sẽ được cập nhật tự động.",
+    },
+    "Extra Columns (advanced)": { vi: "Cột bổ sung (nâng cao)" },
+    "Advanced display-only columns outside the normal dynamic slots. They are not stored on records or indexed for search.": {
+      vi: "Các cột chỉ hiển thị nâng cao nằm ngoài các ô động thông thường. Chúng không được lưu trên bản ghi và không được lập chỉ mục tìm kiếm.",
+    },
+    "Extra columns can be shown in tables but do not store record data.": {
+      vi: "Cột bổ sung có thể hiển thị trong bảng nhưng không lưu dữ liệu bản ghi.",
+    },
+    "Advanced": { vi: "Nâng cao" },
+    "The name shown in the table. Extra columns do not store record values.": {
+      vi: "Tên hiển thị trong bảng. Cột bổ sung không lưu giá trị bản ghi.",
+    },
+    "The name shown in the table for this advanced column.": {
+      vi: "Tên hiển thị trong bảng cho cột nâng cao này.",
+    },
+    "How the extra column is displayed. It does not store record values.": {
+      vi: "Cách cột bổ sung được hiển thị. Nó không lưu giá trị bản ghi.",
+    },
+    "Remove this extra column. The change is applied when you save.": {
+      vi: "Xóa cột bổ sung này. Thay đổi được áp dụng khi bạn lưu.",
+    },
+    "No extra columns.": { vi: "Không có cột bổ sung." },
+    "Extra columns are advanced. They are not stored on records or indexed for search.": {
+      vi: "Cột bổ sung là tính năng nâng cao. Chúng không được lưu trên bản ghi và không được lập chỉ mục tìm kiếm.",
+    },
+    "Extra column type": { vi: "Loại cột bổ sung" },
+    "Choose how the new extra column is displayed.": {
+      vi: "Chọn cách hiển thị cột bổ sung mới.",
+    },
+    "Adds an advanced display-only column. Nothing is saved until you click Save Changes.": {
+      vi: "Thêm một cột chỉ để hiển thị nâng cao. Không có gì được lưu cho đến khi bạn bấm Lưu thay đổi.",
+    },
+    "e.g. Skin type": { vi: "VD: Loại da" },
+    "e.g. Internal note": { vi: "VD: Ghi chú nội bộ" },
+    "e.g. Gold": { vi: "VD: Vàng" },
+    "Choices": { vi: "Các lựa chọn" },
+    "Define the options users can pick. The number is stored in the database; the label is shown to users.": {
+      vi: "Định nghĩa các lựa chọn người dùng có thể chọn. Số được lưu trong cơ sở dữ liệu; nhãn được hiển thị cho người dùng.",
+    },
+    "Example: 1 = Gold, 2 = Silver, 3 = Bronze.": {
+      vi: "Ví dụ: 1 = Vàng, 2 = Bạc, 3 = Đồng.",
+    },
+    "Add option": { vi: "Thêm lựa chọn" },
+    "Adds another choice. The next number is filled in automatically.": {
+      vi: "Thêm một lựa chọn khác. Số tiếp theo sẽ được điền tự động.",
+    },
+    "The whole number stored in the database. It must be unique for this property. Example: 1.": {
+      vi: "Số nguyên được lưu trong cơ sở dữ liệu. Nó phải là duy nhất cho thuộc tính này. Ví dụ: 1.",
+    },
+    "The text users see. Example: Gold.": {
+      vi: "Văn bản người dùng thấy. Ví dụ: Vàng.",
+    },
+    "At least one choice is required. Edit this choice instead.": {
+      vi: "Cần ít nhất một lựa chọn. Hãy sửa lựa chọn này thay vì xóa.",
+    },
+    "Remove this choice. Existing records keep their stored number.": {
+      vi: "Xóa lựa chọn này. Các bản ghi hiện có vẫn giữ số đã lưu.",
+    },
+    "Default choice": { vi: "Lựa chọn mặc định" },
+    "Optional. The choice selected automatically on new records.": {
+      vi: "Tùy chọn. Lựa chọn được chọn tự động trên bản ghi mới.",
+    },
+    "No default": { vi: "Không có mặc định" },
+    "Every mapping needs a name.": { vi: "Mỗi ánh xạ cần có tên." },
+    "Every property needs a display name.": { vi: "Mỗi thuộc tính cần có tên hiển thị." },
+    "Every extra column needs a display name.": { vi: "Mỗi cột bổ sung cần có tên hiển thị." },
+    "Every choice list needs at least one choice.": { vi: "Mỗi danh sách lựa chọn cần ít nhất một lựa chọn." },
+    "Option values must be whole numbers.": { vi: "Giá trị lựa chọn phải là số nguyên." },
+    "Option values must be unique.": { vi: "Giá trị lựa chọn phải là duy nhất." },
+    "Option labels are required.": { vi: "Nhãn lựa chọn là bắt buộc." },
+    "Default choice must match one of the choices.": {
+      vi: "Lựa chọn mặc định phải khớp với một trong các lựa chọn.",
+    },
+    "Minimum cannot be greater than maximum.": {
+      vi: "Giá trị tối thiểu không được lớn hơn giá trị tối đa.",
+    },
+    "Decimal places must be a whole number between 0 and 4.": {
+      vi: "Số chữ số thập phân phải là số nguyên từ 0 đến 4.",
+    },
+    "At least one choice is required.": { vi: "Cần ít nhất một lựa chọn." },
+    "Property Fields": { vi: "Trường thuộc tính" },
+    "Display Name": { vi: "Tên hiển thị" },
+    "What kind of value this property stores.": { vi: "Loại giá trị mà thuộc tính này lưu." },
+    "Options and limits configured for this property.": {
+      vi: "Các tùy chọn và giới hạn được cấu hình cho thuộc tính này.",
+    },
+    "Text": { vi: "Văn bản" },
+    "Whole number": { vi: "Số nguyên" },
+    "Decimal number": { vi: "Số thập phân" },
+    "Yes / No": { vi: "Có / Không" },
+    "Date & time": { vi: "Ngày & giờ" },
+    "Choice list": { vi: "Danh sách lựa chọn" },
+    "Stores letters, numbers and symbols, up to 255 characters.": {
+      vi: "Lưu chữ, số và ký hiệu, tối đa 255 ký tự.",
+    },
+    "Stores whole numbers only — no decimals.": {
+      vi: "Chỉ lưu số nguyên — không có phần thập phân.",
+    },
+    "Stores numbers with up to 4 decimal places.": {
+      vi: "Lưu số có tối đa 4 chữ số thập phân.",
+    },
+    "Stores a true or false value.": { vi: "Lưu giá trị đúng hoặc sai." },
+    "Stores a date and time.": { vi: "Lưu ngày và giờ." },
+    "Stores one whole-number value from a list of choices you define.": {
+      vi: "Lưu một giá trị số nguyên từ danh sách lựa chọn bạn định nghĩa.",
+    },
+    "e.g. Skin type, internal code, short note": {
+      vi: "VD: Loại da, mã nội bộ, ghi chú ngắn",
+    },
+    "e.g. Quantity, loyalty points, number of seats": {
+      vi: "VD: Số lượng, điểm thưởng, số chỗ",
+    },
+    "e.g. Price, weight, volume": { vi: "VD: Giá, trọng lượng, dung tích" },
+    "e.g. Organic certified, active, includes tester": {
+      vi: "VD: Chứng nhận hữu cơ, đang hoạt động, có kèm bản thử",
+    },
+    "e.g. Expiry date, appointment time, last checked": {
+      vi: "VD: Ngày hết hạn, giờ hẹn, lần kiểm tra cuối",
+    },
+    "e.g. 1 = Gold, 2 = Silver, 3 = Bronze": {
+      vi: "VD: 1 = Vàng, 2 = Bạc, 3 = Đồng",
+    },
+    "Placeholder": { vi: "Văn bản gợi ý" },
+    "Default value": { vi: "Giá trị mặc định" },
+    "Display style": { vi: "Kiểu hiển thị" },
+    "Label": { vi: "Nhãn" },
+    "Minimum": { vi: "Tối thiểu" },
+    "Maximum": { vi: "Tối đa" },
+    "Suffix": { vi: "Hậu tố" },
+    "Number field": { vi: "Ô nhập số" },
+    "Progress bar": { vi: "Thanh tiến trình" },
+    "Slider": { vi: "Thanh trượt" },
+    "Star rating": { vi: "Đánh giá sao" },
+    "Percentage": { vi: "Phần trăm" },
+    "Decimal places": { vi: "Số chữ số thập phân" },
+    "decimal places": { vi: "chữ số thập phân" },
+    "Yes label": { vi: "Nhãn Có" },
+    "No label": { vi: "Nhãn Không" },
+    "Display format": { vi: "Định dạng hiển thị" },
+    "Yes": { vi: "Có" },
+    "No": { vi: "Không" },
+    "Min": { vi: "Tối thiểu" },
+    "Max": { vi: "Tối đa" },
+    "Hint text shown inside an empty input. Example: Enter skin type.": {
+      vi: "Văn bản gợi ý hiển thị trong ô trống. Ví dụ: Nhập loại da.",
+    },
+    "Value filled in automatically for new records. Leave blank for no default.": {
+      vi: "Giá trị được điền tự động cho bản ghi mới. Để trống nếu không có mặc định.",
+    },
+    "Text shown before the value. Example: SKU-.": {
+      vi: "Văn bản hiển thị trước giá trị. Ví dụ: SKU-.",
+    },
+    "Text shown after the value. Example: ml.": {
+      vi: "Văn bản hiển thị sau giá trị. Ví dụ: ml.",
+    },
+    "How the field is shown in forms that support it. Number field is the default.": {
+      vi: "Cách trường được hiển thị trong các biểu mẫu hỗ trợ. Ô nhập số là mặc định.",
+    },
+    "Hint text shown inside an empty input. Example: 150.": {
+      vi: "Văn bản gợi ý hiển thị trong ô trống. Ví dụ: 150.",
+    },
+    "Smallest allowed value. Example: 0.": { vi: "Giá trị nhỏ nhất được phép. Ví dụ: 0." },
+    "Largest allowed value. Example: 9999.": { vi: "Giá trị lớn nhất được phép. Ví dụ: 9999." },
+    "Text shown before the value. Example: #.": {
+      vi: "Văn bản hiển thị trước giá trị. Ví dụ: #.",
+    },
+    "Text shown after the value. Example: units.": {
+      vi: "Văn bản hiển thị sau giá trị. Ví dụ: đơn vị.",
+    },
+    "Hint text shown inside an empty input. Example: 12.50.": {
+      vi: "Văn bản gợi ý hiển thị trong ô trống. Ví dụ: 12.50.",
+    },
+    "Three-letter currency code used when the display style is Currency. Example: USD or VND.": {
+      vi: "Mã tiền tệ ba chữ cái dùng khi kiểu hiển thị là Tiền tệ. Ví dụ: USD hoặc VND.",
+    },
+    "Digits after the decimal point, from 0 to 4. Example: 2 for 12.50.": {
+      vi: "Số chữ số sau dấu thập phân, từ 0 đến 4. Ví dụ: 2 cho 12.50.",
+    },
+    "Text shown before the value. Example: $.": {
+      vi: "Văn bản hiển thị trước giá trị. Ví dụ: $.",
+    },
+    "Text shown after the value. Example: kg.": {
+      vi: "Văn bản hiển thị sau giá trị. Ví dụ: kg.",
+    },
+    "Text shown for a Yes value. Example: Active.": {
+      vi: "Văn bản hiển thị cho giá trị Có. Ví dụ: Đang hoạt động.",
+    },
+    "Text shown for a No value. Example: Inactive.": {
+      vi: "Văn bản hiển thị cho giá trị Không. Ví dụ: Ngừng hoạt động.",
+    },
+    "How dates are displayed. Example: DD/MM/YYYY HH:mm.": {
+      vi: "Cách ngày được hiển thị. Ví dụ: DD/MM/YYYY HH:mm.",
+    },
+    "Timezone used when displaying this date. Example: UTC or Asia/Ho_Chi_Minh.": {
+      vi: "Múi giờ dùng khi hiển thị ngày này. Ví dụ: UTC hoặc Asia/Ho_Chi_Minh.",
+    },
+    "e.g. Enter skin type": { vi: "VD: Nhập loại da" },
+    "e.g. Oily": { vi: "VD: Da dầu" },
+    "e.g. SKU-": { vi: "VD: SKU-" },
+    "e.g. ml": { vi: "VD: ml" },
+    "e.g. 150": { vi: "VD: 150" },
+    "e.g. 0": { vi: "VD: 0" },
+    "e.g. 9999": { vi: "VD: 9999" },
+    "e.g. #": { vi: "VD: #" },
+    "e.g. units": { vi: "VD: đơn vị" },
+    "e.g. 12.50": { vi: "VD: 12.50" },
+    "e.g. 0.00": { vi: "VD: 0.00" },
+    "e.g. USD": { vi: "VD: USD" },
+    "e.g. 2": { vi: "VD: 2" },
+    "e.g. $": { vi: "VD: $" },
+    "e.g. kg": { vi: "VD: kg" },
+    "e.g. Active": { vi: "VD: Đang hoạt động" },
+    "e.g. Inactive": { vi: "VD: Ngừng hoạt động" },
+    "e.g. DD/MM/YYYY HH:mm": { vi: "VD: DD/MM/YYYY HH:mm" },
+    "e.g. UTC": { vi: "VD: UTC" },
+
     // === HR / Attendance ===
     "Shift Templates": { vi: "Mẫu ca làm việc" },
     "Shifts": { vi: "Ca làm việc" },

@@ -218,12 +218,41 @@ class PropertyMapping < ApplicationRecord
         next
       end
 
-      if input_type == "select"
-        options = entry["options"]
-        unless options.is_a?(Array) && options.all? { |o| o.is_a?(Hash) && o.key?("value") && o.key?("label") }
-          errors.add(:metadata, "properties element #{idx}: options must be an array of objects with value and label keys")
-        end
-      end
+      validate_enum_options(entry, idx, errors) if input_type == "select"
+    end
+  end
+
+  def validate_enum_options(entry, idx, errors)
+    options = entry["options"]
+
+    unless options.is_a?(Array) && options.any?
+      errors.add(:metadata, "properties element #{idx}: options must be a non-empty array of objects with value and label keys")
+      return
+    end
+
+    unless options.all? { |option| option.is_a?(Hash) && option.key?("value") && option.key?("label") }
+      errors.add(:metadata, "properties element #{idx}: options must be an array of objects with value and label keys")
+      return
+    end
+
+    values = options.map { |option| option["value"] }
+    unless values.all? { |value| value.is_a?(Integer) }
+      errors.add(:metadata, "properties element #{idx}: option values must be whole numbers")
+    end
+
+    if values.uniq.length != values.length
+      errors.add(:metadata, "properties element #{idx}: option values must be unique")
+    end
+
+    if options.any? { |option| option["label"].blank? }
+      errors.add(:metadata, "properties element #{idx}: option labels are required")
+    end
+
+    default = entry["default"]
+    return if default.blank?
+
+    unless values.include?(default)
+      errors.add(:metadata, "properties element #{idx}: default must be one of the option values")
     end
   end
 end
