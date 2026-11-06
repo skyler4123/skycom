@@ -81,6 +81,7 @@ export default class Companies_Exams_ShowController extends Companies_LayoutCont
 
   summaryHTML() {
     const summary = this.summary || {}
+    const companyId = currentCompany()?.id
     const cards = [
       { label: translate("Assigned"), value: summary.assigned_count || 0 },
       { label: translate("Started"), value: summary.started_count || 0 },
@@ -88,7 +89,7 @@ export default class Companies_Exams_ShowController extends Companies_LayoutCont
       { label: translate("Graded"), value: summary.graded_count || 0 },
       { label: translate("Passed"), value: summary.passed_count || 0, tone: "text-success" },
       { label: translate("Failed"), value: summary.failed_count || 0, tone: "text-danger" },
-      { label: translate("Pending Review"), value: summary.pending_review_count || 0, tone: "text-warning" },
+      { label: translate("Pending Review"), value: summary.pending_review_count || 0, tone: "text-warning", href: `${Helpers.company_exam_appointments_path(companyId, this.exam.id)}?workflow_status=submitted` },
       { label: translate("Expired"), value: summary.expired_count || 0, tone: "text-warning" },
       { label: translate("Pass Rate"), value: this.summaryValue(summary.pass_rate === null || summary.pass_rate === undefined ? null : Number(summary.pass_rate).toFixed(2), "%") },
       { label: translate("Average Score"), value: this.summaryValue(summary.average_score === null || summary.average_score === undefined ? null : Number(summary.average_score).toFixed(2)) },
@@ -111,12 +112,15 @@ export default class Companies_Exams_ShowController extends Companies_LayoutCont
           </button>
         </div>
         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          ${cards.map(card => `
-            <div class="rounded-lg border border-line bg-background p-3">
+          ${cards.map(card => {
+            const content = `
               <p class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">${card.label}</p>
               <p class="mt-1 text-lg font-bold ${card.tone || "text-foreground"}">${card.value}</p>
-            </div>
-          `).join("")}
+            `
+            return card.href
+              ? `<a href="${card.href}" class="rounded-lg border border-line bg-background p-3 hover:bg-primary/10">${content}</a>`
+              : `<div class="rounded-lg border border-line bg-background p-3">${content}</div>`
+          }).join("")}
         </div>
       </div>
     `

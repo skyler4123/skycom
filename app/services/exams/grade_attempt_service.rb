@@ -84,6 +84,8 @@ module Exams
         raw_grades || {}
       end
 
+      return {} unless hash.respond_to?(:each_with_object)
+
       hash.each_with_object({}) { |(key, value), memo| memo[key.to_s] = value }
     end
 

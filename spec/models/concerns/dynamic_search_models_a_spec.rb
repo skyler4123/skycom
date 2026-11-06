@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "dynamic meilisearch models A (Answer → Order)" do
+RSpec.describe "dynamic meilisearch models A (Branch → Order)" do
   include DynamicSearchModelHelpers
 
   before(:all) do
