@@ -64,6 +64,7 @@ RSpec.feature "Employee My Exams", type: :feature, js: true do
     page.refresh
 
     expect(page).to have_selector("input[type='radio'][value='#{question.correct_option.id}']:checked", wait: 10)
+    expect(page).to have_no_selector(".toastify", wait: 10)
     click_button "Submit Exam"
     find(".swal2-confirm").click
 
@@ -90,6 +91,7 @@ RSpec.feature "Employee My Exams", type: :feature, js: true do
 
     expect(page).to have_content("Explain safety", wait: 10)
     find("textarea").set("Wear protective equipment")
+    expect(page).to have_no_selector(".toastify", wait: 10)
     click_button "Submit Exam"
     find(".swal2-confirm").click
 
