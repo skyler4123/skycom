@@ -273,6 +273,13 @@ export const company_exam_assignments_path = (companyId, examId) => `/companies/
 export const company_exam_appointments_path = (companyId, examId) => `/companies/${companyId}/exams/${examId}/appointments`
 export const company_exam_appointment_path = (companyId, examId, appointmentId) => `/companies/${companyId}/exams/${examId}/appointments/${appointmentId}`
 export const grade_company_exam_appointment_path = (companyId, examId, appointmentId) => `/companies/${companyId}/exams/${examId}/appointments/${appointmentId}/grade`
+export const company_my_exams_path = (companyId) => `/companies/${companyId}/my_exams`
+export const company_my_exam_path = (companyId, examId) => `/companies/${companyId}/my_exams/${examId}`
+export const start_company_my_exam_path = (companyId, examId) => `/companies/${companyId}/my_exams/${examId}/start`
+export const company_my_exam_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/my_exam_appointments/${appointmentId}`
+export const take_company_my_exam_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/my_exam_appointments/${appointmentId}/take`
+export const answer_company_my_exam_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/my_exam_appointments/${appointmentId}/answer`
+export const submit_company_my_exam_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/my_exam_appointments/${appointmentId}/submit`
 export const company_announcements_path = (companyId) => `/companies/${companyId}/announcements`
 export const company_events_path = (companyId) => `/companies/${companyId}/events`
 export const new_company_event_path = (companyId) => `/companies/${companyId}/events/new`

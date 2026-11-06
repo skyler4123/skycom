@@ -68,6 +68,8 @@ export const fetchJson = async (url, options = {}) => {
       const error = new Error(errorData.message || `HTTP error! status: ${response.status}`);
       error.errors = errorData.errors;
       error.status = response.status;
+      error.payload = errorData;
+      error.redirect_url = errorData.redirect_url;
       throw error;
     }
 
