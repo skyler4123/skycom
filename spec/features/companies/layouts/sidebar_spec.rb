@@ -81,6 +81,17 @@ RSpec.feature "Sidebar favourites", type: :feature, js: true do
     end
   end
 
+  scenario "exams group lists Exams, Question Bank, and My Exams" do
+    visit company_dashboards_path(company)
+
+    find("details[data-sidebar-group='exams'] summary", visible: :all).click
+    within("details[data-sidebar-group='exams']", visible: :all) do
+      expect(page).to have_link("Exams", href: %r{/exams}, visible: :all, wait: 10)
+      expect(page).to have_link("Question Bank", href: %r{/questions}, visible: :all)
+      expect(page).to have_link("My Exams", href: %r{/my_exams}, visible: :all)
+    end
+  end
+
   scenario "operations group lists Operations and Operation Configs" do
     visit company_dashboards_path(company)
 

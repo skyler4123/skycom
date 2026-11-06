@@ -661,7 +661,8 @@ const ENUMS = {
       "suppliers",
       "customers",
       "services",
-      "facilities"
+      "facilities",
+      "questions"
     ]
   },
   "product": {
@@ -1723,6 +1724,66 @@ const ENUMS = {
       {
         "name": "Announcement",
         "value": "announcement"
+      }
+    ]
+  },
+  "question": {
+    "question_types": [
+      {
+        "name": "Single choice",
+        "value": "single_choice"
+      },
+      {
+        "name": "True / False",
+        "value": "true_false"
+      },
+      {
+        "name": "Text answer",
+        "value": "text"
+      }
+    ]
+  },
+  "exam": {
+    "workflow_statuses": [
+      {
+        "name": "Draft",
+        "value": "draft"
+      },
+      {
+        "name": "Published",
+        "value": "published"
+      },
+      {
+        "name": "Archived",
+        "value": "archived"
+      }
+    ]
+  },
+  "employee_exam_appointment": {
+    "workflow_statuses": [
+      {
+        "name": "Assigned",
+        "value": "assigned"
+      },
+      {
+        "name": "In progress",
+        "value": "in_progress"
+      },
+      {
+        "name": "Submitted",
+        "value": "submitted"
+      },
+      {
+        "name": "Graded",
+        "value": "graded"
+      },
+      {
+        "name": "Expired",
+        "value": "expired"
+      },
+      {
+        "name": "Cancelled",
+        "value": "cancelled"
       }
     ]
   },

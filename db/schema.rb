@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_04_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_06_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -286,64 +286,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000002) do
     t.datetime "updated_at", null: false
     t.index ["external_id"], name: "index_addresses_on_external_id"
     t.index ["fingerprint"], name: "index_addresses_on_fingerprint", unique: true
-  end
-
-  create_table "answer_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "answer_id", null: false
-    t.uuid "tag_id", null: false
-    t.string "value"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.string "external_id"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["answer_id"], name: "index_answer_tag_appointments_on_answer_id"
-    t.index ["business_type"], name: "index_answer_tag_appointments_on_business_type"
-    t.index ["company_id", "answer_id", "tag_id"], name: "idx_answer_tag_appointments_uniq", unique: true
-    t.index ["company_id"], name: "index_answer_tag_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_answer_tag_appointments_on_discarded_at"
-    t.index ["external_id"], name: "index_answer_tag_appointments_on_external_id"
-    t.index ["lifecycle_status"], name: "index_answer_tag_appointments_on_lifecycle_status"
-    t.index ["tag_id"], name: "index_answer_tag_appointments_on_tag_id"
-    t.index ["workflow_status"], name: "index_answer_tag_appointments_on_workflow_status"
-  end
-
-  create_table "answers", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "question_id", null: false
-    t.uuid "category_id", null: false
-    t.uuid "property_mapping_id", null: false
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.string "external_id"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_answers_on_business_type"
-    t.index ["category_id"], name: "index_answers_on_category_id"
-    t.index ["company_id"], name: "index_answers_on_company_id"
-    t.index ["discarded_at"], name: "index_answers_on_discarded_at"
-    t.index ["external_id"], name: "index_answers_on_external_id"
-    t.index ["lifecycle_status"], name: "index_answers_on_lifecycle_status"
-    t.index ["property_mapping_id"], name: "index_answers_on_property_mapping_id"
-    t.index ["question_id"], name: "index_answers_on_question_id"
-    t.index ["workflow_status"], name: "index_answers_on_workflow_status"
   end
 
   create_table "attendance_balances", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -2575,28 +2517,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000002) do
     t.uuid "company_id", null: false
     t.uuid "employee_id", null: false
     t.uuid "exam_id", null: false
+    t.uuid "assigned_by_employee_id"
+    t.uuid "graded_by_employee_id"
+    t.integer "attempt_number", default: 1, null: false
+    t.datetime "started_at"
+    t.datetime "deadline_at"
+    t.datetime "submitted_at"
+    t.datetime "graded_at"
+    t.integer "question_count", default: 0, null: false
+    t.integer "correct_count", default: 0, null: false
+    t.decimal "total_points", precision: 8, scale: 2, default: "0.0", null: false
+    t.decimal "earned_points", precision: 8, scale: 2, default: "0.0", null: false
+    t.decimal "score", precision: 5, scale: 2
+    t.boolean "passed"
     t.string "name"
     t.string "description"
     t.string "code"
-    t.string "external_id"
     t.integer "lifecycle_status"
-    t.integer "workflow_status"
+    t.integer "workflow_status", default: 0, null: false
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata"
+    t.jsonb "metadata", default: {}, null: false
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_employee_exam_appointments_on_business_type"
-    t.index ["company_id", "employee_id", "exam_id"], name: "idx_employee_exam_appointments_uniq", unique: true
+    t.index ["company_id", "employee_id", "exam_id", "attempt_number"], name: "idx_employee_exam_attempt_uniq", unique: true
+    t.index ["company_id", "employee_id", "exam_id"], name: "idx_employee_exam_active_uniq", unique: true, where: "(workflow_status = ANY (ARRAY[0, 1]))"
     t.index ["company_id"], name: "index_employee_exam_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_exam_appointments_on_discarded_at"
+    t.index ["employee_id", "workflow_status"], name: "idx_on_employee_id_workflow_status_d6d223d768"
     t.index ["employee_id"], name: "index_employee_exam_appointments_on_employee_id"
+    t.index ["exam_id", "workflow_status"], name: "idx_on_exam_id_workflow_status_e8ec8d50b6"
     t.index ["exam_id"], name: "index_employee_exam_appointments_on_exam_id"
-    t.index ["external_id"], name: "index_employee_exam_appointments_on_external_id"
-    t.index ["lifecycle_status"], name: "index_employee_exam_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_employee_exam_appointments_on_workflow_status"
   end
 
   create_table "employee_facility_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -2987,6 +2940,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000002) do
     t.index ["lifecycle_status"], name: "index_employee_project_group_appointments_on_lifecycle_status"
     t.index ["project_group_id"], name: "index_employee_project_group_appointments_on_project_group_id"
     t.index ["workflow_status"], name: "index_employee_project_group_appointments_on_workflow_status"
+  end
+
+  create_table "employee_question_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_exam_appointment_id", null: false
+    t.uuid "question_id", null: false
+    t.integer "question_type", default: 0, null: false
+    t.integer "position", default: 0, null: false
+    t.jsonb "question_snapshot", default: {}, null: false
+    t.jsonb "option_order", default: [], null: false
+    t.jsonb "selected_option_ids", default: [], null: false
+    t.text "text_answer"
+    t.boolean "correct"
+    t.decimal "points_possible", precision: 8, scale: 2, default: "0.0", null: false
+    t.decimal "points_awarded", precision: 8, scale: 2, default: "0.0", null: false
+    t.datetime "graded_at"
+    t.uuid "graded_by_employee_id"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_employee_question_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_question_appointments_on_discarded_at"
+    t.index ["employee_exam_appointment_id", "question_id"], name: "idx_employee_question_attempt_uniq", unique: true
+    t.index ["employee_exam_appointment_id"], name: "idx_on_employee_exam_appointment_id_46f73451d1"
+    t.index ["question_id"], name: "index_employee_question_appointments_on_question_id"
   end
 
   create_table "employee_role_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -3605,122 +3589,65 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000002) do
     t.index ["workflow_status"], name: "index_events_on_workflow_status"
   end
 
-  create_table "exam_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "exam_group_id", null: false
-    t.uuid "tag_id", null: false
-    t.string "value"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.string "external_id"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_exam_group_tag_appointments_on_business_type"
-    t.index ["company_id", "exam_group_id", "tag_id"], name: "idx_exam_group_tag_appointments_uniq", unique: true
-    t.index ["company_id"], name: "index_exam_group_tag_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_exam_group_tag_appointments_on_discarded_at"
-    t.index ["exam_group_id"], name: "index_exam_group_tag_appointments_on_exam_group_id"
-    t.index ["external_id"], name: "index_exam_group_tag_appointments_on_external_id"
-    t.index ["lifecycle_status"], name: "index_exam_group_tag_appointments_on_lifecycle_status"
-    t.index ["tag_id"], name: "index_exam_group_tag_appointments_on_tag_id"
-    t.index ["workflow_status"], name: "index_exam_group_tag_appointments_on_workflow_status"
-  end
-
-  create_table "exam_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.uuid "category_id", null: false
-    t.uuid "property_mapping_id", null: false
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.string "external_id"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_exam_groups_on_branch_id"
-    t.index ["business_type"], name: "index_exam_groups_on_business_type"
-    t.index ["category_id"], name: "index_exam_groups_on_category_id"
-    t.index ["company_id"], name: "index_exam_groups_on_company_id"
-    t.index ["discarded_at"], name: "index_exam_groups_on_discarded_at"
-    t.index ["external_id"], name: "index_exam_groups_on_external_id"
-    t.index ["lifecycle_status"], name: "index_exam_groups_on_lifecycle_status"
-    t.index ["property_mapping_id"], name: "index_exam_groups_on_property_mapping_id"
-    t.index ["workflow_status"], name: "index_exam_groups_on_workflow_status"
-  end
-
-  create_table "exam_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "exam_question_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "exam_id", null: false
-    t.uuid "tag_id", null: false
-    t.string "value"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.string "external_id"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
+    t.uuid "question_id", null: false
+    t.integer "position", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_exam_tag_appointments_on_business_type"
-    t.index ["company_id", "exam_id", "tag_id"], name: "idx_exam_tag_appointments_uniq", unique: true
-    t.index ["company_id"], name: "index_exam_tag_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_exam_tag_appointments_on_discarded_at"
-    t.index ["exam_id"], name: "index_exam_tag_appointments_on_exam_id"
-    t.index ["external_id"], name: "index_exam_tag_appointments_on_external_id"
-    t.index ["lifecycle_status"], name: "index_exam_tag_appointments_on_lifecycle_status"
-    t.index ["tag_id"], name: "index_exam_tag_appointments_on_tag_id"
-    t.index ["workflow_status"], name: "index_exam_tag_appointments_on_workflow_status"
+    t.index ["company_id"], name: "index_exam_question_appointments_on_company_id"
+    t.index ["exam_id", "position"], name: "index_exam_question_appointments_on_exam_id_and_position"
+    t.index ["exam_id", "question_id"], name: "index_exam_question_appointments_on_exam_id_and_question_id", unique: true
+    t.index ["exam_id"], name: "index_exam_question_appointments_on_exam_id"
+    t.index ["question_id"], name: "index_exam_question_appointments_on_question_id"
+  end
+
+  create_table "exam_summaries", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "exam_id", null: false
+    t.integer "assigned_count", default: 0, null: false
+    t.integer "started_count", default: 0, null: false
+    t.integer "submitted_count", default: 0, null: false
+    t.integer "graded_count", default: 0, null: false
+    t.integer "passed_count", default: 0, null: false
+    t.integer "failed_count", default: 0, null: false
+    t.integer "pending_review_count", default: 0, null: false
+    t.integer "expired_count", default: 0, null: false
+    t.decimal "average_score", precision: 5, scale: 2
+    t.decimal "highest_score", precision: 5, scale: 2
+    t.decimal "lowest_score", precision: 5, scale: 2
+    t.decimal "pass_rate", precision: 5, scale: 2
+    t.jsonb "question_stats", default: {}, null: false
+    t.datetime "computed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_exam_summaries_on_company_id"
+    t.index ["exam_id"], name: "index_exam_summaries_on_exam_id", unique: true
   end
 
   create_table "exams", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "exam_group_id", null: false
     t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.uuid "category_id", null: false
-    t.uuid "property_mapping_id", null: false
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.string "external_id"
+    t.string "name", null: false
+    t.text "description"
+    t.integer "duration_minutes"
+    t.decimal "passing_score", precision: 5, scale: 2, default: "70.0", null: false
+    t.integer "max_attempts", default: 1
+    t.boolean "shuffle_options", default: true, null: false
     t.integer "lifecycle_status"
-    t.integer "workflow_status"
+    t.integer "workflow_status", default: 0, null: false
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata"
+    t.jsonb "metadata", default: {}, null: false
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.datetime "published_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_exams_on_branch_id"
-    t.index ["business_type"], name: "index_exams_on_business_type"
-    t.index ["category_id"], name: "index_exams_on_category_id"
+    t.index ["company_id", "name"], name: "index_exams_on_company_id_and_name", unique: true
+    t.index ["company_id", "workflow_status"], name: "index_exams_on_company_id_and_workflow_status"
     t.index ["company_id"], name: "index_exams_on_company_id"
     t.index ["discarded_at"], name: "index_exams_on_discarded_at"
-    t.index ["exam_group_id"], name: "index_exams_on_exam_group_id"
-    t.index ["external_id"], name: "index_exams_on_external_id"
-    t.index ["lifecycle_status"], name: "index_exams_on_lifecycle_status"
-    t.index ["property_mapping_id"], name: "index_exams_on_property_mapping_id"
-    t.index ["workflow_status"], name: "index_exams_on_workflow_status"
   end
 
   create_table "facilities", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5617,62 +5544,50 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000002) do
     t.index ["workflow_step_id"], name: "index_purchases_on_workflow_step_id"
   end
 
-  create_table "question_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "question_options", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "question_id", null: false
-    t.uuid "tag_id", null: false
-    t.string "value"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.string "external_id"
+    t.string "content", null: false
+    t.boolean "correct", default: false, null: false
+    t.integer "position", default: 0, null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata"
+    t.jsonb "metadata", default: {}, null: false
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_question_tag_appointments_on_business_type"
-    t.index ["company_id", "question_id", "tag_id"], name: "idx_question_tag_appointments_uniq", unique: true
-    t.index ["company_id"], name: "index_question_tag_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_question_tag_appointments_on_discarded_at"
-    t.index ["external_id"], name: "index_question_tag_appointments_on_external_id"
-    t.index ["lifecycle_status"], name: "index_question_tag_appointments_on_lifecycle_status"
-    t.index ["question_id"], name: "index_question_tag_appointments_on_question_id"
-    t.index ["tag_id"], name: "index_question_tag_appointments_on_tag_id"
-    t.index ["workflow_status"], name: "index_question_tag_appointments_on_workflow_status"
+    t.index ["company_id"], name: "index_question_options_on_company_id"
+    t.index ["discarded_at"], name: "index_question_options_on_discarded_at"
+    t.index ["question_id", "position"], name: "index_question_options_on_question_id_and_position"
+    t.index ["question_id"], name: "index_question_options_on_question_id"
   end
 
   create_table "questions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.uuid "branch_id"
     t.uuid "category_id", null: false
-    t.uuid "property_mapping_id", null: false
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.string "external_id"
+    t.string "name", null: false
+    t.text "description"
+    t.integer "question_type", default: 0, null: false
+    t.integer "points", default: 1, null: false
+    t.text "correct_text"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata"
+    t.jsonb "metadata", default: {}, null: false
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_questions_on_branch_id"
-    t.index ["business_type"], name: "index_questions_on_business_type"
     t.index ["category_id"], name: "index_questions_on_category_id"
+    t.index ["company_id", "category_id"], name: "index_questions_on_company_id_and_category_id"
+    t.index ["company_id", "name"], name: "index_questions_on_company_id_and_name"
+    t.index ["company_id", "question_type"], name: "index_questions_on_company_id_and_question_type"
     t.index ["company_id"], name: "index_questions_on_company_id"
     t.index ["discarded_at"], name: "index_questions_on_discarded_at"
-    t.index ["external_id"], name: "index_questions_on_external_id"
-    t.index ["lifecycle_status"], name: "index_questions_on_lifecycle_status"
-    t.index ["property_mapping_id"], name: "index_questions_on_property_mapping_id"
-    t.index ["workflow_status"], name: "index_questions_on_workflow_status"
   end
 
   create_table "role_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -7811,13 +7726,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000002) do
   add_foreign_key "address_user_appointments", "addresses"
   add_foreign_key "address_user_appointments", "companies"
   add_foreign_key "address_user_appointments", "users"
-  add_foreign_key "answer_tag_appointments", "answers"
-  add_foreign_key "answer_tag_appointments", "companies"
-  add_foreign_key "answer_tag_appointments", "tags"
-  add_foreign_key "answers", "categories"
-  add_foreign_key "answers", "companies"
-  add_foreign_key "answers", "property_mappings"
-  add_foreign_key "answers", "questions"
   add_foreign_key "attendance_balances", "companies"
   add_foreign_key "attendance_balances", "employees"
   add_foreign_key "attendance_config_logs", "attendance_configs"
@@ -8005,6 +7913,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000002) do
   add_foreign_key "employee_event_group_appointments", "event_groups"
   add_foreign_key "employee_exam_appointments", "companies"
   add_foreign_key "employee_exam_appointments", "employees"
+  add_foreign_key "employee_exam_appointments", "employees", column: "assigned_by_employee_id", on_delete: :nullify
+  add_foreign_key "employee_exam_appointments", "employees", column: "graded_by_employee_id", on_delete: :nullify
   add_foreign_key "employee_exam_appointments", "exams"
   add_foreign_key "employee_facility_appointments", "companies"
   add_foreign_key "employee_facility_appointments", "employees"
@@ -8043,6 +7953,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000002) do
   add_foreign_key "employee_project_group_appointments", "companies"
   add_foreign_key "employee_project_group_appointments", "employees"
   add_foreign_key "employee_project_group_appointments", "project_groups"
+  add_foreign_key "employee_question_appointments", "companies"
+  add_foreign_key "employee_question_appointments", "employee_exam_appointments"
+  add_foreign_key "employee_question_appointments", "employees", column: "graded_by_employee_id", on_delete: :nullify
+  add_foreign_key "employee_question_appointments", "questions"
   add_foreign_key "employee_role_appointments", "companies"
   add_foreign_key "employee_role_appointments", "employees"
   add_foreign_key "employee_role_appointments", "roles"
@@ -8102,21 +8016,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000002) do
   add_foreign_key "events", "companies"
   add_foreign_key "events", "event_groups"
   add_foreign_key "events", "property_mappings"
-  add_foreign_key "exam_group_tag_appointments", "companies"
-  add_foreign_key "exam_group_tag_appointments", "exam_groups"
-  add_foreign_key "exam_group_tag_appointments", "tags"
-  add_foreign_key "exam_groups", "branches"
-  add_foreign_key "exam_groups", "categories"
-  add_foreign_key "exam_groups", "companies"
-  add_foreign_key "exam_groups", "property_mappings"
-  add_foreign_key "exam_tag_appointments", "companies"
-  add_foreign_key "exam_tag_appointments", "exams"
-  add_foreign_key "exam_tag_appointments", "tags"
-  add_foreign_key "exams", "branches"
-  add_foreign_key "exams", "categories"
+  add_foreign_key "exam_question_appointments", "companies"
+  add_foreign_key "exam_question_appointments", "exams"
+  add_foreign_key "exam_question_appointments", "questions"
+  add_foreign_key "exam_summaries", "companies"
+  add_foreign_key "exam_summaries", "exams"
   add_foreign_key "exams", "companies"
-  add_foreign_key "exams", "exam_groups"
-  add_foreign_key "exams", "property_mappings"
   add_foreign_key "facilities", "branches"
   add_foreign_key "facilities", "categories"
   add_foreign_key "facilities", "companies"
@@ -8279,13 +8184,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_04_000002) do
   add_foreign_key "purchases", "suppliers"
   add_foreign_key "purchases", "warehouses"
   add_foreign_key "purchases", "workflow_steps"
-  add_foreign_key "question_tag_appointments", "companies"
-  add_foreign_key "question_tag_appointments", "questions"
-  add_foreign_key "question_tag_appointments", "tags"
-  add_foreign_key "questions", "branches"
+  add_foreign_key "question_options", "companies"
+  add_foreign_key "question_options", "questions"
   add_foreign_key "questions", "categories"
   add_foreign_key "questions", "companies"
-  add_foreign_key "questions", "property_mappings"
   add_foreign_key "role_tag_appointments", "companies"
   add_foreign_key "role_tag_appointments", "roles"
   add_foreign_key "role_tag_appointments", "tags"

@@ -519,6 +519,7 @@ class Seed::RetailInitService
     create_default_notification_tags
     create_categories
     create_table_configs
+    create_default_question_categories
     create_default_workflows
     create_default_event_configs
     create_default_dynamic_sidebar
@@ -577,6 +578,12 @@ class Seed::RetailInitService
 
   def field_hash(key, properties = {})
     Seed::TableConfigService.field_hash(key, properties[key.to_sym])
+  end
+
+  def create_default_question_categories
+    %w[General Safety Compliance Customer\ Service].each do |name|
+      Category.find_or_create_by!(company: @company, resource_name: "questions", name: name)
+    end
   end
 
   # Category is the bridge to workflows (docs/PURCHASE_WORKFLOW.md): every purchases
@@ -709,6 +716,7 @@ class Seed::RetailInitService
         "EmployeeGroup" => { create: true, read: true, update: true, delete: true },
         "Employee" => { create: false, read: true, update: false, delete: true },
         "Exam" => { create: true, read: true, update: true, delete: true },
+        "Question" => { create: true, read: true, update: true, delete: true },
         "Facility" => { create: true, read: true, update: true, delete: true },
         "Invoice" => { create: true, read: true, update: true, delete: true },
         "Membership" => { create: true, read: true, update: true, delete: true },
@@ -772,6 +780,7 @@ class Seed::RetailInitService
         "EmployeeGroup" => { create: true, read: true, update: true, delete: true },
         "Employee" => { create: false, read: true, update: false, delete: true },
         "Exam" => { create: true, read: true, update: true, delete: true },
+        "Question" => { create: true, read: true, update: true, delete: true },
         "Facility" => { create: true, read: true, update: true, delete: true },
         "Invoice" => { create: true, read: true, update: true, delete: true },
         "Membership" => { create: true, read: true, update: true, delete: true },

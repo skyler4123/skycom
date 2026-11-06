@@ -214,6 +214,7 @@ class Seed::HotelInitService
     create_default_notification_tags
     create_categories
     create_table_configs
+    create_default_question_categories
     create_default_workflows
     create_default_event_configs
     create_default_dynamic_sidebar
@@ -221,6 +222,12 @@ class Seed::HotelInitService
   end
 
   private
+
+  def create_default_question_categories
+    %w[General Safety Compliance Customer\ Service].each do |name|
+      Category.find_or_create_by!(company: @company, resource_name: "questions", name: name)
+    end
+  end
 
   # Category is the bridge to workflows (docs/PURCHASE_WORKFLOW.md): every purchases
   # category gets its own default "Standard Purchase Process" so purchases in the same
@@ -424,6 +431,8 @@ class Seed::HotelInitService
         "Brand" => full_crud,
         "Policy" => { read: true },
         "CompanyPaymentMethodAppointment" => { read: true, update: true },
+        "Exam" => full_crud,
+        "Question" => full_crud,
         "Customer" => full_crud,
         "Order" => full_crud,
         "Invoice" => full_crud,
@@ -473,6 +482,8 @@ class Seed::HotelInitService
         "Brand" => full_crud,
         "Policy" => { read: true },
         "CompanyPaymentMethodAppointment" => { read: true, update: true },
+        "Exam" => full_crud,
+        "Question" => full_crud,
         "Customer" => full_crud,
         "Order" => full_crud,
         "Invoice" => full_crud,

@@ -126,6 +126,32 @@ Rails.application.routes.draw do
       end
       resources :reports
       resources :documents
+      resources :questions
+      resources :exams do
+        member do
+          post :publish
+          post :archive
+          post :refresh_summary
+        end
+        resources :assignments, only: %i[index create], controller: "exam_assignments"
+        resources :appointments, only: %i[index show], controller: "exam_appointments" do
+          member do
+            patch :grade
+          end
+        end
+      end
+      resources :my_exams, only: %i[index show] do
+        member do
+          post :start
+        end
+      end
+      resources :my_exam_appointments, only: %i[show] do
+        member do
+          get :take
+          patch :answer
+          post :submit
+        end
+      end
       resources :folders, only: [ :index, :show, :create, :update, :destroy ]
       resources :stored_files, only: [ :index, :show, :create, :destroy ] do
         member do

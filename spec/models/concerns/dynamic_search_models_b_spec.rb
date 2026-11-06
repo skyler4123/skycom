@@ -22,7 +22,6 @@ RSpec.describe "dynamic meilisearch models B (OrderGroup → Warehouse)" do
     PurchaseItem,
     Project,
     ProjectGroup,
-    Question,
     Service,
     ServiceGroup,
     Stock,

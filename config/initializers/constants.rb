@@ -50,6 +50,11 @@ WORKFLOW_STATUS = {
   shipped: 11
 }
 
+# Exam attempt submission grace period. The client auto-submits at the
+# deadline; this window absorbs network latency before the server expires the
+# attempt instead of accepting the submission.
+EXAM_SUBMIT_GRACE_SECONDS = 30
+
 # Company-only workflow statuses (companies.workflow_status).
 #
 # These answer "can this tenant use Skycom and should background jobs process it?"
