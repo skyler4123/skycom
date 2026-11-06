@@ -117,6 +117,28 @@ RSpec.describe "Companies::QuestionsController", type: :request do
       expect(created.correct_option.content).to eq("4")
     end
 
+    it "creates a true/false question" do
+      post "/companies/#{company.id}/questions.json", params: {
+        question: {
+          name: "The sky is blue",
+          category_id: category.id,
+          question_type: "true_false",
+          points: 1,
+          options: {
+            "0" => { content: "True" },
+            "1" => { content: "False" }
+          },
+          correct_option_index: 0
+        }
+      }
+
+      expect(response).to have_http_status(:created)
+      created = Question.find(JSON.parse(response.body)["question"]["id"])
+      expect(created).to be_true_false
+      expect(created.question_options.count).to eq(2)
+      expect(created.correct_option.content).to eq("True")
+    end
+
     it "creates a text question with a model answer" do
       post "/companies/#{company.id}/questions.json", params: {
         question: {

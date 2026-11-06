@@ -66,6 +66,8 @@ class Companies::MyExamsController < Companies::ApplicationController
       payload = { errors: result[:errors] }
       if result[:active_appointment_id].present?
         payload[:redirect_url] = take_company_my_exam_appointment_path(current_company, result[:active_appointment_id])
+      elsif result[:submitted_appointment_id].present?
+        payload[:redirect_url] = company_my_exam_appointment_path(current_company, result[:submitted_appointment_id])
       end
       render json: payload, status: :unprocessable_content
     end
@@ -78,7 +80,8 @@ class Companies::MyExamsController < Companies::ApplicationController
     in_progress = ordered.find(&:workflow_status_in_progress?)
     assigned = ordered.find(&:workflow_status_assigned?)
     attempts_used = ordered.size
-    can_start = exam.published? && ordered.any? && in_progress.nil? &&
+    pending_review = ordered.any?(&:workflow_status_submitted?)
+    can_start = exam.published? && ordered.any? && in_progress.nil? && !pending_review &&
       (assigned.present? || exam.max_attempts.nil? || attempts_used < exam.max_attempts)
 
     {

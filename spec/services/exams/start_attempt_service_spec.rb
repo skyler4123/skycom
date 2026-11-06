@@ -119,6 +119,17 @@ RSpec.describe Exams::StartAttemptService, :active_job do
       expect(result[:errors]).to include("You already have an attempt in progress.")
     end
 
+    it "fails when a previous attempt is waiting for review" do
+      exam.update!(max_attempts: 2)
+      publish_exam!(exam)
+      create(:employee_exam_appointment, exam: exam, employee: employee, attempt_number: 1, workflow_status: :submitted)
+
+      result = described_class.call(exam: exam, employee: employee)
+
+      expect(result[:success]).to be(false)
+      expect(result[:errors]).to include("Your previous attempt is waiting for review.")
+    end
+
     it "fails when the attempt limit is reached" do
       exam.update!(max_attempts: 1)
       publish_exam!(exam)

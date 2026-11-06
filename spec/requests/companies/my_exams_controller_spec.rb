@@ -97,6 +97,24 @@ RSpec.describe "Companies::MyExamsController", type: :request, active_job: true 
       expect(body["attempts_used"]).to eq(1)
     end
 
+    it "does not allow a new attempt while a previous attempt is waiting for review" do
+      exam.update!(max_attempts: 2)
+      create(
+        :employee_exam_appointment,
+        exam: exam,
+        employee: employee,
+        workflow_status: :submitted,
+        attempt_number: 1,
+        started_at: 1.hour.ago,
+        submitted_at: 30.minutes.ago
+      )
+
+      get "/companies/#{company.id}/my_exams/#{exam.id}.json"
+
+      body = JSON.parse(response.body)
+      expect(body["can_start"]).to be(false)
+    end
+
     it "does not allow a retake when the limit is reached" do
       exam.update!(max_attempts: 1)
       create(

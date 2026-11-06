@@ -83,6 +83,18 @@ export default class Companies_MyExams_IndexController extends Companies_LayoutC
       `
     }
 
+    if (this.pendingReview(exam)) {
+      const pending = this.latestAttempt(exam)
+      if (pending) {
+        return `
+          <a href="${Helpers.company_my_exam_appointment_path(currentCompany()?.id, pending.id)}"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-line px-4 py-2 text-sm font-medium text-foreground hover:bg-muted">
+            <span class="material-symbols-outlined text-[18px]!">visibility</span>${translate("View Result")}
+          </a>
+        `
+      }
+    }
+
     if (exam.can_start) {
       const label = this.hasCompletedAttempt(exam) ? translate("Retake") : translate("Start Exam")
       return `

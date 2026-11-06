@@ -29,6 +29,15 @@ module Exams
         }
       end
 
+      pending = exam.employee_exam_appointments.find_by(employee: employee, workflow_status: :submitted)
+      if pending
+        return {
+          success: false,
+          errors: [ "Your previous attempt is waiting for review." ],
+          submitted_appointment_id: pending.id
+        }
+      end
+
       assignment = exam.employee_exam_appointments.find_by(employee: employee, workflow_status: :assigned)
       unless assignment
         return failure("You are not assigned to this exam.") unless assigned_to_exam?

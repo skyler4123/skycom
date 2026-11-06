@@ -134,6 +134,7 @@ class Companies::ExamsController < Companies::ApplicationController
     ActiveRecord::Base.transaction do
       exam.save!
       sync_questions(exam)
+      exam.exam_question_appointments.reload
     end
     true
   rescue ActiveRecord::RecordInvalid => e
