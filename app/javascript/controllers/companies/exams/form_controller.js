@@ -162,14 +162,25 @@ export default class Companies_Exams_FormController extends Companies_LayoutCont
       </div>
     `
 
-    return form({
+    const formHTML = form({
       action: this.isEditing()
         ? Helpers.company_exam_path(companyId, this.exam.id)
         : Helpers.company_exams_path(companyId),
       method: this.isEditing() ? "PATCH" : "POST",
-      attributes: `class="p-4" data-action="submit->${this.identifier}#handleSubmit"`,
+      attributes: `class="space-y-4" data-action="submit->${this.identifier}#handleSubmit"`,
       html: fields
     })
+
+    if (!this.isEditing()) return `<div class="p-4">${formHTML}</div>`
+
+    return `
+      <div class="space-y-4 p-4">
+        ${formHTML}
+        <div data-controller="companies--exams--assignment-panel"
+          data-companies--exams--assignment-panel-exam-id-value="${this.exam.id}"
+          data-companies--exams--assignment-panel-exam-status-value="${this.exam.workflow_status}"></div>
+      </div>
+    `
   }
 
   async handleSubmit(event) {
