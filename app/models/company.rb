@@ -116,6 +116,8 @@ class Company < ApplicationRecord
   has_many :table_config_logs, dependent: :destroy
   has_many :brands, dependent: :destroy
   has_many :branches, dependent: :destroy
+  has_many :exams, dependent: :destroy
+  has_many :questions, dependent: :destroy
   has_many :tags, dependent: :destroy
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy

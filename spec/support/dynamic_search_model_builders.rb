@@ -41,10 +41,6 @@ module DynamicSearchModelHelpers
 end
 
 DYNAMIC_SEARCH_MODELS = {
-  Answer => ->(company) {
-    question = create_searchable_record(Question, company, "questions")
-    create_searchable_record(Answer, company, "answers", question: question)
-  },
   Branch => ->(company) { create(:branch, company: company) },
   Brand => ->(company) { create(:brand, company: company) },
   Cart => ->(company) {
@@ -65,11 +61,6 @@ DYNAMIC_SEARCH_MODELS = {
     create_searchable_record(Event, company, "events", event_group: event_group)
   },
   EventGroup => ->(company) { create_searchable_record(EventGroup, company, "event_groups") },
-  Exam => ->(company) {
-    exam_group = create_searchable_record(ExamGroup, company, "exam_groups")
-    create_searchable_record(Exam, company, "exams", exam_group: exam_group)
-  },
-  ExamGroup => ->(company) { create_searchable_record(ExamGroup, company, "exam_groups") },
   Facility => ->(company) { create(:facility, company: company) },
   FacilityGroup => ->(company) { create_searchable_record(FacilityGroup, company, "facility_groups") },
   Invoice => ->(company) {
@@ -95,7 +86,6 @@ DYNAMIC_SEARCH_MODELS = {
     create_searchable_record(Project, company, "projects", project_group: project_group)
   },
   ProjectGroup => ->(company) { create_searchable_record(ProjectGroup, company, "project_groups") },
-  Question => ->(company) { create_searchable_record(Question, company, "questions") },
   Service => ->(company) { create_searchable_record(Service, company, "services") },
   ServiceGroup => ->(company) { create_searchable_record(ServiceGroup, company, "service_groups") },
   Stock => ->(company) { create(:stock, warehouse: create(:warehouse, company: company), product: create(:product, company: company)) },

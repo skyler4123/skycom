@@ -6,5 +6,6 @@ RSpec.describe EmployeeExamAppointment, type: :model do
     it { should belong_to(:company) }
     it { should belong_to(:employee) }
     it { should belong_to(:exam) }
+    it { should have_many(:employee_question_appointments).dependent(:destroy) }
   end
 end

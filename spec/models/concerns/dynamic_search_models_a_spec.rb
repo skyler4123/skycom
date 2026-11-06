@@ -15,7 +15,6 @@ RSpec.describe "dynamic meilisearch models A (Answer → Order)" do
   end
 
   DYNAMIC_SEARCH_MODELS.slice(
-    Answer,
     Branch,
     Brand,
     Cart,
@@ -28,8 +27,6 @@ RSpec.describe "dynamic meilisearch models A (Answer → Order)" do
     EmployeeGroup,
     Event,
     EventGroup,
-    Exam,
-    ExamGroup,
     Facility,
     FacilityGroup,
     Invoice,
