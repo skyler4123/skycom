@@ -177,7 +177,7 @@ export default class Companies_Exams_QuestionPickerController extends Controller
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div class="space-y-3">
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <input type="search" placeholder="${translate("Search questions...")}" data-action="input->${this.identifier}#onSearch"
+            <input type="search" value="${escapeHtml(this.query)}" placeholder="${translate("Search questions...")}" data-action="input->${this.identifier}#onSearch"
               class="rounded-lg border border-line bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground">
             <select data-action="change->${this.identifier}#onCategoryChange"
               class="rounded-lg border border-line bg-card px-3 py-2 text-sm text-foreground">

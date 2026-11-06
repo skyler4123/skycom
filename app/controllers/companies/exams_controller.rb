@@ -132,8 +132,14 @@ class Companies::ExamsController < Companies::ApplicationController
 
   def persist_exam(exam)
     ActiveRecord::Base.transaction do
-      exam.save!
-      sync_questions(exam)
+      if exam.persisted?
+        sync_questions(exam)
+        exam.exam_question_appointments.reload
+        exam.save!
+      else
+        exam.save!
+        sync_questions(exam)
+      end
       exam.exam_question_appointments.reload
     end
     true
@@ -225,7 +231,7 @@ class Companies::ExamsController < Companies::ApplicationController
   end
 
   def format_exam_questions(exam)
-    exam.exam_question_appointments.order(:position).includes(question: :category).map do |row|
+    exam.exam_question_appointments.order(:position).includes(question: [ :category, :question_options ]).map do |row|
       question = row.question
       {
         id: question.id,

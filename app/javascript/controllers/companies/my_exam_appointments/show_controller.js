@@ -64,6 +64,7 @@ export default class Companies_MyExamAppointments_ShowController extends Compani
     const correctOptions = (answer.question?.options || []).filter(option => option.correct).map(option => option.content)
     const pending = this.appointment.status === "submitted"
     const isText = answer.question_type === "text"
+    const correctAnswer = isText ? (answer.question?.correct_text || "—") : (correctOptions.join(", ") || "—")
 
     return `
       <div class="rounded-xl border border-line bg-card p-4">
@@ -90,7 +91,7 @@ export default class Companies_MyExamAppointments_ShowController extends Compani
           ${!pending ? `
             <div class="rounded-lg border border-line bg-background p-3">
               <p class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">${translate("Correct Answer")}</p>
-              <p class="mt-1 whitespace-pre-wrap text-sm text-foreground">${escapeHtml(isText ? (correctOptions.join(", ") || "—") : (correctOptions.join(", ") || "—"))}</p>
+              <p class="mt-1 whitespace-pre-wrap text-sm text-foreground">${escapeHtml(correctAnswer)}</p>
             </div>
           ` : ""}
         </div>

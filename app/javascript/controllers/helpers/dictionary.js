@@ -1505,6 +1505,8 @@ export const dictionary = () => {
     "This exam has no questions.": { vi: "Bài thi chưa có câu hỏi." },
     "Failed to load my exams": { vi: "Không tải được bài thi của tôi" },
     "Graded": { vi: "Đã chấm" },
+    "In progress": { vi: "Đang làm" },
+    "Cancelled": { vi: "Đã hủy" },
     "Selected": { vi: "Đã chọn" },
     "Employee Answer": { vi: "Câu trả lời của nhân viên" },
     "Award points": { vi: "Chấm điểm" },
@@ -1513,5 +1515,8 @@ export const dictionary = () => {
     "No attempts found": { vi: "Không tìm thấy lượt làm bài" },
     "Failed to load attempts": { vi: "Không tải được danh sách lượt làm" },
     "Failed to load attempt": { vi: "Không tải được lượt làm bài" },
+    "Exam not found.": { vi: "Không tìm thấy bài thi." },
+    "Optional instructions for employees": { vi: "Hướng dẫn thêm cho nhân viên (không bắt buộc)" },
+    "e.g. Annual safety exam": { vi: "VD: Bài thi an toàn hằng năm" },
   }
 }

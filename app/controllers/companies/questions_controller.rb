@@ -107,7 +107,7 @@ class Companies::QuestionsController < Companies::ApplicationController
   private
 
   def set_question
-    @question = current_company.questions.find(params[:id])
+    @question = current_company.questions.includes(:category, :question_options).find(params[:id])
   end
 
   def persist_question(question)

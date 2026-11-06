@@ -149,6 +149,23 @@ RSpec.describe "Companies::ExamsController", type: :request, active_job: true do
       expect(exam.duration_minutes).to eq(45)
       expect(exam.questions.map(&:id)).to eq([ questions[1].id ])
     end
+
+    it "refuses to remove all questions from a published exam" do
+      exam.publish!
+      original_question_ids = exam.questions.map(&:id)
+
+      patch "/companies/#{company.id}/exams/#{exam.id}.json", params: {
+        exam: {
+          name: exam.name,
+          passing_score: exam.passing_score,
+          question_ids: []
+        }
+      }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body)["errors"].join(" ")).to include("Add at least one question")
+      expect(exam.reload.questions.map(&:id)).to match_array(original_question_ids)
+    end
   end
 
   describe "POST #publish / #archive / #refresh_summary" do
