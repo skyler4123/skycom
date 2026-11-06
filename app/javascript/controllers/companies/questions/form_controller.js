@@ -208,7 +208,10 @@ export default class Companies_Questions_FormController extends Companies_Layout
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">${translate("Category")}</label>
+            <div class="flex items-center justify-between">
+              <label class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">${translate("Category")}</label>
+              ${newCategoryLink(currentCompany().id, "questions")}
+            </div>
             <select name="question[category_id]" required
               class="w-full rounded-lg border border-line bg-card px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
               ${this.categoryOptionsHTML()}

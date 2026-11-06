@@ -107,7 +107,10 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
         <h2 class="text-xl font-bold text-foreground">${translate("New Order")}</h2>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Category")}</label>
+          <div class="flex items-center justify-between">
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Category")}</label>
+            ${newCategoryLink(currentCompany().id, "orders")}
+          </div>
           <select name="order[category_id]" data-action="change->${this.identifier}#onCategoryChange"
             class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
             ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), this.categoryId)}

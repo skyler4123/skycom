@@ -18,6 +18,7 @@ export default class Companies_Categories_NewController extends Companies_Layout
       name: r.charAt(0).toUpperCase() + r.slice(1),
       value: r
     }))
+    const selectedResourceName = new URLSearchParams(window.location.search).get('resource_name') || ''
 
     const fields = `
       <div class="space-y-6">
@@ -34,8 +35,7 @@ export default class Companies_Categories_NewController extends Companies_Layout
             <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Resource Name")}</label>
             <select name="category[resource_name]" required
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
-              <option value="">${translate("Select Resource")}</option>
-              ${resourceOptions.map(opt => `<option value="${opt.value}">${opt.name}</option>`).join('')}
+              ${selectOptionsHTML(resourceOptions, selectedResourceName, translate("Select Resource"))}
             </select>
           </div>
         </div>

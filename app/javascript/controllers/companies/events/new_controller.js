@@ -217,7 +217,10 @@ export default class Companies_Events_NewController extends Companies_LayoutCont
 
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
+            <div class="flex items-center justify-between">
+              <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Category")}</label>
+              ${newCategoryLink(currentCompany().id, "events")}
+            </div>
             <select
               name="event[category_id]"
               data-action="change->${this.identifier}#onCategoryChange"

@@ -4,6 +4,7 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import Toastify from 'toastify-js';
 import { capitalize, isDefined } from "controllers/helpers/data_helpers" 
+import { new_company_category_path } from "controllers/helpers/url_helpers"
 import qrcode from "qrcode"
 
 dayjs.extend(utc)
@@ -310,6 +311,24 @@ export const translate = (key) => {
   
   // Return translation if found, otherwise return the key itself
   return dictionary()[key]?.[lang] || key;
+}
+
+/**
+ * Renders the "New Category" shortcut used beside a category select.
+ * Links to the category form with the record's resource preselected.
+ * @param {string} companyId - Current company UUID.
+ * @param {string} resourceName - Category resource_name (e.g. "products").
+ * @returns {string} Anchor HTML, or an empty string when inputs are missing.
+ */
+export const newCategoryLink = (companyId, resourceName) => {
+  if (!companyId || !resourceName) return ""
+
+  return `
+    <a href="${new_company_category_path(companyId, resourceName)}"
+      class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
+      <span class="material-symbols-outlined text-[16px]" aria-hidden="true">add</span>${translate("New Category")}
+    </a>
+  `
 };
 
 /**
