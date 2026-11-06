@@ -126,6 +126,7 @@ Rails.application.routes.draw do
       end
       resources :reports
       resources :documents
+      resources :questions
       resources :folders, only: [ :index, :show, :create, :update, :destroy ]
       resources :stored_files, only: [ :index, :show, :create, :destroy ] do
         member do

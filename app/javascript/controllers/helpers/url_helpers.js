@@ -256,6 +256,11 @@ export const create_company_documents_path = (companyId) => `/companies/${compan
 export const new_company_document_path = (companyId) => `/companies/${companyId}/documents/new`
 export const company_document_path = (companyId, documentId) => `/companies/${companyId}/documents/${documentId}`
 export const edit_company_document_path = (companyId, documentId) => `/companies/${companyId}/documents/${documentId}/edit`
+export const company_questions_path = (companyId) => `/companies/${companyId}/questions`
+export const create_company_questions_path = (companyId) => `/companies/${companyId}/questions`
+export const new_company_question_path = (companyId) => `/companies/${companyId}/questions/new`
+export const company_question_path = (companyId, questionId) => `/companies/${companyId}/questions/${questionId}`
+export const edit_company_question_path = (companyId, questionId) => `/companies/${companyId}/questions/${questionId}/edit`
 export const company_announcements_path = (companyId) => `/companies/${companyId}/announcements`
 export const company_events_path = (companyId) => `/companies/${companyId}/events`
 export const new_company_event_path = (companyId) => `/companies/${companyId}/events/new`

@@ -1727,6 +1727,22 @@ const ENUMS = {
       }
     ]
   },
+  "question": {
+    "question_types": [
+      {
+        "name": "Single choice",
+        "value": "single_choice"
+      },
+      {
+        "name": "True / False",
+        "value": "true_false"
+      },
+      {
+        "name": "Text answer",
+        "value": "text"
+      }
+    ]
+  },
   "workflow": {
     "process_types": [
       {
