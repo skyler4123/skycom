@@ -75,6 +75,18 @@ RSpec.feature "Companies::Warehouses Management", type: :feature, js: true do
     expect(edit_link).to be_present
   end
 
+  scenario "import button creates a warehouses import pre-selected for this category" do
+    visit company_warehouses_path(company)
+    expect(page).to have_selector("table", wait: 10)
+
+    find("button[data-import-table='warehouses']", match: :first).click
+
+    expect(page).to have_content("What you're importing", wait: 15)
+    expect(page).to have_current_path(%r{/companies/#{company.id}/imports/[0-9a-f-]+}, wait: 10)
+    expect(find("[data-import-target]").value).to eq("warehouses")
+    expect(find("[data-import-category]").value).to eq(warehouse.category.id)
+  end
+
   scenario "name link goes to show page" do
     visit company_warehouses_path(company)
     expect(page).to have_selector('table', wait: 10)

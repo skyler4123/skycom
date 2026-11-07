@@ -56,4 +56,16 @@ RSpec.feature "Companies::EmployeeProfiles Management", type: :feature, js: true
     edit_link = find("a[href*='/employee_profiles/#{profile.id}/edit']", match: :first)
     expect(edit_link).to be_present
   end
+
+  scenario "import button creates a employee_profiles import pre-selected for this category" do
+    visit company_employee_profiles_path(company)
+    expect(page).to have_selector("table", wait: 10)
+
+    find("button[data-import-table='employee_profiles']", match: :first).click
+
+    expect(page).to have_content("What you're importing", wait: 15)
+    expect(page).to have_current_path(%r{/companies/#{company.id}/imports/[0-9a-f-]+}, wait: 10)
+    expect(find("[data-import-target]").value).to eq("employee_profiles")
+    expect(find("[data-import-category]").value).to eq(profile.category.id)
+  end
 end

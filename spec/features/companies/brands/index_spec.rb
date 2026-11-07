@@ -74,6 +74,18 @@ RSpec.feature "Companies::Brands Management", type: :feature, js: true do
     expect(edit_link).to be_present
   end
 
+  scenario "import button creates a brands import pre-selected for this category" do
+    visit company_brands_path(company)
+    expect(page).to have_selector("table", wait: 10)
+
+    find("button[data-import-table='brands']", match: :first).click
+
+    expect(page).to have_content("What you're importing", wait: 15)
+    expect(page).to have_current_path(%r{/companies/#{company.id}/imports/[0-9a-f-]+}, wait: 10)
+    expect(find("[data-import-target]").value).to eq("brands")
+    expect(find("[data-import-category]").value).to eq(brand.category.id)
+  end
+
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "brands")
     brand.update!(category: category, property_mapping: category.default_property_mapping)

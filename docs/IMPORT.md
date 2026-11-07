@@ -192,22 +192,38 @@ All failures use `{ errors: [...] }` (`docs/API_ERROR_FORMAT.md`). Policy
 ## 7. Frontend
 
 - Sidebar item **Imports** in the `platform` group.
+- **Import shortcut on importable index pages** — every index controller for a
+  table in `IMPORTABLE_RESOURCES` renders an **Import** button before its Edit
+  action (`Companies_LayoutController#importData`). Clicking it auto-creates a
+  draft import (auto name) through `POST /companies/:id/imports.json` and opens
+  the show page with `?target_table=…&category_id=…`, which pre-selects step 1's
+  target table and category. Nothing is saved until the user clicks
+  **Save setup & load sample**.
 - `Companies_Imports_IndexController` — list, New Import modal, guarded draft delete.
 - `Companies_Imports_NewModalController` — name + description, redirects to show.
-- `Companies_Imports_ShowController` — the whole workflow:
-  1. Step-by-step instructions card.
-  2. Setup: target table (FE allowlist mirror) + category (company categories
-     filtered by `resource_name`), "Save setup & load sample".
-  3. Expected headers table (header, maps-to slot, type, required, notes) and
-     "Copy headers".
-  4. Sample table: latest 10 records for the table + category, under the same
-     friendly headers.
-  5. Upload: single CSV; a browser-side header pre-check blocks unknown/duplicate
-     headers and missing required headers before uploading (new
-     `helpers/csv_headers.js`). The BE remains the authority.
-  6. Dry run result panel (passed/failed counts, header errors, row error table).
-  7. Approve; live progress via `import_progress` / `import_finished`.
-  8. Rollback.
+- `Companies_Imports_ShowController` — a guided four-step flow for non-technical
+  managers. All step sections stay in the DOM; progress is shown with step badges and a
+  top stepper. Raw storage keys (`property_string_1`), raw table names (`products`), and
+  raw database types (`uuid`, `enum`) never render.
+  1. **What you're importing** — friendly target picker ("Products", not
+     `Product (products)`), category filtered by target, name + description.
+  2. **Prepare your file** — "Expected CSV headers" table with the exact header,
+     a plain-language "What it means" column (no "Maps to" slot), a friendly type badge,
+     required state, and an example value. Buttons: **Copy headers** and **Download
+     starter CSV** (client-side CSV with exact headers + one example row). Sample table
+     keeps the exact header casing.
+  3. **Upload & check** — drag-and-drop/file picker, browser-side header pre-check in
+     plain language, **Run dry run**, and a dry-run verdict ("All N rows look good" /
+     "N of M rows have problems"). Failed checks offer **Download problem rows**.
+  4. **Review & import** — summary of target/category/rows, **Approve** with a
+     consequence confirmation, live progress via `import_progress` / `import_finished`,
+     completed/failed/rolled-back summary cards, and **Rollback** with a confirmation
+     that states exactly which records will be deleted. Rollback still replays
+     `import_logs` and keeps the audit history.
+- Shared presentation helper: `app/javascript/controllers/helpers/import_helpers.js`
+  (friendly target labels, column meanings/type labels/icons/examples, step state,
+  starter/problem CSV generation, status badges). `import_tables.js` still mirrors the
+  backend allowlist for the picker.
 - All strings are in `dictionary.js` (EN + VI); semantic colors only
   (`bin/check_colors --strict`).
 
@@ -298,7 +314,7 @@ Unique index `[import_id, record_type, record_id]`.
 | `spec/services/imports/notify_creator_service_spec.rb`, `spec/jobs/imports/*` | status transitions, notifications, rescuers |
 | `spec/policies/companies/imports_policy_spec.rb` | owner-only |
 | `spec/requests/companies/imports_controller_spec.rb` | every endpoint success + `errors` failure |
-| `spec/features/companies/imports/{index,show,full_journey}_spec.rb` | real-browser E2E incl. header pre-check, dry-run failure/recovery, approve → run → rollback |
+| `spec/features/companies/imports/{index,show,full_journey}_spec.rb` | real-browser E2E incl. guided-step/friendly-label rendering, no raw slot keys, header pre-check, dry-run failure/recovery, approve → run → rollback |
 
 Run:
 

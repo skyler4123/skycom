@@ -9,7 +9,8 @@
 # docs/IMPORT.md.
 # Serves Stimulus: Companies_Imports_IndexController (list + create modal + delete),
 #                  Companies_Imports_ShowController (setup, sample, upload, dry run, approve, rollback, progress),
-#                  Companies_Imports_NewModalController (create modal)
+#                  Companies_Imports_NewModalController (create modal),
+#                  Companies_LayoutController#importData (Import shortcut on importable index pages)
 # Endpoints: GET/POST /companies/:company_id/imports(.json) + member
 #            POST source_file, POST dry_run, POST approve, POST rollback — see config/routes.rb
 # Docs: docs/IMPORT.md
