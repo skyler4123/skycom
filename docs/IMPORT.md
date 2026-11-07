@@ -192,13 +192,14 @@ All failures use `{ errors: [...] }` (`docs/API_ERROR_FORMAT.md`). Policy
 ## 7. Frontend
 
 - Sidebar item **Imports** in the `platform` group.
-- **Import shortcut on importable index pages** — every index controller for a
-  table in `IMPORTABLE_RESOURCES` renders an **Import** button before its Edit
-  action (`Companies_LayoutController#importData`). Clicking it auto-creates a
-  draft import (auto name) through `POST /companies/:id/imports.json` and opens
-  the show page with `?target_table=…&category_id=…`, which pre-selects step 1's
-  target table and category. Nothing is saved until the user clicks
-  **Save setup & load sample**.
+- **Import shortcut on importable index pages** — every index page whose table
+  is in `IMPORTABLE_RESOURCES` renders an **Import** button in the table title,
+  immediately before the table-config **Edit** button
+  (`Companies_LayoutController#renderTableTitle` → `#importData`). Clicking it
+  auto-creates a draft import (auto name) through
+  `POST /companies/:id/imports.json` and opens the show page with
+  `?target_table=…&category_id=…`, which pre-selects step 1's target table and
+  category. Nothing is saved until the user clicks **Save setup & load sample**.
 - `Companies_Imports_IndexController` — list, New Import modal, guarded draft delete.
 - `Companies_Imports_NewModalController` — name + description, redirects to show.
 - `Companies_Imports_ShowController` — a guided four-step flow for non-technical
