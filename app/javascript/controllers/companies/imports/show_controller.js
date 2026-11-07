@@ -628,25 +628,47 @@ export default class Companies_Imports_ShowController extends Companies_LayoutCo
 
     return `
       <section data-import-columns class="space-y-3">
-        <div class="flex flex-wrap items-start justify-between gap-3">
+        <div class="rounded-xl border border-primary/30 bg-primary/5 p-4">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-start gap-3">
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <span class="material-symbols-outlined text-[22px]!">download</span>
+              </span>
+              <div>
+                <h4 class="text-sm font-bold text-foreground">${translate("Start here: download the starter file")}</h4>
+                <p class="mt-1 text-xs text-muted-foreground">
+                  ${translate("Open it in Excel or Google Sheets, fill one row per record, and save it as CSV. The first row already has the exact column names.")}
+                </p>
+              </div>
+            </div>
+            <button type="button" data-action="click->${this.identifier}#downloadStarterCsv"
+              class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground hover:bg-primary/90 cursor-pointer"
+              ${tooltip(translate("Downloads a CSV with these exact headers and one example row. Open it in Excel or Google Sheets, replace the example row, and save."))}>
+              <span class="material-symbols-outlined text-[18px]!">download</span>
+              ${translate("Download starter CSV")}
+            </button>
+          </div>
+          <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-primary/20 pt-3">
+            <button type="button" data-action="click->${this.identifier}#copyHeaders"
+              class="inline-flex items-center gap-1 px-3 py-1.5 bg-card text-foreground border border-line rounded-lg text-xs font-medium hover:bg-muted cursor-pointer"
+              ${tooltip(translate("Copies the header row so you can paste it into the first row of your spreadsheet."))}>
+              <span class="material-symbols-outlined text-[16px]!">content_copy</span>
+              ${translate("Copy headers")}
+            </button>
+            <p class="text-[11px] text-muted-foreground">${translate("Prefer a spreadsheet? Copy the headers instead.")}</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-start justify-between gap-2 pt-1">
           <div>
-            <h4 class="text-sm font-bold text-foreground">${translate("Expected CSV headers")}</h4>
+            <h4 class="text-xs font-bold text-muted-foreground">${translate("Expected CSV headers")}</h4>
             <p class="text-xs text-muted-foreground">
               ${translate("The CSV must use these exact names. Property columns use the category's display names.")}
             </p>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <button type="button" data-action="click->${this.identifier}#copyHeaders"
-              class="px-3 py-1.5 bg-muted hover:bg-card text-foreground rounded-lg text-xs font-medium cursor-pointer"
-              ${tooltip(translate("Copies the header row so you can paste it into the first row of your spreadsheet."))}>
-              ${translate("Copy headers")}
-            </button>
-            <button type="button" data-action="click->${this.identifier}#downloadStarterCsv"
-              class="px-3 py-1.5 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg text-xs font-medium cursor-pointer"
-              ${tooltip(translate("Downloads a CSV with these exact headers and one example row. Open it in Excel or Google Sheets, replace the example row, and save."))}>
-              ${translate("Download starter CSV")}
-            </button>
-          </div>
+          <span class="inline-flex items-center gap-1 rounded-full border border-line bg-muted px-2.5 py-1 text-[11px] font-bold text-muted-foreground">
+            ${schema.headers.length} ${translate("columns")}
+          </span>
         </div>
 
         <div class="overflow-x-auto rounded-lg border border-line">
