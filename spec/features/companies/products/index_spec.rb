@@ -90,6 +90,22 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     expect(edit_link).to be_present
   end
 
+  scenario "import button creates a products import pre-selected for this category" do
+    visit company_products_path(company, category_id: default_category.id)
+    expect(page).to have_selector('table', wait: 10)
+
+    find("button[data-import-table='products']", match: :first).click
+
+    expect(page).to have_content("What you're importing", wait: 15)
+    expect(page).to have_current_path(%r{/companies/#{company.id}/imports/[0-9a-f-]+}, wait: 10)
+    expect(find("[data-import-target]").value).to eq("products")
+    expect(find("[data-import-category]").value).to eq(default_category.id)
+
+    created = company.imports.order(:created_at).last
+    expect(created.target_table).to be_nil
+    expect(created.name).to include("Products")
+  end
+
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "products")
     product.update!(category: category, property_mapping: category.default_property_mapping)

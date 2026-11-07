@@ -1,6 +1,7 @@
 //  https://fonts.google.com/icons
 
 import { Controller } from "@hotwired/stimulus"
+import { targetTableLabel } from "controllers/helpers/import_helpers"
 
 export default class Companies_LayoutController extends Controller {
   static targets = ["content", "profileDropdown"]
@@ -109,6 +110,42 @@ export default class Companies_LayoutController extends Controller {
       downloadCSV(all, columns, filename)
     } catch (error) {
       toast({ type: "error", message: error.errors?.join(", ") || translate("Export failed") })
+    }
+  }
+
+  // Index-page "Import" button: auto-create a draft Import for the table the
+  // page lists, then open its show page with the target table + category
+  // pre-selected. The show page owns the rest of the guided flow.
+  // Depends on BE: Companies::ImportsController#create
+  // Endpoints: POST /companies/:id/imports.json
+  // Docs: docs/IMPORT.md
+  async importData(event) {
+    const button = event.currentTarget
+    const table = button.dataset.importTable
+    const categoryId = button.dataset.importCategoryId
+    const companyId = currentCompany()?.id
+
+    if (!table || !companyId) return
+
+    button.disabled = true
+
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")
+    const name = `${targetTableLabel(table)} import ${stamp}`
+
+    try {
+      const response = await fetchJson(Helpers.company_imports_path(companyId), {
+        method: "POST",
+        body: { import: { name } }
+      })
+
+      const params = new URLSearchParams()
+      params.set("target_table", table)
+      if (categoryId) params.set("category_id", categoryId)
+
+      window.location.href = `${Helpers.company_import_path(companyId, response.import.id)}?${params.toString()}`
+    } catch (error) {
+      button.disabled = false
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to create import") })
     }
   }
 

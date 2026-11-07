@@ -153,4 +153,19 @@ RSpec.feature "Companies::Imports Show", type: :feature, js: true do
 
     expect(page).to have_button("Download starter CSV")
   end
+
+  scenario "pre-selects the target table and category from index-page params" do
+    import = create(
+      :import,
+      company: company,
+      creator: owner_of(company),
+      name: "Index prefill #{SecureRandom.hex(3)}"
+    )
+
+    visit company_import_path(company, import, target_table: "products", category_id: category.id)
+
+    expect(page).to have_content("What you're importing", wait: 10)
+    expect(find("[data-import-target]").value).to eq("products")
+    expect(find("[data-import-category]").value).to eq(category.id)
+  end
 end

@@ -37,6 +37,8 @@ export default class Companies_Imports_ShowController extends Companies_LayoutCo
   /** @type {Object|null} */ liveProgress = null
   /** @type {string} */ loadError = ""
   /** @type {Object|null} */ headerCheck = null
+  /** @type {string} */ pendingTargetTable = ""
+  /** @type {string} */ pendingCategoryId = ""
   uploadState = { active: false, name: "" }
 
   async connect() {
@@ -50,6 +52,13 @@ export default class Companies_Imports_ShowController extends Companies_LayoutCo
       this.loadError = error.errors?.join(", ") || error.message || ""
       toast({ type: "error", message: `${translate("Failed to load import")}: ${this.loadError}` })
     }
+
+    // Index-page Import button passes the page's table + category so step 1
+    // opens with both already selected. Nothing is saved until the user clicks
+    // "Save setup & load sample".
+    const params = new URLSearchParams(window.location.search)
+    this.pendingTargetTable = params.get("target_table") || ""
+    this.pendingCategoryId = params.get("category_id") || ""
 
     this.subscribeToProgress()
 
@@ -521,8 +530,11 @@ export default class Companies_Imports_ShowController extends Companies_LayoutCo
       `
     }
 
+    const effectiveTable = this.import.target_table || this.pendingTargetTable
+    const effectiveCategory = this.import.category_id || this.pendingCategoryId
+
     const targetOptions = Object.keys(IMPORTABLE_RESOURCES).map((table) => {
-      return `<option value="${table}" ${table === this.import.target_table ? "selected" : ""}>${escapeHtml(targetTableLabel(table))}</option>`
+      return `<option value="${table}" ${table === effectiveTable ? "selected" : ""}>${escapeHtml(targetTableLabel(table))}</option>`
     }).join("")
 
     return `
@@ -564,7 +576,7 @@ export default class Companies_Imports_ShowController extends Companies_LayoutCo
             >${translate("Category")}</label>
             <select data-import-category
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
-              ${this.categoryOptionsHTML(this.import.target_table, this.import.category_id)}
+              ${this.categoryOptionsHTML(effectiveTable, effectiveCategory)}
             </select>
           </div>
         </div>
