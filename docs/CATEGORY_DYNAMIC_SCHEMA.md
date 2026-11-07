@@ -289,16 +289,54 @@ Each element in `metadata["properties"]` is a Hash with these keys:
 | `key` | String | The resource column this config describes (e.g. `"property_string_1"`). Required. |
 | `type` | String | Data type: `string`, `integer`, `decimal`, `boolean`, or `datetime`. Derivable from the key prefix. |
 | `name` | String | Human-readable display name. Required. |
+| `input_type` | String | Optional. How the field is rendered. Integer supports `select`, `progress_bar`, `slider`, `star`; decimal supports `currency`, `number`, `percentage`; boolean supports `toggle`. |
+| `options` | Array | Required when `input_type` is `select`. Each entry is `{ "value" => <integer>, "label" => "<text>" }`. |
+| `placeholder`, `default`, `prefix`, `suffix` | Various | Optional input metadata (see `PropertyMapping::SUPPORTED_KEYS`). |
+| `min`, `max` | Integer | Optional limits for integer properties. |
+| `currency`, `precision` | String / Integer | Optional display metadata for decimal properties. |
+| `true_label`, `false_label` | String | Optional labels for boolean properties. |
+| `format`, `timezone` | String | Optional display metadata for datetime properties. |
+
+### Choice Lists (Enum)
+
+A choice list is **not a separate database type**. It is an integer property with
+`input_type: "select"` and an `options` array:
+
+```json
+{
+  "key": "property_integer_1",
+  "type": "integer",
+  "name": "Membership tier",
+  "input_type": "select",
+  "options": [
+    { "value": 1, "label": "Gold" },
+    { "value": 2, "label": "Silver" },
+    { "value": 3, "label": "Bronze" }
+  ]
+}
+```
+
+- The integer is what the record stores; the label is what users see.
+- Option values must be unique whole numbers, labels are required, and at least one option is required.
+- The Table Config enum filter reads this exact shape (`input_type == "select"` + `options`).
 
 ### Column Count Per Type
 
 | Type | Slots Available | Example Keys |
 |------|----------------|--------------|
-| String | 10 | `property_string_1` through `property_string_10` |
-| Integer | 20 | `property_integer_1` through `property_integer_20` |
-| Decimal | 10 | `property_decimal_1` through `property_decimal_10` |
-| Boolean | 10 | `property_boolean_1` through `property_boolean_10` |
-| DateTime | 10 | `property_datetime_1` through `property_datetime_10` |
+| String | 5 | `property_string_1` through `property_string_5` |
+| Integer | 10 | `property_integer_1` through `property_integer_10` |
+| Decimal | 5 | `property_decimal_1` through `property_decimal_5` |
+| Boolean | 5 | `property_boolean_1` through `property_boolean_5` |
+| DateTime | 5 | `property_datetime_1` through `property_datetime_5` |
+
+### Slot History
+
+`metadata["used_property_keys"]` records every slot that has ever been assigned
+to a property. The editor never reuses a deleted slot: old values remain in the
+database column and would otherwise appear under a new field name. The list is
+maintained by `Companies::PropertyMappingsController#normalize_metadata`; do
+not edit it from the UI.
 
 ---
 
@@ -389,6 +427,32 @@ for (const config of (mapping.property_metadata || [])) {
 // Result: { property_string_1: "Skin Type Suitability", property_integer_1: "Volume (ml)" }
 ```
 
+### Property Mapping Editor
+
+`app/javascript/controllers/companies/property_mappings/edit_controller.js` is
+**type-first**: the user picks Text / Whole number / Decimal number / Yes-No /
+Date & time / Choice list, and the controller assigns the next free
+`property_*` slot. The raw key is submitted as a hidden input and is never shown
+on the edit or show page.
+
+- Shared type/slot/settings definitions live in
+  `app/javascript/controllers/helpers/property_mapping_helpers.js` and are
+  exported through `controllers/helpers.js`.
+- The Setup column opens a per-property panel. Enum entries get a repeatable
+  `value` + `label` editor; other types get their supported settings
+  (`placeholder`, `default`, `min`, `max`, `currency`, `precision`,
+  `true_label`, `false_label`, `format`, `timezone`, …).
+- Setup inputs are rendered inside the form even when the panel is visually
+  collapsed, so native form submission still sends them.
+- Hidden `properties_submitted` / `extra_columns_submitted` markers let a save
+  clear the last row (Rails submits no nested params for an empty table).
+- `Companies::PropertyMappingsController#normalize_metadata` converts indexed
+  form hashes into arrays, coerces enum option values to integers, strips blank
+  settings, and maintains `used_property_keys`.
+- Client-side validation blocks blank names, empty choice lists, duplicate
+  option values, blank option labels, and invalid min/max/precision before the
+  native submit runs.
+
 ### New Category Shortcut (Record Forms)
 
 Every record form whose category is selectable must render a **New Category** link beside the Category label. The link opens the category form with the record's resource preselected, so the user does not have to leave the form, guess the resource name, and start over.
@@ -452,6 +516,7 @@ function renderDynamicFields(product, category) {
 5. **Separate concerns** - PropertyMapping defines what data means via `property_metadata`; TableConfig defines what's visible via `columns_metadata`. A named property can be hidden from the table by setting `visible: false` in the column hash
 6. **Keep in sync** - Properties and their table visibility live in the same `METADATA_CATEGORIES` entry — never define them separately
 7. **`name` is universal** - The `name` column is prepended automatically by `TableConfig`'s default. Always include it first in the seed `visible_columns` array
+8. **Choice lists are integer + select** - Store `type: "integer"`, `input_type: "select"`, and a unique-integer `options` array. Never use `type: "enum"` — the database column is an integer and the Table Config enum filter expects the integer shape.
 
 ---
 

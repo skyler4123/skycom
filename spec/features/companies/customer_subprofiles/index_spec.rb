@@ -21,7 +21,7 @@ RSpec.feature "Companies::CustomerSubprofiles Management", type: :feature, js: t
       property_mapping: default_category.default_property_mapping,
       resource_name: "customer_subprofiles",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Subprofile Name", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
         { "key" => "code", "name" => "Code", "visible" => true, "align" => "left", "width" => nil },
         { "key" => "business_type", "name" => "Type", "visible" => true, "align" => "center", "width" => nil },
         { "key" => "workflow_status", "name" => "Status", "visible" => true, "align" => "center", "width" => nil }

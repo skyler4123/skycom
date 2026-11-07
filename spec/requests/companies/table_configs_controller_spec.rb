@@ -102,4 +102,38 @@ RSpec.describe "Companies::TableConfigsController", type: :request do
       expect(response).to redirect_to(edit_company_table_config_path(company, config))
     end
   end
+
+  describe "PATCH #update with canonical column names" do
+    it "stores an empty columns array when columns_submitted is 1 and no columns are sent" do
+      patch "/companies/#{company.id}/table_configs/#{config.id}", params: {
+        table_config: { metadata: { columns_submitted: "1" } }
+      }
+
+      expect(config.reload.columns).to eq([])
+    end
+
+    it "normalizes a submitted standard name to the fixed label" do
+      patch_columns({ "0" => { "key" => "name", "name" => "Product Title", "visible" => "true" } })
+
+      expect(config.reload.columns.first["name"]).to eq("Name")
+    end
+
+    it "normalizes property and extra names from Property Mapping" do
+      config.property_mapping.update!(metadata: {
+        "properties" => [
+          { "key" => "property_string_1", "name" => "Color", "type" => "string" }
+        ],
+        "extra_columns" => [
+          { "key" => "extra_1", "name" => "Extra Demo", "type" => "string" }
+        ]
+      })
+
+      patch_columns({
+        "0" => { "key" => "property_string_1", "name" => "Old Color", "visible" => "true" },
+        "1" => { "key" => "extra_1", "name" => "Old Extra", "visible" => "true" }
+      })
+
+      expect(config.reload.columns.map { |column| column["name"] }).to eq([ "Color", "Extra Demo" ])
+    end
+  end
 end

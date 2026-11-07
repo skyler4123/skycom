@@ -4,11 +4,33 @@
 
 - **Work on the current branch, in the current working directory.** Never create a new branch or worktree, and never move the session elsewhere, unless the user explicitly asks for it.
 - **Default to native (inline) execution.** Never dispatch subagents — for implementation, review, or anything else — unless the user explicitly asks for subagent mode.
+- **Plan multi-step work before coding.** Any feature or refactor that touches more than a trivial change starts from `docs/PLAN_TEMPLATE.md`. Keep the plan self-contained and update it when decisions change. For UI-heavy work, read `docs/AGENT_PLAYBOOK.md` first.
 - These rules take precedence over any installed skill/workflow guidance (e.g. superpowers) that says otherwise.
+
+## UI/UX Golden Rules (mandatory for UI refactors)
+
+- **Hide the machinery.** Never show raw keys (`property_string_1`, `extra_123`), internal IDs, or raw JSON in a user-facing form. Show meaning, not storage.
+- **Type-first creation.** Ask what the data means — Text, Whole number, Decimal, Yes/No, Date & time, Choice list — and assign storage slots automatically. Users pick types, not column names.
+- **One owner per concept.** A label, type, or layout setting has one home. If another page owns it, render it read-only with a source badge and a link; do not compete for the same value.
+- **Progressive disclosure.** Keep rows scannable with a summary; put complex configuration in an expandable panel below the row. Never put ten controls in one table cell.
+- **Explain every control.** Add a help card, tooltips, examples, empty states, disabled reasons, and consequences (Save, delete, Active, what data remains).
+- **Explicit actions.** A select must not auto-add or auto-submit on change. Use a clear Add button and an explicit Save. State that nothing is saved until Save.
+- **Validate before native submit.** Mirror server rules on the client, show a toast and focus the first invalid field, and never let a predictable validation error redirect away and destroy edits.
+- **Protect structural data.** Block removing required fields, warn that deleting a config does not delete underlying data, and separate “remove from this view” from “delete the data”.
+- **Reuse shared domain helpers and the dictionary.** One source of truth for type labels, names, summaries, and options. Every new user-facing string gets a `translate()` entry; no duplicated maps or hardcoded copy.
+- **Feature specs are the proof.** Run feature → model → request, then `bin/rubocop`, `bin/check_colors --strict`, and `bin/brakeman`.
+- **Keep it simple.** Fewer columns, fewer controls, clear labels, one obvious next action. Prefer up/down buttons over drag-and-drop and icons + text over icon-only actions.
 
 ## Doc Map — read before you code (mandatory)
 
 This file and `README.md` are always in context. Everything in `docs/` is on-demand: when your task matches a row, **read the doc before writing code**. The one-line "why" is usable alone; the doc has the exact contract.
+
+### Working method (plans, UI refactors)
+
+| When your task involves… | Read first |
+|---|---|
+| Planning a multi-step feature or refactor | `docs/PLAN_TEMPLATE.md` — copy the skeleton; keep the plan self-contained and executable by a fresh session |
+| Any multi-step UI refactor, complex settings page, or UX rethink | `docs/AGENT_PLAYBOOK.md` — understanding, planning, UI/UX rules, frontend/backend mechanics, definition of done |
 
 ### Contracts (backend responses, shared conventions)
 

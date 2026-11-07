@@ -27,7 +27,7 @@ RSpec.feature "Companies::Events Management", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "events",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Event Name", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
         { "key" => "code", "name" => "Code", "visible" => true, "align" => "left", "width" => nil },
         { "key" => "business_type", "name" => "Type", "visible" => true, "align" => "center", "width" => nil },
         { "key" => "workflow_status", "name" => "Status", "visible" => true, "align" => "center", "width" => nil }
@@ -45,7 +45,7 @@ RSpec.feature "Companies::Events Management", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Event Name')
+    expect(page).to have_selector('th', text: 'Name')
     expect(page).to have_selector('th', text: 'Status')
 
     expect(page).to have_selector('tbody tr')

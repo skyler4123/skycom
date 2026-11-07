@@ -16,7 +16,7 @@ RSpec.feature "Companies::Invoices Permissions", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "invoices",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Invoice Name", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
         { "key" => "code", "name" => "Code", "visible" => true, "align" => "left", "width" => nil },
         { "key" => "workflow_status", "name" => "Status", "visible" => true, "align" => "center", "width" => nil }
       ] }

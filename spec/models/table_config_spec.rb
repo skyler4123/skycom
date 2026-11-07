@@ -26,7 +26,7 @@ RSpec.describe TableConfig, type: :model do
 
       it "accepts a full valid hash array" do
         config.metadata = { "columns" => [
-          { "key" => "name", "name" => "Product Name", "visible" => true,
+          { "key" => "name", "name" => "Name", "visible" => true,
             "width" => 250, "align" => "left" },
           { "key" => "property_integer_1", "name" => "Unit Cost",
             "visible" => true, "width" => 120, "align" => "right" }
@@ -71,16 +71,62 @@ RSpec.describe TableConfig, type: :model do
     end
 
     context "with missing or blank name" do
-      it "rejects when name is missing" do
-        config.metadata = { "columns" => [ { "key" => "name" } ] }
+      it "rejects when name is missing on an unknown key" do
+        config.metadata = { "columns" => [ { "key" => "workflow_status" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/name is required/))
       end
 
-      it "rejects when name is blank" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "" } ] }
+      it "rejects when name is blank on an unknown key" do
+        config.metadata = { "columns" => [ { "key" => "workflow_status", "name" => "" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/name is required/))
+      end
+    end
+
+    context "with canonical column names" do
+      subject(:config) { build(:table_config) }
+
+      it "normalizes a standard key to its fixed label" do
+        config.metadata = { "columns" => [
+          { "key" => "name", "name" => "Product Name", "visible" => true }
+        ] }
+        expect(config).to be_valid
+        expect(config.columns.first["name"]).to eq("Name")
+      end
+
+      it "fills a blank standard name with its fixed label" do
+        config.metadata = { "columns" => [
+          { "key" => "quantity", "visible" => true }
+        ] }
+        expect(config).to be_valid
+        expect(config.columns.first["name"]).to eq("Quantity")
+      end
+
+      it "normalizes property and extra key names from Property Mapping" do
+        config.property_mapping.metadata = {
+          "properties" => [
+            { "key" => "property_string_1", "name" => "Color", "type" => "string" }
+          ],
+          "extra_columns" => [
+            { "key" => "extra_1", "name" => "Extra Demo", "type" => "string" }
+          ]
+        }
+        config.metadata = { "columns" => [
+          { "key" => "property_string_1", "name" => "Old Color", "visible" => true },
+          { "key" => "extra_1", "name" => "Old Extra", "visible" => true }
+        ] }
+
+        expect(config).to be_valid
+        expect(config.columns.map { |column| column["name"] }).to eq([ "Color", "Extra Demo" ])
+      end
+
+      it "keeps the submitted name for an unknown key" do
+        config.metadata = { "columns" => [
+          { "key" => "workflow_status", "name" => "Status", "visible" => true }
+        ] }
+        expect(config).to be_valid
+        expect(config.columns.first["name"]).to eq("Status")
       end
     end
 

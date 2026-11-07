@@ -367,6 +367,7 @@ now matches a stock by `company_id + warehouse_id + product_id` only.
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
 | `belongs_to :company, touch: true` | 12 | ActiveRecord `touch` | Touches the parent `Company` on create, update, and destroy of a TableConfig. Invalidates the client cache. |
+| `before_validation :normalize_column_names` | 86 | `normalize_column_names` | Forces standard labels from `TableConfig::STANDARD_COLUMN_NAMES`, property labels from `PropertyMapping.properties[].name`, and extra labels from `PropertyMapping.metadata.extra_columns[].name`. Unknown keys keep their submitted name. |
 
 ---
 

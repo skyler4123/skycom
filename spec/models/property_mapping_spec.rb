@@ -38,6 +38,78 @@ RSpec.describe PropertyMapping, type: :model do
       end
     end
 
+    describe "enum options" do
+      let(:property_mapping) { create(:property_mapping) }
+
+      def enum_entry(overrides = {})
+        {
+          "key" => "property_integer_1",
+          "type" => "integer",
+          "name" => "Membership tier",
+          "input_type" => "select",
+          "options" => [ { "value" => 1, "label" => "Gold" } ]
+        }.merge(overrides)
+      end
+
+      it "accepts a choice list with unique integer values and labels" do
+        property_mapping.properties = [
+          enum_entry("options" => [
+            { "value" => 1, "label" => "Gold" },
+            { "value" => 2, "label" => "Silver" }
+          ])
+        ]
+
+        expect(property_mapping).to be_valid
+      end
+
+      it "rejects an empty options array" do
+        property_mapping.properties = [ enum_entry("options" => []) ]
+
+        expect(property_mapping).not_to be_valid
+        expect(property_mapping.errors[:metadata].join).to include("options must be a non-empty array")
+      end
+
+      it "rejects non-integer option values" do
+        property_mapping.properties = [ enum_entry("options" => [ { "value" => "one", "label" => "Gold" } ]) ]
+
+        expect(property_mapping).not_to be_valid
+        expect(property_mapping.errors[:metadata].join).to include("option values must be whole numbers")
+      end
+
+      it "rejects duplicate option values" do
+        property_mapping.properties = [
+          enum_entry("options" => [
+            { "value" => 1, "label" => "Gold" },
+            { "value" => 1, "label" => "Silver" }
+          ])
+        ]
+
+        expect(property_mapping).not_to be_valid
+        expect(property_mapping.errors[:metadata].join).to include("option values must be unique")
+      end
+
+      it "rejects blank option labels" do
+        property_mapping.properties = [ enum_entry("options" => [ { "value" => 1, "label" => "" } ]) ]
+
+        expect(property_mapping).not_to be_valid
+        expect(property_mapping.errors[:metadata].join).to include("option labels are required")
+      end
+
+      it "rejects a default that is not one of the option values" do
+        property_mapping.properties = [ enum_entry("default" => 9) ]
+
+        expect(property_mapping).not_to be_valid
+        expect(property_mapping.errors[:metadata].join).to include("default must be one of the option values")
+      end
+
+      it "does not persist an invalid choice list" do
+        property_mapping.properties = [ enum_entry("options" => []) ]
+        property_mapping.save
+
+        expect(property_mapping.reload.properties).to be_blank
+      end
+    end
+
     describe "must_have_table_config" do
       it "is valid when table_config exists" do
         property_mapping = create(:property_mapping)
@@ -113,6 +185,45 @@ RSpec.describe PropertyMapping, type: :model do
 
       table_config.reload
       expect(table_config.columns.map { |c| c["key"] }).to include("name")
+    end
+
+    it "updates extra column names when an extra column is renamed" do
+      property_mapping.update!(metadata: property_mapping.metadata.merge(
+        "extra_columns" => [
+          { "key" => "extra_1", "name" => "Extra Demo", "type" => "string" }
+        ]
+      ))
+      table_config.update!(columns: [
+        { "key" => "name", "name" => "Name", "visible" => true },
+        { "key" => "extra_1", "name" => "Extra Demo", "visible" => true }
+      ])
+
+      property_mapping.update!(metadata: property_mapping.metadata.merge(
+        "extra_columns" => [
+          { "key" => "extra_1", "name" => "Renamed Extra", "type" => "string" }
+        ]
+      ))
+
+      table_config.reload
+      extra = table_config.columns.find { |column| column["key"] == "extra_1" }
+      expect(extra["name"]).to eq("Renamed Extra")
+    end
+
+    it "keeps an extra column when it is deleted from Property Mapping" do
+      property_mapping.update!(metadata: property_mapping.metadata.merge(
+        "extra_columns" => [
+          { "key" => "extra_1", "name" => "Extra Demo", "type" => "string" }
+        ]
+      ))
+      table_config.update!(columns: [
+        { "key" => "name", "name" => "Name", "visible" => true },
+        { "key" => "extra_1", "name" => "Extra Demo", "visible" => true }
+      ])
+
+      property_mapping.update!(metadata: property_mapping.metadata.merge("extra_columns" => []))
+
+      table_config.reload
+      expect(table_config.columns.map { |column| column["key"] }).to include("extra_1")
     end
 
     it "syncs all associated table configs" do

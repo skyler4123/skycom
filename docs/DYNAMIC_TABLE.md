@@ -72,7 +72,7 @@ async connect() {
 
 ### 2.2 Name Resolution
 
-The `name` value from `TableConfig.columns_metadata[].name` is used directly as the table header display text. For `property_*` columns, the `name` in `columns_metadata` is validated to match the `name` in `PropertyMapping.property_metadata`, and the edit field is read-only — changes must be made via the PropertyMapping edit page.
+The `name` value from `TableConfig.columns_metadata[].name` is used directly as the table header display text. Column labels are **not editable from Table Config**: standard labels are fixed in `TableConfig::STANDARD_COLUMN_NAMES`, and property/extra labels come from the Property Mapping. `before_validation :normalize_column_names` enforces this on every save (including API writes and seeds).
 
 ```javascript
 // In ui_helpers.js table() helper:
@@ -81,8 +81,12 @@ The `name` value from `TableConfig.columns_metadata[].name` is used directly as 
 
 | Column Type | Source |
 |-------------|--------|
-| `property_*` (dynamic) | `TableConfig.columns_metadata[].name` (synced from PropertyMapping) |
-| Standard (name, code, workflow_status) | `TableConfig.columns_metadata[].name` |
+| Standard (`name`, `description`, `code`, `title`, `quantity`, `pending`) | Fixed label from `TableConfig::STANDARD_COLUMN_NAMES` (`Name`, `Description`, `Code`, `Title`, `Quantity`, `Pending`) |
+| `property_*` (dynamic) | `PropertyMapping.metadata.properties[].name` |
+| `extra_*` | `PropertyMapping.metadata.extra_columns[].name` |
+| Unknown key | Stored `columns_metadata[].name` (kept as submitted) |
+
+Existing configs that still carry custom standard labels are normalized on their next save. The Table Config edit/show pages render canonical labels immediately; the live index table may keep a stale custom standard label until that config is saved.
 
 ### 2.3 Type-Aware Cell Rendering
 
@@ -142,16 +146,42 @@ everything: the filter only renders/applies while `"active": true`):
 { "type": "date", "active": true, "buckets": [[null, 2024], [2024, 2025], [2025, null]] }
 ```
 
-**Editor** (`companies/table_configs/edit_controller.js`): per-row **Search** checkbox
-(disabled for non-string keys) + **Filter** cell = a **Filter Type** select (None / Range /
-Enum / Boolean / Date, depending on the column type), an **Active** checkbox, and — for
-Range/Date — repeatable **From/To** bucket inputs with **Add Bucket** and remove-bucket
-buttons. Blank From/To means an open side. Selecting a type seeds sensible default buckets;
-selecting None removes the filter on save. Enum options still come from the PropertyMapping.
+**Editor** (`companies/table_configs/edit_controller.js`): the column table shows **Display
+Name | Type | Visible | Search | Filter | Actions**. Display names are read-only canonical
+labels with a `Standard` or `Property Mapping` source badge; the raw key and canonical name
+travel in hidden inputs. **Type** is a friendly badge (`Text`, `Whole number`, `Choice list`,
+etc.). **Visible** and **Search** are checkboxes (Search only for `name` / `description` /
+`code` / `title` / `property_string_*`). **Filter** shows a summary (`No filter`,
+`Range · 2 buckets · Active`, …) and a **Configure** button that opens an expandable per-row
+panel — only one panel is open at a time. The panel contains the **Filter Type** select
+(None / Range / Choice list / Yes / No / Date, depending on the column type), an **Active**
+checkbox, and — for Range/Date — repeatable **From/To** bucket inputs with **Add Bucket** and
+remove-bucket buttons. Blank From/To means an open side; date buckets are whole years. Enum
+panels preview the PropertyMapping choices. Selecting a type seeds sensible default buckets;
+selecting None removes the filter on save. Extra columns remain non-filterable (the backend
+filter validator does not resolve their type).
+
+**Ordering / adding:** up/down buttons reorder columns; `name` cannot be removed. The Add
+Column area is a grouped select (`Standard columns` / `Property columns` / `Extra columns`)
+plus an explicit **Add Column** button — selecting an option alone does **not** add it.
+Unsaved visibility/search/filter edits are captured from the DOM before every rerender, so
+reordering or adding does not lose them.
+
+**Validation:** client-side validation blocks submission (toast + focus first invalid field)
+for a blank config name, no columns, missing/blank buckets, `from >= to`, non-numeric range
+buckets, and non-whole-year date buckets. On success the form submits natively, preserving the
+existing redirect/flash behavior. A hidden `columns_submitted=1` marker lets the controller
+distinguish "all columns removed" from "columns were not part of this payload", so clearing
+the table stores `[]` instead of leaving the old columns in place.
+
 `TableConfigsController#normalize_column_types` converts the submitted bucket hash into
 `[[from, to], …]`, coerces `active` to a boolean, drops fully blank buckets, and deletes the
-filter when the type is blank. Invalid buckets (both sides open, `from >= to`) are rejected by
-the `TableConfig` model → flash alert. API writes may send the same stored hash shape directly.
+filter when the type is blank. Invalid buckets (both sides open, `from >= to`) are also
+rejected by the `TableConfig` model. API writes may send the same stored hash shape directly.
+
+**Show page** (`companies/table_configs/show_controller.js`): no raw key column; shows
+Display Name, friendly Type, Visible (`Yes` / `No`), Search (`Yes` / `—`), and the friendly
+filter summary, using the shared `table_config_helpers.js`.
 
 **Index page (all 17 dynamic-table pages — Products, Customers, Branches, Brands, Departments,
 Employee Groups, Employees, Facilities, Invoices, Orders, Services, Warehouses, Stocks,

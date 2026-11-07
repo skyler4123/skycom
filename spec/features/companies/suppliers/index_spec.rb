@@ -25,7 +25,7 @@ RSpec.feature "Companies::Suppliers Management", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "suppliers",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Supplier Name", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
         { "key" => "code", "name" => "Code", "visible" => true, "align" => "left", "width" => nil },
         { "key" => "business_type", "name" => "Type", "visible" => true, "align" => "center", "width" => nil },
         { "key" => "workflow_status", "name" => "Status", "visible" => true, "align" => "center", "width" => nil }
@@ -64,7 +64,7 @@ RSpec.feature "Companies::Suppliers Management", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Supplier Name')
+    expect(page).to have_selector('th', text: 'Name')
     expect(page).to have_selector('th', text: 'Category')
     expect(page).to have_selector('th', text: 'Status')
 
