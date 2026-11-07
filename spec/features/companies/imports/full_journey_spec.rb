@@ -71,7 +71,7 @@ RSpec.feature "Companies::Imports Full Journey", type: :feature, js: true do
 
     # 3) Setup: choose products + the category → schema + sample render
     expect(page).to have_selector("[data-import-target]", wait: 10)
-    find("[data-import-target]").select("Product (products)")
+    find("[data-import-target]").select("Products")
     find("[data-import-category]").select(category.name)
     click_button "Save setup & load sample"
 
@@ -112,7 +112,7 @@ RSpec.feature "Companies::Imports Full Journey", type: :feature, js: true do
     expect(import.approvable?).to be(true)
 
     # 6) Approve → status flips and the job runs (no worker in specs)
-    click_button "Approve"
+    accept_confirm { click_button "Approve" }
     expect(page).to have_content("Approved", wait: 15)
     expect(import.reload.workflow_status).to eq("approved")
 
@@ -137,7 +137,7 @@ RSpec.feature "Companies::Imports Full Journey", type: :feature, js: true do
     # 7) Rollback → the imported records disappear again
     visit company_import_path(company, import)
     expect(page).to have_button("Rollback", wait: 10)
-    click_button "Rollback"
+    accept_confirm { click_button "Rollback" }
     expect(page).to have_content("Rolling back", wait: 15)
     expect(import.reload.workflow_status).to eq("rolling_back")
 

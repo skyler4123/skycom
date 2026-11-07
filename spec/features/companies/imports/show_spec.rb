@@ -127,4 +127,30 @@ RSpec.feature "Companies::Imports Show", type: :feature, js: true do
 
     expect(page).to have_button("Rollback", wait: 10)
   end
+
+  scenario "presents the guided flow with friendly labels instead of DB keys" do
+    import = setup_import
+
+    visit company_import_path(company, import)
+
+    expect(page).to have_content("What you're importing", wait: 10)
+    expect(page).to have_content("Prepare your file")
+    expect(page).to have_content("Upload & check")
+    expect(page).to have_content("Review & import")
+
+    target = find("[data-import-target]")
+    expect(target).to have_selector("option", text: "Products")
+    expect(target).not_to have_selector("option", text: "(products)")
+
+    within("[data-import-columns]", wait: 10) do
+      expect(page).to have_content(/what it means/i)
+      expect(page).to have_content(/example/i)
+      expect(page).to have_content("Text")
+      expect(page).not_to have_content("Maps to")
+      expect(page).not_to have_content("property slot")
+      expect(page).not_to have_content("property_string_1")
+    end
+
+    expect(page).to have_button("Download starter CSV")
+  end
 end
