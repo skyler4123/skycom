@@ -68,6 +68,19 @@ RSpec.feature "Sidebar search", type: :feature, js: true do
     expect(page).to have_current_path(/tickets/, wait: 10)
   end
 
+  scenario "clicking a search result opens the group that contains the item" do
+    visit company_dashboards_path(company)
+
+    within("aside", visible: :all) do
+      fill_in "sidebar_search", with: "p"
+      expect(page).to have_link("Products", href: /products/, wait: 10)
+      click_link "Products"
+    end
+
+    expect(page).to have_current_path(/products/, wait: 10)
+    expect(page).to have_selector("details[data-sidebar-group='catalog'][open]", visible: :all, wait: 10)
+  end
+
   scenario "Vietnamese locale: typing t lists Vietnamese-labelled items" do
     page.execute_script("localStorage.setItem('languageCode', 'vi')")
     visit company_dashboards_path(company)

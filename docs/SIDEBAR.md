@@ -24,8 +24,9 @@
 - **Star toggle** — trailing star button on regular items: filled yellow
   (`font-variation-settings: 'FILL' 1`) when favourited, grey outline otherwise.
   Regular = not `comingSoon` and not in a `locked` (System) group.
-- **Groups** — every group renders as `<details>/<summary>` (label + item count),
-  collapsed by default; open state persists per employee.
+- **Groups** — every group renders as `<details>/<summary>` (label only),
+  collapsed by default; open state persists per employee. Clicking a search
+  result opens the group that owns the item before navigating.
 - **Coming-soon** groups/items keep the amber badge + tooltip; no star.
 - **System group** — `locked: true`; no stars; still collapsible.
 

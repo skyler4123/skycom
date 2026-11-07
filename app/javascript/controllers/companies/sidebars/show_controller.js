@@ -72,6 +72,14 @@ export default class Companies_Sidebars_ShowController extends Controller {
     container.innerHTML = matches.map((item) => this.searchResultHTML(item)).join("\n")
   }
 
+  // Clicking a search result expands the group that owns the item, so the
+  // sidebar shows it in context after navigating. The localStorage write is
+  // synchronous, so it lands before the browser follows the link.
+  openSearchResultGroup(event) {
+    const group = event.currentTarget.dataset.sidebarGroup
+    if (group) setGroupOpen(this.companyId(), group, true, this.userId())
+  }
+
   searchResultHTML(item) {
     const cid = this.companyId()
     const labelHTML = item.custom ? escapeHtml(item.label) : translate(item.label)
@@ -81,6 +89,9 @@ export default class Companies_Sidebars_ShowController extends Controller {
         class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted"
         href="${href}"
         data-sidebar-link
+        data-sidebar-search-result
+        data-sidebar-group="${item.group}"
+        data-action="click->${this.identifier}#openSearchResultGroup"
         ${openByPathname()}
       >
         <span class="material-symbols-outlined">${item.icon}</span>
@@ -183,7 +194,6 @@ export default class Companies_Sidebars_ShowController extends Controller {
             ${translate(groupConfig.label)}
             ${groupConfig.comingSoon ? `<span class="material-symbols-outlined text-[14px]! text-warning ">error</span>` : ""}
           </span>
-          <span class="text-xs text-muted-foreground">${items.length}</span>
         </summary>
         <div class="flex flex-col gap-1 pt-1">
           ${items.map(item => this.itemHTML(item)).join("\n")}
