@@ -1152,4 +1152,24 @@ The company health dashboard at `/companies/:company_id/dashboards` is configura
 
 ---
 
+## Analytics Configuration
+
+The executive analysis page at `/companies/:company_id/analytics` is configurable per company, using the same contract as the dashboard.
+
+- **Model**: `Analytic` (one row per company today; `Company#analytic` returns `analytics.first` and lazily creates a default when none exists).
+- **Storage**: `metadata["blocks"]` is an ordered array of active block keys. Missing metadata means all blocks; an explicit empty array means no blocks.
+- **Block registry**: `Analytic::BLOCKS` (backend) and `app/javascript/controllers/companies/analytics/blocks.js` (frontend labels/descriptions) must stay in the same order.
+- **Config page**: `GET/PATCH /companies/:company_id/analytic` — rendered by `companies/analytics/show_controller.js`, linked from the Analytics **Config** button and the sidebar **Settings → Analytics Config** item.
+- **Layout rule**: every active block renders full-width and stacked. Do not add side-by-side block layouts without revisiting the config contract.
+- **Cache**: updating the block list clears every cached `CacheKeyService.company_analytics` period payload.
+
+### Adding an analytics block
+
+1. Add the key to `Analytic::BLOCKS` and the matching entry (label, description, icon) to `analytics/blocks.js`.
+2. Add the render method and a `case` branch in `companies/analytics/index_controller.js`.
+3. Wrap the block root with `data-analytics-block="<key>"` for tests and debugging.
+4. Add the label/description strings to `dictionary.js`.
+
+---
+
 *End of documentation*

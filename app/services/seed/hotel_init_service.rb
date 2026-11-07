@@ -463,7 +463,8 @@ class Seed::HotelInitService
         "Discount" => full_crud,
         "Document" => full_crud,
         "CompanySetting" => { create: true, read: true, update: false, delete: true }, # owner-only update (see CompanySettingsPolicy)
-        "Dashboard" => { create: true, read: true, update: false, delete: true } # owner-only update (see DashboardsPolicy)
+        "Dashboard" => { create: true, read: true, update: false, delete: true }, # owner-only update (see DashboardsPolicy)
+        "Analytic" => { create: true, read: true, update: false, delete: true } # owner-only update (see AnalyticsPolicy)
       },
       Admin: {
         "Product" => full_crud,
@@ -515,7 +516,8 @@ class Seed::HotelInitService
         "Discount" => full_crud,
         "Document" => full_crud,
         "CompanySetting" => { create: true, read: true, update: false, delete: true }, # owner-only update (see CompanySettingsPolicy)
-        "Dashboard" => { create: true, read: true, update: false, delete: true } # owner-only update (see DashboardsPolicy)
+        "Dashboard" => { create: true, read: true, update: false, delete: true }, # owner-only update (see DashboardsPolicy)
+        "Analytic" => { create: true, read: true, update: false, delete: true } # owner-only update (see AnalyticsPolicy)
       }
     }
 

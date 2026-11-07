@@ -7,4 +7,14 @@ class Companies::AnalyticsPolicy < ApplicationPolicy
   def index?
     record.can?(:read, Invoice)
   end
+
+  def show?
+    record.can?(:read, Invoice)
+  end
+
+  # The analytics layout is company-wide configuration — owner-only, mirroring
+  # Companies::DashboardsPolicy#update?.
+  def update?
+    record.owner_role?
+  end
 end

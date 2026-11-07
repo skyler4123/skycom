@@ -15,7 +15,7 @@
 # company (see docs/SYSTEM_COMPANY.md, docs/ABAC.md).
 # Main associations: belongs_to :user; has_one :company_wallet; has_many
 # :branches, :employees, :roles, :policies, :customers, :products, :services,
-# :orders, :invoices, :stocks, :company_settings, :dashboards,
+# :orders, :invoices, :stocks, :company_settings, :dashboards, :analytics,
 # :company_payment_method_appointments, and the audit/log tables (all
 # dependent: :destroy).
 class Company < ApplicationRecord
@@ -52,7 +52,7 @@ class Company < ApplicationRecord
     CompanyTicket CompanyTicketComment CompanyTicketLog
     Ticket TicketComment TicketLog
     Ticket TicketComment TicketLog
-    Document CompanySetting Dashboard Folder StoredFile
+    Document CompanySetting Dashboard Analytic Folder StoredFile
   ].freeze
   # Delay before the welcome notification job runs. Single-file: only used
   # by #initialize_company — long enough for seeding to settle, short enough
@@ -187,6 +187,7 @@ class Company < ApplicationRecord
   has_many :operation_warehouse_appointments, dependent: :destroy
   has_many :company_settings, dependent: :destroy
   has_many :dashboards, dependent: :destroy
+  has_many :analytics, dependent: :destroy
   has_one :company_wallet, dependent: :destroy
   has_many :company_wallet_logs, dependent: :destroy
   has_many :company_orders, dependent: :destroy
@@ -296,6 +297,16 @@ class Company < ApplicationRecord
     end
   end
 
+  # The analytics layout currently rendered for this company. Only the first
+  # record is used today; the table stays one-to-many so more layouts can be
+  # added later.
+  def analytic
+    analytics.first || analytics.find_or_create_by!(name: Analytic::DEFAULT_NAME) do |analytic|
+      analytic.workflow_status = :active
+      analytic.metadata = { "blocks" => Analytic::BLOCKS }
+    end
+  end
+
   def record_credit_usage!(credits)
     return unless credits.is_a?(Integer) && credits.positive?
 
@@ -346,6 +357,7 @@ class Company < ApplicationRecord
       Seed::OperationService.seed_defaults!(company: self)
       setup_payment_method_appointments
       create_default_dashboard
+      create_default_analytic
     end
 
     role = Seed::RoleService.create(
@@ -429,6 +441,13 @@ class Company < ApplicationRecord
     dashboards.find_or_create_by!(name: Dashboard::DEFAULT_NAME) do |dashboard|
       dashboard.workflow_status = :active
       dashboard.metadata = { "blocks" => Dashboard::BLOCKS }
+    end
+  end
+
+  def create_default_analytic
+    analytics.find_or_create_by!(name: Analytic::DEFAULT_NAME) do |analytic|
+      analytic.workflow_status = :active
+      analytic.metadata = { "blocks" => Analytic::BLOCKS }
     end
   end
 

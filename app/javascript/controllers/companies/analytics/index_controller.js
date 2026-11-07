@@ -1,9 +1,11 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import ApexCharts from "apexcharts"
 import { chartGridColor, chartLabelColor, tokenColor } from "controllers/helpers/chart_colors"
+import { ANALYTICS_BLOCK_KEYS } from "controllers/companies/analytics/blocks"
 
 // Depends on BE: Companies::AnalyticsController#index
 // Endpoints: GET /companies/:company_id/analytics.json?period=this_month|last_month|last_6_months|this_year
+// Config link: GET /companies/:company_id/analytic (companies/analytics/show_controller.js)
 export default class Companies_Analytics_IndexController extends Companies_LayoutController {
   /** @type {object | null} */ analyticsData = null
   /** @type {ApexCharts[]} */ charts = []
@@ -69,6 +71,34 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     return this.analyticsData?.summary?.currency || currentCompany()?.currency || "usd"
   }
 
+  activeBlocks() {
+    const configured = this.analyticsData?.analytic?.blocks
+    if (Array.isArray(configured)) return configured.filter((key) => ANALYTICS_BLOCK_KEYS.includes(key))
+    return ANALYTICS_BLOCK_KEYS
+  }
+
+  blocksHTML() {
+    const blocks = this.activeBlocks()
+    if (!blocks.length) {
+      return this.emptyHTML(translate("No analytics blocks are enabled. Use Config to choose what to show."))
+    }
+
+    return blocks.map((key) => {
+      switch (key) {
+        case "pillars": return this.pillarsHTML()
+        case "secondary_metrics": return this.secondaryMetricsHTML()
+        case "margin_chart": return this.marginChartHTML()
+        case "revenue_mix": return this.revenueMixHTML()
+        case "top_items": return this.topItemsHTML()
+        case "cohorts": return this.cohortsHTML()
+        case "inventory": return this.inventoryHTML()
+        case "workforce": return this.workforceHTML()
+        case "clv": return this.clvHTML()
+        default: return ""
+      }
+    }).join("")
+  }
+
   contentHTML() {
     if (this.loading) return this.loadingHTML()
     if (this.error) return this.errorHTML()
@@ -77,20 +107,14 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     return `
       <div class="p-4 overflow-y-auto space-y-4">
         ${this.headerHTML()}
-        ${this.pillarsHTML()}
-        ${this.secondaryMetricsHTML()}
-        ${this.marginChartHTML()}
-        ${this.revenueMixHTML()}
-        ${this.topItemsHTML()}
-        ${this.cohortsHTML()}
-        ${this.inventoryHTML()}
-        ${this.workforceHTML()}
-        ${this.clvHTML()}
+        ${this.blocksHTML()}
       </div>
     `
   }
 
   headerHTML() {
+    const companyId = currentCompany().id
+
     return `
       <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <div>
@@ -105,6 +129,11 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
               ${this.periodOptionsHTML()}
             </select>
           </label>
+          <a href="${Helpers.company_analytic_path(companyId)}"
+            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-card border border-line text-foreground text-xs font-semibold hover:bg-muted">
+            <span class="material-symbols-outlined text-[16px]">tune</span>
+            ${translate("Config")}
+          </a>
           <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-muted text-muted-foreground text-[11px]">
             <span class="material-symbols-outlined text-[15px]">compare_arrows</span>
             ${translate("vs previous period")}
@@ -135,7 +164,7 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     const currency = this.currency()
 
     return `
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+      <div data-analytics-block="pillars" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
         ${this.pillarCard("revenue", translate("Net revenue"), Helpers.formatMoney(s.total_revenue_cents, currency), this.deltaBadge(s.revenue_delta_pct), translate("vs previous period"), "payments")}
         ${this.grossProfitCard(s, currency)}
         ${this.pillarCard("customer-economics", translate("Customer economics"), Helpers.formatMoney(s.avg_order_value_cents, currency), `${this.number(s.active_customers)} ${translate("active customers")}`, `${this.percent(s.repeat_customer_rate)} ${translate("returning")}`, "group")}
@@ -188,7 +217,7 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     const currency = this.currency()
 
     return `
-      <div class="grid grid-cols-2 xl:grid-cols-4 gap-3">
+      <div data-analytics-block="secondary_metrics" class="grid grid-cols-2 xl:grid-cols-4 gap-3">
         ${this.smallMetric("orders", translate("Orders"), this.number(s.total_orders), "receipt_long")}
         ${this.smallMetric("new-customers", translate("New customers"), this.number(s.new_customers), "person_add")}
         ${this.smallMetric("revenue-per-hour", translate("Revenue per worked hour"), s.revenue_per_worked_hour_cents == null ? "—" : Helpers.formatMoney(s.revenue_per_worked_hour_cents, currency), "schedule")}
@@ -214,7 +243,7 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     const rows = margins.by_month || []
 
     return `
-      <div class="bg-card border border-line rounded-xl p-4">
+      <div data-analytics-block="margin_chart" class="bg-card border border-line rounded-xl p-4">
         <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
           <div>
             <h2 class="text-base font-bold text-foreground">${translate("Revenue vs tracked cost")}</h2>
@@ -236,7 +265,7 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     const currency = this.currency()
 
     return `
-      <div data-analytics-section="revenue-mix" class="bg-card border border-line rounded-xl p-4">
+      <div data-analytics-block="revenue_mix" data-analytics-section="revenue-mix" class="bg-card border border-line rounded-xl p-4">
         <div class="mb-3">
           <h2 class="text-base font-bold text-foreground">${translate("Revenue mix")}</h2>
           <p class="text-xs text-muted-foreground">${translate("Where this period's revenue came from.")}</p>
@@ -275,7 +304,7 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     const currency = this.currency()
 
     return `
-      <div data-analytics-section="top-items" class="bg-card border border-line rounded-xl p-4">
+      <div data-analytics-block="top_items" data-analytics-section="top-items" class="bg-card border border-line rounded-xl p-4">
         <div class="mb-3">
           <h2 class="text-base font-bold text-foreground">${translate("Top products & services")}</h2>
           <p class="text-xs text-muted-foreground">${translate("Ranked by revenue in the selected period.")}</p>
@@ -317,7 +346,7 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     const cohorts = this.analyticsData.cohorts || []
 
     return `
-      <div data-analytics-section="cohorts" class="bg-card border border-line rounded-xl p-4">
+      <div data-analytics-block="cohorts" data-analytics-section="cohorts" class="bg-card border border-line rounded-xl p-4">
         <div class="mb-3">
           <h2 class="text-base font-bold text-foreground">${translate("Customer cohorts")}</h2>
           <p class="text-xs text-muted-foreground">${translate("Retention from each customer's first paid order month.")}</p>
@@ -367,7 +396,7 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     const lowStock = inventory.low_stock_items || []
 
     return `
-      <div data-analytics-section="inventory" class="bg-card border border-line rounded-xl p-4">
+      <div data-analytics-block="inventory" data-analytics-section="inventory" class="bg-card border border-line rounded-xl p-4">
         <div class="mb-3">
           <h2 class="text-base font-bold text-foreground">${translate("Inventory velocity")}</h2>
           <p class="text-xs text-muted-foreground">${translate("Sell-through, days of cover, and low-stock risk.")}</p>
@@ -414,7 +443,7 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     const rows = performance.by_employee || []
 
     return `
-      <div data-analytics-section="workforce" class="bg-card border border-line rounded-xl p-4">
+      <div data-analytics-block="workforce" data-analytics-section="workforce" class="bg-card border border-line rounded-xl p-4">
         <div class="mb-3">
           <h2 class="text-base font-bold text-foreground">${translate("Workforce")}</h2>
           <p class="text-xs text-muted-foreground">${translate("Attendance, hours, and overtime from monthly rollups.")}</p>
@@ -446,7 +475,7 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
     const currency = this.currency()
 
     return `
-      <div data-analytics-section="clv" class="bg-card border border-line rounded-xl p-4">
+      <div data-analytics-block="clv" data-analytics-section="clv" class="bg-card border border-line rounded-xl p-4">
         <div class="mb-3">
           <h2 class="text-base font-bold text-foreground">${translate("Top customers by lifetime value")}</h2>
           <p class="text-xs text-muted-foreground">${translate("All-time paid order spend, not just the selected period.")}</p>
@@ -551,6 +580,10 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
 
   emptyInline(message) {
     return `<div class="flex flex-col items-center justify-center py-8 text-center text-muted-foreground"><span class="material-symbols-outlined text-3xl mb-1">inbox</span><p class="text-xs">${message}</p></div>`
+  }
+
+  emptyHTML(message) {
+    return `<div class="p-6">${this.emptyInline(message)}</div>`
   }
 
   deltaBadge(value) {

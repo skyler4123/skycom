@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_07_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_07_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -286,6 +286,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_000001) do
     t.datetime "updated_at", null: false
     t.index ["external_id"], name: "index_addresses_on_external_id"
     t.index ["fingerprint"], name: "index_addresses_on_fingerprint", unique: true
+  end
+
+  create_table "analytics", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "external_id"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status", default: 1, null: false
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "name"], name: "index_analytics_on_company_id_and_name", unique: true
+    t.index ["company_id", "workflow_status"], name: "index_analytics_on_company_id_and_workflow_status"
+    t.index ["company_id"], name: "index_analytics_on_company_id"
+    t.index ["discarded_at"], name: "index_analytics_on_discarded_at"
   end
 
   create_table "attendance_balances", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -7746,6 +7766,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_000001) do
   add_foreign_key "address_user_appointments", "addresses"
   add_foreign_key "address_user_appointments", "companies"
   add_foreign_key "address_user_appointments", "users"
+  add_foreign_key "analytics", "companies"
   add_foreign_key "attendance_balances", "companies"
   add_foreign_key "attendance_balances", "employees"
   add_foreign_key "attendance_config_logs", "attendance_configs"
