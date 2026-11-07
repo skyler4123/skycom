@@ -53,7 +53,8 @@ Rails.application.routes.draw do
   end
   resources :companies, only: %i[new create show edit update] do
     scope module: :companies do
-      resources :dashboards
+      resources :dashboards, only: [ :index ]
+      resource :dashboard, only: [ :show, :update ]
       resources :branches
       resources :departments
       resources :categories

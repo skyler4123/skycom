@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_06_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_07_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -2060,6 +2060,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_000001) do
     t.index ["property_mapping_id"], name: "index_customers_on_property_mapping_id"
     t.index ["user_id"], name: "index_customers_on_user_id"
     t.index ["workflow_status"], name: "index_customers_on_workflow_status"
+  end
+
+  create_table "dashboards", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "external_id"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status", default: 1, null: false
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "name"], name: "index_dashboards_on_company_id_and_name", unique: true
+    t.index ["company_id", "workflow_status"], name: "index_dashboards_on_company_id_and_workflow_status"
+    t.index ["company_id"], name: "index_dashboards_on_company_id"
+    t.index ["discarded_at"], name: "index_dashboards_on_discarded_at"
   end
 
   create_table "department_employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -7870,6 +7890,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_000001) do
   add_foreign_key "customers", "companies"
   add_foreign_key "customers", "property_mappings"
   add_foreign_key "customers", "users"
+  add_foreign_key "dashboards", "companies"
   add_foreign_key "department_employee_appointments", "companies"
   add_foreign_key "department_employee_appointments", "departments"
   add_foreign_key "department_employee_appointments", "employees"

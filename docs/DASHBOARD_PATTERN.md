@@ -1132,4 +1132,24 @@ Three critical steps:
 
 ---
 
+## Company Health Dashboard Configuration
+
+The company health dashboard at `/companies/:company_id/dashboards` is configurable per company.
+
+- **Model**: `Dashboard` (one row per company today; `Company#dashboard` returns `dashboards.first` and lazily creates a default when none exists).
+- **Storage**: `metadata["blocks"]` is an ordered array of active block keys. Missing metadata means all blocks; an explicit empty array means no blocks.
+- **Block registry**: `Dashboard::BLOCKS` (backend) and `app/javascript/controllers/companies/dashboards/blocks.js` (frontend labels/descriptions) must stay in the same order.
+- **Config page**: `GET/PATCH /companies/:company_id/dashboard` — rendered by `companies/dashboards/show_controller.js`, linked from the Dashboard **Config** button and the sidebar **Settings → Dashboard Config** item.
+- **Layout rule**: every active block renders full-width and stacked. Do not add side-by-side block layouts without revisiting the config contract.
+- **Cache**: updating the block list clears both cached `Dashboards::OverviewService` payloads (financial and operational).
+
+### Adding a dashboard block
+
+1. Add the key to `Dashboard::BLOCKS` and the matching entry (label, description, icon) to `dashboards/blocks.js`.
+2. Add the render method and a `case` branch in `companies/dashboards/index_controller.js`.
+3. Wrap the block root with `data-dashboard-block="<key>"` for tests and debugging.
+4. Add the label/description strings to `dictionary.js`.
+
+---
+
 *End of documentation*

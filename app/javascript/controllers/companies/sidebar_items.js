@@ -99,6 +99,7 @@ export const SIDEBAR_ITEMS = [
   { key: "permission_logs", group: "authorization", icon: "history", label: "Permission Logs", href: (cid) => Helpers.company_permission_logs_path(cid) },
   { key: "company", group: "settings", icon: "storefront", label: "Company", href: (cid) => Helpers.company_path(cid) },
   { key: "quick_links", group: "settings", icon: "link", label: "Quick Links", href: (cid) => Helpers.company_settings_path(cid) },
+  { key: "dashboard_config", group: "settings", icon: "dashboard_customize", label: "Dashboard Config", href: (cid) => Helpers.company_dashboard_path(cid) },
   { key: "usage", group: "system", icon: "monitoring", label: "Usage", href: (cid) => Helpers.company_usage_path(cid) },
   { key: "top_up", group: "system", icon: "account_balance_wallet", label: "Top Up", href: (cid) => Helpers.new_company_top_up_path(cid) },
   { key: "billing", group: "system", icon: "receipt_long", label: "Billing", href: (cid) => Helpers.company_billing_path(cid) },

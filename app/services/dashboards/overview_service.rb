@@ -29,6 +29,7 @@ module Dashboards
     def call
       payload = {
         period: period_payload,
+        dashboard: dashboard_payload,
         company: company_payload,
         permissions: { can_view_financials: can_view_financials },
         kpis: operational_kpis,
@@ -78,6 +79,15 @@ module Dashboards
 
     def previous_revenue_calculator
       @previous_revenue_calculator ||= Analytics::RevenueCalculator.new(company: company, orders: previous_orders)
+    end
+
+    def dashboard_payload
+      dashboard = company.dashboard
+      {
+        id: dashboard.id,
+        name: dashboard.name,
+        blocks: dashboard.active_blocks
+      }
     end
 
     def period_payload
