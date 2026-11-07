@@ -2,6 +2,7 @@
 
 import { Controller } from "@hotwired/stimulus"
 import { targetTableLabel } from "controllers/helpers/import_helpers"
+import { IMPORTABLE_RESOURCES } from "controllers/helpers/import_tables"
 
 export default class Companies_LayoutController extends Controller {
   static targets = ["content", "profileDropdown"]
@@ -152,7 +153,14 @@ export default class Companies_LayoutController extends Controller {
   renderTableTitle() {
     const config = this.currentTableConfig()
     const category = this.currentCategory()
-    if (!config || !category) return ''
+    if (!category) return ''
+
+    const parts = pathname().split('/').filter(Boolean)
+    const table = (parts.length === 3 && parts[0] === 'companies') ? parts[2] : null
+    const isImportable = Boolean(table && IMPORTABLE_RESOURCES[table])
+
+    // Non-importable pages keep the original behavior: no title without a config.
+    if (!config && !isImportable) return ''
 
     const companyId = currentCompany()?.id
     const resourceName = this.identifier
@@ -160,18 +168,39 @@ export default class Companies_LayoutController extends Controller {
       .replace(/-/g, ' ')
       .replace(/\b\w/g, c => c.toUpperCase())
 
+    // Import is a table-level action: it belongs next to the table-config Edit
+    // button, not in every row's action cell.
+    const importButton = isImportable ? `
+      <button type="button"
+        data-action="click->${this.identifier}#importData"
+        data-import-table="${table}"
+        data-import-category-id="${category.id}"
+        class="inline-flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer"
+        ${tooltip(translate("Import CSV data into this table"))}>
+        <span class="material-symbols-outlined text-[18px]!">upload_file</span>
+        ${translate("Import")}
+      </button>
+    ` : ''
+
+    const editLink = config ? `
+      <a href="${Helpers.edit_company_table_config_path(companyId, config.id)}"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors cursor-pointer"
+        ${tooltip(translate("Edit table configuration"))}
+      >
+        <span class="material-symbols-outlined text-[18px]!">edit</span>
+        ${translate("Edit")}
+      </a>
+    ` : ''
+
     return `
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-bold text-foreground">
           ${resourceName} - ${category.name}
         </h2>
-        <a href="${Helpers.edit_company_table_config_path(companyId, config.id)}"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors cursor-pointer"
-          ${tooltip(translate("Edit table configuration"))}
-        >
-          <span class="material-symbols-outlined text-[18px]!">edit</span>
-          ${translate("Edit")}
-        </a>
+        <div class="flex items-center gap-2">
+          ${importButton}
+          ${editLink}
+        </div>
       </div>
     `
   }

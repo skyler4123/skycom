@@ -1845,6 +1845,7 @@ export const dictionary = () => {
     "Review, import, and undo if needed.": { vi: "Xem lại, nhập và hoàn tác nếu cần." },
     "Problem rows downloaded": { vi: "Đã tải các dòng có lỗi" },
     "Import": { vi: "Nhập" },
+    "Import CSV data into this table": { vi: "Nhập dữ liệu CSV vào bảng này" },
     "row": { vi: "dòng" },
     "rows": { vi: "dòng" },
     "into": { vi: "vào" },

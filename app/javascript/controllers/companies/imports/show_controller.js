@@ -429,10 +429,20 @@ export default class Companies_Imports_ShowController extends Companies_LayoutCo
           ? "border-success/30 bg-success/10 text-success"
           : "border-line bg-card text-muted-foreground"
 
+      // Current step: ping ring around the number + gentle pulse on the card
+      // so the manager immediately sees where to work next.
+      const cardAnimation = state === "current" ? " animate-pulse" : ""
+      const pingHTML = state === "current"
+        ? `<span class="absolute inset-0 rounded-full bg-primary/40 animate-ping"></span>`
+        : ""
+
       return `
         <a href="#import-step-${step.number}"
-          class="flex items-center gap-2 rounded-lg border px-3 py-2 text-left transition-colors hover:bg-muted ${classes}">
-          <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-card text-[11px] font-black">${step.number}</span>
+          class="flex items-center gap-2 rounded-lg border px-3 py-2 text-left transition-colors hover:bg-muted ${classes}${cardAnimation}">
+          <span class="relative flex size-6 shrink-0 items-center justify-center rounded-full bg-card text-[11px] font-black">
+            ${pingHTML}
+            <span class="relative z-10">${step.number}</span>
+          </span>
           <span class="text-xs font-bold">${escapeHtml(step.title)}</span>
           <span class="material-symbols-outlined ml-auto text-[16px]!">${this.stepIcon(state)}</span>
         </a>
@@ -463,13 +473,22 @@ export default class Companies_Imports_ShowController extends Companies_LayoutCo
       : state === "done"
         ? "bg-success/10 text-success"
         : "bg-muted text-muted-foreground"
+    const numberClasses = state === "current"
+      ? "bg-primary/10 text-primary"
+      : "bg-muted text-foreground"
+    const pingHTML = state === "current"
+      ? `<span class="absolute inset-0 rounded-full bg-primary/40 animate-ping"></span>`
+      : ""
 
     return `
       <section id="import-step-${number}" data-import-step="${number}"
         class="rounded-xl border ${border} bg-card">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3">
           <div class="flex items-start gap-3">
-            <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-black text-foreground">${number}</span>
+            <span class="relative flex size-7 shrink-0 items-center justify-center rounded-full ${numberClasses} text-xs font-black">
+              ${pingHTML}
+              <span class="relative z-10">${number}</span>
+            </span>
             <div>
               <h3 class="text-sm font-bold text-foreground">${escapeHtml(title)}</h3>
               <p class="text-xs text-muted-foreground">${escapeHtml(subtitle)}</p>

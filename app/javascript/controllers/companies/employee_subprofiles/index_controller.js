@@ -146,15 +146,6 @@ export default class Companies_EmployeeSubprofiles_IndexController extends Compa
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
-                  <button type="button"
-                    data-action="click->${this.identifier}#importData"
-                    data-import-table="employee_subprofiles"
-                    data-import-category-id="${record.category?.id || this.categoryIdValue || ''}"
-                    class="mr-1 inline-flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer"
-                    ${tooltip(translate("Import"))}>
-                    <span class="material-symbols-outlined text-[18px]!">upload_file</span>
-                    ${translate("Import")}
-                  </button>
                   <a href="${Helpers.edit_company_employee_subprofile_path(currentCompany().id, record.id)}"
                     class="inline-flex items-center justify-center p-2 text-muted-foreground hover:text-warning hover:bg-warning/10 rounded-lg cursor-pointer">
                     <span class="material-symbols-outlined text-[20px]">edit</span>

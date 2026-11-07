@@ -45,18 +45,6 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
     expect(edit_link).to be_present
   end
 
-  scenario "import button creates a employees import pre-selected for this category" do
-    visit company_employees_path(company)
-    expect(page).to have_selector("table", wait: 10)
-
-    find("button[data-import-table='employees']", match: :first).click
-
-    expect(page).to have_content("What you're importing", wait: 15)
-    expect(page).to have_current_path(%r{/companies/#{company.id}/imports/[0-9a-f-]+}, wait: 10)
-    expect(find("[data-import-target]").value).to eq("employees")
-    expect(find("[data-import-category]").value).to eq(employee.category.id)
-  end
-
   scenario "name link goes to show page" do
     visit company_employees_path(company)
     expect(page).to have_selector('table', wait: 10)
@@ -145,6 +133,18 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
 
       edit_link = find("a[href*='/table_configs/#{test_table_config.id}/edit']", match: :first)
       expect(edit_link).to be_present
+    end
+
+    scenario "import button creates an employees import pre-selected for this category" do
+      visit company_employees_path(company, category_id: test_category.id)
+      expect(page).to have_selector('table', wait: 10)
+
+      find("button[data-import-table='employees']", match: :first).click
+
+      expect(page).to have_content("What you're importing", wait: 15)
+      expect(page).to have_current_path(%r{/companies/#{company.id}/imports/[0-9a-f-]+}, wait: 10)
+      expect(find("[data-import-target]").value).to eq("employees")
+      expect(find("[data-import-category]").value).to eq(test_category.id)
     end
   end
 
