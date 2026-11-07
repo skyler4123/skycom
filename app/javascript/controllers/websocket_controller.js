@@ -59,6 +59,7 @@ export default class WebsocketController extends Controller {
       const ports = new Set();
       let centrifuge = null;
       let activeSubscriptions = {};
+      let connectionIdentity = null;
 
       self.onconnect = (e) => {
         const port = e.ports[0];
@@ -80,9 +81,33 @@ export default class WebsocketController extends Controller {
         port.start();
       };
 
-      function initCentrifugo(url, token) {
-        if (centrifuge) return;
+      // The SharedWorker outlives page loads, but its connection token belongs
+      // to the user/company of the page that created it. Reusing that token
+      // after the identity changes makes Centrifugo reject the new company's
+      // channel subscriptions. Compare the token claims, not the raw token, so
+      // same-identity page loads keep the existing connection.
+      function identityFor(url, token) {
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+          return JSON.stringify({ url, sub: payload.sub, channels: payload.channels || [] });
+        } catch (error) {
+          return url + "|" + token;
+        }
+      }
 
+      function initCentrifugo(url, token) {
+        const identity = identityFor(url, token);
+        if (centrifuge && identity === connectionIdentity) return;
+
+        if (centrifuge) {
+          Object.values(activeSubscriptions).forEach((sub) => {
+            try { sub.unsubscribe(); } catch (error) {}
+          });
+          try { centrifuge.disconnect(); } catch (error) {}
+        }
+
+        activeSubscriptions = {};
+        connectionIdentity = identity;
         centrifuge = new Centrifuge(url, { token });
         centrifuge.connect();
       }

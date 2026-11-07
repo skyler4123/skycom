@@ -254,8 +254,13 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
 
       visit company_table_config_path(company, table_config)
       expect(page).to have_selector('table', wait: 10)
-      expect(page).to have_content('property_boolean_1')
       expect(page).to have_content('Active')
+      expect(page).to have_no_content('property_boolean_1')
+
+      table_config.reload
+      expect(table_config.columns).to include(
+        hash_including('key' => 'property_boolean_1', 'name' => 'Active')
+      )
     end
 
     scenario "updating a field name in PropertyMapping syncs to TableConfig" do
