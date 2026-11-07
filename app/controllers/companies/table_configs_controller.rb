@@ -120,7 +120,14 @@ class Companies::TableConfigsController < Companies::ApplicationController
     return p_params unless p_params[:metadata].is_a?(ActionController::Parameters)
 
     meta = p_params[:metadata].to_unsafe_h
-    meta["columns"] = normalize_column_types(meta["columns"].values.to_a) if meta["columns"].is_a?(Hash)
+    columns_submitted = meta.delete("columns_submitted").to_s == "1"
+
+    if meta["columns"].is_a?(Hash)
+      meta["columns"] = normalize_column_types(meta["columns"].values.to_a)
+    elsif columns_submitted
+      meta["columns"] = []
+    end
+
     p_params[:metadata] = meta
     p_params
   end

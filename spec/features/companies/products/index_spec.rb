@@ -34,8 +34,8 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "products",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Product Name", "visible" => true, "align" => "left", "width" => nil },
-        { "key" => "code", "name" => "Product Code", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "code", "name" => "Code", "visible" => true, "align" => "left", "width" => nil },
         { "key" => "business_type", "name" => "Type", "visible" => true, "align" => "center", "width" => nil },
         { "key" => "workflow_status", "name" => "Status", "visible" => true, "align" => "center", "width" => nil }
       ] }
@@ -73,7 +73,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Product Name')
+    expect(page).to have_selector('th', text: 'Name')
     expect(page).to have_selector('th', text: 'Category')
     expect(page).to have_selector('th', text: 'Type')
     expect(page).to have_selector('th', text: 'Status')
@@ -157,7 +157,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         property_mapping: category_cosmetics.default_property_mapping,
         resource_name: "products",
         metadata: { "columns" => [
-          { "key" => "name", "name" => "Product Name", "visible" => true, "align" => "left", "width" => nil },
+          { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
           { "key" => "code", "name" => "Code", "visible" => true, "align" => "left", "width" => nil },
           { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "align" => "left", "width" => nil },
           { "key" => "property_string_2", "name" => "Key Ingredients", "visible" => true, "align" => "left", "width" => nil },
@@ -177,7 +177,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         property_mapping: category_supplements.default_property_mapping,
         resource_name: "products",
         metadata: { "columns" => [
-          { "key" => "name", "name" => "Product Name", "visible" => true, "align" => "left", "width" => nil },
+          { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
           { "key" => "code", "name" => "Code", "visible" => true, "align" => "left", "width" => nil },
           { "key" => "property_string_3", "name" => "Benefits", "visible" => true, "align" => "left", "width" => nil },
           { "key" => "property_decimal_1", "name" => "Potency %", "visible" => true, "align" => "right", "width" => nil },
@@ -260,7 +260,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
       expect(page).to have_selector('table', wait: 10)
 
-      expect(page).to have_selector('th', text: 'Product Name', wait: 10)
+      expect(page).to have_selector('th', text: 'Name', wait: 10)
       expect(page).to have_selector('th', text: 'Category', wait: 10)
       expect(page).to have_selector('th', text: 'Code', wait: 10)
       expect(page).to have_selector('th', text: 'Skin Type', wait: 10)

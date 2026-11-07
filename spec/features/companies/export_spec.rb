@@ -21,7 +21,7 @@ RSpec.feature "Skycom Index Export", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "products",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Product Name", "visible" => true, "align" => "left", "width" => nil }
+        { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil }
       ] }
     )
   end

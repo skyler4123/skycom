@@ -8,7 +8,8 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
   let(:property_mapping) do
     pm = category.default_property_mapping || create(:property_mapping, company: company, category: category, name: "Cosmetics Mapping")
     pm.update!(metadata: { "properties" => [
-      { "key" => "property_string_1", "type" => "string", "name" => "Skin Type" }
+      { "key" => "property_string_1", "type" => "string", "name" => "Skin Type" },
+      { "key" => "property_integer_1", "type" => "integer", "name" => "Stock Level" }
     ] })
     pm
   end
@@ -18,8 +19,10 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     create(:table_config, company: company, category: category, property_mapping: property_mapping,
       name: "Cosmetics Table",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
-        { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "align" => "left", "width" => nil }
+        { "key" => "name", "name" => "Name", "visible" => true, "search" => true },
+        { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "search" => true },
+        { "key" => "property_integer_1", "name" => "Stock Level", "visible" => true,
+          "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 10 ], [ 10, nil ] ] } }
       ] })
   end
 
@@ -83,13 +86,19 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     expect(page).to have_content(table_config.name)
   end
 
-  scenario "show page displays column config details" do
+  scenario "show page displays friendly column config details without raw keys" do
     visit company_table_config_path(company, table_config)
     expect(page).to have_content(table_config.name, wait: 10)
 
     expect(page).to have_content(/Column Config/i)
+    expect(page).to have_selector("th", text: "Type")
+    expect(page).to have_selector("th", text: "Search")
+    expect(page).to have_selector("th", text: "Filter")
     expect(page).to have_content("Skin Type")
-    expect(page).to have_content("property_string_1")
+    expect(page).to have_content("Stock Level")
+    expect(page).to have_content("Range · 2 buckets · Active")
+    expect(page).to have_no_content("property_string_1")
+    expect(page).to have_no_content("property_integer_1")
   end
 
   scenario "new page creates a table config" do
@@ -104,22 +113,27 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     expect(company.table_configs.find_by(name: 'New Test Table Config')).to be_present
   end
 
-  scenario "edit page renders with column config editor" do
+  scenario "edit page renders with the friendly column editor" do
     visit edit_company_table_config_path(company, table_config)
     expect(page).to have_selector('form', wait: 10)
 
     expect(page).to have_content("Edit Table Config")
-    expect(page).to have_content(/Column Config/i)
-
-    expect(page).to have_selector('input[name*="[metadata]"][name*="[columns]"][name*="[key]"]', wait: 10)
+    expect(page).to have_selector("th", text: "Display Name")
+    expect(page).to have_selector("th", text: "Type")
+    expect(page).to have_selector("th", text: "Visible")
+    expect(page).to have_selector("th", text: "Search")
+    expect(page).to have_selector("th", text: "Filter")
+    expect(page).to have_selector("th", text: "Actions")
+    expect(page).to have_no_selector("th", text: "Key")
   end
 
-  scenario "edit columns and verify Products table reflects changes" do
+  scenario "hiding a column updates the live Products table" do
     visit edit_company_table_config_path(company, table_config)
-    expect(page).to have_selector('form', wait: 10)
+    expect(page).to have_selector('[data-column-row="property_string_1"]', wait: 10)
 
-    first_label_input = find(:xpath, '//input[@name="table_config[metadata][columns][0][name]"]')
-    first_label_input.set('Product Title')
+    within('[data-column-row="property_string_1"]') do
+      uncheck "col-visible-property_string_1"
+    end
 
     click_button 'Save Changes'
     expect(page).to have_current_path(/table_configs\/#{table_config.id}$/, wait: 10)
@@ -148,10 +162,8 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     visit company_products_path(company, category_id: category.id)
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Product Title')
-    expect(page).to have_selector('th.text-center', text: 'Product Title')
-    expect(page).to have_selector('td.text-center')
-    expect(page).to have_selector('td div[class*="max-w-[240px]"]')
+    expect(page).to have_selector('th', text: 'Name')
+    expect(page).to have_no_selector('th', text: 'Skin Type')
   end
 
   scenario "show page has clickable property mapping link" do

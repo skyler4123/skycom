@@ -747,6 +747,166 @@ export const dictionary = () => {
       vi: "Cột ảo — được tính khi hiển thị, không lưu trong cơ sở dữ liệu",
     },
 
+    // === Table Config editor (docs/DYNAMIC_TABLE.md) ===
+    "Table Config Name": { vi: "Tên cấu hình bảng" },
+    "A short description of when this table configuration should be used.": {
+      vi: "Mô tả ngắn về thời điểm nên dùng cấu hình bảng này.",
+    },
+    "This name identifies the table configuration. It is not a column label.": {
+      vi: "Tên này nhận diện cấu hình bảng. Đây không phải nhãn cột.",
+    },
+    "The category this table configuration belongs to. It cannot be changed here.": {
+      vi: "Danh mục mà cấu hình bảng này thuộc về. Không thể thay đổi tại đây.",
+    },
+    "Property labels, types, and choices are managed in the Property Mapping.": {
+      vi: "Nhãn, loại và lựa chọn thuộc tính được quản lý trong Ánh xạ thuộc tính.",
+    },
+    "Manage property fields, labels, types, and choices.": {
+      vi: "Quản lý trường thuộc tính, nhãn, loại và lựa chọn.",
+    },
+    "Choose which columns appear in this table, in what order, and how people can search or filter them.": {
+      vi: "Chọn cột nào xuất hiện trong bảng này, theo thứ tự nào và cách mọi người tìm kiếm hoặc lọc chúng.",
+    },
+    "Column labels come from Property Mapping. This page controls order, visibility, search, and filters.": {
+      vi: "Nhãn cột đến từ Ánh xạ thuộc tính. Trang này điều khiển thứ tự, hiển thị, tìm kiếm và bộ lọc.",
+    },
+    "Column labels come from Property Mapping.": {
+      vi: "Nhãn cột đến từ Ánh xạ thuộc tính.",
+    },
+    "Column labels are managed in Property Mapping. This page controls display behavior.": {
+      vi: "Nhãn cột được quản lý trong Ánh xạ thuộc tính. Trang này điều khiển cách hiển thị.",
+    },
+    "Add columns — pick from standard columns and category properties.": {
+      vi: "Thêm cột — chọn từ cột chuẩn và thuộc tính của danh mục.",
+    },
+    "Arrange order — use the up/down buttons.": {
+      vi: "Sắp xếp thứ tự — dùng nút lên/xuống.",
+    },
+    "Configure — choose visibility, keyword search, and index filters.": {
+      vi: "Cấu hình — chọn hiển thị, tìm kiếm từ khóa và bộ lọc trang danh sách.",
+    },
+    "Range filter: 10 – 20 means 10 ≤ value < 20.": {
+      vi: "Bộ lọc khoảng: 10 – 20 nghĩa là 10 ≤ giá trị < 20.",
+    },
+    "Date filter: 2024 – 2025 means the year 2024.": {
+      vi: "Bộ lọc ngày: 2024 – 2025 nghĩa là năm 2024.",
+    },
+    "Choice list filter: uses the options defined in Property Mapping.": {
+      vi: "Bộ lọc danh sách lựa chọn: dùng các lựa chọn được định nghĩa trong Ánh xạ thuộc tính.",
+    },
+    "The column data type controls which search and filter options are available.": {
+      vi: "Loại dữ liệu của cột quyết định các tùy chọn tìm kiếm và lọc có sẵn.",
+    },
+    "Search and filter options depend on this type.": {
+      vi: "Tùy chọn tìm kiếm và lọc phụ thuộc vào loại này.",
+    },
+    "No type information is available for this column.": {
+      vi: "Không có thông tin loại cho cột này.",
+    },
+    "Show this column in the live table. Hidden columns keep their settings and data.": {
+      vi: "Hiển thị cột này trong bảng thực tế. Cột ẩn vẫn giữ cài đặt và dữ liệu.",
+    },
+    "Include this column in the keyword search box on the index page.": {
+      vi: "Đưa cột này vào ô tìm kiếm từ khóa trên trang danh sách.",
+    },
+    "Only text columns can be included in keyword search.": {
+      vi: "Chỉ cột văn bản mới có thể được đưa vào tìm kiếm từ khóa.",
+    },
+    "Configure the index-page filter for this column.": {
+      vi: "Cấu hình bộ lọc trang danh sách cho cột này.",
+    },
+    "This column cannot be used as an index filter.": {
+      vi: "Cột này không thể dùng làm bộ lọc trang danh sách.",
+    },
+    "Open the filter settings for this column.": {
+      vi: "Mở cài đặt bộ lọc cho cột này.",
+    },
+    "Reorder or remove this column.": {
+      vi: "Sắp xếp lại hoặc xóa cột này.",
+    },
+    "Move this column up.": { vi: "Di chuyển cột này lên." },
+    "Move this column down.": { vi: "Di chuyển cột này xuống." },
+    "Removes this column from this table only. The property and its data are not deleted.": {
+      vi: "Chỉ xóa cột này khỏi bảng này. Thuộc tính và dữ liệu của nó không bị xóa.",
+    },
+    "The name column is required and cannot be removed.": {
+      vi: "Cột tên là bắt buộc và không thể xóa.",
+    },
+    "No columns yet. Add your first column below.": {
+      vi: "Chưa có cột nào. Thêm cột đầu tiên bên dưới.",
+    },
+    "Filter for": { vi: "Bộ lọc cho" },
+    "Filter type": { vi: "Loại bộ lọc" },
+    "Choose how this column filters the index page.": {
+      vi: "Chọn cách cột này lọc trang danh sách.",
+    },
+    "Only active filters appear on the index page.": {
+      vi: "Chỉ bộ lọc đang hoạt động mới xuất hiện trên trang danh sách.",
+    },
+    "Choose a filter type to configure how this column filters the index page.": {
+      vi: "Chọn loại bộ lọc để cấu hình cách cột này lọc trang danh sách.",
+    },
+    "The index filter shows True and False options.": {
+      vi: "Bộ lọc trang danh sách hiển thị tùy chọn Đúng và Sai.",
+    },
+    "From year": { vi: "Từ năm" },
+    "To year": { vi: "Đến năm" },
+    "Half-open year buckets. 2024 – 2025 means the year 2024.": {
+      vi: "Khoảng năm nửa mở. 2024 – 2025 nghĩa là năm 2024.",
+    },
+    "From is inclusive, To is exclusive. Leave one side blank for an open-ended bucket.": {
+      vi: "Từ bao gồm, Đến không bao gồm. Để trống một bên cho khoảng mở.",
+    },
+    "Remove this bucket.": { vi: "Xóa khoảng này." },
+    "Add another bucket to this filter.": { vi: "Thêm một khoảng khác cho bộ lọc này." },
+    "No choices defined. Add choices in Property Mapping first.": {
+      vi: "Chưa có lựa chọn nào. Hãy thêm lựa chọn trong Ánh xạ thuộc tính trước.",
+    },
+    "Edit choices in Property Mapping": { vi: "Sửa lựa chọn trong Ánh xạ thuộc tính" },
+    "Add a column": { vi: "Thêm một cột" },
+    "Pick a column to add. Nothing is added until you click Add Column.": {
+      vi: "Chọn một cột để thêm. Không có gì được thêm cho đến khi bạn bấm Thêm cột.",
+    },
+    "Choose a column": { vi: "Chọn một cột" },
+    "Choose a column to add.": { vi: "Chọn một cột để thêm." },
+    "All available columns are already in this table.": {
+      vi: "Tất cả cột có sẵn đã nằm trong bảng này.",
+    },
+    "Standard": { vi: "Chuẩn" },
+    "Standard column": { vi: "Cột chuẩn" },
+    "Standard columns": { vi: "Cột chuẩn" },
+    "Property columns": { vi: "Cột thuộc tính" },
+    "Extra columns": { vi: "Cột bổ sung" },
+    "From Property Mapping": { vi: "Từ Ánh xạ thuộc tính" },
+    "Other": { vi: "Khác" },
+    "Unknown type": { vi: "Loại không xác định" },
+    "No filter": { vi: "Không lọc" },
+    "bucket": { vi: "khoảng" },
+    "buckets": { vi: "khoảng" },
+    "year bucket": { vi: "khoảng năm" },
+    "year buckets": { vi: "khoảng năm" },
+    "Table config name is required.": { vi: "Tên cấu hình bảng là bắt buộc." },
+    "Add at least one column.": { vi: "Thêm ít nhất một cột." },
+    "Add at least one filter bucket.": { vi: "Thêm ít nhất một khoảng lọc." },
+    "Each filter bucket needs at least one value.": {
+      vi: "Mỗi khoảng lọc cần ít nhất một giá trị.",
+    },
+    "From must be less than To.": { vi: "Từ phải nhỏ hơn Đến." },
+    "Date buckets must use whole years.": { vi: "Khoảng ngày phải dùng năm nguyên." },
+    "Numeric buckets must use numbers.": { vi: "Khoảng số phải dùng số." },
+    "Choose a valid filter type for this column.": {
+      vi: "Chọn loại bộ lọc hợp lệ cho cột này.",
+    },
+    "Whether this column appears in the live table.": {
+      vi: "Cột này có xuất hiện trong bảng thực tế hay không.",
+    },
+    "Whether this column participates in keyword search.": {
+      vi: "Cột này có tham gia tìm kiếm từ khóa hay không.",
+    },
+    "The index-page filter configured for this column.": {
+      vi: "Bộ lọc trang danh sách được cấu hình cho cột này.",
+    },
+
     // === Property Mapping editor (docs/CATEGORY_DYNAMIC_SCHEMA.md) ===
     "How properties work": { vi: "Cách thuộc tính hoạt động" },
     "Properties are extra fields for this category. Your team fills them in when creating or editing records. Pick a type, give it a clear name, and configure choices if needed.": {

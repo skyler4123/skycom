@@ -7,8 +7,9 @@
 # changes; the layout is data (metadata.columns) validated against the category's
 # property mapping (see docs/DYNAMIC_TABLE.md).
 # How it works: `columns` is a store_accessor on metadata; after_initialize seeds
-# defaults, and the validation enforces the documented column shape
-# (key/name/visible/search/filter). Updates are audited in TableConfigLog.
+# defaults, before_validation normalizes each label from its source, and the
+# validation enforces the documented column shape (key/name/visible/search/filter).
+# Updates are audited in TableConfigLog.
 # Main associations: belongs_to :company (touch), :category, :property_mapping;
 # has_many :table_config_logs (dependent: :nullify).
 class TableConfig < ApplicationRecord
@@ -25,6 +26,16 @@ class TableConfig < ApplicationRecord
   FILTER_TYPES = %w[range enum boolean date].freeze
   # Allowed keys inside a column "filter" hash (strict shape).
   FILTER_ALLOWED_KEYS = %w[type active buckets].freeze
+  # Fixed display labels for standard (non-property) columns. Names are owned
+  # by this table, never by the Table Config editor.
+  STANDARD_COLUMN_NAMES = {
+    "name" => "Name",
+    "description" => "Description",
+    "code" => "Code",
+    "title" => "Title",
+    "quantity" => "Quantity",
+    "pending" => "Pending"
+  }.freeze
   store_accessor :metadata, :columns
   attribute :permission_resource_name, :string, default: -> { self.name }
 
@@ -73,9 +84,43 @@ class TableConfig < ApplicationRecord
   # ---------------------------------------------------------------------------
 
   validate :columns_metadata_must_conform_to_schema
+  before_validation :normalize_column_names
   after_initialize :set_default_columns, if: :new_record?
 
   private
+
+  # Column labels are derived from their source: standard keys use the fixed
+  # labels above, property/extra keys use the corresponding PropertyMapping
+  # name. Unknown keys keep whatever the caller submitted.
+  def normalize_column_names
+    return unless columns.is_a?(Array)
+
+    properties_by_key = (property_mapping&.properties || []).index_by { |entry| entry["key"] }
+    extra_columns = property_mapping&.metadata&.dig("extra_columns")
+    extras_by_key = (extra_columns.is_a?(Array) ? extra_columns : []).index_by { |entry| entry["key"] }
+    changed = false
+
+    normalized = columns.map do |column|
+      next column unless column.is_a?(Hash)
+
+      key = column["key"].to_s
+      canonical_name =
+        if STANDARD_COLUMN_NAMES.key?(key)
+          STANDARD_COLUMN_NAMES[key]
+        elsif key.start_with?("property_")
+          properties_by_key[key]&.[]("name")
+        elsif key.start_with?("extra_")
+          extras_by_key[key]&.[]("name")
+        end
+
+      next column if canonical_name.blank? || canonical_name == column["name"]
+
+      changed = true
+      column.merge("name" => canonical_name)
+    end
+
+    self.columns = normalized if changed
+  end
 
   def columns_metadata_must_conform_to_schema
     columns = self.columns || []

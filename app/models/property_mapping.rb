@@ -126,6 +126,8 @@ class PropertyMapping < ApplicationRecord
     props = self.properties || []
     pm_property_keys = props.select { |pm| pm["key"].to_s.start_with?("property_") }
     pm_keys = pm_property_keys.map { |pm| pm["key"] }
+    extra_columns = (metadata || {})["extra_columns"]
+    extras_by_key = (extra_columns.is_a?(Array) ? extra_columns : []).index_by { |entry| entry["key"] }
 
     table_configs.reset.each do |tc|
       columns = (tc.columns || []).dup
@@ -136,12 +138,18 @@ class PropertyMapping < ApplicationRecord
       changed ||= columns.size != original_size
 
       columns.each do |col|
-        next unless col["key"].to_s.start_with?("property_")
-        pm_entry = pm_property_keys.find { |pm| pm["key"] == col["key"] }
-        next unless pm_entry
-        next if pm_entry["name"] == col["name"]
+        key = col["key"].to_s
+        entry =
+          if key.start_with?("property_")
+            pm_property_keys.find { |pm| pm["key"] == key }
+          elsif key.start_with?("extra_")
+            extras_by_key[key]
+          end
 
-        col["name"] = pm_entry["name"]
+        next unless entry
+        next if entry["name"].blank? || entry["name"] == col["name"]
+
+        col["name"] = entry["name"]
         changed = true
       end
 

@@ -187,6 +187,45 @@ RSpec.describe PropertyMapping, type: :model do
       expect(table_config.columns.map { |c| c["key"] }).to include("name")
     end
 
+    it "updates extra column names when an extra column is renamed" do
+      property_mapping.update!(metadata: property_mapping.metadata.merge(
+        "extra_columns" => [
+          { "key" => "extra_1", "name" => "Extra Demo", "type" => "string" }
+        ]
+      ))
+      table_config.update!(columns: [
+        { "key" => "name", "name" => "Name", "visible" => true },
+        { "key" => "extra_1", "name" => "Extra Demo", "visible" => true }
+      ])
+
+      property_mapping.update!(metadata: property_mapping.metadata.merge(
+        "extra_columns" => [
+          { "key" => "extra_1", "name" => "Renamed Extra", "type" => "string" }
+        ]
+      ))
+
+      table_config.reload
+      extra = table_config.columns.find { |column| column["key"] == "extra_1" }
+      expect(extra["name"]).to eq("Renamed Extra")
+    end
+
+    it "keeps an extra column when it is deleted from Property Mapping" do
+      property_mapping.update!(metadata: property_mapping.metadata.merge(
+        "extra_columns" => [
+          { "key" => "extra_1", "name" => "Extra Demo", "type" => "string" }
+        ]
+      ))
+      table_config.update!(columns: [
+        { "key" => "name", "name" => "Name", "visible" => true },
+        { "key" => "extra_1", "name" => "Extra Demo", "visible" => true }
+      ])
+
+      property_mapping.update!(metadata: property_mapping.metadata.merge("extra_columns" => []))
+
+      table_config.reload
+      expect(table_config.columns.map { |column| column["key"] }).to include("extra_1")
+    end
+
     it "syncs all associated table configs" do
       tc2 = TableConfig.create!(company: property_mapping.company, category: property_mapping.category, property_mapping: property_mapping)
 
