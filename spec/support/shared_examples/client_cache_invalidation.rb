@@ -57,10 +57,10 @@ RSpec.shared_examples "client cache invalidation" do |resource_name:|
 
   scenario "adding a property field appears in the dynamic table" do
     visit edit_company_property_mapping_path(company, property_mapping)
-    expect(page).to have_selector("#new-property-slot", wait: 10)
+    expect(page).to have_selector("#new-property-type", wait: 10)
 
-    select "property_string_2 (string)", from: "new-property-slot"
-    click_button "Add Property"
+    select "Text", from: "new-property-type"
+    find("button", text: "Add Property").click
     fill_in "property_mapping[metadata][properties][1][name]", with: "Added Field"
     click_button "Save Changes"
     expect(page).to have_content("Property mapping updated successfully", wait: 10)
@@ -73,7 +73,7 @@ RSpec.shared_examples "client cache invalidation" do |resource_name:|
 
   scenario "updating a property field renames the column in the dynamic table" do
     visit edit_company_property_mapping_path(company, property_mapping)
-    expect(page).to have_selector("#new-property-slot", wait: 10)
+    expect(page).to have_selector("#new-property-type", wait: 10)
 
     fill_in "property_mapping[metadata][properties][0][name]", with: "Renamed Field"
     click_button "Save Changes"
@@ -88,9 +88,9 @@ RSpec.shared_examples "client cache invalidation" do |resource_name:|
 
   scenario "deleting a property field removes the column from the dynamic table" do
     visit edit_company_property_mapping_path(company, property_mapping)
-    expect(page).to have_selector("#new-property-slot", wait: 10)
+    expect(page).to have_selector("#new-property-type", wait: 10)
 
-    find("button[data-index='0']").click
+    first('[data-action*="removeProperty"]').click
     click_button "Save Changes"
     expect(page).to have_content("Property mapping updated successfully", wait: 10)
 
