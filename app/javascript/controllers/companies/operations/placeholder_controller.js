@@ -50,10 +50,6 @@ export default class Companies_Operations_PlaceholderController extends Controll
 
           <div class="grid grid-cols-2 gap-3">
             <div class="rounded-lg border border-line bg-card p-3">
-              <p class="text-[10px] font-bold uppercase text-muted-foreground">${translate("Resolution")}</p>
-              <p class="text-sm font-semibold text-foreground">${Helpers.escapeHtml(operation.resolution || "—")}</p>
-            </div>
-            <div class="rounded-lg border border-line bg-card p-3">
               <p class="text-[10px] font-bold uppercase text-muted-foreground">${translate("Status")}</p>
               <p class="text-sm font-semibold text-foreground">${Helpers.escapeHtml(appointment.workflow_status || "—")}</p>
             </div>

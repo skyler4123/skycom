@@ -9,8 +9,6 @@ class OperationLaunchService
     "booking" => :booking_company_operations_path,
     "inventory" => :inventory_company_operations_path,
     "reception" => :reception_company_operations_path,
-    "kitchen" => :kitchen_company_operations_path,
-    "housekeeping" => :housekeeping_company_operations_path,
     "store_manager" => :store_manager_company_operations_path
   }.freeze
 

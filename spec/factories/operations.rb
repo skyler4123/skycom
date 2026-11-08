@@ -8,7 +8,6 @@ FactoryBot.define do
     end
 
     operation_type { :pos }
-    resolution { :desktop }
     name { "#{operation_type.to_s.humanize} Operation" }
     code { "OP-#{SecureRandom.hex(4).upcase}" }
     metadata { { "roles" => [] } }
@@ -18,8 +17,7 @@ FactoryBot.define do
     initialize_with do
       Operation.find_or_initialize_by(
         company: company,
-        operation_type: operation_type,
-        resolution: resolution
+        operation_type: operation_type
       ).tap do |record|
         if record.new_record?
           record.name = name

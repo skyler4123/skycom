@@ -77,10 +77,6 @@ export default class Companies_OperationConfigs_ShowController extends Companies
               <p class="text-sm font-semibold text-foreground">${Helpers.escapeHtml((c.operation_type || "—").replace(/_/g, " ").toUpperCase())}</p>
             </div>
 
-            <div class="rounded-lg border border-line bg-background p-4">
-              <p class="text-[10px] font-bold uppercase text-muted-foreground">${translate("Resolution")}</p>
-              <p class="text-sm font-semibold text-foreground">${Helpers.escapeHtml(c.resolution || "—")}</p>
-            </div>
 
             <div class="rounded-lg border border-line bg-background p-4">
               <p class="text-[10px] font-bold uppercase text-muted-foreground">${translate("Locations")}</p>

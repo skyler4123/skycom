@@ -2,7 +2,7 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 
 // Companies_OperationConfigs_IndexController — company-wide Operation config list.
 // Depends on BE: Companies::OperationConfigsController#index
-// Endpoints: GET /companies/:company_id/operation_configs(.json?q=&operation_type=&workflow_status=&resolution=)
+// Endpoints: GET /companies/:company_id/operation_configs(.json?q=&operation_type=&workflow_status=)
 export default class Companies_OperationConfigs_IndexController extends Companies_LayoutController {
   /** @type {any[]} */ operationConfigs = []
 
@@ -62,12 +62,6 @@ export default class Companies_OperationConfigs_IndexController extends Companie
                 ${selectOptionsHTML(this.translatedOptions(this.filters.statuses), urlParams.get("workflow_status"), translate("All"))}
               </select>
             </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold text-muted-foreground uppercase ml-1">${translate("Resolution")}</label>
-              <select name="resolution" class="pl-3 pr-10 py-2 text-sm border border-line rounded-lg bg-card text-muted-foreground">
-                ${selectOptionsHTML(this.translatedOptions(this.filters.resolutions), urlParams.get("resolution"), translate("All"))}
-              </select>
-            </div>
             <button type="submit" class="h-[38px] px-6 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer">
               <span class="material-symbols-outlined text-[18px]!">search</span>
               ${translate("Search")}
@@ -80,7 +74,6 @@ export default class Companies_OperationConfigs_IndexController extends Companie
                 <tr class="border-b border-line">
                   <th class="text-left py-4 px-6 font-semibold text-foreground">${translate("Operation")}</th>
                   <th class="text-left py-4 px-6 font-semibold text-foreground">${translate("Type")}</th>
-                  <th class="text-left py-4 px-6 font-semibold text-foreground">${translate("Resolution")}</th>
                   <th class="text-left py-4 px-6 font-semibold text-foreground">${translate("Access Roles")}</th>
                   <th class="text-left py-4 px-6 font-semibold text-foreground">${translate("Status")}</th>
                   <th class="text-left py-4 px-6 font-semibold text-foreground">${translate("Locations")}</th>
@@ -89,7 +82,7 @@ export default class Companies_OperationConfigs_IndexController extends Companie
               </thead>
               <tbody>
                 ${this.operationConfigs.length === 0
-                  ? `<tr><td colspan="7" class="py-8 text-center text-muted-foreground">${translate("No operation configs found.")}</td></tr>`
+                  ? `<tr><td colspan="6" class="py-8 text-center text-muted-foreground">${translate("No operation configs found.")}</td></tr>`
                   : this.operationConfigs.map(operationConfig => this.rowHTML(operationConfig)).join("")}
               </tbody>
             </table>
@@ -114,7 +107,6 @@ export default class Companies_OperationConfigs_IndexController extends Companie
           <p class="font-mono text-xs text-muted-foreground">${Helpers.escapeHtml(operationConfig.code || "—")}</p>
         </td>
         <td class="py-4 px-6 text-muted-foreground">${Helpers.escapeHtml((operationConfig.operation_type || "—").replace(/_/g, " ").toUpperCase())}</td>
-        <td class="py-4 px-6 text-muted-foreground">${Helpers.escapeHtml(operationConfig.resolution || "—")}</td>
         <td class="py-4 px-6">
           ${roles.length === 0
             ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-line">${translate("All roles")}</span>`

@@ -185,8 +185,6 @@ export const reception_parcels_company_operation_path = (companyId, operationId)
 export const reception_parcel_notify_company_operation_path = (companyId, operationId, parcelId) => `${reception_parcels_company_operation_path(companyId, operationId)}/${parcelId}/notify`
 export const reception_parcel_pick_up_company_operation_path = (companyId, operationId, parcelId) => `${reception_parcels_company_operation_path(companyId, operationId)}/${parcelId}/pick_up`
 export const reception_notify_host_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/notify_host`
-export const kitchen_company_operation_path = (companyId, operationId, params = {}) => operationPath("kitchen", companyId, operationId, params)
-export const housekeeping_company_operation_path = (companyId, operationId, params = {}) => operationPath("housekeeping", companyId, operationId, params)
 export const store_manager_company_operation_path = (companyId, operationId, params = {}) => operationPath("store_manager", companyId, operationId, params)
 
 export const order_processing_v1_checkout_path = (companyId) => `/companies/${companyId}/order_processing/v1/checkout`

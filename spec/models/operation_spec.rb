@@ -17,17 +17,8 @@ RSpec.describe Operation, type: :model do
         booking: 200,
         inventory: 300,
         reception: 400,
-        kitchen: 500,
-        housekeeping: 600,
         store_manager: 700
       ).with_prefix(:operation_type)
-    end
-
-    it do
-      should define_enum_for(:resolution).with_values(
-        mobile: 10,
-        desktop: 20
-      ).with_prefix(:resolution)
     end
   end
 
@@ -37,8 +28,6 @@ RSpec.describe Operation, type: :model do
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:code) }
     it { should validate_presence_of(:operation_type) }
-    it { should validate_presence_of(:resolution) }
-
     it "requires metadata" do
       operation = build(:operation, metadata: nil)
 
@@ -59,13 +48,12 @@ RSpec.describe Operation, type: :model do
       expect(operation).to be_valid
     end
 
-    it "requires the operation type and resolution to be unique per company" do
+    it "requires the operation type to be unique per company" do
       company = create(:company)
-      create(:operation, company: company, operation_type: :pos, resolution: :desktop)
+      create(:operation, company: company, operation_type: :pos)
       duplicate = Operation.new(
         company: company,
         operation_type: :pos,
-        resolution: :desktop,
         name: "Duplicate POS",
         code: "OP-DUP-#{SecureRandom.hex(3).upcase}"
       )

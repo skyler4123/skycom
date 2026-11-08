@@ -3,7 +3,7 @@
 ## 1. Overview
 
 Operations are full-screen interfaces keyed by **purpose**, not industry or
-role: POS, Booking, Inventory, Reception, Kitchen, Housekeeping, Store Manager.
+role: POS, Booking, Inventory, Reception, Store Manager.
 A hospital and a hotel use the same POS operation; their differences live in
 categories, dynamic properties, location appointments, and ABAC policies.
 
@@ -17,12 +17,12 @@ appointment tables. Operation config (company-wide) wins over appointment config
 
 | Layer | Table / model | Purpose |
 |---|---|---|
-| **Operation** | `operations` / `Operation` | One deployable purpose + resolution for a company. Seeded, never created from the UI. |
+| **Operation** | `operations` / `Operation` | One deployable purpose for a company. Seeded, never created from the UI. |
 | **Branch appointment** | `branch_operation_appointments` / `BranchOperationAppointment` | Binds an Operation to a Branch with branch metadata and active/inactive status. |
 | **Warehouse appointment** | `operation_warehouse_appointments` / `OperationWarehouseAppointment` | Binds an Operation to a Warehouse with warehouse metadata and active/inactive status. |
 
-`Operation` is unique per `(company, operation_type, resolution)`. The catalog currently
-seeds one `desktop` Operation per purpose.
+`Operation` is unique per `(company, operation_type)`. The catalog currently
+seeds one Operation per purpose.
 
 ### Config override direction
 
@@ -57,8 +57,6 @@ Source of truth: `OPERATION_TYPES` in `config/initializers/constants.rb`.
 | `booking` | Booking | `BKG` | branch |
 | `inventory` | Inventory | `INV` | warehouse |
 | `reception` | Reception | `RCP` | branch |
-| `kitchen` | Kitchen | `KIT` | branch |
-| `housekeeping` | Housekeeping | `HSK` | branch |
 | `store_manager` | Store Manager | `MGR` | branch |
 
 `appointment_scope` is a **seed-time hint**: branch creation creates branch
@@ -89,7 +87,7 @@ Seed::OperationService.ensure_appointments_for_operation!(operation)
 Seed::OperationService.create(company:, operation_type:, ...)
 ```
 
-- `seed_defaults!` creates one `desktop` Operation per `OPERATION_TYPES` key for the
+- `seed_defaults!` creates one Operation per `OPERATION_TYPES` key for the
   company, then materializes appointments for every existing branch/warehouse.
 - `Company#initialize_company` calls it for every non-system company.
 - `Branch` and `Warehouse` include `OperationAppointmentConcern`; its `after_create`
@@ -111,7 +109,7 @@ All appointments start `active`. Companies disable the ones they do not use.
 |---|---|---|---|
 | GET | `/companies/:company_id/operations` | `Companies::OperationsController#index` | List branch + warehouse appointments (filters: `q`, `operation_type`, `workflow_status`, `location`; 1-day cache) |
 | GET | `/companies/:company_id/operations/:id/launch` | `Companies::OperationsController#launch` | Resolve appointment and redirect |
-| GET | `/companies/:company_id/operation_configs` | `Companies::OperationConfigsController#index` | List company Operation records (filters: `q`, `operation_type`, `workflow_status`, `resolution`; 1-day cache) |
+| GET | `/companies/:company_id/operation_configs` | `Companies::OperationConfigsController#index` | List company Operation records (filters: `q`, `operation_type`, `workflow_status`; 1-day cache) |
 | GET | `/companies/:company_id/operation_configs/:id` | `Companies::OperationConfigsController#show` | Operation config details |
 | GET | `/companies/:company_id/operation_configs/:id/edit` | `Companies::OperationConfigsController#edit` | Operation config edit page |
 | PATCH | `/companies/:company_id/operation_configs/:id` | `Companies::OperationConfigsController#update` | Update Operation metadata only |
@@ -133,8 +131,6 @@ All appointments start `active`. Companies disable the ones they do not use.
 | POST | `/companies/:company_id/operations/reception/:operation_id/parcels/:parcel_id/pick_up` | `Companies::Operations::ReceptionController#pick_up_parcel` | Complete the parcel Event |
 | POST | `/companies/:company_id/operations/reception/:operation_id/notify_host` | `Companies::Operations::ReceptionController#notify_host` | Stamp the visit's host_notified_at metadata |
 | GET | `/mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | Mobile/tablet Shell-First mount point |
-| GET | `/companies/:company_id/operations/kitchen/:operation_id` | `Companies::Operations::KitchenController#show` | Placeholder |
-| GET | `/companies/:company_id/operations/housekeeping/:operation_id` | `Companies::Operations::HousekeepingController#show` | Placeholder |
 | GET | `/companies/:company_id/operations/store_manager/:operation_id` | `Companies::Operations::StoreManagerController#show` | Store Manager console (Orders/Stocks/Employees) |
 
 Both index payloads are cached per company in `Rails.sync_cache` for
@@ -253,7 +249,7 @@ pages link the row name to the show page and the edit icon to the edit page. Bot
 list pages have GET filter bars:
 
 - Operations: keyword, operation type, status, location
-- Operation Configs: keyword, operation type, status, resolution
+- Operation Configs: keyword, operation type, status
 
 The Operation config edit page edits company access roles with a multi-select role
 picker (the company's roles come from the client cache); it never exposes raw JSON.
@@ -284,7 +280,7 @@ A new operation type touches six layers:
 
 ## 9. Database
 
-- `operations`: unique `(company_id, operation_type, resolution)`; unique `code`.
+- `operations`: unique `(company_id, operation_type)`; unique `code`.
 - `branch_operation_appointments`: unique `(company_id, branch_id, operation_id)`.
 - `operation_warehouse_appointments`: unique `(company_id, operation_id, warehouse_id)`.
 - Both appointment tables carry the standard System Fields block; the column default

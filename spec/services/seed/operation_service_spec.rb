@@ -11,7 +11,6 @@ RSpec.describe Seed::OperationService do
 
       expect(company.operations.count).to eq(OPERATION_TYPES.size)
       expect(company.operations.pluck(:operation_type)).to contain_exactly(*OPERATION_TYPES.keys.map(&:to_s))
-      expect(company.operations.pluck(:resolution).uniq).to eq([ "desktop" ])
     end
 
     it "uses the catalog label for every business type" do
@@ -23,7 +22,7 @@ RSpec.describe Seed::OperationService do
 
       expect(retail.operations.find_by!(operation_type: :pos).name).to eq("POS")
       expect(hotel.operations.find_by!(operation_type: :pos).name).to eq("POS")
-      expect(hotel.operations.find_by!(operation_type: :kitchen).name).to eq("Kitchen")
+      expect(hotel.operations.find_by!(operation_type: :store_manager).name).to eq("Store Manager")
     end
 
     it "is idempotent and keeps the generated code" do

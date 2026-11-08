@@ -247,8 +247,6 @@ Rails.application.routes.draw do
           post "reception/:operation_id/parcels/:parcel_id/notify", to: "operations/reception#notify_parcel", as: :reception_parcel_notify
           post "reception/:operation_id/parcels/:parcel_id/pick_up", to: "operations/reception#pick_up_parcel", as: :reception_parcel_pick_up
           post "reception/:operation_id/notify_host", to: "operations/reception#notify_host", as: :reception_notify_host
-          get "kitchen/:operation_id", to: "operations/kitchen#show", as: :kitchen
-          get "housekeeping/:operation_id", to: "operations/housekeeping#show", as: :housekeeping
           get "store_manager/:operation_id", to: "operations/store_manager#show", as: :store_manager
         end
       end

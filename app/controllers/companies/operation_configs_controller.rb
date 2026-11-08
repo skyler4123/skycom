@@ -4,11 +4,11 @@
 # Operations are seeded, never created here. Update permits metadata only; saving
 # it copies the metadata to every appointment, whose local metadata otherwise wins
 # when effective config is built. Index caches the company-level payload for
-# OPERATIONS_CACHE_EXPIRY and filters it by q/operation_type/workflow_status/resolution.
+# OPERATIONS_CACHE_EXPIRY and filters it by q/operation_type/workflow_status.
 # Serves Stimulus: Companies_OperationConfigs_IndexController (index),
 #                  Companies_OperationConfigs_ShowController (show),
 #                  Companies_OperationConfigs_EditController (edit, update)
-# Endpoints: GET /companies/:company_id/operation_configs(.json?q=&operation_type=&workflow_status=&resolution=),
+# Endpoints: GET /companies/:company_id/operation_configs(.json?q=&operation_type=&workflow_status=),
 #            GET /companies/:company_id/operation_configs/:id(.json),
 #            GET /companies/:company_id/operation_configs/:id/edit,
 #            PATCH /companies/:company_id/operation_configs/:id
@@ -96,7 +96,6 @@ class Companies::OperationConfigsController < Companies::ApplicationController
 
     filtered = filtered.select { |row| row["operation_type"] == params[:operation_type] } if params[:operation_type].present?
     filtered = filtered.select { |row| row["workflow_status"] == params[:workflow_status] } if params[:workflow_status].present?
-    filtered = filtered.select { |row| row["resolution"] == params[:resolution] } if params[:resolution].present?
 
     filtered
   end
@@ -113,9 +112,6 @@ class Companies::OperationConfigsController < Companies::ApplicationController
       end,
       statuses: Operation.workflow_statuses.keys.map do |status|
         { value: status, name: status.split("_").map(&:capitalize).join(" ") }
-      end,
-      resolutions: Operation.resolutions.keys.map do |resolution|
-        { value: resolution, name: resolution.humanize }
       end
     }
   end

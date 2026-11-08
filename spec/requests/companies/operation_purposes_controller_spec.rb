@@ -181,18 +181,6 @@ RSpec.describe "Company operations", type: :request do
   end
 
   describe "GET #show for a placeholder" do
-    it "returns coming_soon with the operation and appointment" do
-      operation = company.operations.find_by!(operation_type: :kitchen)
-
-      get kitchen_company_operations_path(company, operation, branch_id: branch.id), as: :json
-
-      expect(response).to have_http_status(:ok)
-      body = JSON.parse(response.body)
-      expect(body.fetch("coming_soon")).to be(true)
-      expect(body.fetch("operation").fetch("operation_type")).to eq("kitchen")
-      expect(body.fetch("appointment").fetch("kind")).to eq("branch")
-    end
-
     it "returns the live inventory payload for warehouse-scoped inventory" do
       operation = company.operations.find_by!(operation_type: :inventory)
 

@@ -5,7 +5,7 @@
 # describe the same Operation/appointment contract.
 class OperationSerializer
   OPERATION_ATTRIBUTES = %i[
-    id name description code operation_type resolution metadata
+    id name description code operation_type metadata
     lifecycle_status workflow_status permission_resource_name
   ].freeze
 
