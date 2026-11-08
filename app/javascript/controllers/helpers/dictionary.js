@@ -492,6 +492,7 @@ export const dictionary = () => {
     "Cash drawer is not connected.": { vi: "Ngăn kéo tiền chưa được kết nối." },
     "Print Receipt": { vi: "In biên lai" },
     "Open Drawer": { vi: "Mở ngăn kéo" },
+    "Open POS": { vi: "Mở POS" },
 
     // === Permissions ===
     "Permission Logs": { vi: "Nhật ký quyền" },

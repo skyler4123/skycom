@@ -121,6 +121,12 @@ pay_cancel()                       PAY CANCEL (abandoned QR)
 **Class**: `Companies_Operations_Pos_ShowController`
 **Extends**: `Controller` (standalone, not layout)
 
+The same controller also powers the mobile POS page. `Mobile::Companies::Operations::PosController#show`
+returns a Shell-First mount point with `data-company-id` / `data-operation-id`;
+the controller reads those attributes (falling back to the web URL path) and
+hydrates from the same `/companies/:company_id/operations/pos/:operation_id.json`
+endpoint. See `docs/MOBILE.md` §4.
+
 ### 3.1 Cart → Order Link (click item to DB)
 
 Clicking a product/service card does **not** hit the backend — it mutates local `tabs[].items[]` only. The DB link is created later by `ORDER`.
@@ -583,6 +589,7 @@ export const pos_customer_lookup_company_operation_path = (companyId, operationI
 | `spec/services/order_processing_v1/finalize_order_service_spec.rb` | Creates stock exports with sale business_type, links to Order via appoint_for | Paid order with order_product_appointments |
 | `spec/requests/companies/order_processing/v1_controller_spec.rb` | Checkout success, insufficient stock, missing fields, multiple items, string quantity, non-existent order pay, full checkout+pay flow | Company, branch, products, stock |
 | `spec/features/companies/operations/pos_spec.rb` | Operation screen load, dark mode toggle, category filter, customer lookup by id/name/phone + membership tier, lookup not found, add/remove cart, ORDER → COMPLETE PAYMENT, Cancel, cart locked, insufficient stock, empty cart guard | Company, branch, products, stock, Operation + branch appointment, customer + membership |
+| `spec/features/mobile/pos_spec.rb` | Mobile Shell-First hydration, catalog, add-to-cart, ORDER → payment → receipt, Operations link, non-POS operations, missing appointment | Company, branch, product, stock, Operation + branch appointment, cash payment method |
 
 ---
 

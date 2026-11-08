@@ -3,6 +3,8 @@ import { Controller } from "@hotwired/stimulus"
 export default class Companies_Operations_Pos_ShowController extends Controller {
   // POS — Cart (tabs[].items[] in memory) → ORDER → pay → receipt.
   // Click card → addToCart mutates local cart only; ORDER flushes to Order+OrderProductAppointment; pay reads DB snapshots.
+  // Mounted by the web layout and by Mobile::Companies::Operations::PosController (Shell-First;
+  // the mobile shell supplies data-company-id / data-operation-id / data-user-*).
   // Depends on BE: Companies::Operations::PosController#show (hydrate products/services/payment_methods),
   //               Companies::OrderProcessing::V1Controller#checkout|pay|pay_cancel,
   //               Companies::OrdersController#receipt,
@@ -31,7 +33,7 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
 
   async connect() {
     const pathParts = window.location.pathname.split("/")
-    const companyId = pathParts[2]
+    const companyId = this.element.dataset.companyId || pathParts[2]
     const operationId = this.element.dataset.operationId || pathParts[4]
     this.operationId = operationId
 
@@ -483,9 +485,10 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
     const operation = this.operation || {}
     const branchName = operation.branch?.name || this.appointment?.branch?.name || ""
     const operationName = operation.name || translate("Cashier")
-    const userName = window.currentUser?.name || translate("Admin User")
-    const userRole = window.currentUser?.role || translate("Administrator")
-    const avatarUrl = window.currentUser?.avatar || ""
+    const currentUser = typeof window.currentUser === "function" ? window.currentUser() : window.currentUser
+    const userName = this.element.dataset.userName || currentUser?.name || translate("Admin User")
+    const userRole = this.element.dataset.userRole || currentUser?.role || translate("Administrator")
+    const avatarUrl = this.element.dataset.userAvatar || currentUser?.avatar || ""
 
     return `
       <div class="bg-background text-foreground min-h-screen flex flex-col">
@@ -1026,6 +1029,6 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
   }
 
   getCompanyId() {
-    return window.location.pathname.split("/")[2]
+    return this.element.dataset.companyId || window.location.pathname.split("/")[2]
   }
 }

@@ -54,6 +54,14 @@
               <p class="mt-0.5 text-sm font-semibold text-foreground"><%= operation.resolution.humanize %></p>
             </div>
           </div>
+
+          <% if operation.operation_type == "pos" && appointment.is_a?(BranchOperationAppointment) %>
+            <%= link_to mobile_company_pos_path(@company, operation, branch_id: appointment.branch_id),
+              class: "mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 active:scale-95" do %>
+              <span class="material-symbols-outlined text-xl">point_of_sale</span>
+              Open POS
+            <% end %>
+          <% end %>
         </section>
       <% end %>
     <% else %>

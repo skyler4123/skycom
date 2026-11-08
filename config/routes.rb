@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       get "employee", to: "employees#show"
       get "attendance_month", to: "attendance_months#show"
       get "operations", to: "operations#index"
+      get "operations/pos/:operation_id", to: "operations/pos#show", as: :pos
       get "payroll/unlock", to: "payroll_unlocks#new", as: :payroll_unlock
       post "payroll/unlock", to: "payroll_unlocks#create"
       get "payroll", to: "payrolls#show"

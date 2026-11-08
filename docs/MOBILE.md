@@ -22,6 +22,7 @@ authentication.
 | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `mobile/companies/employees/show` (Profile) |
 | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `mobile/companies/attendance_months/show` |
 | `GET /mobile/companies/:company_id/operations` | `Mobile::Companies::OperationsController#index` | `mobile/companies/operations/index` |
+| `GET /mobile/companies/:company_id/operations/pos/:operation_id` | `Mobile::Companies::Operations::PosController#show` | Shell-First mount point (inline HTML, no data) |
 | `GET /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#new` | `mobile/companies/payroll_unlocks/new` |
 | `POST /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#create` | redirect / 422 re-render |
 | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `mobile/companies/payrolls/show` |
@@ -36,13 +37,15 @@ is never treated as authorization.
 
 ### Authorization
 
-Company-level screens use ABAC: Operations requires `Operation` read, Notifications
-requires `Notification` read, and attendance requests require
-`AttendanceRequest` create. Self-service screens (Home, Profile, Attendance
-month, Payroll/unlock, check-in) are membership-scoped instead: the controller
-always resolves `@employee` from `current_user` + `company_id`, so they can only
-reach the signed-in employee's own records. Payroll still requires the password
-unlock before its data is rendered.
+Company-level screens use ABAC: Operations and the mobile POS page require
+`Operation` read, Notifications require `Notification` read, and attendance
+requests require `AttendanceRequest` create. POS additionally resolves an active
+branch appointment and checks `Operation#accessible_by?` before rendering the
+shell. Self-service screens (Home, Profile, Attendance month, Payroll/unlock,
+check-in) are membership-scoped instead: the controller always resolves
+`@employee` from `current_user` + `company_id`, so they can only reach the
+signed-in employee's own records. Payroll still requires the password unlock
+before its data is rendered.
 
 Existing companies seeded before the `Operation` grant was added need a re-seed (or
 a policy-appointment backfill) before staff roles can open the Operations tab;
@@ -135,7 +138,8 @@ screen shows an empty/dash state instead of fabricated content.
 | Home | greeting, company/branch/code, live clock, multi check-in state/times, today's shift/logs, monthly attendance %, worked time, overtime, pending requests, paid-leave balance and pending days, latest published company announcement |
 | Profile | name/code/type/roles/category, email, phone, company, branch, departments, next shift, monthly attendance, group managers, contract renewal (`expiration_date`), Payroll entry point |
 | Attendance | month summary (worked/present/absent/overtime), daily in/out/duration/status |
-| Operations | every accessible operation appointment for the company: Operation name/code/type, branch or warehouse location, resolution, operation workflow status, appointment workflow status |
+| Operations | every accessible operation appointment for the company: Operation name/code/type, branch or warehouse location, resolution, operation workflow status, appointment workflow status; POS operations expose an **Open POS** action |
+| POS | Shell-First page mounted by `Companies_Operations_Pos_ShowController`; the controller hydrates products, services, categories, payment methods, cart, receipt and customer lookup from the existing web JSON endpoint |
 | Payroll unlock | signed-in user's password; success sets a five-minute server-side unlock for the current company |
 | Payroll | month, status/step, period days, worked hours, present days, overtime minutes, salary/allowance/overtime/tax/social/net amounts; only after password confirmation |
 | New request | employee/branch, date, type, times, reason, validation, group managers listed from `EmployeeGroup#manager` (owner fallback) |
@@ -194,6 +198,16 @@ company-scoped URLs (`mobile--select-nav` navigates on change). If the unlock
 has expired, the next payroll request returns to the password gate with the
 selected month preserved.
 
+**POS** — `GET /mobile/companies/:company_id/operations/pos/:operation_id`
+is Shell-First: the response contains only a mount `<div>` with
+`data-controller="companies--operations--pos--show darkmode"` plus the company
+and operation ids. The shared POS Stimulus controller fetches the web JSON
+endpoint (`/companies/:company_id/operations/pos/:operation_id.json`) and renders
+the catalog, cart, payment and receipt. The Operations card links with the
+chosen appointment's `branch_id`; without it the resolver falls back to the
+employee's branch. Tablet layout is width-driven: below `lg` the order panel
+stacks under the catalog, at `lg` and above they sit side by side.
+
 ---
 
 ## 5. Styling
@@ -232,12 +246,14 @@ Coverage:
 | `spec/features/mobile/employee_info_spec.rb` | Profile title, sections, Payroll gate entry, group managers/contract, disabled editor, back/sign-out |
 | `spec/features/mobile/attendance_month_spec.rb` | summary, daily rows, prev/next, empty state |
 | `spec/features/mobile/operations_spec.rb` | current-company operation list, another company's records hidden, empty state, auth |
+| `spec/features/mobile/pos_spec.rb` | Shell-First hydration, catalog, add-to-cart, ORDER/payment/receipt, Operations link, non-POS operations, missing appointment |
 | `spec/features/mobile/payroll_spec.rb` | password gate, every-entry prompt, wrong password, status, real money amounts, timesheet link, disabled payslip, month switch |
 | `spec/features/mobile/attendance_request_spec.rb` | valid submit, group managers, validation errors, future date, auth |
 | `spec/requests/mobile/attendances_controller_spec.rb` | check-in, multiple check-ins, cross-tenant 404 |
 | `spec/requests/mobile/home_controller_spec.rb` | company-local day/timezone for check-ins |
 | `spec/requests/mobile/payrolls_controller_spec.rb` | gate redirect, correct/incorrect password, five-minute expiry, no data leak |
 | `spec/requests/mobile/attendance_requests_controller_spec.rb` | pending create, permission failure, cross-tenant 404 |
+| `spec/requests/mobile/pos_controller_spec.rb` | Shell-First response, missing/inactive appointment redirect, non-POS 404, cross-tenant 404 |
 | `spec/requests/mobile/company_scoping_spec.rb` | member access, cross-tenant 404, malformed company id |
 | `spec/helpers/mobile_helper_spec.rb` | formatting/labels/preview helpers |
 
@@ -254,8 +270,12 @@ request feature spec sets them through the DOM with `set_native_field`.
   form/history, announcement management UI, or payslip/PDF download. Payroll
   money and seeded leave/notice data are real; the remaining items are not
   modelled yet.
-- Operations is a read-only operation-appointment list. Opening an operation, filtering,
-  and operation actions are not built yet.
+- Operations is a read-only operation-appointment list with one built action:
+  POS operations can open the Shell-First cashier screen. Other operation types,
+  filtering, and non-POS actions are not built yet.
+- Mobile POS reuses the web POS page: it has no mobile-specific order list,
+  receipt printing, or offline mode. The POS page's Orders link still points at
+  the web Orders page.
 - Mobile ERB remains English-only; `dictionary.js` covers the new JS toasts
   (`Copied to clipboard`, copy failure).
 - A suspended company sees a 403 page on mobile; there is no mobile top-up flow
@@ -278,6 +298,7 @@ app/views/mobile/shared/
 app/helpers/mobile_helper.rb
 app/controllers/mobile/{base,sessions,home}_controller.rb
 app/controllers/mobile/companies/
+app/controllers/mobile/companies/operations/pos_controller.rb
 app/javascript/controllers/mobile/
 android/.../SignInActivity.kt
 android/.../MainActivity.kt
