@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       get "operations/booking/:operation_id", to: "operations/booking#show", as: :booking
       get "operations/reception/:operation_id", to: "operations/reception#show", as: :reception
       get "operations/store_manager/:operation_id", to: "operations/store_manager#show", as: :store_manager
+      get "operations/inventory/:operation_id", to: "operations/inventory#show", as: :inventory
       get "payroll/unlock", to: "payroll_unlocks#new", as: :payroll_unlock
       post "payroll/unlock", to: "payroll_unlocks#create"
       get "payroll", to: "payrolls#show"

@@ -11,8 +11,9 @@
 Mobile is an **employee self-service companion**, not a full ERP client. It
 currently mirrors the web **My Profile** group (Profile, Attendance, Payroll),
 adds a Home dashboard and an attendance-request form, and exposes the company's
-**Operations** list with Shell-First POS cashier, Booking, Reception and Store
-Manager console pages for POS, Booking, Reception and Store Manager operations.
+**Operations** list with Shell-First POS cashier, Booking, Reception, Store
+Manager and Inventory console pages for POS, Booking, Reception, Store Manager
+and Inventory operations.
 Payroll is a stack page behind a password gate, not a bottom tab. Everything else
 in the web sidebar is classified as web-only unless it is explicitly listed as a
 mobile backlog item.
@@ -47,18 +48,18 @@ Source files for the inventory:
 | Attendance | 🟡 | Own month summary, daily rows, month navigation, check-in | No check-out, geofence, QR, request history, or PDF |
 | Requests | 🟡 | Create attendance request with validation, group managers listed from employee teams | No inbox, status, or attachments |
 | Payroll | 🟡 | Password gate, own status/step, period, worked hours, present days, overtime, salary/allowance/tax/net money; 5-minute unlock | No payslip/PDF |
-| Operations | 🟡 | Accessible operation appointments with Operation name/type, branch or warehouse location, resolution, statuses; POS opens the Shell-First cashier, Booking, Reception and Store Manager open their Shell-First consoles | Other operation types, filtering, and order history are not built |
+| Operations | 🟡 | Accessible operation appointments with Operation name/type, branch or warehouse location, resolution, statuses; POS opens the Shell-First cashier, and Booking, Reception, Store Manager and Inventory open their Shell-First consoles | Other operation types, filtering, and order history are not built |
 | Notifications | ⛔ | — | No inbox, unread badge, mark-read, push, or preferences |
 | Leave | 🟡 | Paid-leave balance and pending days on Home, seeded leave requests | No leave request form or history |
 | Schedule | 🟡 | Today/next shift read | No roster, shift list, or swap |
 | Documents and help desk | ⛔ | — | Web-only; future candidates |
 | Native shell | 🟡 | Five tabs, pull-to-refresh, edge-to-edge safe area, dark mode | No GPS, camera, biometrics, push, offline, or deep links |
 
-**Headline:** 12 mobile screens (including the payroll password gate, Operations,
-the POS cashier, the Booking console, the Reception console, and the Store Manager
-console), 5 native tabs, 6 write surfaces
+**Headline:** 13 mobile screens (including the payroll password gate, Operations,
+the POS cashier, the Booking console, the Reception console, the Store Manager
+console, and the Inventory console), 5 native tabs, 6 write surfaces
 (check-in, request create, sign-out, POS checkout/pay, booking reservation, reception walk-in/parcel),
-and 5 read surfaces (profile, attendance month, payroll, operations, store manager). The web has **69 sidebar items** across 16 active groups
+and 6 read surfaces (profile, attendance month, payroll, operations, store manager, inventory). The web has **69 sidebar items** across 16 active groups
 plus 3 coming-soon groups.
 
 **Biggest blockers**
@@ -90,7 +91,8 @@ plus 3 coming-soon groups.
 | 9 | Booking | `GET /mobile/companies/:company_id/operations/booking/:operation_id` | `Mobile::Companies::Operations::BookingController#show` | `Operation`, `BranchOperationAppointment`, `Event`, `Facility` | Instant reservation via the web booking endpoint | Shell-First; reuses web booking Stimulus controller; responsive tablet portrait/landscape; no offline mode |
 | 10 | Reception | `GET /mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | `Operation`, `BranchOperationAppointment`, `Event`, `Customer`, `Facility` | Walk-in, check-in/out, parcel and host-notification actions via the web reception endpoints | Shell-First; reuses web reception Stimulus controller; responsive phone/tablet; no offline mode or badge printer |
 | 11 | Store Manager | `GET /mobile/companies/:company_id/operations/store_manager/:operation_id` | `Mobile::Companies::Operations::StoreManagerController#show` | `Operation`, `BranchOperationAppointment`, `Order`, `Stock`, `Employee` | — | Shell-First; reuses web store manager Stimulus controller; responsive phone/tablet portrait and landscape; footfall sensor not modelled |
-| 12 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee` (group managers), `AttendanceRequest` | Create request | No attachments |
+| 12 | Inventory | `GET /mobile/companies/:company_id/operations/inventory/:operation_id` | `Mobile::Companies::Operations::InventoryController#show` | `Operation`, `OperationWarehouseAppointment`, `Warehouse`, `Stock`, `StockImport`, `StockExport` | — | Shell-First; reuses web inventory Stimulus controller; responsive phone/tablet portrait and landscape; BOM/audit domains not modelled |
+| 13 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee` (group managers), `AttendanceRequest` | Create request | No attachments |
 
 `GET /mobile/home` remains the signed-in no-employee fallback and renders
 without a company id. Every tenant page asserts membership through
@@ -266,6 +268,7 @@ status.
 
 | Web item | Mobile | Reason / next |
 |---|---|---|
+| Inventory operation console | 🟡 | Read-only stock ledger, freight docks, zone capacity and audit state from the Inventory operation |
 | Warehouses | ⛔ | ERP |
 | Stocks | ⛔ | ERP |
 | Stock Transfers | ⛔ | ERP |
@@ -460,6 +463,7 @@ preferences, and dynamic employee profiles.
 | Operations list | `app/controllers/mobile/companies/operations_controller.rb`, `app/views/mobile/companies/operations/` |
 | Mobile reception | `app/controllers/mobile/companies/operations/reception_controller.rb` |
 | Mobile store manager | `app/controllers/mobile/companies/operations/store_manager_controller.rb` |
+| Mobile inventory | `app/controllers/mobile/companies/operations/inventory_controller.rb` |
 | Mobile formatting helpers | `app/helpers/mobile_helper.rb` |
 | Mobile implementation contract | `docs/MOBILE.md` |
 | Android shell | `android/app/src/main/java/com/example/skycomandroid/MainActivity.kt` |

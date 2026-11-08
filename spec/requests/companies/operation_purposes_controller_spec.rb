@@ -193,13 +193,15 @@ RSpec.describe "Company operations", type: :request do
       expect(body.fetch("appointment").fetch("kind")).to eq("branch")
     end
 
-    it "returns coming_soon for warehouse-scoped inventory" do
+    it "returns the live inventory payload for warehouse-scoped inventory" do
       operation = company.operations.find_by!(operation_type: :inventory)
 
       get inventory_company_operations_path(company, operation, warehouse_id: warehouse.id), as: :json
 
       expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body).fetch("coming_soon")).to be(true)
+      body = JSON.parse(response.body)
+      expect(body.fetch("coming_soon")).to be(false)
+      expect(body.fetch("inventory")).to include("metrics", "stocks", "docks", "zones", "audit")
     end
   end
 end
