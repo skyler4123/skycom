@@ -22,11 +22,11 @@ authentication.
 | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `mobile/companies/employees/show` (Profile) |
 | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `mobile/companies/attendance_months/show` |
 | `GET /mobile/companies/:company_id/operations` | `Mobile::Companies::OperationsController#index` | `mobile/companies/operations/index` |
-| `GET /mobile/companies/:company_id/operations/pos/:operation_id` | `Mobile::Companies::Operations::PosController#show` | Shell-First mount point (inline HTML, no data) |
-| `GET /mobile/companies/:company_id/operations/booking/:operation_id` | `Mobile::Companies::Operations::BookingController#show` | Shell-First mount point (inline HTML, no data) |
-| `GET /mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | Shell-First mount point (inline HTML, no data) |
-| `GET /mobile/companies/:company_id/operations/store_manager/:operation_id` | `Mobile::Companies::Operations::StoreManagerController#show` | Shell-First mount point (inline HTML, no data) |
-| `GET /mobile/companies/:company_id/operations/inventory/:operation_id` | `Mobile::Companies::Operations::InventoryController#show` | Shell-First mount point (inline HTML, no data) |
+| `GET /mobile/companies/:company_id/operations/pos/:operation_id` | `Mobile::Companies::Operations::PosController#show` | Shell-First mount point (inline `shell_html` div) |
+| `GET /mobile/companies/:company_id/operations/booking/:operation_id` | `Mobile::Companies::Operations::BookingController#show` | Shell-First mount point (inline `shell_html` div) |
+| `GET /mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | Shell-First mount point (inline `shell_html` div) |
+| `GET /mobile/companies/:company_id/operations/store_manager/:operation_id` | `Mobile::Companies::Operations::StoreManagerController#show` | Shell-First mount point (inline `shell_html` div) |
+| `GET /mobile/companies/:company_id/operations/inventory/:operation_id` | `Mobile::Companies::Operations::InventoryController#show` | Shell-First mount point (inline `shell_html` div) |
 | `GET /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#new` | `mobile/companies/payroll_unlocks/new` |
 | `POST /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#create` | redirect / 422 re-render |
 | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `mobile/companies/payrolls/show` |
@@ -110,6 +110,40 @@ Native activities:
 - Dark-mode pre-paint from `localStorage["darkmode"]` (same key as desktop).
 - Inter (body) / Plus Jakarta Sans (headings) and Material Symbols Outlined, loaded from Google Fonts.
 - Global flash rendering (`mobile/shared/_flash`) before `yield`.
+
+**Shell-First mount points (`shell_html`).** The web operation pages render
+`render html: "", layout: true`; the desktop layout wraps `yield` in
+`<div data-controller="<%= stimulus_controller %>" data-operation-id=… data-operation-type=…>`,
+so Stimulus binds automatically. The mobile layout has no such wrapper and no
+`stimulus_controller` derivation, and the five operation consoles have no view
+template (they are Shell-First). Each mobile operation controller therefore
+builds its own mount `<div>` in `shell_html`:
+
+```ruby
+# app/controllers/mobile/companies/operations/pos_controller.rb
+def show
+  render html: shell_html.html_safe, layout: true
+end
+
+def shell_html
+  <<~HTML
+    <div class="min-h-dvh bg-background"
+      data-controller="companies--operations--pos--show darkmode"
+      data-company-id="#{@company.id}"
+      data-operation-id="#{@operation.id}"
+      data-user-name="#{ERB::Util.html_escape(@employee.name)}"
+      data-user-role="#{ERB::Util.html_escape(@employee.roles.first&.name || "Employee")}"></div>
+  HTML
+end
+```
+
+The div is the prerequisite for Stimulus binding: it names the shared web
+controller explicitly (`companies--operations--<type>--show`) and carries the
+ids/identity that controller needs to hydrate from
+`/companies/:company_id/operations/<type>/:operation_id.json`. Without it there
+is no element to bind to and the console never renders. Do not move this into
+`mobile.html.erb` — most mobile screens are normal ERB views and must not be
+bound to an operation controller.
 
 Shared partials in `app/views/mobile/shared/`:
 

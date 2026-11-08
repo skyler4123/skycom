@@ -222,7 +222,8 @@ Booking reuses the same domain for resource reservations:
 the payload and posts the write actions.
 
 The mobile/tablet route mounts the same Stimulus controller from a Shell-First
-`<div>` (`Mobile::Companies::Operations::ReceptionController`); the responsive
+`<div>` built by `shell_html` (`Mobile::Companies::Operations::ReceptionController`;
+see `docs/MOBILE.md` §2 for why the mobile layout needs it); the responsive
 Tailwind layout handles phone portrait, tablet portrait and tablet landscape.
 The mobile Operations list adds an **Open Reception** action next to **Open POS**.
 
