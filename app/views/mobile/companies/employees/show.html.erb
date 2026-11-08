@@ -88,6 +88,67 @@
 
     <section class="rounded-xl border border-line bg-card p-4 shadow-sm ">
       <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-xl text-primary">account_circle</span>
+        <h2 class="text-base font-semibold text-foreground">Signed-in Account</h2>
+      </div>
+
+      <div class="mt-3 flex flex-col gap-2">
+        <div class="flex items-center gap-2 rounded-lg border border-line bg-background p-3 ">
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card text-muted-foreground ">
+            <span class="material-symbols-outlined text-lg">alternate_email</span>
+          </span>
+          <div class="min-w-0">
+            <p class="text-xs text-muted-foreground">Account Email</p>
+            <p class="truncate text-sm font-medium text-foreground"><%= current_user.email.presence || "—" %></p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 rounded-lg border border-line bg-background p-3 ">
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card text-muted-foreground ">
+            <span class="material-symbols-outlined text-lg">person</span>
+          </span>
+          <div class="min-w-0">
+            <p class="text-xs text-muted-foreground">Account Name</p>
+            <p class="truncate text-sm font-medium text-foreground"><%= current_user.name.presence || [ current_user.first_name, current_user.last_name ].compact.join(" ").presence || "—" %></p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 rounded-lg border border-line bg-background p-3 ">
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card text-muted-foreground ">
+            <span class="material-symbols-outlined text-lg">admin_panel_settings</span>
+          </span>
+          <div class="min-w-0">
+            <p class="text-xs text-muted-foreground">System Role</p>
+            <p class="truncate text-sm font-medium text-foreground"><%= current_user.system_role&.titleize || "—" %></p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 rounded-lg border border-line bg-background p-3 ">
+          <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card text-muted-foreground ">
+            <span class="material-symbols-outlined text-lg">call</span>
+          </span>
+          <div class="min-w-0">
+            <p class="text-xs text-muted-foreground">Account Phone</p>
+            <p class="truncate text-sm font-medium text-foreground"><%= current_user.phone_number.presence || "—" %></p>
+          </div>
+        </div>
+
+        <% if current_user.username.present? %>
+          <div class="flex items-center gap-2 rounded-lg border border-line bg-background p-3 ">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-card text-muted-foreground ">
+              <span class="material-symbols-outlined text-lg">badge</span>
+            </span>
+            <div class="min-w-0">
+              <p class="text-xs text-muted-foreground">Username</p>
+              <p class="truncate text-sm font-medium text-foreground"><%= current_user.username %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="rounded-xl border border-line bg-card p-4 shadow-sm ">
+      <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-xl text-primary">corporate_fare</span>
         <h2 class="text-base font-semibold text-foreground">Organization &amp; Assignment</h2>
       </div>
