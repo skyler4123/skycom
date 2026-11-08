@@ -133,9 +133,10 @@ All appointments start `active`. Companies disable the ones they do not use.
 | POST | `/companies/:company_id/operations/reception/:operation_id/parcels/:parcel_id/pick_up` | `Companies::Operations::ReceptionController#pick_up_parcel` | Complete the parcel Event |
 | POST | `/companies/:company_id/operations/reception/:operation_id/notify_host` | `Companies::Operations::ReceptionController#notify_host` | Stamp the visit's host_notified_at metadata |
 | GET | `/mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | Mobile/tablet Shell-First mount point |
+| GET | `/mobile/companies/:company_id/operations/store_manager/:operation_id` | `Mobile::Companies::Operations::StoreManagerController#show` | Mobile/tablet Shell-First mount point |
 | GET | `/companies/:company_id/operations/kitchen/:operation_id` | `Companies::Operations::KitchenController#show` | Placeholder |
 | GET | `/companies/:company_id/operations/housekeeping/:operation_id` | `Companies::Operations::HousekeepingController#show` | Placeholder |
-| GET | `/companies/:company_id/operations/store_manager/:operation_id` | `Companies::Operations::StoreManagerController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/store_manager/:operation_id` | `Companies::Operations::StoreManagerController#show` | Store Manager console (Stock/StockImport/StockExport) |
 
 Both index payloads are cached per company in `Rails.sync_cache` for
 `OPERATIONS_CACHE_EXPIRY` (1 day). `OperationPageCacheConcern` deletes the keys on
@@ -190,6 +191,7 @@ preserved when the form is saved. Raw metadata is never exposed in the UI.
 | POS | `Companies_Operations_Pos_ShowController` (`companies--operations--pos--show`) | `Companies::Operations::PosController#show` |
 | Reception | `Companies_Operations_Reception_ShowController` (`companies--operations--reception--show`) | `Companies::Operations::ReceptionController#show/check_in/advance/create_parcel/notify_parcel/pick_up_parcel/notify_host` |
 | Booking | `Companies_Operations_Booking_ShowController` (`companies--operations--booking--show`) | `Companies::Operations::BookingController#show/create_reservation` |
+| Store Manager | `Companies_Operations_StoreManager_ShowController` (`companies--operations--store-manager--show`) | `Companies::Operations::StoreManagerController#show` |
 | Placeholders | `Companies_Operations_<Type>_ShowController` | `Companies::Operations::<Type>Controller#show` |
 
 Reception reuses the existing domain instead of adding visitor/parcel tables:
@@ -219,6 +221,16 @@ Booking reuses the same domain for resource reservations:
 `Reception::CheckInService`, `Reception::AdvanceService` and
 `Reception::ParcelService` own the writes. The Stimulus controller only renders
 the payload and posts the write actions.
+
+The Store Manager console reuses the inventory domain for its read model:
+
+- **On-hand row** = `Stock` scoped to the branch's warehouses; availability comes
+  from `Stock#available_count` and reserved quantity from `Stock#pending`.
+- **Health status** = `stockout` when availability is 0, `low` at or below
+  `StoreManager::ConsoleService::LOW_STOCK_THRESHOLD`, otherwise `in_stock`.
+- **Inbound / Outbound** = open `StockImport` / `StockExport` documents for the
+  branch's warehouses (completed and cancelled documents are excluded).
+- **KPIs** = counts and unit sums derived from those same relations.
 
 The mobile/tablet route mounts the same Stimulus controller from a Shell-First
 `<div>` (`Mobile::Companies::Operations::ReceptionController`); the responsive
