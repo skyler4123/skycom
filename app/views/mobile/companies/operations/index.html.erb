@@ -49,10 +49,6 @@
               <p class="text-xs text-muted-foreground">Location</p>
               <p class="mt-0.5 text-sm font-semibold text-foreground"><%= location&.name || "—" %></p>
             </div>
-            <div class="col-span-2 rounded-lg border border-line bg-background p-2.5">
-              <p class="text-xs text-muted-foreground">Resolution</p>
-              <p class="mt-0.5 text-sm font-semibold text-foreground"><%= operation.resolution.humanize %></p>
-            </div>
           </div>
 
           <% if appointment.is_a?(BranchOperationAppointment) && %w[pos booking reception store_manager].include?(operation.operation_type) %>

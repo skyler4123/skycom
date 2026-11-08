@@ -57,18 +57,6 @@ RSpec.describe "Companies::OperationConfigsController", type: :request do
       expect(configs.map { |config| config.fetch("id") }).not_to include(operation.id)
     end
 
-    it "filters operation configs by resolution" do
-      operation = company.operations.find_by!(operation_type: :pos)
-      operation.update!(resolution: :mobile)
-
-      get company_operation_configs_path(company, resolution: "desktop"), as: :json
-
-      configs = JSON.parse(response.body).fetch("operation_configs")
-      expect(configs).not_to be_empty
-      expect(configs).to all(satisfy { |config| config.fetch("resolution") == "desktop" })
-      expect(configs.map { |config| config.fetch("id") }).not_to include(operation.id)
-    end
-
     it "filters operation configs by keyword" do
       get company_operation_configs_path(company, q: "POS"), as: :json
 
@@ -83,7 +71,6 @@ RSpec.describe "Companies::OperationConfigsController", type: :request do
       filters = JSON.parse(response.body).fetch("filters")
       expect(filters.fetch("operation_types")).to include("value" => "pos", "name" => "POS")
       expect(filters.fetch("statuses").map { |status| status.fetch("value") }).to include("approved")
-      expect(filters.fetch("resolutions").map { |resolution| resolution.fetch("value") }).to include("desktop")
     end
 
     it "caches the index payload and invalidates it when an operation changes" do

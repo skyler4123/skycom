@@ -179,10 +179,6 @@ export default class Companies_OperationConfigs_EditController extends Companies
             <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Type")}</p>
             <p class="text-sm font-semibold text-foreground">${Helpers.escapeHtml((c.operation_type || "—").replace(/_/g, " ").toUpperCase())}</p>
           </div>
-          <div class="rounded-lg border border-line bg-card p-3">
-            <p class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Resolution")}</p>
-            <p class="text-sm font-semibold text-foreground">${Helpers.escapeHtml(c.resolution || "—")}</p>
-          </div>
         </div>
 
         <div class="rounded-lg border border-warning/20 bg-warning/10 p-3 text-xs text-warning">

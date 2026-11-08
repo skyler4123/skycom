@@ -8,7 +8,7 @@ class Seed::OperationService
     def seed_defaults!(company:)
       Operation.transaction do
         OPERATION_TYPES.each_key do |operation_type|
-          operation = company.operations.find_or_initialize_by(operation_type: operation_type, resolution: :desktop)
+          operation = company.operations.find_or_initialize_by(operation_type: operation_type)
           next unless operation.new_record?
 
           operation.assign_attributes(
@@ -82,7 +82,6 @@ class Seed::OperationService
     def create(
       company:,
       operation_type:,
-      resolution: :desktop,
       name: nil,
       description: nil,
       code: nil,
@@ -91,7 +90,7 @@ class Seed::OperationService
       workflow_status: :approved,
       permission_resource_name: "Operation"
     )
-      operation = company.operations.find_or_initialize_by(operation_type: operation_type, resolution: resolution)
+      operation = company.operations.find_or_initialize_by(operation_type: operation_type)
       if operation.new_record?
         operation.assign_attributes(
           name: name || label_for(operation_type: operation_type),

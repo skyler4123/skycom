@@ -422,8 +422,6 @@ OPERATION_TYPES = {
   booking: { label: "Booking", code_prefix: "BKG", appointment_scope: :branch }.freeze,
   inventory: { label: "Inventory", code_prefix: "INV", appointment_scope: :warehouse }.freeze,
   reception: { label: "Reception", code_prefix: "RCP", appointment_scope: :branch }.freeze,
-  kitchen: { label: "Kitchen", code_prefix: "KIT", appointment_scope: :branch }.freeze,
-  housekeeping: { label: "Housekeeping", code_prefix: "HSK", appointment_scope: :branch }.freeze,
   store_manager: { label: "Store Manager", code_prefix: "MGR", appointment_scope: :branch }.freeze
 }.freeze
 

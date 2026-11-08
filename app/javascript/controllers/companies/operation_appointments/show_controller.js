@@ -92,11 +92,6 @@ export default class Companies_OperationAppointments_ShowController extends Comp
             </div>
 
             <div class="rounded-lg border border-line bg-background p-4">
-              <p class="text-[10px] font-bold uppercase text-muted-foreground">${translate("Resolution")}</p>
-              <p class="text-sm font-semibold text-foreground">${Helpers.escapeHtml(operation.resolution || "—")}</p>
-            </div>
-
-            <div class="rounded-lg border border-line bg-background p-4">
               <p class="text-[10px] font-bold uppercase text-muted-foreground">${translate("Location")}</p>
               <p class="text-sm font-semibold text-foreground">${Helpers.escapeHtml(appointment.location?.name || "—")}</p>
             </div>

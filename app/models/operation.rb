@@ -6,7 +6,7 @@
 # Inventory, …), not by industry or target role. Every company receives the full
 # catalog and enables the operations it uses per branch or warehouse.
 # How it works: an Operation is company-level and uniquely identified by
-# (company, operation_type, resolution). Location connections live in
+# (company, operation_type). Location connections live in
 # BranchOperationAppointment / OperationWarehouseAppointment; appointment metadata
 # overrides this Operation's metadata to produce the effective config. Saving this
 # Operation's metadata resets every appointment to a copy of it.
@@ -27,11 +27,8 @@ class Operation < ApplicationRecord
     booking: 200,
     inventory: 300,
     reception: 400,
-    kitchen: 500,
-    housekeeping: 600,
     store_manager: 700
   }, prefix: true
-  enum :resolution, { mobile: 10, desktop: 20 }, prefix: true, default: :desktop
   enum :lifecycle_status, { active: 10, draft: 20, archived: 30 }, prefix: true, default: :draft
   enum :workflow_status, { pending_review: 10, approved: 20, deployed: 30 }, prefix: true, default: :pending_review
 
@@ -45,8 +42,7 @@ class Operation < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true
   validates :code, presence: true, uniqueness: true
-  validates :operation_type, presence: true, uniqueness: { scope: %i[company_id resolution] }
-  validates :resolution, presence: true
+  validates :operation_type, presence: true, uniqueness: { scope: :company_id }
   validate :metadata_must_be_a_hash
   validate :roles_metadata_must_be_strings
 

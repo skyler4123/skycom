@@ -136,7 +136,6 @@ export default class Companies_Operations_IndexController extends Companies_Layo
         </td>
         <td class="py-4 px-6 text-muted-foreground">${Helpers.escapeHtml((operation.operation_type || "—").replace(/_/g, " ").toUpperCase())}</td>
         <td class="py-4 px-6 text-muted-foreground">${Helpers.escapeHtml(appointment.location?.name || "—")}</td>
-        <td class="py-4 px-6 text-muted-foreground">${Helpers.escapeHtml(operation.resolution || "—")}</td>
         <td class="py-4 px-6">${Helpers.statusBadge(appointment.workflow_status)}</td>
         <td class="py-4 px-6">
           ${roles.length === 0
