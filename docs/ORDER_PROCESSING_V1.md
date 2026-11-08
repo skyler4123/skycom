@@ -582,7 +582,7 @@ export const pos_customer_lookup_company_operation_path = (companyId, operationI
 | `spec/services/order_processing_v1/write_stock_ledger_service_spec.rb` | Ledger rows + callback-driven quantity mutation, hold consumption, stock_id / branch-scoped / legacy fallbacks | Paid order, stock records per product |
 | `spec/services/order_processing_v1/finalize_order_service_spec.rb` | Creates stock exports with sale business_type, links to Order via appoint_for | Paid order with order_product_appointments |
 | `spec/requests/companies/order_processing/v1_controller_spec.rb` | Checkout success, insufficient stock, missing fields, multiple items, string quantity, non-existent order pay, full checkout+pay flow | Company, branch, products, stock |
-| `spec/features/companies/operations/pos_spec.rb` | Operation screen load, category filter, customer lookup by id/name/phone + membership tier, lookup not found, add/remove cart, ORDER → COMPLETE PAYMENT, Cancel, cart locked, insufficient stock, empty cart guard | Company, branch, products, stock, Operation + branch appointment, customer + membership |
+| `spec/features/companies/operations/pos_spec.rb` | Operation screen load, dark mode toggle, category filter, customer lookup by id/name/phone + membership tier, lookup not found, add/remove cart, ORDER → COMPLETE PAYMENT, Cancel, cart locked, insufficient stock, empty cart guard | Company, branch, products, stock, Operation + branch appointment, customer + membership |
 
 ---
 

@@ -77,6 +77,20 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(page).not_to have_content(/Tab \d/)
   end
 
+  scenario "toggles dark mode from the POS header" do
+    visit pos_path
+    expect(page).to have_selector("[data-darkmode-target='trigger'] svg", visible: :all, wait: 10)
+
+    page.execute_script("localStorage.setItem('darkmode', 'false')")
+    page.execute_script("document.documentElement.classList.remove('dark')")
+    expect(page.evaluate_script("document.documentElement.classList.contains('dark')")).to be(false)
+
+    find("[data-darkmode-target='trigger']", match: :first, visible: :all).click
+
+    expect(page.evaluate_script("localStorage.getItem('darkmode')")).to eq("true")
+    expect(page.evaluate_script("document.documentElement.classList.contains('dark')")).to be(true)
+  end
+
   scenario "filters the catalog by category" do
     tech_category = Seed::CategoryService.create(company: company, name: "Tech", resource_name: "products")
     office_category = Seed::CategoryService.create(company: company, name: "Office", resource_name: "products")

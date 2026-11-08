@@ -544,6 +544,7 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
                 <span class="text-[10px] text-muted-foreground">${this.escape(userRole)}</span>
               </div>
             </div>
+            <button class="w-9 h-9 rounded-lg bg-muted hover:bg-line text-foreground flex items-center justify-center transition-colors overflow-hidden" ${Helpers.darkmodeTrigger()}></button>
             <button class="w-9 h-9 rounded-lg bg-muted hover:bg-line text-foreground flex items-center justify-center transition-colors" title="${translate("Lock Terminal")}" type="button">
               <span class="material-symbols-outlined text-[18px]">lock</span>
             </button>
