@@ -121,6 +121,12 @@ pay_cancel()                       PAY CANCEL (abandoned QR)
 **Class**: `Companies_Operations_Pos_ShowController`
 **Extends**: `Controller` (standalone, not layout)
 
+The same controller also powers the mobile POS page. `Mobile::Companies::Operations::PosController#show`
+returns a Shell-First mount point with `data-company-id` / `data-operation-id`;
+the controller reads those attributes (falling back to the web URL path) and
+hydrates from the same `/companies/:company_id/operations/pos/:operation_id.json`
+endpoint. See `docs/MOBILE.md` §4.
+
 ### 3.1 Cart → Order Link (click item to DB)
 
 Clicking a product/service card does **not** hit the backend — it mutates local `tabs[].items[]` only. The DB link is created later by `ORDER`.
@@ -133,9 +139,9 @@ Card (renderProductCard) ── data-action="click->...#addToCart" + params {id,
         ├── existing ? qty++ : push({ id, name, price, qty:1, stockId })
         └── renderContent() → cart + Subtotal/Tax/Total (client-side)
         │
-        ▼ initiateOrder() :125 — only here does the cart flush to DB
+        ▼ initiateOrder() — only here does the cart flush to DB
         items = activeTab.items.filter(i=>i.stockId).map(i=>({ stock_id, product_id, quantity: i.qty, unit_price: i.price }))
-        POST /order_processing/v1/checkout { branch_id, items } → CreateOrderService
+        POST /order_processing/v1/checkout { branch_id, customer_id?, items } → CreateOrderService
                 └── Order.create! + OrderProductAppointment.insert_all!({ order_id, product_id, quantity, unit_price, total_price: qty*unit_price })
         pay later reads order.line_total — never trusts the click params again.
 ```
@@ -157,10 +163,12 @@ State ──► ORDER phase ──► COMPLETE PAYMENT phase ──► back to O
 |----------|------|---------|-------------|
 | `orderId` | `string\|null` | `null` | Active Order UUID after checkout; gates all cart mutations |
 | `orderTotal` | `number` | `0` | Total price from checkout response |
-| `activePaymentMethod` | `string` | `'cash'` | `'cash'` or `'card'` |
+| `selectedMethodId` | `string\|null` | first method | Branch payment-method appointment currently selected |
 | `cashReceived` | `number` | `0` | Cash input for change calculation |
-| `tabs` | `Array` | `[]` | Multi-customer tabs, each with `{ id, name, items: [] }` |
-| `products` / `services` | `Array` | `[]` | Loaded from server JSON on connect |
+| `tabs` | `Array` | `[]` | Multi-customer tabs, each with `{ id, name, customer, items: [] }` |
+| `selectedCategoryName` | `string\|null` | `null` | Active catalog filter (`null` = All) |
+| `searchQuery` | `string` | `''` | Search/scan filter applied to products and services |
+| `products` / `services` | `Array` | `[]` | Loaded from server JSON on connect; include `category_id`, `category_name`, and product `stock_quantity` |
 
 ### Order Methods
 
@@ -198,6 +206,12 @@ The locked cart template (in `renderCartItems`) renders items as read-only text 
 ```
 
 Items without `stockId` (services, non-tracked products) are excluded from the checkout payload.
+
+### Catalog Filters & Customer Lookup
+
+- **Category pills** — `catalogCategories` merges `currentCategories()` (client_cache, `resource_name` = `products`/`services`) with the category names carried by the loaded catalog. Clicking a pill filters products and services by `selectedCategoryName`; `All` resets it.
+- **Search / barcode** — the search input filters products and services by name/code in place. Enter tries an exact product `code` match and adds it to the cart (F1 focuses the input).
+- **Customer lookup** — `GET /companies/:company_id/operations/pos/:operation_id/customer_lookup?q=&branch_id=` (`PosController#customer_lookup`, authorized by `PosPolicy#customer_lookup?` = `show?`). UUIDs are exact DB lookups; every text query goes through Meilisearch (`Customer.ms_raw_search`, company-filtered) over name, code, email, and `property_string_1..5` (phone-like slots), returning `{ customer: { id, name, code, email, membership } }` or `{ customer: nil }`. The selected customer is stored on the active tab, displayed with its membership tier, and passed as `customer_id` to checkout.
 
 ---
 
@@ -507,9 +521,10 @@ On reservation failure (any line's hold rejected), prior holds release via
 post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
 post "order_processing/v1/pay",        to: "order_processing/v1#pay"
 post "order_processing/v1/pay_cancel", to: "order_processing/v1#pay_cancel"
+get  "operations/pos/:operation_id/customer_lookup", to: "operations/pos#customer_lookup"
 ```
 
-Both are nested inside `resources :companies` (scoped to `/companies/:company_id/`).
+All are nested inside `resources :companies` (scoped to `/companies/:company_id/`).
 
 ### JavaScript URL Helpers (in `url_helpers.js`)
 
@@ -525,6 +540,11 @@ export const order_processing_v1_pay_cancel_path = (companyId) =>
 
 export const receipt_company_order_path = (companyId, orderId) =>
   `/companies/${companyId}/orders/${orderId}/receipt`
+
+export const pos_customer_lookup_company_operation_path = (companyId, operationId, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `/companies/${companyId}/operations/pos/${operationId}/customer_lookup${query ? `?${query}` : ""}`
+}
 ```
 
 ---
@@ -568,7 +588,8 @@ export const receipt_company_order_path = (companyId, orderId) =>
 | `spec/services/order_processing_v1/write_stock_ledger_service_spec.rb` | Ledger rows + callback-driven quantity mutation, hold consumption, stock_id / branch-scoped / legacy fallbacks | Paid order, stock records per product |
 | `spec/services/order_processing_v1/finalize_order_service_spec.rb` | Creates stock exports with sale business_type, links to Order via appoint_for | Paid order with order_product_appointments |
 | `spec/requests/companies/order_processing/v1_controller_spec.rb` | Checkout success, insufficient stock, missing fields, multiple items, string quantity, non-existent order pay, full checkout+pay flow | Company, branch, products, stock |
-| `spec/features/companies/operations/pos_spec.rb` | Operation screen load, add/remove cart, ORDER → COMPLETE PAYMENT, Cancel, cart locked, insufficient stock, empty cart guard | Company, branch, products, stock, Operation + branch appointment |
+| `spec/features/companies/operations/pos_spec.rb` | Operation screen load, dark mode toggle, category filter, customer lookup by id/name/phone + membership tier, lookup not found, add/remove cart, ORDER → COMPLETE PAYMENT, Cancel, cart locked, insufficient stock, empty cart guard | Company, branch, products, stock, Operation + branch appointment, customer + membership |
+| `spec/features/mobile/pos_spec.rb` | Mobile Shell-First hydration, catalog, add-to-cart, ORDER → payment → receipt, Operations link, non-POS operations, missing appointment | Company, branch, product, stock, Operation + branch appointment, cash payment method |
 
 ---
 

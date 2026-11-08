@@ -35,5 +35,17 @@ RSpec.describe "DynamicSearchConcern settings" do
     it "keeps models without extra metrics free of them" do
       expect(Product.meilisearch_settings.get_setting(:filterable_attributes)).not_to include("quantity")
     end
+
+    it "indexes customer email for text search" do
+      expect(Customer.meilisearch_settings.get_setting(:searchable_attributes)).to include("email")
+    end
+
+    it "indexes customer phone_number for text search" do
+      searchable = Customer.meilisearch_settings.get_setting(:searchable_attributes)
+      attributes = Customer.meilisearch_settings.get_setting(:attributes).keys.map(&:to_s)
+
+      expect(searchable).to include("phone_number")
+      expect(attributes).to include("phone_number")
+    end
   end
 end

@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       get "employee", to: "employees#show"
       get "attendance_month", to: "attendance_months#show"
       get "operations", to: "operations#index"
+      get "operations/pos/:operation_id", to: "operations/pos#show", as: :pos
       get "payroll/unlock", to: "payroll_unlocks#new", as: :payroll_unlock
       post "payroll/unlock", to: "payroll_unlocks#create"
       get "payroll", to: "payrolls#show"
@@ -231,6 +232,7 @@ Rails.application.routes.draw do
 
         collection do
           get "pos/:operation_id", to: "operations/pos#show", as: :pos
+          get "pos/:operation_id/customer_lookup", to: "operations/pos#customer_lookup", as: :pos_customer_lookup
           get "booking/:operation_id", to: "operations/booking#show", as: :booking
           get "inventory/:operation_id", to: "operations/inventory#show", as: :inventory
           get "reception/:operation_id", to: "operations/reception#show", as: :reception

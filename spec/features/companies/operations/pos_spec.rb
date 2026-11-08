@@ -57,7 +57,14 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   end
 
   before do
+    Customer.ms_clear_index!
     sign_in(owner)
+  end
+
+  after { Customer.ms_clear_index! }
+
+  def add_to_cart(product)
+    find('[data-action*="addToCart"]', text: product.name, wait: 10).click
   end
 
   scenario "operation screen loads and displays products gallery" do
@@ -69,12 +76,134 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(page).to have_content(product_b.name)
     expect(page).to have_content(product_c.name)
     expect(page).to have_content("Cart is empty")
+    expect(page).to have_button("Walk-in")
+    expect(page).not_to have_content(/Tab \d/)
+  end
+
+  scenario "toggles dark mode from the POS header" do
+    visit pos_path
+    expect(page).to have_selector("[data-darkmode-target='trigger'] svg", visible: :all, wait: 10)
+
+    page.execute_script("localStorage.setItem('darkmode', 'false')")
+    page.execute_script("document.documentElement.classList.remove('dark')")
+    expect(page.evaluate_script("document.documentElement.classList.contains('dark')")).to be(false)
+
+    find("[data-darkmode-target='trigger']", match: :first, visible: :all).click
+
+    expect(page.evaluate_script("localStorage.getItem('darkmode')")).to eq("true")
+    expect(page.evaluate_script("document.documentElement.classList.contains('dark')")).to be(true)
+  end
+
+  scenario "filters the catalog by category" do
+    tech_category = Seed::CategoryService.create(company: company, name: "Tech", resource_name: "products")
+    office_category = Seed::CategoryService.create(company: company, name: "Office", resource_name: "products")
+
+    create(:product, company: company, branch: branch, name: "Tech Widget",
+      category: tech_category, property_mapping: tech_category.default_property_mapping)
+    create(:product, company: company, branch: branch, name: "Office Widget",
+      category: office_category, property_mapping: office_category.default_property_mapping)
+
+    visit pos_path
+
+    click_button "Tech", wait: 10
+
+    expect(page).to have_content("Tech Widget")
+    expect(page).not_to have_content("Office Widget")
+    expect(page).not_to have_content(product_a.name)
+
+    click_button "All"
+
+    expect(page).to have_content("Tech Widget")
+    expect(page).to have_content("Office Widget")
+    expect(page).to have_content(product_a.name)
+  end
+
+  scenario "fetches a customer by id and shows the membership tier" do
+    customer = create(:customer, company: company, name: "Johnathan Doe")
+    membership = create(:membership, company: company, name: "VIP Gold")
+    customer.attach_membership(membership.code, business_type: :loyalty)
+
+    visit pos_path
+
+    fill_in "pos-customer-lookup", with: customer.id
+    click_button "Find"
+
+    expect(page).to have_content("Johnathan Doe", wait: 10)
+    expect(page).to have_content("VIP Gold")
+  end
+
+  scenario "fetches a customer by name" do
+    create(:customer, company: company, name: "Sarah Jenkins").ms_index!(true)
+
+    visit pos_path
+
+    fill_in "pos-customer-lookup", with: "Sarah Jenkins"
+    click_button "Find"
+
+    expect(page).to have_content("Sarah Jenkins", wait: 10)
+  end
+
+  scenario "fetches a customer by name with typo tolerance" do
+    create(:customer, company: company, name: "Sarah Jenkins").ms_index!(true)
+
+    visit pos_path
+
+    fill_in "pos-customer-lookup", with: "Sarah Jenkns"
+    click_button "Find"
+
+    expect(page).to have_content("Sarah Jenkins", wait: 10)
+  end
+
+  scenario "fetches a customer by email" do
+    create(:customer, company: company, name: "Email Customer", email: "pos.lookup@example.com").ms_index!(true)
+
+    visit pos_path
+
+    fill_in "pos-customer-lookup", with: "pos.lookup@example.com"
+    click_button "Find"
+
+    expect(page).to have_content("Email Customer", wait: 10)
+  end
+
+  scenario "fetches a customer by phone stored in a property slot" do
+    customer = create(:customer, company: company, name: "Phone Customer")
+    customer.update!(property_string_1: "555-0100")
+    customer.ms_index!(true)
+
+    visit pos_path
+
+    fill_in "pos-customer-lookup", with: "555-0100"
+    click_button "Find"
+
+    expect(page).to have_content("Phone Customer", wait: 10)
+  end
+
+  scenario "fetches a customer by phone_number column" do
+    create(:customer, company: company, name: "Phone Column Customer", phone_number: "555-0199").ms_index!(true)
+
+    visit pos_path
+
+    fill_in "pos-customer-lookup", with: "555-0199"
+    click_button "Find"
+
+    expect(page).to have_content("Phone Column Customer", wait: 10)
+  end
+
+  scenario "shows a warning when the customer cannot be found" do
+    visit pos_path
+
+    fill_in "pos-customer-lookup", with: "00000000-0000-0000-0000-000000000000"
+    click_button "Find"
+
+    expect(page).to have_content("Customer not found", wait: 10)
+    expect(page).to have_button("Walk-in")
+    expect(page).not_to have_content("VIP Gold")
   end
 
   scenario "adding and removing items from cart" do
     visit pos_path
 
-    first('[data-action*="addToCart"]', wait: 10).click
+    add_to_cart(product_a)
     expect(page).to have_content(product_a.name)
     expect(page).to have_content("Subtotal")
     expect(page).not_to have_content("Cart is empty")
@@ -86,7 +215,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   scenario "ORDER creates pending order and switches to COMPLETE PAYMENT" do
     visit pos_path
 
-    first('[data-action*="addToCart"]', wait: 10).click
+    add_to_cart(product_a)
 
     click_button "ORDER"
     expect(page).to have_button("COMPLETE PAYMENT", wait: 10)
@@ -99,7 +228,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   scenario "Cancel after ORDER returns to ORDER state" do
     visit pos_path
 
-    first('[data-action*="addToCart"]', wait: 10).click
+    add_to_cart(product_a)
     click_button "ORDER"
     expect(page).to have_button("COMPLETE PAYMENT", wait: 10)
 
@@ -113,7 +242,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   scenario "COMPLETE PAYMENT processes order and shows the receipt" do
     visit pos_path
 
-    first('[data-action*="addToCart"]', wait: 10).click
+    add_to_cart(product_a)
     click_button "ORDER"
     expect(page).to have_button("COMPLETE PAYMENT", wait: 10)
 
@@ -138,7 +267,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   scenario "cart is locked after ORDER is placed" do
     visit pos_path
 
-    first('[data-action*="addToCart"]', wait: 10).click
+    add_to_cart(product_a)
     expect(page).to have_content(product_a.name)
 
     click_button "ORDER"
@@ -152,7 +281,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   scenario "ORDER with insufficient stock shows error" do
     visit pos_path
 
-    all('[data-action*="addToCart"]', wait: 10).last.click
+    add_to_cart(product_c)
     click_button "ORDER"
 
     expect(page).not_to have_button("COMPLETE PAYMENT", wait: 5)
@@ -185,7 +314,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
 
     visit pos_path
 
-    first('[data-action*="addToCart"]', wait: 10).click
+    add_to_cart(product_a)
     click_button "Mock QR"
     click_button "ORDER"
 
@@ -239,7 +368,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
 
     visit pos_path
 
-    first('[data-action*="addToCart"]', wait: 10).click
+    add_to_cart(product_a)
     click_button "Mock QR"
     click_button "ORDER"
     expect(page).to have_selector("#cashier-qr-container", wait: 10)

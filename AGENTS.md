@@ -159,6 +159,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 ## Database
 - Check `db/schema.rb` first for columns/indexes
 - Use `includes`/`eager_load`/`preload` to prevent N+1
+- **Text search is Meilisearch-only (mandatory)** — Never use SQL `LIKE`/`ILIKE`/`sanitize_sql_like` to search text (names, codes, emails, descriptions, property slots). Use `Model.ms_raw_search` or a `DynamicSearch::BaseQueryService` subclass. The DB is only for exact lookups (primary key, foreign key, unique code). If a column is missing from the index, add it to `DynamicSearchConcern`/the model's search concern and reindex. See `docs/MEILISEARCH.md`.
 
 ## Testing
 - **ALWAYS** `bundle exec parallel_rspec -n 14 [paths]` — never bare `parallel_rspec` (raises errors), never `bundle exec rspec` for verification (single process), never `docker exec ... rspec` (compose runs services only, web/job via `bin/dev`). See `docs/PARALLEL_TESTS.md`.

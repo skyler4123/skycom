@@ -168,6 +168,10 @@ const operationPath = (kind, companyId, operationId, params = {}) => {
 }
 
 export const pos_company_operation_path = (companyId, operationId, params = {}) => operationPath("pos", companyId, operationId, params)
+export const pos_customer_lookup_company_operation_path = (companyId, operationId, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `/companies/${companyId}/operations/pos/${operationId}/customer_lookup${query ? `?${query}` : ""}`
+}
 export const booking_company_operation_path = (companyId, operationId, params = {}) => operationPath("booking", companyId, operationId, params)
 export const inventory_company_operation_path = (companyId, operationId, params = {}) => operationPath("inventory", companyId, operationId, params)
 export const reception_company_operation_path = (companyId, operationId, params = {}) => operationPath("reception", companyId, operationId, params)
