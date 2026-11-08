@@ -145,7 +145,16 @@ class Companies::EmployeesController < Companies::ApplicationController
       :property_boolean_1, :property_boolean_2, :property_boolean_3, :property_boolean_4, :property_boolean_5,
       :property_datetime_1, :property_datetime_2, :property_datetime_3, :property_datetime_4, :property_datetime_5
     ]).merge(
-      user: employee.user&.as_json(only: [ :id, :email ]),
+      user: employee.user && {
+        id: employee.user.id,
+        email: employee.user.email,
+        name: employee.user.name,
+        first_name: employee.user.first_name,
+        last_name: employee.user.last_name,
+        system_role: employee.user.system_role,
+        phone_number: employee.user.phone_number,
+        username: employee.user.username
+      },
       branch: employee.branch&.as_json(only: [ :id, :name ]),
       category: employee.category&.as_json(only: [ :id, :name ]),
       roles: employee.roles.map { |r| { id: r.id, name: r.name } },

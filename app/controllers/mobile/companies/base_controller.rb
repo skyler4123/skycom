@@ -16,6 +16,7 @@ class Mobile::Companies::BaseController < Mobile::BaseController
     @employee = current_user.employees.includes(*employee_includes).find_by!(company_id: params[:company_id])
     @company = @employee.company
     @current_company = @company
+    session[:mobile_company_id] = @company.id
   end
 
   def current_company

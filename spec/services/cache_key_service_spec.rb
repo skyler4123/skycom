@@ -48,6 +48,11 @@ RSpec.describe CacheKeyService do
         .to eq("user:7:companies_max_updated_at")
     end
 
+    it "builds the mobile companies key" do
+      expect(described_class.user_mobile_companies(7, version: "2:123:456"))
+        .to eq("user:7:mobile_companies:v1:2:123:456")
+    end
+
     it "builds the company suspended key" do
       expect(described_class.company_suspended(3)).to eq("company:3:suspended")
     end

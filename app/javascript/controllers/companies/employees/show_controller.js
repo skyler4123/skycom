@@ -1,7 +1,7 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_Employees_ShowController extends Companies_LayoutController {
-  /** @type {(Employee & { departments: Department[], roles: Role[], branch: Branch, user: { id: string, email: string }}) | null} */
+  /** @type {(Employee & { departments: Department[], roles: Role[], branch: Branch, user: { id: string, email: string, name: string, first_name: string, last_name: string, system_role: string, phone_number: string, username: string } }) | null} */
   employee = null
 
   /** @type {Array<{key: string, label: string, type: string}>} */
@@ -77,6 +77,71 @@ export default class Companies_Employees_ShowController extends Companies_Layout
       `<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded border border-primary/20 ">${d.name}</span>`
     ).join('')
 
+    const accountRole = e.user?.system_role
+      ? e.user.system_role.replace(/_/g, " ").replace(/\b\w/g, char => char.toUpperCase())
+      : translate("N/A")
+
+    const accountName = e.user?.name || [e.user?.first_name, e.user?.last_name].filter(Boolean).join(" ") || translate("N/A")
+
+    const accountHTML = e.user ? `
+      <div class="border-t border-line pt-6 mt-6">
+        <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("User Account")}</h3>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div class="flex items-center gap-3">
+            <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <span class="material-symbols-outlined">alternate_email</span>
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-muted-foreground">${translate("Account Email")}</p>
+              <p class="truncate text-sm font-semibold text-foreground">${e.user.email || translate("N/A")}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <span class="material-symbols-outlined">person</span>
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-muted-foreground">${translate("Account Name")}</p>
+              <p class="truncate text-sm font-semibold text-foreground">${accountName}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <span class="material-symbols-outlined">admin_panel_settings</span>
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-muted-foreground">${translate("System Role")}</p>
+              <p class="truncate text-sm font-semibold text-foreground">${accountRole}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <span class="material-symbols-outlined">call</span>
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-medium text-muted-foreground">${translate("Account Phone")}</p>
+              <p class="truncate text-sm font-semibold text-foreground">${e.user.phone_number || translate("N/A")}</p>
+            </div>
+          </div>
+
+          ${e.user.username ? `
+            <div class="flex items-center gap-3">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                <span class="material-symbols-outlined">badge</span>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-medium text-muted-foreground">${translate("Username")}</p>
+                <p class="truncate text-sm font-semibold text-foreground">${e.user.username}</p>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    ` : ''
+
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-line pt-6 mt-6">
         <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("Properties")}</h3>
@@ -125,8 +190,8 @@ export default class Companies_Employees_ShowController extends Companies_Layout
                 <span class="material-symbols-outlined">mail</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-muted-foreground">${translate("Email")}</p>
-                <p class="text-sm font-semibold text-foreground">${e.user?.email || e.email || translate("N/A")}</p>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Work Email")}</p>
+                <p class="text-sm font-semibold text-foreground">${e.email || translate("N/A")}</p>
               </div>
             </div>
 
@@ -181,6 +246,8 @@ export default class Companies_Employees_ShowController extends Companies_Layout
             </div>
 
           </div>
+
+          ${accountHTML}
 
           ${dynamicFields}
 

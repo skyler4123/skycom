@@ -372,6 +372,7 @@ Two key families:
 | `company_suspended(id)` | `company:<id>:suspended` | `ram_cache` | 1 hour | write on `workflow_status` change / `Company#suspended?`; sync_cache pub/sub evicts all instances |
 | `employee_record(user_id:, company_id:)` | `employee:user:<uid>:company:<cid>:record:v2` | `sync_cache` | 1 hour | write `Employee#refresh_cache`; delete on destroy; `Role#invalidate_employee_caches` deletes holders |
 | `user_companies_max_updated_at(user_id)` | `user:<id>:companies_max_updated_at` | `sync_cache` | 1 hour | delete on Company save/destroy |
+| `user_mobile_companies(user_id, version:)` | `user:<id>:mobile_companies:v1:<version>` | `sync_cache` | 1 hour | versioned — version embeds employee count + latest employee/company updates |
 | `employee_manager_ids(id)` | `employee:<id>:manager_ids` | `sync_cache` | 1 hour | delete on group membership or group manager change |
 | `employee_owner_role(employee)` | `employee:<id>:<cache_version>:owner_role` | `ram_cache` | 1 hour | touch (role assignment); delete in `clear_permissions_cache` |
 | `employee_permissions(employee)` | `employee:<id>:<cache_version>:permissions` | `sync_cache` | 1 hour | touch / `Employee#clear_permissions_cache` |

@@ -112,6 +112,24 @@ class User < ApplicationRecord
     end
   end
 
+  # Version aggregate for the mobile company switcher cache. The employee count
+  # catches membership removals (which do not change the remaining max
+  # updated_at); the two maxima catch membership additions/updates and company
+  # renames.
+  def mobile_companies_cache_version
+    stats = employees.joins(:company).select(
+      "COUNT(*) AS employee_count",
+      "MAX(employees.updated_at) AS employee_max_updated_at",
+      "MAX(companies.updated_at) AS company_max_updated_at"
+    ).take
+
+    [
+      stats.employee_count.to_i,
+      stats.employee_max_updated_at&.to_f,
+      stats.company_max_updated_at&.to_f
+    ].join(":")
+  end
+
   def permissions
     case system_role&.to_sym
     when :super_admin

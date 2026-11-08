@@ -76,6 +76,15 @@ RSpec.feature "My Profile", type: :feature, js: true do
     expect(page).to have_content(employee.name, wait: 10)
   end
 
+  scenario "Employee profile shows the linked user account" do
+    visit company_employee_path(company, employee)
+
+    expect(page).to have_content(/User Account/i, wait: 10)
+    expect(page).to have_content("Work Email", wait: 10)
+    expect(page).to have_content(owner.email, wait: 10)
+    expect(page).to have_content("Company Owner", wait: 10)
+  end
+
   scenario "Attendance item shows current month and month dropdown" do
     visit company_dashboards_path(company)
     find("details[data-sidebar-group='my_profile'] summary", visible: :all).click
