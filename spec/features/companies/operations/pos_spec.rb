@@ -178,6 +178,17 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(page).to have_content("Phone Customer", wait: 10)
   end
 
+  scenario "fetches a customer by phone_number column" do
+    create(:customer, company: company, name: "Phone Column Customer", phone_number: "555-0199").ms_index!(true)
+
+    visit pos_path
+
+    fill_in "pos-customer-lookup", with: "555-0199"
+    click_button "Find"
+
+    expect(page).to have_content("Phone Column Customer", wait: 10)
+  end
+
   scenario "shows a warning when the customer cannot be found" do
     visit pos_path
 

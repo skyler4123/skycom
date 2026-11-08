@@ -16,7 +16,7 @@ Skycom uses **Meilisearch** (open-source typo-tolerant search engine) to index b
 
 | Group | Columns | Role |
 |-------|---------|------|
-| Standard | `name`, `description`, `code`, `title`, `email` (only when the table has them) | **searchable** |
+| Standard | `name`, `description`, `code`, `title`, `email`, `phone_number` (only when the table has them) | **searchable** |
 | Tenant / scope | `company_id`, `category_id`, `branch_id`, `workflow_status`, `business_type` | **filterable** |
 | Dynamic strings | `property_string_1` … `property_string_10` | searchable + indexed |
 | Dynamic numbers | `property_integer_1..20`, `property_decimal_1..10` | searchable + **filterable** (native numeric — range filters work) |

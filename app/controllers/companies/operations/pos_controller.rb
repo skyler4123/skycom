@@ -8,7 +8,7 @@
 #            GET /companies/:company_id/operations/pos/:operation_id/customer_lookup?q=
 # Docs: docs/OPERATIONS.md, docs/ORDER_PROCESSING_V1.md
 class Companies::Operations::PosController < Companies::Operations::BaseController
-  # Lightweight POS customer lookup (id/code/name/email/phone-like property slots).
+  # Lightweight POS customer lookup (id/code/name/email/phone_number/property slots).
   # IDs are exact DB lookups; every text query goes through Meilisearch — never SQL LIKE.
   # POS operators do not need the Customers dashboard permission to serve a customer.
   def customer_lookup
