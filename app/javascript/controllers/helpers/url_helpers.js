@@ -173,6 +173,10 @@ export const pos_customer_lookup_company_operation_path = (companyId, operationI
   return `/companies/${companyId}/operations/pos/${operationId}/customer_lookup${query ? `?${query}` : ""}`
 }
 export const booking_company_operation_path = (companyId, operationId, params = {}) => operationPath("booking", companyId, operationId, params)
+export const booking_reservations_company_operation_path = (companyId, operationId, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `${booking_company_operation_path(companyId, operationId)}/reservations${query ? `?${query}` : ""}`
+}
 export const inventory_company_operation_path = (companyId, operationId, params = {}) => operationPath("inventory", companyId, operationId, params)
 export const reception_company_operation_path = (companyId, operationId, params = {}) => operationPath("reception", companyId, operationId, params)
 export const reception_check_in_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/check_in`

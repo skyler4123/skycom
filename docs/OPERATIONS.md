@@ -122,7 +122,8 @@ All appointments start `active`. Companies disable the ones they do not use.
 | GET | `/companies/:company_id/operation_warehouse_appointments/:id/edit` | `Companies::OperationWarehouseAppointmentsController#edit` | Warehouse appointment edit page |
 | PATCH | `/companies/:company_id/operation_warehouse_appointments/:id` | `Companies::OperationWarehouseAppointmentsController#update` | Update warehouse metadata/status |
 | GET | `/companies/:company_id/operations/pos/:operation_id` | `Companies::Operations::PosController#show` | POS |
-| GET | `/companies/:company_id/operations/booking/:operation_id` | `Companies::Operations::BookingController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/booking/:operation_id` | `Companies::Operations::BookingController#show` | Booking console (Events/Facilities) |
+| POST | `/companies/:company_id/operations/booking/:operation_id/reservations` | `Companies::Operations::BookingController#create_reservation` | Create a reservation Event + facility link |
 | GET | `/companies/:company_id/operations/inventory/:operation_id` | `Companies::Operations::InventoryController#show` | Placeholder |
 | GET | `/companies/:company_id/operations/reception/:operation_id` | `Companies::Operations::ReceptionController#show` | Reception console (Events/Customers/Facilities) |
 | POST | `/companies/:company_id/operations/reception/:operation_id/check_in` | `Companies::Operations::ReceptionController#check_in` | Walk-in Customer + Event (+ host/room links) |
@@ -188,6 +189,7 @@ preserved when the form is saved. Raw metadata is never exposed in the UI.
 | Operation config details / edit | `Companies_OperationConfigs_ShowController` / `Companies_OperationConfigs_EditController` | `Companies::OperationConfigsController#show/edit/update` |
 | POS | `Companies_Operations_Pos_ShowController` (`companies--operations--pos--show`) | `Companies::Operations::PosController#show` |
 | Reception | `Companies_Operations_Reception_ShowController` (`companies--operations--reception--show`) | `Companies::Operations::ReceptionController#show/check_in/advance/create_parcel/notify_parcel/pick_up_parcel/notify_host` |
+| Booking | `Companies_Operations_Booking_ShowController` (`companies--operations--booking--show`) | `Companies::Operations::BookingController#show/create_reservation` |
 | Placeholders | `Companies_Operations_<Type>_ShowController` | `Companies::Operations::<Type>Controller#show` |
 
 Reception reuses the existing domain instead of adding visitor/parcel tables:
@@ -198,6 +200,17 @@ Reception reuses the existing domain instead of adding visitor/parcel tables:
 - **Host** = `Employee` linked through `EmployeeEventAppointment`.
 - **Room** = `Facility` linked through `EventFacilityAppointment`; room
   availability is derived from the current/next linked Event.
+
+Booking reuses the same domain for resource reservations:
+
+- **Timeline row** = `Facility` (room, pod, studio, equipment) scoped to the
+  branch.
+- **Booking block** = `Event` for the selected day, positioned by `start_at` /
+  `end_at` and linked to its spaces through `EventFacilityAppointment`.
+- **Status** = `active` (in progress or inside its time window), `completed`,
+  `upcoming`; cancelled events are excluded.
+- **Current-time needle** is rendered client-side over the 08:00–18:00 grid and
+  refreshes every minute.
 - **Parcel** = `Event` with `metadata["reception_kind"] = "parcel"`,
   `workflow_status: received`, and the recipient employee linked through
   `EmployeeEventAppointment`. Completed parcels disappear from the console.

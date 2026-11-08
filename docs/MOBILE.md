@@ -23,6 +23,7 @@ authentication.
 | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `mobile/companies/attendance_months/show` |
 | `GET /mobile/companies/:company_id/operations` | `Mobile::Companies::OperationsController#index` | `mobile/companies/operations/index` |
 | `GET /mobile/companies/:company_id/operations/pos/:operation_id` | `Mobile::Companies::Operations::PosController#show` | Shell-First mount point (inline HTML, no data) |
+| `GET /mobile/companies/:company_id/operations/booking/:operation_id` | `Mobile::Companies::Operations::BookingController#show` | Shell-First mount point (inline HTML, no data) |
 | `GET /mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | Shell-First mount point (inline HTML, no data) |
 | `GET /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#new` | `mobile/companies/payroll_unlocks/new` |
 | `POST /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#create` | redirect / 422 re-render |
@@ -41,8 +42,8 @@ is never treated as authorization.
 Company-level screens use ABAC: Operations, the mobile POS page and the mobile
 reception console require `Operation` read, Notifications require
 `Notification` read, and attendance requests require `AttendanceRequest` create.
-POS and Reception additionally resolve an active branch appointment and check
-`Operation#accessible_by?` before rendering the shell. Self-service screens (Home, Profile, Attendance month, Payroll/unlock,
+POS, Booking and Reception additionally resolve an active branch appointment and
+check `Operation#accessible_by?` before rendering the shell. Self-service screens (Home, Profile, Attendance month, Payroll/unlock,
 check-in) are membership-scoped instead: the controller always resolves
 `@employee` from `current_user` + `company_id`, so they can only reach the
 signed-in employee's own records. Payroll still requires the password unlock
@@ -139,8 +140,9 @@ screen shows an empty/dash state instead of fabricated content.
 | Home | greeting, company/branch/code, live clock, multi check-in state/times, today's shift/logs, monthly attendance %, worked time, overtime, pending requests, paid-leave balance and pending days, latest published company announcement |
 | Profile | name/code/type/roles/category, email, phone, company, branch, departments, next shift, monthly attendance, group managers, contract renewal (`expiration_date`), Payroll entry point |
 | Attendance | month summary (worked/present/absent/overtime), daily in/out/duration/status |
-| Operations | every accessible operation appointment for the company: Operation name/code/type, branch or warehouse location, resolution, operation workflow status, appointment workflow status; POS operations expose an **Open POS** action and Reception operations expose **Open Reception** |
+| Operations | every accessible operation appointment for the company: Operation name/code/type, branch or warehouse location, resolution, operation workflow status, appointment workflow status; POS operations expose an **Open POS** action, Booking operations expose **Open Booking**, and Reception operations expose **Open Reception** |
 | POS | Shell-First page mounted by `Companies_Operations_Pos_ShowController`; the controller hydrates products, services, categories, payment methods, cart, receipt and customer lookup from the existing web JSON endpoint |
+| Booking | Shell-First page mounted by `Companies_Operations_Booking_ShowController`; the controller hydrates the facility timeline, booking blocks, KPIs, inspector and reservation form from the existing web JSON endpoint, and posts instant reservations |
 | Reception | Shell-First page mounted by `Companies_Operations_Reception_ShowController`; the controller hydrates today's visit Events, customers, hosts, facility rooms, parcels and next appointments from the existing web JSON endpoint, and posts walk-in/check-out/parcel actions |
 | Payroll unlock | signed-in user's password; success sets a five-minute server-side unlock for the current company |
 | Payroll | month, status/step, period days, worked hours, present days, overtime minutes, salary/allowance/overtime/tax/social/net amounts; only after password confirmation |
@@ -210,6 +212,17 @@ chosen appointment's `branch_id`; without it the resolver falls back to the
 employee's branch. Tablet layout is width-driven: below `lg` the order panel
 stacks under the catalog, at `lg` and above they sit side by side.
 
+**Booking** — `GET /mobile/companies/:company_id/operations/booking/:operation_id`
+uses the same Shell-First contract:
+`data-controller="companies--operations--booking--show darkmode"` plus the
+company, operation and employee identifiers. The shared booking controller
+hydrates from `/companies/:company_id/operations/booking/:operation_id.json`
+and posts instant reservations to the web endpoint. The layout is width-driven
+for both orientations: phone and tablet portrait stack the timeline above the
+inspector/reservation panels; landscape tablet at `lg` places the timeline
+beside the inspector column. The current-time needle remains visible in the
+timeline in both orientations.
+
 **Reception** — `GET /mobile/companies/:company_id/operations/reception/:operation_id`
 uses the same Shell-First contract:
 `data-controller="companies--operations--reception--show darkmode"` plus the
@@ -259,6 +272,7 @@ Coverage:
 | `spec/features/mobile/attendance_month_spec.rb` | summary, daily rows, prev/next, empty state |
 | `spec/features/mobile/operations_spec.rb` | current-company operation list, another company's records hidden, empty state, auth |
 | `spec/features/mobile/pos_spec.rb` | Shell-First hydration, catalog, add-to-cart, ORDER/payment/receipt, Operations link, non-POS operations, missing appointment |
+| `spec/features/mobile/booking_spec.rb` | Shell-First hydration, Operations link, tablet portrait/landscape layouts, real facility/booking data |
 | `spec/features/mobile/reception_spec.rb` | Shell-First hydration, Operations link, phone portrait, tablet portrait/landscape layouts, walk-in check-in, non-reception operations |
 | `spec/features/mobile/payroll_spec.rb` | password gate, every-entry prompt, wrong password, status, real money amounts, timesheet link, disabled payslip, month switch |
 | `spec/features/mobile/attendance_request_spec.rb` | valid submit, group managers, validation errors, future date, auth |
@@ -316,6 +330,7 @@ app/helpers/mobile_helper.rb
 app/controllers/mobile/{base,sessions,home}_controller.rb
 app/controllers/mobile/companies/
 app/controllers/mobile/companies/operations/pos_controller.rb
+app/controllers/mobile/companies/operations/booking_controller.rb
 app/controllers/mobile/companies/operations/reception_controller.rb
 app/javascript/controllers/mobile/
 android/.../SignInActivity.kt

@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       get "attendance_month", to: "attendance_months#show"
       get "operations", to: "operations#index"
       get "operations/pos/:operation_id", to: "operations/pos#show", as: :pos
+      get "operations/booking/:operation_id", to: "operations/booking#show", as: :booking
       get "operations/reception/:operation_id", to: "operations/reception#show", as: :reception
       get "payroll/unlock", to: "payroll_unlocks#new", as: :payroll_unlock
       post "payroll/unlock", to: "payroll_unlocks#create"
@@ -235,6 +236,7 @@ Rails.application.routes.draw do
           get "pos/:operation_id", to: "operations/pos#show", as: :pos
           get "pos/:operation_id/customer_lookup", to: "operations/pos#customer_lookup", as: :pos_customer_lookup
           get "booking/:operation_id", to: "operations/booking#show", as: :booking
+          post "booking/:operation_id/reservations", to: "operations/booking#create_reservation", as: :booking_reservations
           get "inventory/:operation_id", to: "operations/inventory#show", as: :inventory
           get "reception/:operation_id", to: "operations/reception#show", as: :reception
           post "reception/:operation_id/check_in", to: "operations/reception#check_in", as: :reception_check_in
