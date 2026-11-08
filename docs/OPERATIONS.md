@@ -122,12 +122,20 @@ All appointments start `active`. Companies disable the ones they do not use.
 | GET | `/companies/:company_id/operation_warehouse_appointments/:id/edit` | `Companies::OperationWarehouseAppointmentsController#edit` | Warehouse appointment edit page |
 | PATCH | `/companies/:company_id/operation_warehouse_appointments/:id` | `Companies::OperationWarehouseAppointmentsController#update` | Update warehouse metadata/status |
 | GET | `/companies/:company_id/operations/pos/:operation_id` | `Companies::Operations::PosController#show` | POS |
-| GET | `/companies/:company_id/operations/booking/:operation_id` | `Companies::Operations::BookingController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/booking/:operation_id` | `Companies::Operations::BookingController#show` | Booking console (Events/Facilities) |
+| POST | `/companies/:company_id/operations/booking/:operation_id/reservations` | `Companies::Operations::BookingController#create_reservation` | Create a reservation Event + facility link |
 | GET | `/companies/:company_id/operations/inventory/:operation_id` | `Companies::Operations::InventoryController#show` | Placeholder |
-| GET | `/companies/:company_id/operations/reception/:operation_id` | `Companies::Operations::ReceptionController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/reception/:operation_id` | `Companies::Operations::ReceptionController#show` | Reception console (Events/Customers/Facilities) |
+| POST | `/companies/:company_id/operations/reception/:operation_id/check_in` | `Companies::Operations::ReceptionController#check_in` | Walk-in Customer + Event (+ host/room links) |
+| POST | `/companies/:company_id/operations/reception/:operation_id/advance` | `Companies::Operations::ReceptionController#advance` | Check in / check out / re-open a visit Event |
+| POST | `/companies/:company_id/operations/reception/:operation_id/parcels` | `Companies::Operations::ReceptionController#create_parcel` | Log a held parcel Event |
+| POST | `/companies/:company_id/operations/reception/:operation_id/parcels/:parcel_id/notify` | `Companies::Operations::ReceptionController#notify_parcel` | Stamp the parcel's notified_at metadata |
+| POST | `/companies/:company_id/operations/reception/:operation_id/parcels/:parcel_id/pick_up` | `Companies::Operations::ReceptionController#pick_up_parcel` | Complete the parcel Event |
+| POST | `/companies/:company_id/operations/reception/:operation_id/notify_host` | `Companies::Operations::ReceptionController#notify_host` | Stamp the visit's host_notified_at metadata |
+| GET | `/mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | Mobile/tablet Shell-First mount point |
 | GET | `/companies/:company_id/operations/kitchen/:operation_id` | `Companies::Operations::KitchenController#show` | Placeholder |
 | GET | `/companies/:company_id/operations/housekeeping/:operation_id` | `Companies::Operations::HousekeepingController#show` | Placeholder |
-| GET | `/companies/:company_id/operations/store_manager/:operation_id` | `Companies::Operations::StoreManagerController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/store_manager/:operation_id` | `Companies::Operations::StoreManagerController#show` | Store Manager console (Orders/Stocks/Employees) |
 
 Both index payloads are cached per company in `Rails.sync_cache` for
 `OPERATIONS_CACHE_EXPIRY` (1 day). `OperationPageCacheConcern` deletes the keys on
@@ -180,7 +188,65 @@ preserved when the form is saved. Raw metadata is never exposed in the UI.
 | Operation Configs | `Companies_OperationConfigs_IndexController` (`companies--operation-configs--index`) | `Companies::OperationConfigsController#index` |
 | Operation config details / edit | `Companies_OperationConfigs_ShowController` / `Companies_OperationConfigs_EditController` | `Companies::OperationConfigsController#show/edit/update` |
 | POS | `Companies_Operations_Pos_ShowController` (`companies--operations--pos--show`) | `Companies::Operations::PosController#show` |
+| Reception | `Companies_Operations_Reception_ShowController` (`companies--operations--reception--show`) | `Companies::Operations::ReceptionController#show/check_in/advance/create_parcel/notify_parcel/pick_up_parcel/notify_host` |
+| Booking | `Companies_Operations_Booking_ShowController` (`companies--operations--booking--show`) | `Companies::Operations::BookingController#show/create_reservation` |
+| Store Manager | `Companies_Operations_StoreManager_ShowController` (`companies--operations--store-manager--show`) | `Companies::Operations::StoreManagerController#show` |
 | Placeholders | `Companies_Operations_<Type>_ShowController` | `Companies::Operations::<Type>Controller#show` |
+
+Reception reuses the existing domain instead of adding visitor/parcel tables:
+
+- **Visit** = `Event` (branch-scoped). `pending` → upcoming, `confirmed` → lobby,
+  `in_progress` → inside, `completed` → departed.
+- **Visitor** = `Customer` linked through `CustomerEventAppointment`.
+- **Host** = `Employee` linked through `EmployeeEventAppointment`.
+- **Room** = `Facility` linked through `EventFacilityAppointment`; room
+  availability is derived from the current/next linked Event.
+- **Parcel** = `Event` with `metadata["reception_kind"] = "parcel"`,
+  `workflow_status: received`, and the recipient employee linked through
+  `EmployeeEventAppointment`. Completed parcels disappear from the console.
+
+Booking reuses the same domain for resource reservations:
+
+- **Timeline row** = `Facility` (room, pod, studio, equipment) scoped to the
+  branch.
+- **Booking block** = `Event` for the selected day, positioned by `start_at` /
+  `end_at` and linked to its spaces through `EventFacilityAppointment`.
+- **Status** = `active` (in progress or inside its time window), `completed`,
+  `upcoming`; cancelled events are excluded.
+- **Current-time needle** is rendered client-side over the 08:00–18:00 grid and
+  refreshes every minute.
+
+`Reception::ConsoleService` builds the read payload;
+`Reception::CheckInService`, `Reception::AdvanceService` and
+`Reception::ParcelService` own the writes. The Stimulus controller only renders
+the payload and posts the write actions.
+
+The mobile/tablet route mounts the same Stimulus controller from a Shell-First
+`<div>` built by `shell_html` (`Mobile::Companies::Operations::ReceptionController`;
+see `docs/MOBILE.md` §2 for why the mobile layout needs it); the responsive
+Tailwind layout handles phone portrait, tablet portrait and tablet landscape.
+The mobile Operations list adds an **Open Reception** action next to **Open POS**.
+
+Store Manager reuses Orders, Stocks and Employees for the branch command screen:
+
+- **Sales KPIs** = today's paid/completed `Order` rows for the branch, compared
+  with the previous day.
+- **Fulfillment queue** = today's branch orders in `draft`, `pending`,
+  `confirmed` or `in_progress`; the channel chip comes from `business_type`
+  (`in_store` → Click & Collect, `online` → Local Delivery, `phone` → Phone Hold).
+- **Shelf alerts** = branch `Stock` rows where `quantity - pending` is at or
+  below `LOW_STOCK_THRESHOLD`; warehouse availability is the sum of other stock
+  rows for the same product.
+- **Registers** = today's orders grouped by the credited `Employee`, with shift
+  sales and order count.
+- **Roster** = active branch employees, with "Active POS" for employees who
+  processed orders today.
+- **Footfall** is not modelled yet; the payload reports `connected: false` and
+  the panel shows hourly order volume instead of inventing visitor counts.
+
+`StoreManager::ConsoleService` builds the read payload; the Stimulus controller
+only renders it. The web route is built first; mobile parity is out of scope for
+this pass.
 
 The Operations pages use **full-page show + edit** pages, never modals. The two list
 pages link the row name to the show page and the edit icon to the edit page. Both

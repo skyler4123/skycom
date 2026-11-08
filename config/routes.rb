@@ -14,6 +14,10 @@ Rails.application.routes.draw do
       get "attendance_month", to: "attendance_months#show"
       get "operations", to: "operations#index"
       get "operations/pos/:operation_id", to: "operations/pos#show", as: :pos
+      get "operations/booking/:operation_id", to: "operations/booking#show", as: :booking
+      get "operations/reception/:operation_id", to: "operations/reception#show", as: :reception
+      get "operations/store_manager/:operation_id", to: "operations/store_manager#show", as: :store_manager
+      get "operations/inventory/:operation_id", to: "operations/inventory#show", as: :inventory
       get "payroll/unlock", to: "payroll_unlocks#new", as: :payroll_unlock
       post "payroll/unlock", to: "payroll_unlocks#create"
       get "payroll", to: "payrolls#show"
@@ -234,8 +238,15 @@ Rails.application.routes.draw do
           get "pos/:operation_id", to: "operations/pos#show", as: :pos
           get "pos/:operation_id/customer_lookup", to: "operations/pos#customer_lookup", as: :pos_customer_lookup
           get "booking/:operation_id", to: "operations/booking#show", as: :booking
+          post "booking/:operation_id/reservations", to: "operations/booking#create_reservation", as: :booking_reservations
           get "inventory/:operation_id", to: "operations/inventory#show", as: :inventory
           get "reception/:operation_id", to: "operations/reception#show", as: :reception
+          post "reception/:operation_id/check_in", to: "operations/reception#check_in", as: :reception_check_in
+          post "reception/:operation_id/advance", to: "operations/reception#advance", as: :reception_advance
+          post "reception/:operation_id/parcels", to: "operations/reception#create_parcel", as: :reception_parcels
+          post "reception/:operation_id/parcels/:parcel_id/notify", to: "operations/reception#notify_parcel", as: :reception_parcel_notify
+          post "reception/:operation_id/parcels/:parcel_id/pick_up", to: "operations/reception#pick_up_parcel", as: :reception_parcel_pick_up
+          post "reception/:operation_id/notify_host", to: "operations/reception#notify_host", as: :reception_notify_host
           get "kitchen/:operation_id", to: "operations/kitchen#show", as: :kitchen
           get "housekeeping/:operation_id", to: "operations/housekeeping#show", as: :housekeeping
           get "store_manager/:operation_id", to: "operations/store_manager#show", as: :store_manager

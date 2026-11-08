@@ -119,26 +119,89 @@ RSpec.describe "Company operations", type: :request do
     end
   end
 
-  describe "GET #show for a placeholder" do
-    it "returns coming_soon with the operation and appointment" do
+  describe "GET #show for Booking" do
+    it "returns the real booking console payload" do
       operation = company.operations.find_by!(operation_type: :booking)
+      facility = create(:facility, company: company, branch: branch, name: "Boardroom Orion", property_integer_1: 16)
+      event = create(:event, company: company, branch: branch, name: "Executive Board Review",
+        start_at: 9.hours.from_now, end_at: 11.hours.from_now, workflow_status: :confirmed)
+      EventFacilityAppointment.create!(company: company, event: event, facility: facility)
 
       get booking_company_operations_path(company, operation, branch_id: branch.id), as: :json
 
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
-      expect(body.fetch("coming_soon")).to be(true)
+      expect(body.fetch("coming_soon")).to be(false)
       expect(body.fetch("operation").fetch("operation_type")).to eq("booking")
+      expect(body.fetch("appointment").fetch("kind")).to eq("branch")
+
+      resources = body.fetch("booking").fetch("resources")
+      expect(resources.map { |resource| resource.fetch("name") }).to include("Boardroom Orion")
+      bookings = body.fetch("booking").fetch("bookings")
+      expect(bookings.map { |booking| booking.fetch("title") }).to include("Executive Board Review")
+      expect(bookings.first.fetch("resource_ids")).to include(facility.id)
+    end
+  end
+
+  describe "POST #create_reservation for Booking" do
+    let!(:facility) { create(:facility, company: company, branch: branch, name: "Focus Pod") }
+    let(:operation) { company.operations.find_by!(operation_type: :booking) }
+
+    around do |example|
+      original = ActionController::Base.allow_forgery_protection
+      ActionController::Base.allow_forgery_protection = false
+      example.run
+    ensure
+      ActionController::Base.allow_forgery_protection = original
+    end
+
+    it "creates a confirmed reservation Event linked to the facility" do
+      post booking_reservations_company_operations_path(company, operation, branch_id: branch.id),
+        params: { booking: { title: "Q4 Planning Session", facility_id: facility.id,
+                             start_time: "14:00", end_time: "15:00", date: Date.current.iso8601 } }, as: :json
+
+      expect(response).to have_http_status(:created)
+      body = JSON.parse(response.body)
+      expect(body.fetch("message")).to eq("Reservation confirmed for Q4 Planning Session.")
+
+      event = company.events.find(body.dig("event", "id"))
+      expect(event.workflow_status).to eq("confirmed")
+      expect(event.facilities).to include(facility)
+    end
+
+    it "rejects an end time before the start time" do
+      post booking_reservations_company_operations_path(company, operation, branch_id: branch.id),
+        params: { booking: { title: "Invalid Window", facility_id: facility.id,
+                             start_time: "15:00", end_time: "14:00", date: Date.current.iso8601 } }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body).fetch("errors")).to include("End time must be after start time.")
+      expect(company.events.find_by(name: "Invalid Window")).to be_nil
+    end
+  end
+
+  describe "GET #show for a placeholder" do
+    it "returns coming_soon with the operation and appointment" do
+      operation = company.operations.find_by!(operation_type: :kitchen)
+
+      get kitchen_company_operations_path(company, operation, branch_id: branch.id), as: :json
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body.fetch("coming_soon")).to be(true)
+      expect(body.fetch("operation").fetch("operation_type")).to eq("kitchen")
       expect(body.fetch("appointment").fetch("kind")).to eq("branch")
     end
 
-    it "returns coming_soon for warehouse-scoped inventory" do
+    it "returns the live inventory payload for warehouse-scoped inventory" do
       operation = company.operations.find_by!(operation_type: :inventory)
 
       get inventory_company_operations_path(company, operation, warehouse_id: warehouse.id), as: :json
 
       expect(response).to have_http_status(:ok)
-      expect(JSON.parse(response.body).fetch("coming_soon")).to be(true)
+      body = JSON.parse(response.body)
+      expect(body.fetch("coming_soon")).to be(false)
+      expect(body.fetch("inventory")).to include("metrics", "stocks", "docks", "zones", "audit")
     end
   end
 end

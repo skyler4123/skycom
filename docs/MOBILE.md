@@ -22,7 +22,11 @@ authentication.
 | `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `mobile/companies/employees/show` (Profile) |
 | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `mobile/companies/attendance_months/show` |
 | `GET /mobile/companies/:company_id/operations` | `Mobile::Companies::OperationsController#index` | `mobile/companies/operations/index` |
-| `GET /mobile/companies/:company_id/operations/pos/:operation_id` | `Mobile::Companies::Operations::PosController#show` | Shell-First mount point (inline HTML, no data) |
+| `GET /mobile/companies/:company_id/operations/pos/:operation_id` | `Mobile::Companies::Operations::PosController#show` | Shell-First mount point (inline `shell_html` div) |
+| `GET /mobile/companies/:company_id/operations/booking/:operation_id` | `Mobile::Companies::Operations::BookingController#show` | Shell-First mount point (inline `shell_html` div) |
+| `GET /mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | Shell-First mount point (inline `shell_html` div) |
+| `GET /mobile/companies/:company_id/operations/store_manager/:operation_id` | `Mobile::Companies::Operations::StoreManagerController#show` | Shell-First mount point (inline `shell_html` div) |
+| `GET /mobile/companies/:company_id/operations/inventory/:operation_id` | `Mobile::Companies::Operations::InventoryController#show` | Shell-First mount point (inline `shell_html` div) |
 | `GET /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#new` | `mobile/companies/payroll_unlocks/new` |
 | `POST /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#create` | redirect / 422 re-render |
 | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `mobile/companies/payrolls/show` |
@@ -37,11 +41,12 @@ is never treated as authorization.
 
 ### Authorization
 
-Company-level screens use ABAC: Operations and the mobile POS page require
-`Operation` read, Notifications require `Notification` read, and attendance
-requests require `AttendanceRequest` create. POS additionally resolves an active
-branch appointment and checks `Operation#accessible_by?` before rendering the
-shell. Self-service screens (Home, Profile, Attendance month, Payroll/unlock,
+Company-level screens use ABAC: Operations, the mobile POS page and the mobile
+reception/store manager/inventory consoles require `Operation` read, Notifications require
+`Notification` read, and attendance requests require `AttendanceRequest` create.
+POS, Booking, Reception and Store Manager additionally resolve an active branch
+appointment; Inventory resolves an active warehouse appointment. Every console
+checks `Operation#accessible_by?` before rendering the shell. Self-service screens (Home, Profile, Attendance month, Payroll/unlock,
 check-in) are membership-scoped instead: the controller always resolves
 `@employee` from `current_user` + `company_id`, so they can only reach the
 signed-in employee's own records. Payroll still requires the password unlock
@@ -106,6 +111,40 @@ Native activities:
 - Inter (body) / Plus Jakarta Sans (headings) and Material Symbols Outlined, loaded from Google Fonts.
 - Global flash rendering (`mobile/shared/_flash`) before `yield`.
 
+**Shell-First mount points (`shell_html`).** The web operation pages render
+`render html: "", layout: true`; the desktop layout wraps `yield` in
+`<div data-controller="<%= stimulus_controller %>" data-operation-id=… data-operation-type=…>`,
+so Stimulus binds automatically. The mobile layout has no such wrapper and no
+`stimulus_controller` derivation, and the five operation consoles have no view
+template (they are Shell-First). Each mobile operation controller therefore
+builds its own mount `<div>` in `shell_html`:
+
+```ruby
+# app/controllers/mobile/companies/operations/pos_controller.rb
+def show
+  render html: shell_html.html_safe, layout: true
+end
+
+def shell_html
+  <<~HTML
+    <div class="min-h-dvh bg-background"
+      data-controller="companies--operations--pos--show darkmode"
+      data-company-id="#{@company.id}"
+      data-operation-id="#{@operation.id}"
+      data-user-name="#{ERB::Util.html_escape(@employee.name)}"
+      data-user-role="#{ERB::Util.html_escape(@employee.roles.first&.name || "Employee")}"></div>
+  HTML
+end
+```
+
+The div is the prerequisite for Stimulus binding: it names the shared web
+controller explicitly (`companies--operations--<type>--show`) and carries the
+ids/identity that controller needs to hydrate from
+`/companies/:company_id/operations/<type>/:operation_id.json`. Without it there
+is no element to bind to and the console never renders. Do not move this into
+`mobile.html.erb` — most mobile screens are normal ERB views and must not be
+bound to an operation controller.
+
 Shared partials in `app/views/mobile/shared/`:
 
 | Partial | Purpose |
@@ -138,8 +177,11 @@ screen shows an empty/dash state instead of fabricated content.
 | Home | greeting, company/branch/code, live clock, multi check-in state/times, today's shift/logs, monthly attendance %, worked time, overtime, pending requests, paid-leave balance and pending days, latest published company announcement |
 | Profile | name/code/type/roles/category, email, phone, company, branch, departments, next shift, monthly attendance, group managers, contract renewal (`expiration_date`), Payroll entry point |
 | Attendance | month summary (worked/present/absent/overtime), daily in/out/duration/status |
-| Operations | every accessible operation appointment for the company: Operation name/code/type, branch or warehouse location, resolution, operation workflow status, appointment workflow status; POS operations expose an **Open POS** action |
+| Operations | every accessible operation appointment for the company: Operation name/code/type, branch or warehouse location, resolution, operation workflow status, appointment workflow status; POS operations expose an **Open POS** action, Booking operations expose **Open Booking**, Reception operations expose **Open Reception**, Store Manager operations expose **Open Store Manager**, and warehouse Inventory operations expose **Open Inventory** |
 | POS | Shell-First page mounted by `Companies_Operations_Pos_ShowController`; the controller hydrates products, services, categories, payment methods, cart, receipt and customer lookup from the existing web JSON endpoint |
+| Booking | Shell-First page mounted by `Companies_Operations_Booking_ShowController`; the controller hydrates the facility timeline, booking blocks, KPIs, inspector and reservation form from the existing web JSON endpoint, and posts instant reservations |
+| Reception | Shell-First page mounted by `Companies_Operations_Reception_ShowController`; the controller hydrates today's visit Events, customers, hosts, facility rooms, parcels and next appointments from the existing web JSON endpoint, and posts walk-in/check-out/parcel actions |
+| Inventory | Shell-First page mounted by `Companies_Operations_Inventory_ShowController`; the controller hydrates vital stock metrics, the granular stock ledger, inbound/outbound freight docks, zone capacity and audit state from the existing web JSON endpoint |
 | Payroll unlock | signed-in user's password; success sets a five-minute server-side unlock for the current company |
 | Payroll | month, status/step, period days, worked hours, present days, overtime minutes, salary/allowance/overtime/tax/social/net amounts; only after password confirmation |
 | New request | employee/branch, date, type, times, reason, validation, group managers listed from `EmployeeGroup#manager` (owner fallback) |
@@ -208,6 +250,53 @@ chosen appointment's `branch_id`; without it the resolver falls back to the
 employee's branch. Tablet layout is width-driven: below `lg` the order panel
 stacks under the catalog, at `lg` and above they sit side by side.
 
+**Booking** — `GET /mobile/companies/:company_id/operations/booking/:operation_id`
+uses the same Shell-First contract:
+`data-controller="companies--operations--booking--show darkmode"` plus the
+company, operation and employee identifiers. The shared booking controller
+hydrates from `/companies/:company_id/operations/booking/:operation_id.json`
+and posts instant reservations to the web endpoint. The layout is width-driven
+for both orientations: phone and tablet portrait stack the timeline above the
+inspector/reservation panels; landscape tablet at `lg` places the timeline
+beside the inspector column. The current-time needle remains visible in the
+timeline in both orientations.
+
+**Reception** — `GET /mobile/companies/:company_id/operations/reception/:operation_id`
+uses the same Shell-First contract:
+`data-controller="companies--operations--reception--show darkmode"` plus the
+company, operation and employee identifiers. The shared reception controller
+hydrates from `/companies/:company_id/operations/reception/:operation_id.json`
+and posts walk-in, check-in/check-out, parcel and host-notification actions. The
+layout is width-driven for both orientations: phone portrait stacks the queue and
+coordination panels; tablet portrait keeps a single column; landscape tablet at
+`xl` puts the queue beside the rooms/deliveries/speed-dial panels.
+
+**Store Manager** — `GET /mobile/companies/:company_id/operations/store_manager/:operation_id`
+uses the same Shell-First contract:
+`data-controller="companies--operations--store-manager--show darkmode"` plus the
+company, operation and employee identifiers. The shared store manager controller
+hydrates from `/companies/:company_id/operations/store_manager/:operation_id.json`
+and renders today's sales KPIs, fulfillment queue, shelf alerts, registers,
+hourly order volume and the on-duty roster. The layout is width-driven for both
+orientations: phone and tablet portrait stack the fulfillment/replenishment
+column above the register/footfall/roster column; landscape tablet at `lg`
+places the two columns side by side. Tables scroll horizontally inside their
+cards instead of widening the page.
+
+**Inventory** — `GET /mobile/companies/:company_id/operations/inventory/:operation_id`
+uses the same Shell-First contract:
+`data-controller="companies--operations--inventory--show darkmode"` plus the
+company, operation and employee identifiers. Inventory is warehouse-scoped, so
+the Operations list links with the appointment's `warehouse_id`; without it the
+resolver falls back to a warehouse under the employee's branch. The shared
+inventory controller hydrates from
+`/companies/:company_id/operations/inventory/:operation_id.json` and renders
+stock metrics, the granular stock ledger, inbound/outbound freight docks, zone
+capacity and audit state. The layout is width-driven for both orientations:
+phone and tablet portrait stack the ledger/BOM column above the docks/zone/audit
+column; landscape tablet at `lg` places the two columns side by side. Tables
+scroll horizontally inside their cards instead of widening the page.
+
 ---
 
 ## 5. Styling
@@ -247,6 +336,10 @@ Coverage:
 | `spec/features/mobile/attendance_month_spec.rb` | summary, daily rows, prev/next, empty state |
 | `spec/features/mobile/operations_spec.rb` | current-company operation list, another company's records hidden, empty state, auth |
 | `spec/features/mobile/pos_spec.rb` | Shell-First hydration, catalog, add-to-cart, ORDER/payment/receipt, Operations link, non-POS operations, missing appointment |
+| `spec/features/mobile/booking_spec.rb` | Shell-First hydration, Operations link, tablet portrait/landscape layouts, real facility/booking data |
+| `spec/features/mobile/reception_spec.rb` | Shell-First hydration, Operations link, phone portrait, tablet portrait/landscape layouts, walk-in check-in, non-reception operations |
+| `spec/features/mobile/store_manager_spec.rb` | Shell-First hydration, Operations link, phone portrait/landscape, tablet portrait/landscape layouts, real sales/stock/roster data |
+| `spec/features/mobile/inventory_spec.rb` | Shell-First hydration, Operations link, phone portrait/landscape, tablet portrait/landscape layouts, real stock ledger data |
 | `spec/features/mobile/payroll_spec.rb` | password gate, every-entry prompt, wrong password, status, real money amounts, timesheet link, disabled payslip, month switch |
 | `spec/features/mobile/attendance_request_spec.rb` | valid submit, group managers, validation errors, future date, auth |
 | `spec/requests/mobile/attendances_controller_spec.rb` | check-in, multiple check-ins, cross-tenant 404 |
@@ -254,6 +347,9 @@ Coverage:
 | `spec/requests/mobile/payrolls_controller_spec.rb` | gate redirect, correct/incorrect password, five-minute expiry, no data leak |
 | `spec/requests/mobile/attendance_requests_controller_spec.rb` | pending create, permission failure, cross-tenant 404 |
 | `spec/requests/mobile/pos_controller_spec.rb` | Shell-First response, missing/inactive appointment redirect, non-POS 404, cross-tenant 404 |
+| `spec/requests/mobile/reception_controller_spec.rb` | Shell-First response, missing/inactive appointment redirect, non-reception 404, cross-tenant 404 |
+| `spec/requests/mobile/store_manager_controller_spec.rb` | Shell-First response, missing/inactive appointment redirect, non-store-manager 404, cross-tenant 404 |
+| `spec/requests/mobile/inventory_controller_spec.rb` | Shell-First response, missing/inactive appointment redirect, non-inventory 404, cross-tenant 404 |
 | `spec/requests/mobile/company_scoping_spec.rb` | member access, cross-tenant 404, malformed company id |
 | `spec/helpers/mobile_helper_spec.rb` | formatting/labels/preview helpers |
 
@@ -270,12 +366,18 @@ request feature spec sets them through the DOM with `set_native_field`.
   form/history, announcement management UI, or payslip/PDF download. Payroll
   money and seeded leave/notice data are real; the remaining items are not
   modelled yet.
-- Operations is a read-only operation-appointment list with one built action:
-  POS operations can open the Shell-First cashier screen. Other operation types,
-  filtering, and non-POS actions are not built yet.
+- Operations is a read-only operation-appointment list with built actions for
+  POS, Booking, Reception and Store Manager branch appointments and Inventory
+  warehouse appointments. Other operation types, filtering, and other actions
+  are not built yet.
 - Mobile POS reuses the web POS page: it has no mobile-specific order list,
   receipt printing, or offline mode. The POS page's Orders link still points at
   the web Orders page.
+- Mobile/tablet Reception reuses the web reception console; there is no native
+  visitor/parcel workflow, offline queue, or badge-printer integration.
+- Mobile/tablet Store Manager reuses the web store manager console; there is no
+  native register/cash-drawer or footfall sensor integration, and the footfall
+  panel reports that the sensor is not connected.
 - Mobile ERB remains English-only; `dictionary.js` covers the new JS toasts
   (`Copied to clipboard`, copy failure).
 - A suspended company sees a 403 page on mobile; there is no mobile top-up flow
@@ -299,6 +401,10 @@ app/helpers/mobile_helper.rb
 app/controllers/mobile/{base,sessions,home}_controller.rb
 app/controllers/mobile/companies/
 app/controllers/mobile/companies/operations/pos_controller.rb
+app/controllers/mobile/companies/operations/booking_controller.rb
+app/controllers/mobile/companies/operations/reception_controller.rb
+app/controllers/mobile/companies/operations/store_manager_controller.rb
+app/controllers/mobile/companies/operations/inventory_controller.rb
 app/javascript/controllers/mobile/
 android/.../SignInActivity.kt
 android/.../MainActivity.kt

@@ -173,8 +173,18 @@ export const pos_customer_lookup_company_operation_path = (companyId, operationI
   return `/companies/${companyId}/operations/pos/${operationId}/customer_lookup${query ? `?${query}` : ""}`
 }
 export const booking_company_operation_path = (companyId, operationId, params = {}) => operationPath("booking", companyId, operationId, params)
+export const booking_reservations_company_operation_path = (companyId, operationId, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `${booking_company_operation_path(companyId, operationId)}/reservations${query ? `?${query}` : ""}`
+}
 export const inventory_company_operation_path = (companyId, operationId, params = {}) => operationPath("inventory", companyId, operationId, params)
 export const reception_company_operation_path = (companyId, operationId, params = {}) => operationPath("reception", companyId, operationId, params)
+export const reception_check_in_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/check_in`
+export const reception_advance_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/advance`
+export const reception_parcels_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/parcels`
+export const reception_parcel_notify_company_operation_path = (companyId, operationId, parcelId) => `${reception_parcels_company_operation_path(companyId, operationId)}/${parcelId}/notify`
+export const reception_parcel_pick_up_company_operation_path = (companyId, operationId, parcelId) => `${reception_parcels_company_operation_path(companyId, operationId)}/${parcelId}/pick_up`
+export const reception_notify_host_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/notify_host`
 export const kitchen_company_operation_path = (companyId, operationId, params = {}) => operationPath("kitchen", companyId, operationId, params)
 export const housekeeping_company_operation_path = (companyId, operationId, params = {}) => operationPath("housekeeping", companyId, operationId, params)
 export const store_manager_company_operation_path = (companyId, operationId, params = {}) => operationPath("store_manager", companyId, operationId, params)
