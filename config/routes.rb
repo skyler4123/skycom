@@ -53,7 +53,8 @@ Rails.application.routes.draw do
   end
   resources :companies, only: %i[new create show edit update] do
     scope module: :companies do
-      resources :dashboards
+      resources :dashboards, only: [ :index ]
+      resource :dashboard, only: [ :show, :update ]
       resources :branches
       resources :departments
       resources :categories
@@ -243,6 +244,7 @@ Rails.application.routes.draw do
       resources :operation_warehouse_appointments, only: %i[show edit update]
 
       get "analytics", to: "analytics#index"
+      resource :analytic, only: %i[show update], controller: :analytics
 
       resource :tax_config, only: %i[show update], controller: :tax_configs
       get "tax", to: "taxes#index"

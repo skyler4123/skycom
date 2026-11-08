@@ -744,6 +744,8 @@ class Seed::RetailInitService
         "TicketLog" => { create: true, read: true, update: true, delete: true },
         "Document" => { create: true, read: true, update: true, delete: true },
         "CompanySetting" => { create: true, read: true, update: false, delete: true }, # owner-only update (see CompanySettingsPolicy)
+        "Dashboard" => { create: true, read: true, update: false, delete: true }, # owner-only update (see DashboardsPolicy)
+        "Analytic" => { create: true, read: true, update: false, delete: true }, # owner-only update (see AnalyticsPolicy)
 
         "Service" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
@@ -816,6 +818,8 @@ class Seed::RetailInitService
         "TicketLog" => { create: true, read: true, update: true, delete: true },
         "Document" => { create: true, read: true, update: true, delete: true },
         "CompanySetting" => { create: true, read: true, update: false, delete: true }, # owner-only update (see CompanySettingsPolicy)
+        "Dashboard" => { create: true, read: true, update: false, delete: true }, # owner-only update (see DashboardsPolicy)
+        "Analytic" => { create: true, read: true, update: false, delete: true }, # owner-only update (see AnalyticsPolicy)
         "Student" => { create: true, read: true, update: true, delete: true }
       },
       Cashier: {

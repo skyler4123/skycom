@@ -85,7 +85,7 @@ RSpec.feature "Darkmode across sidebar pages", type: :feature, js: true do
     expect(html_dark?).to be(true)
 
     find("details[data-sidebar-group='general'] summary", visible: :all).click
-    click_link("Dashboard", visible: :all)
+    find("a[href='#{company_dashboards_path(company)}']", visible: :all).click
     expect(page).to have_selector("header", wait: 10)
     expect(html_dark?).to be(true)
     # Toggle icons must survive the navigation (re-rendered header).

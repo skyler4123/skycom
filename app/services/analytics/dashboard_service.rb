@@ -30,6 +30,7 @@ module Analytics
 
       {
         period: period_payload,
+        analytic: analytic_payload,
         summary: summary_payload(inventory, staff),
         profit_margins: profit_margins_payload,
         revenue_mix: revenue_mix_payload,
@@ -71,6 +72,15 @@ module Analytics
 
     def previous_revenue_calculator
       @previous_revenue_calculator ||= Analytics::RevenueCalculator.new(company: company, orders: previous_orders)
+    end
+
+    def analytic_payload
+      analytic = company.analytic
+      {
+        id: analytic.id,
+        name: analytic.name,
+        blocks: analytic.active_blocks
+      }
     end
 
     def period_payload

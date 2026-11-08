@@ -1,9 +1,11 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import ApexCharts from "apexcharts"
 import { chartPalette, chartGridColor, chartLabelColor, tokenColor } from "controllers/helpers/chart_colors"
+import { DASHBOARD_BLOCK_KEYS } from "controllers/companies/dashboards/blocks"
 
 // Depends on BE: Companies::DashboardsController#index
 // Endpoints: GET /companies/:company_id/dashboards.json
+// Config link: GET /companies/:company_id/dashboard (companies/dashboards/show_controller.js)
 export default class Companies_Dashboards_IndexController extends Companies_LayoutController {
   /** @type {object | null} */ dashboardData = null
   /** @type {ApexCharts[]} */ charts = []
@@ -57,6 +59,35 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     return this.dashboardData?.company?.currency || "usd"
   }
 
+  activeBlocks() {
+    const configured = this.dashboardData?.dashboard?.blocks
+    if (Array.isArray(configured)) return configured.filter((key) => DASHBOARD_BLOCK_KEYS.includes(key))
+    return DASHBOARD_BLOCK_KEYS
+  }
+
+  blocksHTML() {
+    const blocks = this.activeBlocks()
+    if (!blocks.length) {
+      return this.emptyHTML(translate("No dashboard blocks are enabled. Use Config to choose what to show."))
+    }
+
+    return blocks.map((key) => {
+      switch (key) {
+        case "company_meta": return this.companyMetaHTML()
+        case "kpis": return this.kpisHTML()
+        case "revenue_orders": return this.revenueOrdersHTML()
+        case "sales_channels": return this.salesChannelsHTML()
+        case "attention": return this.attentionHTML()
+        case "recent_orders": return this.recentOrdersHTML()
+        case "top_customers": return this.topCustomersHTML()
+        case "staff_today": return this.staffTodayHTML()
+        case "upcoming_events": return this.upcomingEventsHTML()
+        case "company_wallet": return this.companyWalletHTML()
+        default: return ""
+      }
+    }).join("")
+  }
+
   contentHTML() {
     if (this.loading) return this.loadingHTML()
     if (this.error) return this.errorHTML()
@@ -65,12 +96,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     return `
       <div class="p-4 overflow-y-auto space-y-4">
         ${this.headerHTML()}
-        ${this.companyMetaHTML()}
-        ${this.kpisHTML()}
-        ${this.chartsHTML()}
-        ${this.attentionHTML()}
-        ${this.operationalGridHTML()}
-        ${this.bottomRowHTML()}
+        ${this.blocksHTML()}
       </div>
     `
   }
@@ -89,6 +115,11 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
             <span class="material-symbols-outlined text-[16px]">calendar_today</span>
             ${translate("This month")}
           </span>
+          <a href="${Helpers.company_dashboard_path(companyId)}"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-line text-foreground text-xs font-semibold hover:bg-muted">
+            <span class="material-symbols-outlined text-[16px]">tune</span>
+            ${translate("Config")}
+          </a>
           ${this.canViewFinancials() ? `
             <a href="${Helpers.company_analytics_path(companyId)}"
               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90">
@@ -109,7 +140,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     const timezone = this.timezoneLabel(c.timezone)
 
     return `
-      <div class="bg-card border border-line rounded-xl p-4">
+      <div data-dashboard-block="company_meta" class="bg-card border border-line rounded-xl p-4">
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div class="flex items-center gap-3 min-w-0">
             <div class="size-11 shrink-0 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
@@ -181,7 +212,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
       cards.push(this.kpiCard("credits", translate("Credits remaining"), this.number(k.credits_total), "account_balance_wallet"))
     }
 
-    return `<div class="grid grid-cols-2 xl:grid-cols-4 gap-3" data-dashboard-section="kpis">${cards.join("")}</div>`
+    return `<div class="grid grid-cols-2 xl:grid-cols-4 gap-3" data-dashboard-block="kpis" data-dashboard-section="kpis">${cards.join("")}</div>`
   }
 
   kpiCard(key, label, value, icon, helper = "", tone = "default") {
@@ -205,11 +236,32 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     `
   }
 
-  chartsHTML() {
+  revenueOrdersHTML() {
+    if (!this.canViewFinancials()) return ""
+
+    const trend = this.dashboardData.trend || []
+
+    return `
+      <div data-dashboard-block="revenue_orders" class="bg-card border border-line rounded-xl p-4">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <div>
+            <h2 class="text-base font-bold text-foreground">${translate("Revenue & orders")}</h2>
+            <p class="text-xs text-muted-foreground">${translate("Last 30 days")}</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
+            <span class="inline-flex items-center gap-1"><span class="size-2 rounded-full bg-primary"></span>${translate("Revenue")}</span>
+            <span class="inline-flex items-center gap-1"><span class="size-2 rounded-full bg-success"></span>${translate("Orders")}</span>
+          </div>
+        </div>
+        ${trend.length ? `<div data-dashboard-chart="trend" class="h-64"></div>` : this.emptyInline(translate("No orders yet"))}
+      </div>
+    `
+  }
+
+  salesChannelsHTML() {
     if (!this.canViewFinancials()) return ""
 
     const mix = this.dashboardData.revenue_mix || []
-    const trend = this.dashboardData.trend || []
     const mixLegend = mix.length
       ? mix.map((row, index) => `
           <div class="flex items-center justify-between gap-2 text-xs">
@@ -223,29 +275,13 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
       : this.emptyInline(translate("No revenue yet"))
 
     return `
-      <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
-        <div class="xl:col-span-8 bg-card border border-line rounded-xl p-4">
-          <div class="flex items-start justify-between gap-2 mb-2">
-            <div>
-              <h2 class="text-base font-bold text-foreground">${translate("Revenue & orders")}</h2>
-              <p class="text-xs text-muted-foreground">${translate("Last 30 days")}</p>
-            </div>
-            <div class="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
-              <span class="inline-flex items-center gap-1"><span class="size-2 rounded-full bg-primary"></span>${translate("Revenue")}</span>
-              <span class="inline-flex items-center gap-1"><span class="size-2 rounded-full bg-success"></span>${translate("Orders")}</span>
-            </div>
-          </div>
-          ${trend.length ? `<div data-dashboard-chart="trend" class="h-64"></div>` : this.emptyInline(translate("No orders yet"))}
+      <div data-dashboard-block="sales_channels" class="bg-card border border-line rounded-xl p-4">
+        <div class="mb-2">
+          <h2 class="text-base font-bold text-foreground">${translate("Sales channels")}</h2>
+          <p class="text-xs text-muted-foreground">${translate("Revenue mix this month")}</p>
         </div>
-
-        <div class="xl:col-span-4 bg-card border border-line rounded-xl p-4">
-          <div class="mb-2">
-            <h2 class="text-base font-bold text-foreground">${translate("Sales channels")}</h2>
-            <p class="text-xs text-muted-foreground">${translate("Revenue mix this month")}</p>
-          </div>
-          ${mix.length ? `<div data-dashboard-chart="mix" class="h-44"></div>` : this.emptyInline(translate("No revenue yet"))}
-          <div class="space-y-2 mt-3">${mixLegend}</div>
-        </div>
+        ${mix.length ? `<div data-dashboard-chart="mix" class="h-44"></div>` : this.emptyInline(translate("No revenue yet"))}
+        <div class="space-y-2 mt-3">${mixLegend}</div>
       </div>
     `
   }
@@ -338,7 +374,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     `)
 
     return `
-      <div data-dashboard-section="attention" class="bg-card border border-line rounded-xl p-4">
+      <div data-dashboard-block="attention" data-dashboard-section="attention" class="bg-card border border-line rounded-xl p-4">
         <div class="flex items-center justify-between mb-3">
           <div>
             <h2 class="text-base font-bold text-foreground">${translate("Needs attention")}</h2>
@@ -359,22 +395,13 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     `
   }
 
-  operationalGridHTML() {
-    const financial = this.canViewFinancials()
-    const cards = [ this.recentOrdersHTML() ]
-    if (financial) cards.push(this.topCustomersHTML())
-    cards.push(this.staffTodayHTML())
-
-    return `<div class="grid grid-cols-1 xl:grid-cols-3 gap-4">${cards.join("")}</div>`
-  }
-
   recentOrdersHTML() {
     const orders = this.dashboardData.recent_orders || []
     const companyId = currentCompany().id
     const financial = this.canViewFinancials()
 
     return `
-      <div data-dashboard-section="recent-orders" class="bg-card border border-line rounded-xl p-4">
+      <div data-dashboard-block="recent_orders" data-dashboard-section="recent-orders" class="bg-card border border-line rounded-xl p-4">
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-base font-bold text-foreground">${translate("Recent orders")}</h2>
           <a href="${Helpers.company_orders_path(companyId)}" class="text-[11px] font-semibold text-primary hover:underline">${translate("View all")}</a>
@@ -403,7 +430,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     const companyId = currentCompany().id
 
     return `
-      <div data-dashboard-section="top-customers" class="bg-card border border-line rounded-xl p-4">
+      <div data-dashboard-block="top_customers" data-dashboard-section="top-customers" class="bg-card border border-line rounded-xl p-4">
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-base font-bold text-foreground">${translate("Top customers")}</h2>
           <a href="${Helpers.company_customers_path(companyId)}" class="text-[11px] font-semibold text-primary hover:underline">${translate("View all")}</a>
@@ -429,7 +456,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     const companyId = currentCompany().id
 
     return `
-      <div data-dashboard-section="staff-today" class="bg-card border border-line rounded-xl p-4">
+      <div data-dashboard-block="staff_today" data-dashboard-section="staff-today" class="bg-card border border-line rounded-xl p-4">
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-base font-bold text-foreground">${translate("Staff today")}</h2>
           <a href="${Helpers.company_attendance_days_path(companyId)}" class="text-[11px] font-semibold text-primary hover:underline">${translate("View attendance")}</a>
@@ -463,13 +490,12 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     `
   }
 
-  bottomRowHTML() {
-    const financial = this.canViewFinancials()
+  upcomingEventsHTML() {
     const events = this.dashboardData.upcoming_events || []
     const companyId = currentCompany().id
 
-    const eventsHTML = `
-      <div data-dashboard-section="events" class="bg-card border border-line rounded-xl p-4">
+    return `
+      <div data-dashboard-block="upcoming_events" data-dashboard-section="events" class="bg-card border border-line rounded-xl p-4">
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-base font-bold text-foreground">${translate("Upcoming events")}</h2>
           <a href="${Helpers.company_events_path(companyId)}" class="text-[11px] font-semibold text-primary hover:underline">${translate("View all")}</a>
@@ -485,12 +511,16 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
         `).join("") : this.emptyInline(translate("No upcoming events"))}
       </div>
     `
+  }
 
-    if (!financial) return `<div class="grid grid-cols-1 gap-4">${eventsHTML}</div>`
+  companyWalletHTML() {
+    if (!this.canViewFinancials()) return ""
 
     const wallet = this.dashboardData.wallet || {}
-    const walletHTML = `
-      <div data-dashboard-section="wallet" class="bg-card border border-line rounded-xl p-4">
+    const companyId = currentCompany().id
+
+    return `
+      <div data-dashboard-block="company_wallet" data-dashboard-section="wallet" class="bg-card border border-line rounded-xl p-4">
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-base font-bold text-foreground">${translate("Company wallet")}</h2>
           <a href="${Helpers.new_company_top_up_path(companyId)}" class="text-[11px] font-semibold text-primary hover:underline">${translate("Top up")}</a>
@@ -510,8 +540,6 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
         <p class="text-[10px] text-muted-foreground mt-1">${translate("Balance is shown before this visit's access fee.")}</p>
       </div>
     `
-
-    return `<div class="grid grid-cols-1 xl:grid-cols-2 gap-4">${eventsHTML}${walletHTML}</div>`
   }
 
   renderCharts() {

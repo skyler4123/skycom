@@ -55,6 +55,8 @@ export const create_companies_path = () => `/companies`
 export const company_path = (id) => `/companies/${id}`
 export const edit_company_path = (id) => `/companies/${id}/edit`
 export const company_dashboards_path = (companyId) => `/companies/${companyId}/dashboards`
+export const company_dashboard_path = (companyId) => `/companies/${companyId}/dashboard`
+export const company_analytic_path = (companyId) => `/companies/${companyId}/analytic`
 
 export const company_branches_path = (companyId) => `/companies/${companyId}/branches`
 export const create_company_branches_path = (companyId) => `/companies/${companyId}/branches`
