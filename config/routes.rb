@@ -231,6 +231,7 @@ Rails.application.routes.draw do
 
         collection do
           get "pos/:operation_id", to: "operations/pos#show", as: :pos
+          get "pos/:operation_id/customer_lookup", to: "operations/pos#customer_lookup", as: :pos_customer_lookup
           get "booking/:operation_id", to: "operations/booking#show", as: :booking
           get "inventory/:operation_id", to: "operations/inventory#show", as: :inventory
           get "reception/:operation_id", to: "operations/reception#show", as: :reception

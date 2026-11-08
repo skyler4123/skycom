@@ -3,39 +3,84 @@
 # Companies::Operations::PosController — the POS operation. Hydrates the
 # branch-scoped product/service catalog and the branch's non-redirect payment
 # methods for the resolved BranchOperationAppointment.
-# Serves Stimulus: Companies_Operations_Pos_ShowController (hydrate)
+# Serves Stimulus: Companies_Operations_Pos_ShowController (hydrate, customer lookup)
 # Endpoints: GET /companies/:company_id/operations/pos/:operation_id
+#            GET /companies/:company_id/operations/pos/:operation_id/customer_lookup?q=
 # Docs: docs/OPERATIONS.md, docs/ORDER_PROCESSING_V1.md
 class Companies::Operations::PosController < Companies::Operations::BaseController
+  # Lightweight POS customer lookup (id/code/name/email/phone-like property slots).
+  # POS operators do not need the Customers dashboard permission to serve a customer.
+  def customer_lookup
+    query = params[:q].to_s.strip
+    return render json: { customer: nil } if query.blank?
+
+    customer = find_customer(query)
+    render json: { customer: customer ? customer_lookup_payload(customer) : nil }
+  end
+
   private
 
   def expected_operation_type
     :pos
   end
 
+  def find_customer(query)
+    scope = current_company.customers
+
+    if query.match?(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i)
+      return scope.find_by(id: query)
+    end
+
+    pattern = "%#{Customer.sanitize_sql_like(query)}%"
+    scope.where(
+      "name ILIKE :pattern OR code ILIKE :pattern OR email ILIKE :pattern" \
+      " OR property_string_1 ILIKE :pattern OR property_string_2 ILIKE :pattern" \
+      " OR property_string_3 ILIKE :pattern OR property_string_4 ILIKE :pattern" \
+      " OR property_string_5 ILIKE :pattern",
+      pattern: pattern
+    ).first
+  end
+
+  def customer_lookup_payload(customer)
+    membership = customer.membership_of_type(:loyalty) || customer.membership
+
+    {
+      id: customer.id,
+      name: customer.name,
+      code: customer.code,
+      email: customer.email,
+      membership: membership&.as_json(only: [ :id, :name, :code ])
+    }
+  end
+
   def operation_payload
     branch = @appointment.branch
     warehouse_ids = branch.warehouse_ids
 
-    products = current_company.products.where(branch_id: branch.id).limit(50).map do |product|
+    products = current_company.products.includes(:category).where(branch_id: branch.id).limit(50).map do |product|
       price = product.price
       stock = Stock.find_by(product_id: product.id, warehouse_id: warehouse_ids)
       {
         id: product.id,
         name: product.name,
         code: product.code,
+        category_id: product.category_id,
+        category_name: product.category&.name,
         stock_id: stock&.id,
+        stock_quantity: stock&.available_count || 0,
         price: price&.to_f || 0,
         currency: price&.currency.iso_code || "USD",
         image_url: product.image_attachments.first&.variant(:thumb)&.processed&.url
       }
     end
 
-    services = current_company.services.where(branch_id: branch.id).limit(50).map do |service|
+    services = current_company.services.includes(:category).where(branch_id: branch.id).limit(50).map do |service|
       {
         id: service.id,
         name: service.name,
         code: service.code,
+        category_id: service.category_id,
+        category_name: service.category&.name,
         price: 0,
         currency: "usd",
         image_url: service.image_attachments.first&.variant(:thumb)&.processed&.url
