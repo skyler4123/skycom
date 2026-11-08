@@ -11,7 +11,8 @@
 Mobile is an **employee self-service companion**, not a full ERP client. It
 currently mirrors the web **My Profile** group (Profile, Attendance, Payroll),
 adds a Home dashboard and an attendance-request form, and exposes the company's
-**Operations** list with a Shell-First POS cashier page for POS operations.
+**Operations** list with Shell-First POS cashier and Reception console pages for
+POS and Reception operations.
 Payroll is a stack page behind a password gate, not a bottom tab. Everything else
 in the web sidebar is classified as web-only unless it is explicitly listed as a
 mobile backlog item.
@@ -46,17 +47,17 @@ Source files for the inventory:
 | Attendance | 🟡 | Own month summary, daily rows, month navigation, check-in | No check-out, geofence, QR, request history, or PDF |
 | Requests | 🟡 | Create attendance request with validation, group managers listed from employee teams | No inbox, status, or attachments |
 | Payroll | 🟡 | Password gate, own status/step, period, worked hours, present days, overtime, salary/allowance/tax/net money; 5-minute unlock | No payslip/PDF |
-| Operations | 🟡 | Accessible operation appointments with Operation name/type, branch or warehouse location, resolution, statuses; POS opens the Shell-First cashier | Non-POS actions, filtering, and order history are not built |
+| Operations | 🟡 | Accessible operation appointments with Operation name/type, branch or warehouse location, resolution, statuses; POS opens the Shell-First cashier, Reception opens the Shell-First console | Other operation types, filtering, and order history are not built |
 | Notifications | ⛔ | — | No inbox, unread badge, mark-read, push, or preferences |
 | Leave | 🟡 | Paid-leave balance and pending days on Home, seeded leave requests | No leave request form or history |
 | Schedule | 🟡 | Today/next shift read | No roster, shift list, or swap |
 | Documents and help desk | ⛔ | — | Web-only; future candidates |
 | Native shell | 🟡 | Five tabs, pull-to-refresh, edge-to-edge safe area, dark mode | No GPS, camera, biometrics, push, offline, or deep links |
 
-**Headline:** 9 mobile screens (including the payroll password gate, Operations,
-and the POS cashier), 5 native tabs, 4 write surfaces (check-in, request create,
-sign-out, POS checkout/pay), and 4 read surfaces (profile, attendance month,
-payroll, operations). The web has **69 sidebar items** across 16 active groups
+**Headline:** 10 mobile screens (including the payroll password gate, Operations,
+the POS cashier, and the Reception console), 5 native tabs, 5 write surfaces
+(check-in, request create, sign-out, POS checkout/pay, reception walk-in/parcel),
+and 4 read surfaces (profile, attendance month, payroll, operations). The web has **69 sidebar items** across 16 active groups
 plus 3 coming-soon groups.
 
 **Biggest blockers**
@@ -83,9 +84,10 @@ plus 3 coming-soon groups.
 | 4 | Attendance month | `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `AttendanceMonth`, `AttendanceDay` | — | Read-only; no PDF, collect, or request list |
 | 5 | Payroll password gate | `GET/POST /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#new/create` | `User` password, session | Password confirmation | Five-minute company-scoped unlock; every Profile entry asks again |
 | 6 | Payroll | `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `Payroll` (money), `AttendanceMonth` | — | Password-gated; no payslip download |
-| 7 | Operations | `GET /mobile/companies/:company_id/operations` | `Mobile::Companies::OperationsController#index` | `BranchOperationAppointment` / `OperationWarehouseAppointment` + `Operation` | — | List filtered by `Operation#accessible_by?`; POS operations expose **Open POS**; other operation types have no action |
+| 7 | Operations | `GET /mobile/companies/:company_id/operations` | `Mobile::Companies::OperationsController#index` | `BranchOperationAppointment` / `OperationWarehouseAppointment` + `Operation` | — | List filtered by `Operation#accessible_by?`; POS operations expose **Open POS** and Reception operations expose **Open Reception**; other operation types have no action |
 | 8 | POS | `GET /mobile/companies/:company_id/operations/pos/:operation_id` | `Mobile::Companies::Operations::PosController#show` | `Operation`, `BranchOperationAppointment` | Checkout/pay via `Companies::OrderProcessing::V1Controller` | Shell-First; reuses web POS Stimulus controller; no order list or offline mode |
-| 9 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee` (group managers), `AttendanceRequest` | Create request | No attachments |
+| 9 | Reception | `GET /mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | `Operation`, `BranchOperationAppointment`, `Event`, `Customer`, `Facility` | Walk-in, check-in/out, parcel and host-notification actions via the web reception endpoints | Shell-First; reuses web reception Stimulus controller; responsive phone/tablet; no offline mode or badge printer |
+| 10 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee` (group managers), `AttendanceRequest` | Create request | No attachments |
 
 `GET /mobile/home` remains the signed-in no-employee fallback and renders
 without a company id. Every tenant page asserts membership through
@@ -453,6 +455,7 @@ preferences, and dynamic employee profiles.
 | Mobile views/partials | `app/views/mobile/` |
 | Payroll password gate | `app/controllers/mobile/companies/payroll_unlocks_controller.rb`, `app/views/mobile/companies/payroll_unlocks/` |
 | Operations list | `app/controllers/mobile/companies/operations_controller.rb`, `app/views/mobile/companies/operations/` |
+| Mobile reception | `app/controllers/mobile/companies/operations/reception_controller.rb` |
 | Mobile formatting helpers | `app/helpers/mobile_helper.rb` |
 | Mobile implementation contract | `docs/MOBILE.md` |
 | Android shell | `android/app/src/main/java/com/example/skycomandroid/MainActivity.kt` |

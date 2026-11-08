@@ -124,7 +124,14 @@ All appointments start `active`. Companies disable the ones they do not use.
 | GET | `/companies/:company_id/operations/pos/:operation_id` | `Companies::Operations::PosController#show` | POS |
 | GET | `/companies/:company_id/operations/booking/:operation_id` | `Companies::Operations::BookingController#show` | Placeholder |
 | GET | `/companies/:company_id/operations/inventory/:operation_id` | `Companies::Operations::InventoryController#show` | Placeholder |
-| GET | `/companies/:company_id/operations/reception/:operation_id` | `Companies::Operations::ReceptionController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/reception/:operation_id` | `Companies::Operations::ReceptionController#show` | Reception console (Events/Customers/Facilities) |
+| POST | `/companies/:company_id/operations/reception/:operation_id/check_in` | `Companies::Operations::ReceptionController#check_in` | Walk-in Customer + Event (+ host/room links) |
+| POST | `/companies/:company_id/operations/reception/:operation_id/advance` | `Companies::Operations::ReceptionController#advance` | Check in / check out / re-open a visit Event |
+| POST | `/companies/:company_id/operations/reception/:operation_id/parcels` | `Companies::Operations::ReceptionController#create_parcel` | Log a held parcel Event |
+| POST | `/companies/:company_id/operations/reception/:operation_id/parcels/:parcel_id/notify` | `Companies::Operations::ReceptionController#notify_parcel` | Stamp the parcel's notified_at metadata |
+| POST | `/companies/:company_id/operations/reception/:operation_id/parcels/:parcel_id/pick_up` | `Companies::Operations::ReceptionController#pick_up_parcel` | Complete the parcel Event |
+| POST | `/companies/:company_id/operations/reception/:operation_id/notify_host` | `Companies::Operations::ReceptionController#notify_host` | Stamp the visit's host_notified_at metadata |
+| GET | `/mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | Mobile/tablet Shell-First mount point |
 | GET | `/companies/:company_id/operations/kitchen/:operation_id` | `Companies::Operations::KitchenController#show` | Placeholder |
 | GET | `/companies/:company_id/operations/housekeeping/:operation_id` | `Companies::Operations::HousekeepingController#show` | Placeholder |
 | GET | `/companies/:company_id/operations/store_manager/:operation_id` | `Companies::Operations::StoreManagerController#show` | Placeholder |
@@ -180,7 +187,30 @@ preserved when the form is saved. Raw metadata is never exposed in the UI.
 | Operation Configs | `Companies_OperationConfigs_IndexController` (`companies--operation-configs--index`) | `Companies::OperationConfigsController#index` |
 | Operation config details / edit | `Companies_OperationConfigs_ShowController` / `Companies_OperationConfigs_EditController` | `Companies::OperationConfigsController#show/edit/update` |
 | POS | `Companies_Operations_Pos_ShowController` (`companies--operations--pos--show`) | `Companies::Operations::PosController#show` |
+| Reception | `Companies_Operations_Reception_ShowController` (`companies--operations--reception--show`) | `Companies::Operations::ReceptionController#show/check_in/advance/create_parcel/notify_parcel/pick_up_parcel/notify_host` |
 | Placeholders | `Companies_Operations_<Type>_ShowController` | `Companies::Operations::<Type>Controller#show` |
+
+Reception reuses the existing domain instead of adding visitor/parcel tables:
+
+- **Visit** = `Event` (branch-scoped). `pending` → upcoming, `confirmed` → lobby,
+  `in_progress` → inside, `completed` → departed.
+- **Visitor** = `Customer` linked through `CustomerEventAppointment`.
+- **Host** = `Employee` linked through `EmployeeEventAppointment`.
+- **Room** = `Facility` linked through `EventFacilityAppointment`; room
+  availability is derived from the current/next linked Event.
+- **Parcel** = `Event` with `metadata["reception_kind"] = "parcel"`,
+  `workflow_status: received`, and the recipient employee linked through
+  `EmployeeEventAppointment`. Completed parcels disappear from the console.
+
+`Reception::ConsoleService` builds the read payload;
+`Reception::CheckInService`, `Reception::AdvanceService` and
+`Reception::ParcelService` own the writes. The Stimulus controller only renders
+the payload and posts the write actions.
+
+The mobile/tablet route mounts the same Stimulus controller from a Shell-First
+`<div>` (`Mobile::Companies::Operations::ReceptionController`); the responsive
+Tailwind layout handles phone portrait, tablet portrait and tablet landscape.
+The mobile Operations list adds an **Open Reception** action next to **Open POS**.
 
 The Operations pages use **full-page show + edit** pages, never modals. The two list
 pages link the row name to the show page and the edit icon to the edit page. Both

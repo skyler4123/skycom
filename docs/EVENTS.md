@@ -120,6 +120,18 @@ FE: `companies/events/{index,new,show,edit}`, `companies/event_configs/*`,
 (board create, JSON submit → toast + `calendar:refresh` event, no reload).
 Sidebar group `calendar` ("Calendar/Schedule"): Calendar, Events, Event Configs.
 
+### Reception console projection
+
+The Reception operation (`Companies::Operations::ReceptionController`) projects
+Events into a front-desk queue rather than adding a visitor table:
+
+- `pending` → upcoming, `confirmed` → lobby, `in_progress` → inside,
+  `completed` → departed, `cancelled` → hidden.
+- Visitor = linked Customer, host = linked Employee, room = linked Facility.
+- Parcels are Events flagged `metadata["reception_kind"] = "parcel"` with
+  `workflow_status: received`; completing the Event removes them from the
+  console. See `docs/OPERATIONS.md` §7.
+
 ## 5. Seeding
 
 **Init** (`RetailInitService` / `HospitalInitService`): `events` categories
