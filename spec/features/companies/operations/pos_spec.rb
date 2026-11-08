@@ -57,8 +57,11 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   end
 
   before do
+    Customer.ms_clear_index!
     sign_in(owner)
   end
+
+  after { Customer.ms_clear_index! }
 
   def add_to_cart(product)
     find('[data-action*="addToCart"]', text: product.name, wait: 10).click
@@ -130,7 +133,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   end
 
   scenario "fetches a customer by name" do
-    create(:customer, company: company, name: "Sarah Jenkins")
+    create(:customer, company: company, name: "Sarah Jenkins").ms_index!(true)
 
     visit pos_path
 
@@ -140,9 +143,32 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(page).to have_content("Sarah Jenkins", wait: 10)
   end
 
+  scenario "fetches a customer by name with typo tolerance" do
+    create(:customer, company: company, name: "Sarah Jenkins").ms_index!(true)
+
+    visit pos_path
+
+    fill_in "pos-customer-lookup", with: "Sarah Jenkns"
+    click_button "Find"
+
+    expect(page).to have_content("Sarah Jenkins", wait: 10)
+  end
+
+  scenario "fetches a customer by email" do
+    create(:customer, company: company, name: "Email Customer", email: "pos.lookup@example.com").ms_index!(true)
+
+    visit pos_path
+
+    fill_in "pos-customer-lookup", with: "pos.lookup@example.com"
+    click_button "Find"
+
+    expect(page).to have_content("Email Customer", wait: 10)
+  end
+
   scenario "fetches a customer by phone stored in a property slot" do
     customer = create(:customer, company: company, name: "Phone Customer")
     customer.update!(property_string_1: "555-0100")
+    customer.ms_index!(true)
 
     visit pos_path
 

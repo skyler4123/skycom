@@ -4,6 +4,10 @@
 
 ---
 
+## 0. Text Search Rule (mandatory)
+
+All user-facing text search goes through Meilisearch. Never add SQL `LIKE` / `ILIKE` / `sanitize_sql_like` queries for names, codes, emails, descriptions, or property slots — PostgreSQL is for exact lookups only (primary key, foreign key, unique code). Use `Model.ms_raw_search` for a direct lookup or a `DynamicSearch::BaseQueryService` subclass for a table page. If a field is not searchable yet, extend `DynamicSearchConcern` / the model's search concern and reindex.
+
 ## 1. Overview
 
 Skycom uses **Meilisearch** (open-source typo-tolerant search engine) to index business records so a future "search" feature can query and filter them. Every **dynamic-property model** — a model that includes `PropertyMappingConcern` (products, branches, employees, customers, ...) — is made searchable by a single shared concern.
@@ -12,7 +16,7 @@ Skycom uses **Meilisearch** (open-source typo-tolerant search engine) to index b
 
 | Group | Columns | Role |
 |-------|---------|------|
-| Standard | `name`, `description`, `code` (only when the table has them) | **searchable** |
+| Standard | `name`, `description`, `code`, `title`, `email` (only when the table has them) | **searchable** |
 | Tenant / scope | `company_id`, `category_id`, `branch_id`, `workflow_status`, `business_type` | **filterable** |
 | Dynamic strings | `property_string_1` … `property_string_10` | searchable + indexed |
 | Dynamic numbers | `property_integer_1..20`, `property_decimal_1..10` | searchable + **filterable** (native numeric — range filters work) |

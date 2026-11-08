@@ -211,7 +211,7 @@ Items without `stockId` (services, non-tracked products) are excluded from the c
 
 - **Category pills** — `catalogCategories` merges `currentCategories()` (client_cache, `resource_name` = `products`/`services`) with the category names carried by the loaded catalog. Clicking a pill filters products and services by `selectedCategoryName`; `All` resets it.
 - **Search / barcode** — the search input filters products and services by name/code in place. Enter tries an exact product `code` match and adds it to the cart (F1 focuses the input).
-- **Customer lookup** — `GET /companies/:company_id/operations/pos/:operation_id/customer_lookup?q=&branch_id=` (`PosController#customer_lookup`, authorized by `PosPolicy#customer_lookup?` = `show?`). Searches UUID, name, code, email, and `property_string_1..5` (phone-like slots), returning `{ customer: { id, name, code, email, membership } }` or `{ customer: nil }`. The selected customer is stored on the active tab, displayed with its membership tier, and passed as `customer_id` to checkout.
+- **Customer lookup** — `GET /companies/:company_id/operations/pos/:operation_id/customer_lookup?q=&branch_id=` (`PosController#customer_lookup`, authorized by `PosPolicy#customer_lookup?` = `show?`). UUIDs are exact DB lookups; every text query goes through Meilisearch (`Customer.ms_raw_search`, company-filtered) over name, code, email, and `property_string_1..5` (phone-like slots), returning `{ customer: { id, name, code, email, membership } }` or `{ customer: nil }`. The selected customer is stored on the active tab, displayed with its membership tier, and passed as `customer_id` to checkout.
 
 ---
 

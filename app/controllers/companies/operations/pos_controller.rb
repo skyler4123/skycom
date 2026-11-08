@@ -9,6 +9,7 @@
 # Docs: docs/OPERATIONS.md, docs/ORDER_PROCESSING_V1.md
 class Companies::Operations::PosController < Companies::Operations::BaseController
   # Lightweight POS customer lookup (id/code/name/email/phone-like property slots).
+  # IDs are exact DB lookups; every text query goes through Meilisearch — never SQL LIKE.
   # POS operators do not need the Customers dashboard permission to serve a customer.
   def customer_lookup
     query = params[:q].to_s.strip
@@ -27,18 +28,15 @@ class Companies::Operations::PosController < Companies::Operations::BaseControll
   def find_customer(query)
     scope = current_company.customers
 
+    # Exact primary-key lookup stays on the DB — this is not text search.
     if query.match?(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i)
       return scope.find_by(id: query)
     end
 
-    pattern = "%#{Customer.sanitize_sql_like(query)}%"
-    scope.where(
-      "name ILIKE :pattern OR code ILIKE :pattern OR email ILIKE :pattern" \
-      " OR property_string_1 ILIKE :pattern OR property_string_2 ILIKE :pattern" \
-      " OR property_string_3 ILIKE :pattern OR property_string_4 ILIKE :pattern" \
-      " OR property_string_5 ILIKE :pattern",
-      pattern: pattern
-    ).first
+    hit = Customer.ms_raw_search(
+      query, filter: %(company_id = "#{current_company.id}")
+    )["hits"].first
+    hit ? scope.find_by(id: hit["id"]) : nil
   end
 
   def customer_lookup_payload(customer)

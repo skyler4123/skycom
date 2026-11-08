@@ -481,7 +481,7 @@ Validates every configured `property_*` slot against the limits of its real data
 
 ### DynamicSearchConcern (`app/models/concerns/dynamic_search_concern.rb`)
 
-Includes `Meilisearch::Rails` and declares one `meilisearch` block for every included model. Indexes `name`/`description`/`code` (when the columns exist) plus all `property_*` dynamic columns; `company_id`/`category_id`/`branch_id`/`workflow_status`/`business_type` + numeric/boolean/datetime properties are filterable. Auto-sync runs through the gem's callbacks, enqueued to `MeilisearchIndexJob` (Solid Queue) via the `enqueue:` proc.
+Includes `Meilisearch::Rails` and declares one `meilisearch` block for every included model. Indexes `name`/`description`/`code`/`title`/`email` (when the columns exist) plus all `property_*` dynamic columns; `company_id`/`category_id`/`branch_id`/`workflow_status`/`business_type` + numeric/boolean/datetime properties are filterable. Auto-sync runs through the gem's callbacks, enqueued to `MeilisearchIndexJob` (Solid Queue) via the `enqueue:` proc.
 
 | Callback | Method | Description |
 |----------|--------|-------------|
