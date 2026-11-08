@@ -52,6 +52,18 @@ RSpec.feature "Mobile Home", type: :feature, js: true do
     expect(page).not_to have_content("--:--:--")
   end
 
+  scenario "switches company when the user belongs to multiple companies" do
+    second_company = create(:company, user: user)
+    sign_in(user)
+    visit mobile_company_home_path(company)
+
+    expect(page).to have_select("Company", with_options: [ company.name, second_company.name ])
+    select second_company.name, from: "Switch company"
+
+    expect(page).to have_current_path(mobile_company_home_path(second_company))
+    expect(page).to have_content(second_company.name)
+  end
+
   scenario "toggles dark mode from the header" do
     sign_in(user)
     visit mobile_company_home_path(company)

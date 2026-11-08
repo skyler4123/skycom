@@ -102,6 +102,16 @@ class CacheKeyService
     "user:#{user_id}:companies_max_updated_at"
   end
 
+  # Pattern: user:<user_id>:mobile_companies:v1:<version>
+  # Purpose: the mobile Home company switcher list (company id + name).
+  # Store: Rails.sync_cache
+  # TTL: CACHE_DEFAULT_EXPIRY (1 hour)
+  # Written by: Mobile::Companies::HomeController#index
+  # Cleared by: versioned — version embeds employee count + latest employee/company updates
+  def self.user_mobile_companies(user_id, version:)
+    "user:#{user_id}:mobile_companies:v1:#{version}"
+  end
+
   # Pattern: employee:<employee_id>:manager_ids
   # Purpose: ids of the group managers this employee reports to (Employee#managers).
   # Store: Rails.sync_cache
