@@ -68,6 +68,8 @@ companies:
 - Existing branches/warehouses won't get the new appointment rows.
 - Launch/route/controller/FE wiring must also be added.
 
+> Full new-type procedure: `docs/OPERATION_PAGES.md`.
+
 Future task:
 
 - Add `Seed::OperationService.sync_catalog!(company:)` — idempotent upsert of every

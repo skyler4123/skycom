@@ -1,5 +1,8 @@
 # Skycom Operations System
 
+> **Adding a new operation type?** Read `docs/OPERATION_PAGES.md` first — it is
+> the executable, end-to-end procedure. This document explains the domain.
+
 ## 1. Overview
 
 Operations are full-screen interfaces keyed by **purpose**, not industry or
@@ -265,16 +268,25 @@ config here resets every branch and warehouse config.
 
 ## 8. Adding a new operation type
 
-A new operation type touches six layers:
+A new operation type touches every layer. The full procedure — design intake,
+real-data rules, page inventory, backend contract, web/mobile parity,
+exact-value feature tests, and definition of done — is in
+[`docs/OPERATION_PAGES.md`](OPERATION_PAGES.md). Read it before starting.
+
+At a glance:
 
 1. Add the enum value to `Operation.operation_type`.
-2. Add the `OPERATION_TYPES` entry (label, prefix, scope).
-3. Add a `Companies::Operations::<Type>Controller` + route + policy.
-4. Add the route helper to `OperationLaunchService`.
-5. Add the FE Stimulus controller (or placeholder subclass).
-6. **Backfill existing companies** — see `docs/TODO.md` "Operations —
-   new operation_type backfill". Adding the value alone does not create Operation records
-   or appointments for existing companies.
+2. Add the `OPERATION_TYPES` entry (label, code prefix, appointment scope).
+3. Backfill existing companies (Operation + appointments).
+4. Add the web route, policy, controller, and `OperationLaunchService` entry.
+5. Add the console service and real-data payload.
+6. Add the shared Stimulus controller.
+7. Add the mobile route, policy, shell, and Operations-list link.
+8. Add translations and exact-value feature tests.
+9. Update `docs/MOBILE.md`, `docs/MOBILE_FEATURE_MATRIX.md`, and BE↔FE headers.
+
+See `docs/TODO.md` "Operations — new operation_type backfill" for the existing
+backfill gap.
 
 ---
 

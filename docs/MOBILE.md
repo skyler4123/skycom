@@ -34,6 +34,12 @@ authentication.
 | `POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#create` | redirect / 422 re-render |
 | `POST /mobile/companies/:company_id/attendances` | `Mobile::Companies::AttendancesController#create` | redirect |
 
+> **Adding a new operation console?** Follow `docs/OPERATION_PAGES.md` §8. The
+> mobile route, policy, `shell_html`, Operations-list link, and orientation tests
+> are part of the same deliverable as the web page. The mobile shell must mount
+> the shared web Stimulus controller; do not create a mobile-only operation
+> controller.
+
 `Mobile::Companies::BaseController` resolves the employee through
 `current_user.employees.find_by!(company_id: params[:company_id])`. A company
 the user does not belong to returns `404`; the stored company id on the device

@@ -5,6 +5,9 @@
 > `/mobile/companies/:company_id/*` pages.
 > **Purpose:** the single place to compare mobile with web, track what works,
 > and decide what to build next.
+>
+> **Adding a new operation console?** Follow `docs/OPERATION_PAGES.md` §8 and
+> update this matrix's Operations row/backlog when the page ships.
 
 ## 0. How to read this
 
