@@ -124,7 +124,8 @@ RSpec.describe "Company operations", type: :request do
       operation = company.operations.find_by!(operation_type: :booking)
       facility = create(:facility, company: company, branch: branch, name: "Boardroom Orion", property_integer_1: 16)
       event = create(:event, company: company, branch: branch, name: "Executive Board Review",
-        start_at: 9.hours.from_now, end_at: 11.hours.from_now, workflow_status: :confirmed)
+        start_at: Time.current.change(hour: 9, min: 0), end_at: Time.current.change(hour: 11, min: 0),
+        workflow_status: :confirmed)
       EventFacilityAppointment.create!(company: company, event: event, facility: facility)
 
       get booking_company_operations_path(company, operation, branch_id: branch.id), as: :json
