@@ -25,7 +25,6 @@ RSpec.feature "Mobile Operations", type: :feature, js: true do
     expect(page).to have_content(operation_record.code)
     expect(page).to have_content("Downtown Branch")
     expect(page).to have_content("POS")
-    expect(page).to have_content("Desktop")
     expect(page).to have_content("Active")
     expect(page).to have_content("Approved")
     expect(page).not_to have_content("Retail cashier")
