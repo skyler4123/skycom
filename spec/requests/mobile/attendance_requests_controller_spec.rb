@@ -34,6 +34,7 @@ RSpec.describe "Mobile::Companies::AttendanceRequestsController", type: :request
     expect(created.company).to eq(company)
     expect(created).to be_status_pending
     expect(response).to redirect_to(new_mobile_company_attendance_request_path(company))
+    expect(flash[:notice]).to eq("Attendance request submitted successfully")
   end
 
   it "redirects with alert when the employee lacks create permission" do

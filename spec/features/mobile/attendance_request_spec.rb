@@ -22,9 +22,16 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
     )
   end
 
+  # The form is rendered by the page Stimulus controller after its .json fetch;
+  # wait for it before touching fields, because the raw DOM helper does not retry.
+  def visit_new_request_form(company)
+    visit new_mobile_company_attendance_request_path(company)
+    expect(page).to have_button("Submit Request", wait: 10)
+  end
+
   scenario "submits a valid attendance request" do
     sign_in(user)
-    visit new_mobile_company_attendance_request_path(company)
+    visit_new_request_form(company)
 
     expect(page).to have_content("New Request")
     set_native_field("attendance_date", Date.yesterday.strftime("%Y-%m-%d"))
@@ -35,7 +42,12 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
     expect(page).to have_content("12/240")
     click_button "Submit Request"
 
-    expect(page).to have_content("Attendance request submitted successfully")
+    # A successful submit redirects back to a fresh form (the reason counter
+    # resets to 0/240). Wait for that durable outcome; the 4-second flash toast
+    # can expire while Chrome is still loading under parallel test load, which
+    # made the old assertion flaky. The notice itself is covered by the request
+    # spec, where the response flash is deterministic.
+    expect(page).to have_content("0/240", wait: 10)
     expect(AttendanceRequest.count).to eq(1)
     expect(AttendanceRequest.last.employee).to eq(employee)
     expect(AttendanceRequest.last).to be_status_pending
@@ -44,9 +56,9 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
 
   scenario "shows the employee's group managers" do
     sign_in(user)
-    visit new_mobile_company_attendance_request_path(company)
+    visit_new_request_form(company)
 
-    expect(page).to have_content("Your Managers")
+    expect(page).to have_content("Your Managers", wait: 10)
     expect(page).to have_content("Alex Approver")
     expect(page).to have_content("AA")
     expect(page).not_to have_content("Sample")
@@ -63,7 +75,7 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
     )
 
     sign_in(user)
-    visit new_mobile_company_attendance_request_path(company)
+    visit_new_request_form(company)
 
     expect(page).to have_content("Alex Approver")
     expect(page).to have_content("Blair Approver")
@@ -71,20 +83,20 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
 
   scenario "shows validation errors and does not create a request" do
     sign_in(user)
-    visit new_mobile_company_attendance_request_path(company)
+    visit_new_request_form(company)
 
     set_native_field("attendance_date", Date.yesterday.strftime("%Y-%m-%d"))
     select "Onsite Miss", from: "Type"
     set_native_field("check_in_time", "09:00")
     click_button "Submit Request"
 
-    expect(page).to have_content("can't be blank")
+    expect(page).to have_content("can't be blank", wait: 10)
     expect(AttendanceRequest.count).to eq(0)
   end
 
   scenario "rejects a future attendance date" do
     sign_in(user)
-    visit new_mobile_company_attendance_request_path(company)
+    visit_new_request_form(company)
 
     set_native_field("attendance_date", Date.tomorrow.strftime("%Y-%m-%d"))
     select "Field Work", from: "Type"
@@ -92,7 +104,7 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
     fill_in "Reason", with: "Site inspection"
     click_button "Submit Request"
 
-    expect(page).to have_content("cannot be in the future")
+    expect(page).to have_content("cannot be in the future", wait: 10)
     expect(AttendanceRequest.count).to eq(0)
   end
 
