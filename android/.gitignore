@@ -1,12 +1,10 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# Android Studio project metadata is machine-specific; Gradle is the source of
+# truth and Studio regenerates this folder on import. Share run configurations
+# via .run/*.xml if ever needed.
+/.idea/
 .DS_Store
 /build
 /captures
