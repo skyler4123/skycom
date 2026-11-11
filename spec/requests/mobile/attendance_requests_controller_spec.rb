@@ -87,4 +87,47 @@ RSpec.describe "Mobile::Companies::AttendanceRequestsController", type: :request
 
     expect(response).to have_http_status(:not_found)
   end
+
+
+  it "renders only the shell on the new page" do
+    get new_mobile_company_attendance_request_path(company)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include('data-controller="mobile--companies--attendance-requests--new"')
+    expect(response.body).to include(
+      %(data-json-url="#{new_mobile_company_attendance_request_path(company, format: :json)}")
+    )
+    expect(response.body).not_to include("Your Managers")
+  end
+
+  it "returns the form payload as JSON" do
+    get new_mobile_company_attendance_request_path(company, format: :json)
+
+    expect(response).to have_http_status(:ok)
+    json = JSON.parse(response.body)
+    expect(json.dig("employee", "name")).to eq(user.employees.find_by(company_id: company.id).name)
+    expect(json.dig("company", "id")).to eq(company.id)
+    expect(json["business_types"]).to eq(AttendanceRequest.business_types.keys)
+    expect(json.dig("defaults", "business_type")).to eq("onsite_miss")
+    expect(json["managers"]).to be_an(Array)
+  end
+
+  it "re-renders the shell with errors and values when the request is invalid" do
+    expect {
+      post mobile_company_attendance_requests_path(company), params: {
+        attendance_request: {
+          attendance_date: Date.yesterday,
+          business_type: "remote_work",
+          check_in_time: "09:00"
+        }
+      }
+    }.not_to change(AttendanceRequest, :count)
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(response.body).to include('data-controller="mobile--companies--attendance-requests--new"')
+    expect(response.body).to include("data-errors")
+    expect(response.body).to include("Reason")
+    expect(response.body).to include("data-values")
+    expect(response.body).to include("remote_work")
+  end
 end

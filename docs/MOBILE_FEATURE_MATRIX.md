@@ -1,8 +1,8 @@
 # Skycom Mobile Feature Matrix
 
-> **Last verified:** 2026-11-08
-> **Scope:** Android Hotwire Native app + the server-rendered
-> `/mobile/companies/:company_id/*` pages.
+> **Last verified:** 2026-11-11
+> **Scope:** Android Hotwire Native app + the Shell-First
+> `/mobile/companies/:company_id/*` pages (HTML shell + same-URL `.json`).
 > **Purpose:** the single place to compare mobile with web, track what works,
 > and decide what to build next.
 >
@@ -60,10 +60,12 @@ Source files for the inventory:
 
 **Headline:** 13 mobile screens (including the payroll password gate, Operations,
 the POS cashier, the Booking console, the Reception console, the Store Manager
-console, and the Inventory console), 5 native tabs, 6 write surfaces
-(check-in, request create, sign-out, POS checkout/pay, booking reservation, reception walk-in/parcel),
-and 6 read surfaces (profile, attendance month, payroll, operations, store manager, inventory). The web has **69 sidebar items** across 16 active groups
-plus 3 coming-soon groups.
+console, and the Inventory console), every page Shell-First (HTML shell plus a
+same-URL `.json` payload; form pages still submit natively), 5 native tabs, 6
+write surfaces (check-in, request create, sign-out, POS checkout/pay, booking
+reservation, reception walk-in/parcel), and 6 read surfaces (profile, attendance
+month, payroll, operations, store manager, inventory). The web has **69 sidebar
+items** across 16 active groups plus 3 coming-soon groups.
 
 **Biggest blockers**
 

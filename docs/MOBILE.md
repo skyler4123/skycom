@@ -1,9 +1,10 @@
 # Skycom Mobile (Hotwire Native)
 
-Server-rendered mobile pages inside the Android Hotwire Native shell. Tenant
-pages are scoped to the company in the URL (`/mobile/companies/:company_id/*`);
-the native app owns the five-tab bottom navigation and shows it only after
-authentication.
+Shell-First mobile pages inside the Android Hotwire Native shell. Every page
+response is only a mount `<div>`; a mobile Stimulus controller hydrates it from
+the same URL as `.json`. Tenant pages are scoped to the company in the URL
+(`/mobile/companies/:company_id/*`); the native app owns the five-tab bottom
+navigation and shows it only after authentication.
 
 > Feature parity, pending work, and the Android shell audit live in
 > [`docs/MOBILE_FEATURE_MATRIX.md`](MOBILE_FEATURE_MATRIX.md).
@@ -12,38 +13,41 @@ authentication.
 
 ## 1. Routes and pages
 
-| Route | Controller#action | View |
+| Route | Controller#action | Hydrated by |
 |---|---|---|
-| `GET/POST /mobile/sign_in` | `Mobile::SessionsController#new/create` | `mobile/sessions/new` |
+| `GET/POST /mobile/sign_in` | `Mobile::SessionsController#new/create` | `Mobile_Sessions_NewController` |
 | `DELETE /mobile/sign_out` | `Mobile::SessionsController#destroy` | redirect |
-| `GET /mobile/home` | `Mobile::HomeController#index` | `mobile/companies/home/index` (no-employee fallback) |
-| `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `mobile/companies/home/index` |
-| `GET /mobile/companies/:company_id/notifications` | `Mobile::Companies::NotificationsController#index` | `mobile/companies/notifications/index` |
-| `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `mobile/companies/employees/show` (Profile) |
-| `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `mobile/companies/attendance_months/show` |
-| `GET /mobile/companies/:company_id/operations` | `Mobile::Companies::OperationsController#index` | `mobile/companies/operations/index` |
-| `GET /mobile/companies/:company_id/operations/pos/:operation_id` | `Mobile::Companies::Operations::PosController#show` | Shell-First mount point (inline `shell_html` div) |
-| `GET /mobile/companies/:company_id/operations/booking/:operation_id` | `Mobile::Companies::Operations::BookingController#show` | Shell-First mount point (inline `shell_html` div) |
-| `GET /mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | Shell-First mount point (inline `shell_html` div) |
-| `GET /mobile/companies/:company_id/operations/store_manager/:operation_id` | `Mobile::Companies::Operations::StoreManagerController#show` | Shell-First mount point (inline `shell_html` div) |
-| `GET /mobile/companies/:company_id/operations/inventory/:operation_id` | `Mobile::Companies::Operations::InventoryController#show` | Shell-First mount point (inline `shell_html` div) |
-| `GET /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#new` | `mobile/companies/payroll_unlocks/new` |
-| `POST /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#create` | redirect / 422 re-render |
-| `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `mobile/companies/payrolls/show` |
-| `GET /mobile/companies/:company_id/attendance_requests/new` | `Mobile::Companies::AttendanceRequestsController#new` | `mobile/companies/attendance_requests/new` |
-| `POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#create` | redirect / 422 re-render |
-| `POST /mobile/companies/:company_id/attendances` | `Mobile::Companies::AttendancesController#create` | redirect |
+| `GET /mobile/companies/:company_id/home` | `Mobile::Companies::HomeController#index` | `Mobile_Companies_Home_IndexController` |
+| `GET /mobile/companies/:company_id/notifications` | `Mobile::Companies::NotificationsController#index` | `Mobile_Companies_Notifications_IndexController` |
+| `GET /mobile/companies/:company_id/employee` | `Mobile::Companies::EmployeesController#show` | `Mobile_Companies_Employees_ShowController` |
+| `GET /mobile/companies/:company_id/attendance_month` | `Mobile::Companies::AttendanceMonthsController#show` | `Mobile_Companies_AttendanceMonths_ShowController` |
+| `GET /mobile/companies/:company_id/operations` | `Mobile::Companies::OperationsController#index` | `Mobile_Companies_Operations_IndexController` |
+| `GET /mobile/companies/:company_id/operations/pos/:operation_id` | `Mobile::Companies::Operations::PosController#show` | shared `Companies_Operations_Pos_ShowController` |
+| `GET /mobile/companies/:company_id/operations/booking/:operation_id` | `Mobile::Companies::Operations::BookingController#show` | shared `Companies_Operations_Booking_ShowController` |
+| `GET /mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | shared `Companies_Operations_Reception_ShowController` |
+| `GET /mobile/companies/:company_id/operations/store_manager/:operation_id` | `Mobile::Companies::Operations::StoreManagerController#show` | shared `Companies_Operations_StoreManager_ShowController` |
+| `GET /mobile/companies/:company_id/operations/inventory/:operation_id` | `Mobile::Companies::Operations::InventoryController#show` | shared `Companies_Operations_Inventory_ShowController` |
+| `GET /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#new` | `Mobile_Companies_PayrollUnlocks_NewController` |
+| `POST /mobile/companies/:company_id/payroll/unlock` | `Mobile::Companies::PayrollUnlocksController#create` | native POST → redirect / 422 shell |
+| `GET /mobile/companies/:company_id/payroll` | `Mobile::Companies::PayrollsController#show` | `Mobile_Companies_Payrolls_ShowController` |
+| `GET /mobile/companies/:company_id/attendance_requests/new` | `Mobile::Companies::AttendanceRequestsController#new` | `Mobile_Companies_AttendanceRequests_NewController` |
+| `POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#create` | native POST → redirect / 422 shell |
+| `POST /mobile/companies/:company_id/attendances` | `Mobile::Companies::AttendancesController#create` | native POST → redirect |
+
+Every GET route above also accepts `.json`, which returns the page payload. The
+HTML response contains no screen content.
 
 > **Adding a new operation console?** Follow `docs/OPERATION_PAGES.md` §8. The
 > mobile route, policy, `shell_html`, Operations-list link, and orientation tests
-> are part of the same deliverable as the web page. The mobile shell must mount
-> the shared web Stimulus controller; do not create a mobile-only operation
+> are part of the same deliverable as the web page. The mobile console shell must
+> mount the shared web Stimulus controller; do not create a mobile-only operation
 > controller.
 
 `Mobile::Companies::BaseController` resolves the employee through
 `current_user.employees.find_by!(company_id: params[:company_id])`. A company
 the user does not belong to returns `404`; the stored company id on the device
-is never treated as authorization.
+is never treated as authorization. The `.json` payload uses the same resolution,
+so a multi-company user always hydrates the employee for the company in the URL.
 
 ### Authorization
 
@@ -67,8 +71,8 @@ new companies receive it from their init service.
 `Mobile::Companies::SuspendedCompanyConcern` runs after mobile authorization on
 every `/mobile/companies/:company_id/*` page. A company with
 `workflow_status: suspend` gets a `403` mobile-layout notice (“top up on the
-web”); mobile has no top-up flow. Mobile sign-in, `/mobile/home`, and the
-company picker are not company-scoped and stay reachable. See
+web”); mobile has no top-up flow. Mobile sign-in is not company-scoped and
+stays reachable. See
 `docs/CREDIT_DEDUCTION.md` §5.2.
 
 ### Native auth gate
@@ -95,9 +99,9 @@ Leaving the Profile tab, or putting the app in the background, clears the
 Profile back stack so payroll cannot reappear without a fresh password
 confirmation.
 
-On `/mobile/sign_in`, `/mobile/home`, or a `404`, `MainActivity` clears the
-stored id and returns to `SignInActivity` with a cleared task. Company ids are
-UUIDs (PostgreSQL `uuidv7`), not numeric ids.
+On `/mobile/sign_in` or a `404`, `MainActivity` clears the stored id and
+returns to `SignInActivity` with a cleared task. Company ids are UUIDs
+(PostgreSQL `uuidv7`), not numeric ids.
 
 ---
 
@@ -117,58 +121,48 @@ Native activities:
 - Inter (body) / Plus Jakarta Sans (headings) and Material Symbols Outlined, loaded from Google Fonts.
 - Global flash rendering (`mobile/shared/_flash`) before `yield`.
 
-**Shell-First mount points (`shell_html`).** The web operation pages render
-`render html: "", layout: true`; the desktop layout wraps `yield` in
-`<div data-controller="<%= stimulus_controller %>" data-operation-id=… data-operation-type=…>`,
-so Stimulus binds automatically. The mobile layout has no such wrapper and no
-`stimulus_controller` derivation, and the five operation consoles have no view
-template (they are Shell-First). Each mobile operation controller therefore
-builds its own mount `<div>` in `shell_html`:
+**Shell-First contract.** Every mobile page action responds to two formats:
 
-```ruby
-# app/controllers/mobile/companies/operations/pos_controller.rb
-def show
-  render html: shell_html.html_safe, layout: true
-end
+- `html` renders `render_mobile_shell(json_url: …)`: a single
+  `<div class="min-h-dvh bg-background" data-controller="mobile--…" data-json-url="…">`.
+  `Mobile::BaseController#render_mobile_shell` derives the Stimulus identifier
+  from `controller_path` + `action_name` (the same derivation as the desktop
+  `stimulus_controller` helper), so the shell can never drift from the JS file
+  path.
+- `json` renders the page payload from a private `*_payload` method. No screen
+  content is rendered server-side.
 
-def shell_html
-  <<~HTML
-    <div class="min-h-dvh bg-background"
-      data-controller="companies--operations--pos--show darkmode"
-      data-company-id="#{@company.id}"
-      data-operation-id="#{@operation.id}"
-      data-user-name="#{ERB::Util.html_escape(@employee.name)}"
-      data-user-role="#{ERB::Util.html_escape(@employee.roles.first&.name || "Employee")}"></div>
-  HTML
-end
-```
+The page controller fetches `data-json-url` in `connect()`, renders the screen
+with the shared helpers, and shows a retry state when the fetch fails. A page
+that mounts a shared web console (the five operation consoles) keeps its existing
+`shell_html` div with the ids that controller needs; every other page uses
+`render_mobile_shell`.
 
-The div is the prerequisite for Stimulus binding: it names the shared web
-controller explicitly (`companies--operations--<type>--show`) and carries the
-ids/identity that controller needs to hydrate from
-`/companies/:company_id/operations/<type>/:operation_id.json`. Without it there
-is no element to bind to and the console never renders. Do not move this into
-`mobile.html.erb` — most mobile screens are normal ERB views and must not be
-bound to an operation controller.
+Failed native form POSTs (sign-in, payroll unlock, new request) re-render the
+same shell with HTTP 422 plus `data-errors` and `data-values`. The page controller
+renders the errors inline and restores what the user typed (passwords are never
+restored).
 
-Shared partials in `app/views/mobile/shared/`:
+The only server-rendered screens left are the layout-level `_flash` partial and
+`mobile/shared/suspended.html.erb` (the 403 boundary, which has no data and no
+page controller).
 
-| Partial | Purpose |
-|---|---|
-| `_header` | Brand/back header, theme toggle, initials avatar |
-| `_flash` | Notice/alert toast, dismiss + auto-hide |
-| `_avatar` | Initials circle (no placeholder image dependency) |
-| `_stat_tile` | Label/value/hint/icon card |
-| `_empty_state` | Dashed empty state |
-| `_month_nav` | Previous/next month links with disabled next |
-
-Helpers live in `app/helpers/mobile_helper.rb`: greeting, initials, duration
-formatting, 12-hour times, dates/months, attendance rate, status badges,
-employee/business-type labels, and preview values.
+Page chrome and formatting live in
+`app/javascript/controllers/helpers/mobile_helpers.js`: header, avatar, stat
+tile, empty state, month nav, fetch-error state, greeting, initials, duration,
+12-hour times, dates/months, money, attendance/payroll badges, and
+employee/business-type labels. Reused as-is: `Helpers.form`, `Helpers.fetchJson`,
+`Helpers.timeFormat`, `Helpers.formatMoney`, `translate`, `toast`.
 
 Small Stimulus controllers live in `app/javascript/controllers/mobile/`:
 `theme`, `flash`, `password_visibility`, `clock`, `copy`,
 `character_counter`, `select_nav`. They are local UI only — no JSON calls.
+
+Page controllers live under
+`app/javascript/controllers/mobile/companies/<resource>/<action>_controller.js`
+and `app/javascript/controllers/mobile/sessions/new_controller.js`. Their
+identifiers come from the file path (`mobile--companies--home--index`),
+matching `render_mobile_shell`.
 
 ---
 
@@ -177,25 +171,32 @@ Small Stimulus controllers live in `app/javascript/controllers/mobile/`:
 Every value is read from persisted data. If the schema has no value yet, the
 screen shows an empty/dash state instead of fabricated content.
 
-| Operation | Real data |
+The `.json` sibling of each GET page is the data contract. It carries raw values
+only — ids, enum keys, ISO timestamps, cents, minutes and seconds. JS owns the
+formatting and copy, so the server never ships a second representation of the
+same screen. Errors use `{ errors: [...] }` (plural array) per
+`docs/API_ERROR_FORMAT.md`.
+
+| Screen | Payload |
 |---|---|
-| Sign-in | email/password auth, errors |
-| Home | greeting, company/branch/code, live clock, multi check-in state/times, today's shift/logs, monthly attendance %, worked time, overtime, pending requests, paid-leave balance and pending days, latest published company announcement |
+| Sign-in | `email` (kept after a failed attempt), errors |
+| Home | employee/company/branch/code, company UTC offset, company switcher, check-in state and every check-in time, today's shift/logs, monthly attendance totals, overtime, pending requests, paid-leave balance and pending days, latest published company announcement |
+| Notifications | every subscribed notification (name, description, severity, created_at) |
 | Profile | name/code/type/roles/category, email, phone, company, branch, departments, next shift, monthly attendance, group managers, contract renewal (`expiration_date`), Payroll entry point |
-| Attendance | month summary (worked/present/absent/overtime), daily in/out/duration/status |
-| Operations | every accessible operation appointment for the company: Operation name/code/type, branch or warehouse location, resolution, operation workflow status, appointment workflow status; POS operations expose an **Open POS** action, Booking operations expose **Open Booking**, Reception operations expose **Open Reception**, Store Manager operations expose **Open Store Manager**, and warehouse Inventory operations expose **Open Inventory** |
+| Attendance | month summary (worked/present/absent/overtime), daily in/out/duration/status/recorded method, prev/next month and whether next is disabled |
+| Operations | every accessible operation appointment for the company: Operation name/code/type, branch or warehouse location, operation workflow status, appointment workflow status; POS operations expose an **Open POS** action, Booking operations expose **Open Booking**, Reception operations expose **Open Reception**, Store Manager operations expose **Open Store Manager**, and warehouse Inventory operations expose **Open Inventory** |
 | POS | Shell-First page mounted by `Companies_Operations_Pos_ShowController`; the controller hydrates products, services, categories, payment methods, cart, receipt and customer lookup from the existing web JSON endpoint |
 | Booking | Shell-First page mounted by `Companies_Operations_Booking_ShowController`; the controller hydrates the facility timeline, booking blocks, KPIs, inspector and reservation form from the existing web JSON endpoint, and posts instant reservations |
 | Reception | Shell-First page mounted by `Companies_Operations_Reception_ShowController`; the controller hydrates today's visit Events, customers, hosts, facility rooms, parcels and next appointments from the existing web JSON endpoint, and posts walk-in/check-out/parcel actions |
 | Inventory | Shell-First page mounted by `Companies_Operations_Inventory_ShowController`; the controller hydrates vital stock metrics, the granular stock ledger, inbound/outbound freight docks, zone capacity and audit state from the existing web JSON endpoint |
 | Payroll unlock | signed-in user's password; success sets a five-minute server-side unlock for the current company |
-| Payroll | month, status/step, period days, worked hours, present days, overtime minutes, salary/allowance/overtime/tax/social/net amounts; only after password confirmation |
-| New request | employee/branch, date, type, times, reason, validation, group managers listed from `EmployeeGroup#manager` (owner fallback) |
+| Payroll | month, status/step, period start/end/days, disbursement date, month options, worked hours, present days, overtime minutes, salary/allowance/overtime/deductions/net amounts, currency, tax percent; only after password confirmation |
+| New request | employee/branch, defaults, business types, group managers listed from `EmployeeGroup#manager` (owner fallback), errors and submitted values after a failed POST |
 
 Rules:
 
-- There are no hardcoded mobile sample values. `MobileHelper::PREVIEW` and
-  `mobile_sample_badge` were removed.
+- There are no hardcoded mobile sample values. Every value in the payload comes
+  from the database, the session, or a Ruby constant.
 - Payroll money is computed by `Payrolls::GenerateService` from the employee's
   monthly salary/allowance and the attendance month, then persisted on
   `payrolls`.
@@ -214,6 +215,18 @@ Rules:
 
 ## 4. Flows
 
+**Page load** — the HTML request returns the shell; the page controller fetches
+`data-json-url` and renders. A failed fetch replaces the shell content with a
+retry state (never a blank screen). Turbo restores may reuse an empty shell, but
+`connect()` always hydrates it again.
+
+**Forms** — sign-in, payroll unlock and the new-request form submit natively
+(`data-turbo="false"`). Success keeps the existing redirect + flash. A validation
+failure returns HTTP 422 with the same shell plus `data-errors` and `data-values`;
+the page controller renders the errors inline and restores the submitted values.
+Check-in and sign-out are also native form posts, so their redirects and flashes
+are unchanged.
+
 **Check-in** — `POST /mobile/companies/:company_id/attendances` writes one
 `AttendanceLog` (`log_type: check_in`) for the employee resolved from the URL
 company. Every tap creates another check-in; the home punch card lists every
@@ -228,7 +241,8 @@ from the URL employee, sets `pending`, and:
 
 - success → redirect back to `new` with a flash toast (stays on the
   new-request screen);
-- validation failure → `422` re-render with inline errors.
+- validation failure → `422` shell with `data-errors`/`data-values`; the page
+  controller renders the inline errors and keeps the typed values.
 
 Attachments and approver assignment are not modelled.
 
@@ -312,10 +326,13 @@ scroll horizontally inside their cards instead of widening the page.
   containers (`max-w-lg md:max-w-2xl lg:max-w-4xl xl:max-w-5xl`) and to
   upgrade grids (`md:grid-cols-3`, `md:gap-4`). Never ship a phone-only
   fixed width on tablet breakpoints.
-- Skycom palette: `blue-600/700` primary, `slate` surfaces/text, `green`
-  success, `amber` pending, `red` error.
+- Semantic tokens only: `bg-card`, `text-foreground`, `text-muted-foreground`,
+  `border-line`, `bg-primary`, `text-danger`, `bg-success/10`, … Never raw
+  palette classes (`bg-white`, `text-slate-500`) and never `dark:` on a themed
+  color — the CSS variable switches itself. `bin/check_colors --strict` scans
+  both `app/javascript` and `app/views`.
 - Every card/tile has a border or distinct background in light **and** dark.
-- Every text has a `dark:` variant; every clickable has `cursor-pointer`.
+- Every clickable has `cursor-pointer`.
 - No HTML bottom tab bar; the native shell provides it.
 - Safe-area is the only arbitrary-value exception:
   `pt-[env(safe-area-inset-top)]` and the flash offset.
@@ -327,8 +344,7 @@ scroll horizontally inside their cards instead of widening the page.
 ```bash
 bundle exec parallel_rspec -n 14 \
   spec/features/mobile \
-  spec/requests/mobile \
-  spec/helpers/mobile_helper_spec.rb
+  spec/requests/mobile
 ```
 
 Coverage:
@@ -336,7 +352,7 @@ Coverage:
 | File | Covers |
 |---|---|
 | `spec/features/mobile/sign_in_spec.rb` | form, password toggle, invalid/valid auth, company-scoped redirect, sign-out |
-| `spec/features/mobile/home_spec.rb` | dashboard data, paid leave, company notice, check-in, dark toggle, no-employee fallback, company redirect, auth redirect |
+| `spec/features/mobile/home_spec.rb` | dashboard data, paid leave, company notice, check-in, company switcher, dark toggle, auth redirect |
 | `spec/features/mobile/check_in_spec.rb` | log creation, employee/company stamping, multiple check-ins, company-local day/timezone |
 | `spec/features/mobile/employee_info_spec.rb` | Profile title, sections, Payroll gate entry, group managers/contract, disabled editor, back/sign-out |
 | `spec/features/mobile/attendance_month_spec.rb` | summary, daily rows, prev/next, empty state |
@@ -349,15 +365,16 @@ Coverage:
 | `spec/features/mobile/payroll_spec.rb` | password gate, every-entry prompt, wrong password, status, real money amounts, timesheet link, disabled payslip, month switch |
 | `spec/features/mobile/attendance_request_spec.rb` | valid submit, group managers, validation errors, future date, auth |
 | `spec/requests/mobile/attendances_controller_spec.rb` | check-in, multiple check-ins, cross-tenant 404 |
-| `spec/requests/mobile/home_controller_spec.rb` | company-local day/timezone for check-ins |
+| `spec/requests/mobile/home_controller_spec.rb` | shell-only response, company-local check-in state and UTC offset |
 | `spec/requests/mobile/payrolls_controller_spec.rb` | gate redirect, correct/incorrect password, five-minute expiry, no data leak |
 | `spec/requests/mobile/attendance_requests_controller_spec.rb` | pending create, permission failure, cross-tenant 404 |
 | `spec/requests/mobile/pos_controller_spec.rb` | Shell-First response, missing/inactive appointment redirect, non-POS 404, cross-tenant 404 |
 | `spec/requests/mobile/reception_controller_spec.rb` | Shell-First response, missing/inactive appointment redirect, non-reception 404, cross-tenant 404 |
 | `spec/requests/mobile/store_manager_controller_spec.rb` | Shell-First response, missing/inactive appointment redirect, non-store-manager 404, cross-tenant 404 |
 | `spec/requests/mobile/inventory_controller_spec.rb` | Shell-First response, missing/inactive appointment redirect, non-inventory 404, cross-tenant 404 |
-| `spec/requests/mobile/company_scoping_spec.rb` | member access, cross-tenant 404, malformed company id |
-| `spec/helpers/mobile_helper_spec.rb` | formatting/labels/preview helpers |
+| `spec/requests/mobile/company_scoping_spec.rb` | member access (shell + JSON), cross-tenant 404, malformed company id |
+| `spec/requests/mobile/shell_first_spec.rb` | shell-only HTML plus JSON payload for notifications, operations, attendance month and profile |
+| `spec/requests/mobile/sessions_controller_spec.rb` | sign-in shell, empty JSON payload, invalid credentials (errors + email), valid redirect |
 
 Native date/time inputs are unreliable through Selenium `send_keys`; the
 request feature spec sets them through the DOM with `set_native_field`.
@@ -384,8 +401,12 @@ request feature spec sets them through the DOM with `set_native_field`.
 - Mobile/tablet Store Manager reuses the web store manager console; there is no
   native register/cash-drawer or footfall sensor integration, and the footfall
   panel reports that the sensor is not connected.
-- Mobile ERB remains English-only; `dictionary.js` covers the new JS toasts
-  (`Copied to clipboard`, copy failure).
+- Mobile copy lives in `dictionary.js` and renders through `translate()`.
+  Missing entries fall back to the English key, so add the entry whenever a
+  string moves or changes.
+- `/mobile/home` is not a server route. The Android `CompanyUrl.isMobileHome`
+  check is therefore dormant; sign-in either redirects to the member's company
+  home or back to `/mobile/sign_in`.
 - A suspended company sees a 403 page on mobile; there is no mobile top-up flow
   yet, so recovery happens on the web.
 - No HTML tab bar; browser-only users navigate through Home quick actions.
@@ -400,18 +421,15 @@ request feature spec sets them through the DOM with `set_native_field`.
 
 ```
 app/views/layouts/mobile.html.erb
-app/views/mobile/sessions/
-app/views/mobile/companies/{home,employees,attendance_months,operations,payrolls,payroll_unlocks,attendance_requests}/
-app/views/mobile/shared/
-app/helpers/mobile_helper.rb
-app/controllers/mobile/{base,sessions,home}_controller.rb
+app/views/mobile/shared/_flash.html.erb
+app/views/mobile/shared/suspended.html.erb
+app/controllers/mobile/{base,sessions}_controller.rb
 app/controllers/mobile/companies/
-app/controllers/mobile/companies/operations/pos_controller.rb
-app/controllers/mobile/companies/operations/booking_controller.rb
-app/controllers/mobile/companies/operations/reception_controller.rb
-app/controllers/mobile/companies/operations/store_manager_controller.rb
-app/controllers/mobile/companies/operations/inventory_controller.rb
-app/javascript/controllers/mobile/
+app/controllers/mobile/companies/operations/{pos,booking,reception,store_manager,inventory}_controller.rb
+app/javascript/controllers/helpers/mobile_helpers.js
+app/javascript/controllers/mobile/companies/{home,notifications,employees,attendance_months,operations,payrolls,payroll_unlocks,attendance_requests}/
+app/javascript/controllers/mobile/sessions/new_controller.js
+app/javascript/controllers/mobile/{theme,flash,password_visibility,clock,copy,character_counter,select_nav}_controller.js
 android/.../SignInActivity.kt
 android/.../MainActivity.kt
 android/.../SkycomWebFragment.kt
@@ -419,5 +437,4 @@ android/.../CompanyStore.kt
 android/.../CompanyUrl.kt
 spec/features/mobile/
 spec/requests/mobile/
-spec/helpers/mobile_helper_spec.rb
 ```

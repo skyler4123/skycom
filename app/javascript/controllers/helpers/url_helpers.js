@@ -464,3 +464,34 @@ export const company_payroll_payroll_path = (companyId, id) => `/companies/${com
 export const company_payroll_generate_path = (companyId) => `/companies/${companyId}/payroll/generate`
 export const company_payroll_config_path = (companyId) => `/companies/${companyId}/payroll_config`
 export const company_payroll_my_path = (companyId, month = null) => month ? `/companies/${companyId}/payroll/my?month=${month}` : `/companies/${companyId}/payroll/my`
+
+// --- Mobile (Shell-First pages / Hotwire Native shell) ---
+const mobileQuery = (params = {}) => {
+  const search = new URLSearchParams()
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== null && value !== undefined && value !== "") search.set(key, value)
+  })
+  const query = search.toString()
+  return query ? `?${query}` : ""
+}
+
+const mobileCompanyPath = (companyId, suffix, params = {}) => `/mobile/companies/${companyId}/${suffix}${mobileQuery(params)}`
+const mobileOperationPath = (kind, companyId, operationId, params = {}) => mobileCompanyPath(companyId, `operations/${kind}/${operationId}`, params)
+
+export const mobile_sign_in_path = () => `/mobile/sign_in`
+export const mobile_sign_out_path = () => `/mobile/sign_out`
+export const mobile_company_home_path = (companyId) => mobileCompanyPath(companyId, "home")
+export const mobile_company_notifications_path = (companyId) => mobileCompanyPath(companyId, "notifications")
+export const mobile_company_employee_path = (companyId) => mobileCompanyPath(companyId, "employee")
+export const mobile_company_attendance_month_path = (companyId, params = {}) => mobileCompanyPath(companyId, "attendance_month", params)
+export const mobile_company_operations_path = (companyId) => mobileCompanyPath(companyId, "operations")
+export const mobile_company_pos_path = (companyId, operationId, params = {}) => mobileOperationPath("pos", companyId, operationId, params)
+export const mobile_company_booking_path = (companyId, operationId, params = {}) => mobileOperationPath("booking", companyId, operationId, params)
+export const mobile_company_reception_path = (companyId, operationId, params = {}) => mobileOperationPath("reception", companyId, operationId, params)
+export const mobile_company_store_manager_path = (companyId, operationId, params = {}) => mobileOperationPath("store_manager", companyId, operationId, params)
+export const mobile_company_inventory_path = (companyId, operationId, params = {}) => mobileOperationPath("inventory", companyId, operationId, params)
+export const mobile_company_attendance_requests_path = (companyId) => mobileCompanyPath(companyId, "attendance_requests")
+export const new_mobile_company_attendance_request_path = (companyId) => mobileCompanyPath(companyId, "attendance_requests/new")
+export const mobile_company_attendances_path = (companyId) => mobileCompanyPath(companyId, "attendances")
+export const mobile_company_payroll_unlock_path = (companyId, params = {}) => mobileCompanyPath(companyId, "payroll/unlock", params)
+export const mobile_company_payroll_path = (companyId, params = {}) => mobileCompanyPath(companyId, "payroll", params)

@@ -33,7 +33,7 @@ RSpec.describe "Mobile payroll access", type: :request do
 
     expect(response).to redirect_to(mobile_company_payroll_unlock_path(company))
     follow_redirect!
-    expect(response.body).to include("Payroll is private")
+    expect(response.body).to include('data-controller="mobile--companies--payroll-unlocks--new"')
     expect(response.body).not_to include("$4,865.40")
   end
 
@@ -45,13 +45,23 @@ RSpec.describe "Mobile payroll access", type: :request do
     get mobile_company_payroll_path(company)
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include("$4,865.40")
+    expect(response.body).to include('data-controller="mobile--companies--payrolls--show"')
+    expect(response.body).not_to include("$4,865.40")
+
+    get mobile_company_payroll_path(company, format: :json)
+
+    json = JSON.parse(response.body)
+    expect(json.dig("payroll", "net_amount_cents")).to eq(486_540)
+    expect(json.dig("company", "id")).to eq(company.id)
+    expect(json["month_options"].map { |option| option["value"] }).to include(Date.current.beginning_of_month.strftime("%Y-%m"))
   end
 
   it "does not unlock payroll with an incorrect password" do
     post mobile_company_payroll_unlock_path(company), params: { password: "WrongPassword@1234" }
 
     expect(response).to have_http_status(:unprocessable_content)
+    expect(response.body).to include('data-controller="mobile--companies--payroll-unlocks--new"')
+    expect(response.body).to include("data-errors")
     expect(response.body).to include("Incorrect password")
     expect(response.body).not_to include("$4,865.40")
 

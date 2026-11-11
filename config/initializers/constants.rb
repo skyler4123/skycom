@@ -167,7 +167,7 @@ MAX_PHONE_NUMBER_LENGTH = 20
 
 # =============================================================================
 # Payroll Calculation
-# Referenced in: Payrolls::GenerateService, Payroll, MobileHelper, payroll views.
+# Referenced in: Payrolls::GenerateService, Payroll, Mobile::Companies::PayrollsController.
 # =============================================================================
 
 # Withholding tax applied to gross pay.
