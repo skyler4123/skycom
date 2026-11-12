@@ -11,7 +11,18 @@ RSpec.describe "Mobile::Companies::HomeController", type: :request do
 
   before { get sign_in_for_test_path(email: user.email) }
 
-  it "uses the company's local day and timezone for check-ins" do
+  it "renders only the shell" do
+    get mobile_company_home_path(company)
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include('data-controller="mobile--companies--home--index"')
+    expect(response.body).to include(
+      %(data-json-url="#{mobile_company_home_path(company, format: :json)}")
+    )
+    expect(response.body).not_to include("Paid Leave")
+  end
+
+  it "returns the company-local check-in state as JSON" do
     company.update!(timezone: :plus_7)
 
     travel_to Time.zone.parse("2026-10-30 01:00") do
@@ -22,12 +33,15 @@ RSpec.describe "Mobile::Companies::HomeController", type: :request do
         logged_at: Time.zone.parse("2026-10-29 17:30")
       )
 
-      get mobile_company_home_path(company)
+      get mobile_company_home_path(company, format: :json)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include('data-check-in-status="checked_in"')
-      expect(response.body).to include("Today's Check-ins")
-      expect(response.body).to include("12:30 AM")
+      json = JSON.parse(response.body)
+      expect(json.dig("company", "utc_offset")).to eq(7 * 3600)
+      expect(json["checked_in"]).to be(true)
+      expect(json["check_in_logs"].size).to eq(1)
+      expect(json["check_in_logs"].first["logged_at"]).to be_present
+      expect(json["today_logs"].first["branch_name"]).to be_present
     end
   end
 end

@@ -12,7 +12,13 @@ RSpec.describe "Mobile company scoping", type: :request do
     get mobile_company_home_path(company)
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to include(company.name)
+    expect(response.body).to include('data-controller="mobile--companies--home--index"')
+    expect(response.body).to include(mobile_company_home_path(company, format: :json))
+
+    get mobile_company_home_path(company, format: :json)
+
+    expect(response).to have_http_status(:ok)
+    expect(JSON.parse(response.body).dig("company", "name")).to eq(company.name)
   end
 
   it "returns not found for another company" do
