@@ -18,6 +18,7 @@
 export const root_path = () => `/`
 export const sign_in_path = () => `/sign_in`
 export const sign_up_path = () => `/sign_up`
+export const new_identity_password_reset_path = () => `/identity/password_reset/new`
 export const sign_out_path = () => `/sign_out`
 export const auth_google_oauth2_path = () => `/auth/google_oauth2`
 

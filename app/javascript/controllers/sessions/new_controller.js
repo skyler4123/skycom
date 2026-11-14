@@ -70,6 +70,13 @@ export default class Sessions_NewController extends Controller {
                       id="password" name="password" placeholder="••••••••" type="password" />
                   </div>
                 </div>
+                <div class="flex justify-end">
+                  <a
+                    href="${Helpers.new_identity_password_reset_path()}"
+                    class="text-sm font-medium text-primary hover:underline cursor-pointer">
+                    Forgot your password?
+                  </a>
+                </div>
                 <button
                   class="mt-2 w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer">
                   Sign In

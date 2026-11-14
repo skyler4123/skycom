@@ -92,6 +92,12 @@ export default class Registrations_NewController extends Controller {
                 </button>
               </form>
               <p class="text-center text-sm text-muted-foreground">
+                <a
+                  href="${Helpers.new_identity_password_reset_path()}"
+                  class="font-medium text-primary hover:underline cursor-pointer">Forgot your password?
+                </a>
+              </p>
+              <p class="text-center text-sm text-muted-foreground">
                 Already have an account?
                 <a
                   href="/sign_in"
