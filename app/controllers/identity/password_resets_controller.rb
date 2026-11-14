@@ -4,6 +4,10 @@ class Identity::PasswordResetsController < ApplicationController
   before_action :set_user, only: %i[ edit update ]
 
   def new
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: {} }
+    end
   end
 
   def edit

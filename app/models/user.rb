@@ -76,7 +76,7 @@ class User < ApplicationRecord
   end
 
   after_update if: :password_digest_previously_changed? do
-    sessions.where.not(id: current_session).delete_all
+    sessions.where.not(id: Current.session_id).delete_all
   end
 
   # --- Business Logic Associations ---

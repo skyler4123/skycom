@@ -10,7 +10,8 @@ export default class Sessions_NewController extends Controller {
 
   pageHTML() {
     return `
-      <div class="min-h-screen bg-background py-12 ">
+      <div class="min-h-screen flex flex-col bg-background">
+        <div class="flex-1 py-12 ">
         <div class="mx-auto w-full max-w-[480px] px-4">
           <a
             class="mb-8 flex items-center justify-center gap-2 cursor-pointer"
@@ -70,6 +71,13 @@ export default class Sessions_NewController extends Controller {
                       id="password" name="password" placeholder="••••••••" type="password" />
                   </div>
                 </div>
+                <div class="flex justify-end">
+                  <a
+                    href="${Helpers.new_identity_password_reset_path()}"
+                    class="text-sm font-medium text-primary hover:underline cursor-pointer">
+                    Reset your password?
+                  </a>
+                </div>
                 <button
                   class="mt-2 w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 cursor-pointer">
                   Sign In
@@ -85,6 +93,19 @@ export default class Sessions_NewController extends Controller {
             </div>
           </div>
         </div>
+      </div>
+      <footer class="w-full border-t border-line bg-background/80">
+        <div class="mx-auto max-w-7xl px-4 py-6">
+          <div class="flex flex-col items-center justify-between gap-4 md:flex-row">
+            <p class="text-sm text-muted-foreground">© 2025 Skycom Technologies Inc. All rights reserved.</p>
+            <div class="flex items-center gap-4">
+              <a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">Privacy Policy</a>
+              <a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">Security Center</a>
+              <a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#">Trust Center</a>
+            </div>
+          </div>
+        </div>
+      </footer>
       </div>
     `
   }
