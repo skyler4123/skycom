@@ -19,7 +19,7 @@ RSpec.feature "Password reset via email", type: :feature, js: true, active_job: 
     visit new_identity_password_reset_path
 
     fill_in "Email", with: user.email
-    click_button "Send password reset email"
+    click_button "Send Reset Link"
 
     expect(page).to have_current_path(sign_in_path, wait: 10)
     expect(page).to have_selector("p#notice", text: "Check your email for reset instructions", wait: 10)
@@ -74,7 +74,7 @@ RSpec.feature "Password reset via email", type: :feature, js: true, active_job: 
     visit new_identity_password_reset_path
 
     fill_in "Email", with: unverified.email
-    click_button "Send password reset email"
+    click_button "Send Reset Link"
 
     expect(page).to have_current_path(new_identity_password_reset_path, wait: 10)
     expect(page).to have_selector("p#alert", text: "You can't reset your password until you verify your email", wait: 10)
@@ -87,7 +87,7 @@ RSpec.feature "Password reset via email", type: :feature, js: true, active_job: 
     visit new_identity_password_reset_path
 
     fill_in "Email", with: "nobody_reset@example.com"
-    click_button "Send password reset email"
+    click_button "Send Reset Link"
 
     expect(page).to have_current_path(new_identity_password_reset_path, wait: 10)
     expect(page).to have_selector("p#alert", text: "You can't reset your password until you verify your email", wait: 10)
@@ -106,7 +106,7 @@ RSpec.feature "Password reset via email", type: :feature, js: true, active_job: 
   scenario "rejects mismatched password confirmation" do
     visit new_identity_password_reset_path
     fill_in "Email", with: user.email
-    click_button "Send password reset email"
+    click_button "Send Reset Link"
 
     expect(page).to have_selector("p#notice", text: "Check your email for reset instructions", wait: 10)
 
