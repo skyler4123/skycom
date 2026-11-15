@@ -93,6 +93,7 @@ class Seed::RetailEnrichService
     create_events
     create_documents
     create_purchase_data
+    create_refund_data
     create_discount_data
     create_dynamic_sidebar_samples
     create_support_ticket_data
@@ -749,6 +750,63 @@ class Seed::RetailEnrichService
 
       run_purchase_workflow(purchase, requester, managers.sample, i)
     end
+  end
+
+  # Sample refund requests across every workflow phase (mirrors create_purchase_data).
+  def create_refund_data
+    puts "Creating refunds..."
+    refund_categories = Category.where(company: @retail, resource_name: "refunds").order(:id).to_a
+    return if refund_categories.empty?
+
+    managers = @employees.select { |e| e.has_role?("Manager") }
+    requesters = @employees.select { |e| e.can?(:update, Refund) }
+    return if requesters.empty?
+
+    customers = Customer.where(company: @retail).to_a
+    branches = @branches
+
+    6.times do |i|
+      branch = branches.sample
+      requester = requesters.sample
+      category = round_robin(refund_categories, i)
+      refund = Seed::RefundService.create(
+        company: @retail, branch: branch, category: category,
+        customer: customers.sample,
+        created_by_employee: requester,
+        name: "Refund #{i + 1} for #{branch.name}",
+        refund_type: Refund.refund_types.keys.sample,
+        reason: "Customer requested refund"
+      )
+
+      run_refund_workflow(refund, requester, managers.sample, i)
+    end
+  end
+
+  def run_refund_workflow(refund, requester, manager, index)
+    return if refund.workflow_step.nil?
+
+    case index % 4
+    when 0
+      advance_refund(refund, manager, :approved)
+      advance_refund(refund, manager, :approved)
+      advance_refund(refund, requester, :approved)
+    when 1
+      advance_refund(refund, manager, :rejected, note: "Not eligible")
+    when 2
+      step_one = refund.workflow_step.workflow.workflow_steps.find_by(position: 1)
+      advance_refund(refund, manager, :rework, note: "More info needed", target_step: step_one)
+      advance_refund(refund, manager, :approved)
+      advance_refund(refund, manager, :approved)
+      advance_refund(refund, requester, :approved)
+    else
+      # left pending
+    end
+  end
+
+  def advance_refund(refund, employee, outcome, note: nil, target_step: nil)
+    Workflows::AdvanceService.call(
+      subject: refund, employee: employee, outcome: outcome, note: note, target_step: target_step
+    )
   end
 
   def create_discount_data

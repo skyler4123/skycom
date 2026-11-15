@@ -15,7 +15,7 @@ class Workflow < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Enums ---
-  enum :process_type, { purchase_process: 0, leave_process: 1, ticket_process: 2 }, prefix: true
+  enum :process_type, { purchase_process: 0, leave_process: 1, ticket_process: 2, refund_process: 3 }, prefix: true
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
 
   # --- Associations ---
@@ -49,5 +49,6 @@ class Workflow < ApplicationRecord
   def release_subject_pointers
     Purchase.where(workflow_step_id: workflow_step_ids).update_all(workflow_step_id: nil)
     Ticket.where(workflow_step_id: workflow_step_ids).update_all(workflow_step_id: nil)
+    Refund.where(workflow_step_id: workflow_step_ids).update_all(workflow_step_id: nil)
   end
 end

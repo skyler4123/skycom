@@ -670,6 +670,7 @@ const ENUMS = {
       "events",
       "tickets",
       "purchases",
+      "refunds",
       "purchase_items",
       "stocks",
       "stock_imports",

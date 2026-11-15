@@ -134,6 +134,12 @@ class Seed::HospitalInitService
         visible_columns: %w[name code workflow_status needed_by]
       }
     },
+    refunds: {
+      "Patient Refunds" => {
+        properties: { property_string_1: "Reason", property_string_2: "Source Invoice", property_decimal_1: "Amount" },
+        visible_columns: %w[name code refund_type workflow_status money_amount_cents]
+      }
+    },
     tickets: {
       "Clinical Issue" => {
         properties: { property_string_1: "Department", property_string_2: "Reported By" },
@@ -239,6 +245,24 @@ class Seed::HospitalInitService
         { name: "Manager Approval", position: 2, text_color: WORKFLOW_STEP_TEXT_COLORS[3], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[3] },
         { name: "Buy", position: 3, text_color: WORKFLOW_STEP_TEXT_COLORS[1], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[1] },
         { name: "Complete", position: 4, text_color: WORKFLOW_STEP_TEXT_COLORS[2], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[2] }
+      ].each do |attrs|
+        Seed::WorkflowStepService.create(company: @company, workflow: workflow, **attrs)
+      end
+    end
+
+    @company.categories.where(resource_name: "refunds").find_each do |category|
+      workflow = Seed::WorkflowService.create(
+        company: @company,
+        category: category,
+        name: "#{category.name} Refund Process",
+        description: "Default refund workflow: submit, review, approve.",
+        process_type: :refund_process
+      )
+
+      [
+        { name: "Submit", position: 1, text_color: WORKFLOW_STEP_TEXT_COLORS[0], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[0] },
+        { name: "Review", position: 2, text_color: WORKFLOW_STEP_TEXT_COLORS[3], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[3] },
+        { name: "Approve", position: 3, text_color: WORKFLOW_STEP_TEXT_COLORS[2], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[2] }
       ].each do |attrs|
         Seed::WorkflowStepService.create(company: @company, workflow: workflow, **attrs)
       end
@@ -375,6 +399,7 @@ class Seed::HospitalInitService
         "Appointment" => { create: true, read: true, update: true, delete: true },
         "Patient" => { create: true, read: true, update: true, delete: false },
         "Purchase" => { create: true, read: true, update: true, delete: false },
+        "Refund" => { create: true, read: true, update: true, delete: false },
         "PurchaseItem" => { create: false, read: true, update: false, delete: false },
         "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
@@ -478,6 +503,7 @@ class Seed::HospitalInitService
         "Notification" => { create: true, read: true, update: true, delete: true },
         "NotificationTag" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
+        "Refund" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
@@ -540,6 +566,7 @@ class Seed::HospitalInitService
         "Notification" => { create: true, read: true, update: true, delete: true },
         "NotificationTag" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
+        "Refund" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },

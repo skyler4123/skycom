@@ -208,6 +208,17 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 
 ---
 
+### Refund (`app/models/refund.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :bind_category_workflow, on: :create` | — | `bind_category_workflow` | On create, binds the **category's** default `refund_process` `Workflow` (sets `workflow_step` to the first step + `workflow_status: pending`). Skipped when the transient `skip_workflow` flag is set or the category has no workflow (or its workflow has no steps) — in both no-bind cases the refund stays `workflow_status: draft`. |
+| `after_create :record_submission_log` | — | `record_submission_log` | When a workflow was bound, writes the audit `WorkflowStepLog` (`outcome: :submitted`, actor from the transient `created_by_employee` accessor, `metadata.from_step_id` = first step). No log when unbound (draft) or the workflow has no steps. |
+
+> Both callbacks honor the transient `created_by_employee` / `skip_workflow` attr accessors — the log row is the permanent record; neither is persisted as a column.
+
+---
+
 ### AttendanceRequest (`app/models/attendance_request.rb`)
 
 _No callbacks._ State moves only through `AttendanceRequests::ApproveService` /

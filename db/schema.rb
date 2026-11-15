@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_07_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_14_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -5630,6 +5630,86 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_000002) do
     t.index ["discarded_at"], name: "index_questions_on_discarded_at"
   end
 
+  create_table "refunds", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "customer_id"
+    t.uuid "order_id"
+    t.uuid "invoice_id"
+    t.uuid "transaction_id"
+    t.uuid "payment_method_id"
+    t.uuid "product_id"
+    t.uuid "workflow_step_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.integer "refund_type", default: 0, null: false
+    t.text "reason"
+    t.integer "money_amount_cents"
+    t.integer "currency"
+    t.integer "quantity"
+    t.integer "country"
+    t.integer "timezone"
+    t.string "external_id"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_refunds_on_branch_id"
+    t.index ["category_id"], name: "index_refunds_on_category_id"
+    t.index ["code"], name: "index_refunds_on_code", unique: true
+    t.index ["company_id"], name: "index_refunds_on_company_id"
+    t.index ["customer_id"], name: "index_refunds_on_customer_id"
+    t.index ["discarded_at"], name: "index_refunds_on_discarded_at"
+    t.index ["external_id"], name: "index_refunds_on_external_id"
+    t.index ["invoice_id"], name: "index_refunds_on_invoice_id"
+    t.index ["lifecycle_status"], name: "index_refunds_on_lifecycle_status"
+    t.index ["order_id"], name: "index_refunds_on_order_id"
+    t.index ["payment_method_id"], name: "index_refunds_on_payment_method_id"
+    t.index ["product_id"], name: "index_refunds_on_product_id"
+    t.index ["property_mapping_id"], name: "index_refunds_on_property_mapping_id"
+    t.index ["refund_type"], name: "index_refunds_on_refund_type"
+    t.index ["transaction_id"], name: "index_refunds_on_transaction_id"
+    t.index ["workflow_status"], name: "index_refunds_on_workflow_status"
+    t.index ["workflow_step_id"], name: "index_refunds_on_workflow_step_id"
+  end
+
   create_table "role_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "role_id", null: false
@@ -8230,6 +8310,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_000002) do
   add_foreign_key "question_options", "questions"
   add_foreign_key "questions", "categories"
   add_foreign_key "questions", "companies"
+  add_foreign_key "refunds", "branches"
+  add_foreign_key "refunds", "categories"
+  add_foreign_key "refunds", "companies"
+  add_foreign_key "refunds", "customers"
+  add_foreign_key "refunds", "invoices"
+  add_foreign_key "refunds", "orders"
+  add_foreign_key "refunds", "payment_methods"
+  add_foreign_key "refunds", "products"
+  add_foreign_key "refunds", "property_mappings"
+  add_foreign_key "refunds", "transactions"
+  add_foreign_key "refunds", "workflow_steps"
   add_foreign_key "role_tag_appointments", "companies"
   add_foreign_key "role_tag_appointments", "roles"
   add_foreign_key "role_tag_appointments", "tags"
