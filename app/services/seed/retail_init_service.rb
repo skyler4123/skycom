@@ -458,6 +458,12 @@ class Seed::RetailInitService
         visible_columns: %w[name code workflow_status needed_by]
       }
     },
+    refunds: {
+      "Customer Refunds" => {
+        properties: { property_string_1: "Reason", property_string_2: "Source Order", property_decimal_1: "Amount" },
+        visible_columns: %w[name code refund_type workflow_status money_amount_cents]
+      }
+    },
     tickets: {
       "General Issue" => {
         properties: { property_string_1: "Issue Type", property_string_2: "Reported By" },
@@ -610,6 +616,24 @@ class Seed::RetailInitService
       end
     end
 
+    @company.categories.where(resource_name: "refunds").find_each do |category|
+      workflow = Seed::WorkflowService.create(
+        company: @company,
+        category: category,
+        name: "#{category.name} Refund Process",
+        description: "Default refund workflow: submit, review, approve.",
+        process_type: :refund_process
+      )
+
+      [
+        { name: "Submit", position: 1, text_color: WORKFLOW_STEP_TEXT_COLORS[0], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[0] },
+        { name: "Review", position: 2, text_color: WORKFLOW_STEP_TEXT_COLORS[3], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[3] },
+        { name: "Approve", position: 3, text_color: WORKFLOW_STEP_TEXT_COLORS[2], background_color: WORKFLOW_STEP_BACKGROUND_COLORS[2] }
+      ].each do |attrs|
+        Seed::WorkflowStepService.create(company: @company, workflow: workflow, **attrs)
+      end
+    end
+
     @company.categories.where(resource_name: "tickets").find_each do |category|
       workflow = Seed::WorkflowService.create(
         company: @company,
@@ -729,6 +753,7 @@ class Seed::RetailInitService
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
         "TableConfig" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
+        "Refund" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true },
         "DiscountGroup" => { create: true, read: true, update: true, delete: true },
         "Discount" => { create: true, read: true, update: true, delete: true },
@@ -803,6 +828,7 @@ class Seed::RetailInitService
         "StockTransfer" => { create: true, read: true, update: true, delete: true },
         "StockPending" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
+        "Refund" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true },
         "DiscountGroup" => { create: true, read: true, update: true, delete: true },
         "Discount" => { create: true, read: true, update: true, delete: true },
@@ -838,6 +864,7 @@ class Seed::RetailInitService
         "Brand" => { create: false, read: true, update: false, delete: false },
         "Supplier" => { create: false, read: true, update: false, delete: false },
         "Purchase" => { create: true, read: true, update: true, delete: false },
+        "Refund" => { create: true, read: true, update: true, delete: false },
         "PurchaseItem" => { create: false, read: true, update: false, delete: false },
         "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
@@ -857,6 +884,7 @@ class Seed::RetailInitService
         "Brand" => { create: false, read: true, update: false, delete: false },
         "Supplier" => { create: false, read: true, update: false, delete: false },
         "Purchase" => { create: true, read: true, update: true, delete: false },
+        "Refund" => { create: true, read: true, update: true, delete: false },
         "PurchaseItem" => { create: false, read: true, update: false, delete: false },
         "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },

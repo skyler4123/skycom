@@ -390,6 +390,13 @@ export const company_purchase_path = (companyId, purchaseId) => `/companies/${co
 export const edit_company_purchase_path = (companyId, purchaseId) => `/companies/${companyId}/purchases/${purchaseId}/edit`
 export const advance_company_purchase_path = (companyId, purchaseId) => `/companies/${companyId}/purchases/${purchaseId}/advance`
 
+export const company_refunds_path = (companyId) => `/companies/${companyId}/refunds`
+export const create_company_refunds_path = (companyId) => `/companies/${companyId}/refunds`
+export const new_company_refund_path = (companyId) => `/companies/${companyId}/refunds/new`
+export const company_refund_path = (companyId, refundId) => `/companies/${companyId}/refunds/${refundId}`
+export const edit_company_refund_path = (companyId, refundId) => `/companies/${companyId}/refunds/${refundId}/edit`
+export const advance_company_refund_path = (companyId, refundId) => `/companies/${companyId}/refunds/${refundId}/advance`
+
 export const company_workflows_path = (companyId) => `/companies/${companyId}/workflows`
 export const create_company_workflows_path = (companyId) => `/companies/${companyId}/workflows`
 export const new_company_workflow_path = (companyId) => `/companies/${companyId}/workflows/new`

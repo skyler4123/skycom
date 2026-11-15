@@ -106,6 +106,11 @@ Rails.application.routes.draw do
           post :advance
         end
       end
+      resources :refunds do
+        member do
+          post :advance
+        end
+      end
       resources :workflows
       resources :discount_groups do
         member do
