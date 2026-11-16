@@ -46,6 +46,15 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
     expect(page).not_to have_content("Sample")
   end
 
+  scenario "shows the signed-in user's avatar in the top bar" do
+    user.update!(avatar: "/icon.png")
+
+    sign_in(user)
+    visit mobile_company_employee_path(company)
+
+    expect(page).to have_selector("header img[data-current-user-avatar][src='/icon.png']", wait: 10)
+  end
+
   scenario "changes the avatar from the profile" do
     sign_in(user)
     visit mobile_company_employee_path(company)
@@ -54,6 +63,7 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
 
     expect(page).to have_content("Avatar updated!", wait: 10)
     expect(page).to have_selector("img[src*='/rails/active_storage/']", wait: 10)
+    expect(page).to have_selector("header img[data-current-user-avatar][src*='/rails/active_storage/']", wait: 10)
   end
 
   scenario "rejected avatar upload keeps the initials" do
@@ -65,6 +75,7 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
 
     expect(page).to have_content("is too big", wait: 10)
     expect(page).not_to have_selector("img[src*='/rails/active_storage/']")
+    expect(page).not_to have_selector("header img[data-current-user-avatar]", visible: :visible)
   ensure
     oversized&.close!
   end

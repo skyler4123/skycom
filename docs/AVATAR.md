@@ -288,6 +288,12 @@ The header avatar is read-only; editing lives on the Profile page.
 | Web employee profile (`/companies/:company_id/employees/:id`) | `app/javascript/controllers/companies/employees/show_controller.js` | Renders `user.avatar` in the identity block. Editable **only** when the employee's linked user is the signed-in user; everyone else sees it read-only. Tooltip: "Change avatar · JPG or PNG, up to 500KB". `reloadOnSuccess: true` clears the client cache and reloads so the header avatar refreshes too. |
 | Mobile profile (`/mobile/companies/:company_id/employee`) | `app/javascript/controllers/mobile/companies/employees/show_controller.js` | Self-only page. Shows `user.avatar` with the employee's initials as fallback, a persistent camera badge, and the hint "Tap the photo to change it · JPG or PNG, up to 500KB". Upload updates the image in place and toasts — no reload. |
 
+The mobile top bar reads the signed-in avatar from the layout's
+`<body data-user-avatar="…">` (via `mobileHeader()`), with initials as fallback.
+After an in-place upload the avatar controller updates every
+`[data-current-user-avatar]` image and the body dataset, so the top-right
+Profile circle updates without a reload.
+
 Payloads:
 
 - Web: `Companies::EmployeesController#format_employee` includes `user.avatar`.

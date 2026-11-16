@@ -50,7 +50,10 @@ export default class extends Controller {
       }
 
       // 3. Update with the real processed URL from the server
-      if (response.url) this.renderImage(response.url)
+      if (response.url) {
+        this.renderImage(response.url)
+        this.syncCurrentUserAvatar(response.url)
+      }
 
       toast({ type: "success", message: response.message || translate("Avatar updated!") })
     } catch (error) {
@@ -80,5 +83,14 @@ export default class extends Controller {
     image.alt = "Avatar"
     image.className = "h-full w-full object-cover pointer-events-none"
     this.imageTarget.replaceWith(image)
+  }
+
+  // Keep other current-user avatars (e.g. the mobile top bar) in sync.
+  syncCurrentUserAvatar(url) {
+    document.body.dataset.userAvatar = url
+    document.querySelectorAll("[data-current-user-avatar]").forEach((image) => {
+      image.src = url
+      image.classList.remove("hidden")
+    })
   }
 }

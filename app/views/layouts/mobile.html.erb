@@ -24,6 +24,7 @@
   <body
   class="min-h-dvh bg-background font-sans text-foreground antialiased "
   data-controller="websocket"
+  data-user-avatar="<%= current_user&.avatar %>"
   <% if is_signed_in? && @channels.present? %>
     data-websocket-url-value="ws://localhost:8000/connection/websocket"
     data-websocket-token-value="<%= WEBSOCKET.token(sub: current_user.id.to_s, channels: @channels) %>"

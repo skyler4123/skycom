@@ -117,6 +117,9 @@ Native activities:
 `app/views/layouts/mobile.html.erb`:
 
 - `viewport-fit=cover` + `pt-[env(safe-area-inset-top)]` on the sticky header.
+- `data-user-avatar` on `<body>` (from `current_user.avatar`); the sticky header
+  renders it in the top-right Profile circle, with the employee's initials as the
+  fallback when no avatar is set.
 - Dark-mode pre-paint from `localStorage["darkmode"]` (same key as desktop).
 - Inter (body) / Plus Jakarta Sans (headings) and Material Symbols Outlined, loaded from Google Fonts.
 - Global flash rendering (`mobile/shared/_flash`) before `yield`.
@@ -152,11 +155,12 @@ The only server-rendered screens left are the layout-level `_flash` partial and
 page controller).
 
 Page chrome and formatting live in
-`app/javascript/controllers/helpers/mobile_helpers.js`: header, avatar, stat
-tile, empty state, month nav, fetch-error state, greeting, initials, duration,
-12-hour times, dates/months, money, attendance/payroll badges, and
-employee/business-type labels. Reused as-is: `Helpers.form`, `Helpers.fetchJson`,
-`Helpers.timeFormat`, `Helpers.formatMoney`, `translate`, `toast`.
+`app/javascript/controllers/helpers/mobile_helpers.js`: header (signed-in avatar
+with initials fallback), avatar, stat tile, empty state, month nav, fetch-error
+state, greeting, initials, duration, 12-hour times, dates/months, money,
+attendance/payroll badges, and employee/business-type labels. Reused as-is:
+`Helpers.form`, `Helpers.fetchJson`, `Helpers.timeFormat`, `Helpers.formatMoney`,
+`translate`, `toast`.
 
 Small Stimulus controllers live in `app/javascript/controllers/mobile/`:
 `theme`, `flash`, `password_visibility`, `clock`, `copy`,
