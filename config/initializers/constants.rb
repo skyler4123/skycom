@@ -136,9 +136,11 @@ TEST_RUN_INSIDE_DOCKER = ActiveModel::Type::Boolean.new.cast(
   false
 )
 
-SKIP_TEST_RUN_SEED = ActiveModel::Type::Boolean.new.cast(
-  ENV["SKIP_TEST_RUN_SEED"].presence ||
-  Rails.application.credentials.dig(:skip_test_run_seed) ||
+# true = skip the db:seed that db:prepare runs on a freshly created database
+# (the rspec container sets it; the seed-test pipeline leaves it false).
+SKIP_DB_SEED = ActiveModel::Type::Boolean.new.cast(
+  ENV["SKIP_DB_SEED"].presence ||
+  Rails.application.credentials.dig(:skip_db_seed) ||
   false
 )
 

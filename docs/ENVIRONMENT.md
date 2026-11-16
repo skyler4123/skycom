@@ -104,7 +104,11 @@ development:
 | `MISSION_CONTROL_PASSWORD` | `MISSION_CONTROL_PASSWORD` | `mission_control_password` | `secret` | `mission_control.rb` |
 | `TEST_ENV_NUMBER` | `TEST_ENV_NUMBER` | `test_env_number` | `""` | `meilisearch.rb`, `config/redis/shared.yml`, `spec/retry_helper.rb` |
 | `TEST_RUN_INSIDE_DOCKER` | `TEST_RUN_INSIDE_DOCKER` | `test_run_inside_docker` | `false` | `spec/selenium_helper.rb` |
-| `SKIP_TEST_RUN_SEED` | `SKIP_TEST_RUN_SEED` | `skip_test_run_seed` | `false` | `db/seeds.rb` |
+| `SKIP_DB_SEED` | `SKIP_DB_SEED` | `skip_db_seed` | `false` | `db/seeds.rb` |
+
+`SKIP_DB_SEED=true` skips the seed that `db:prepare` runs on a freshly created
+database. The rspec container sets it; the seed-test pipeline leaves it unset so
+seeding is exercised.
 
 ### 3.2 Inline-only (documented exceptions)
 

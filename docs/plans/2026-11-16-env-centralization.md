@@ -31,7 +31,7 @@ credentials. Credentials remain the durable secret store; defaults keep dev/test
 | Pre-boot / out-of-band files | Keep the inline rule (`database.yml`, `environments/*.rb`, `puma.rb`, `boot.rb`, `spec/rails_helper.rb`) |
 | Production defaults | One explicit warning block at the bottom of the env section (no helper) |
 | Guardrail | `bin/check_env` + CI lint step + `AGENTS.md` pre-commit bullet |
-| Test flags | `ActiveModel::Type::Boolean` for strict `"false"` handling; `SKIP_TEST_RUN_SEED: true` in the rspec compose file |
+| Test flags | `ActiveModel::Type::Boolean` for strict `"false"` handling; `SKIP_DB_SEED: true` in the rspec compose file |
 | TDD exception | Pure config assignments are the TDD skill's documented "configuration files" exception; the spec proves ENV precedence + defaults + catalog completeness, and `bin/check_env` gets its own check |
 
 ---
@@ -54,7 +54,7 @@ credentials. Credentials remain the durable secret store; defaults keep dev/test
 | `config/redis/shared.yml` | Credentials + defaults per environment |
 | `config/queue.yml` | `ENV.fetch("JOB_CONCURRENCY", 1)` |
 | `config/database.yml` | Credentials + defaults for Postgres; `ENV["TEST_ENV_NUMBER"]` |
-| `db/seeds.rb` | `ENV.fetch("SKIP_TEST_RUN_SEED") { false }` |
+| `db/seeds.rb` | `ENV.fetch("SKIP_DB_SEED") { false }` |
 | `spec/retry_helper.rb` | `ENV["TEST_ENV_NUMBER"]` |
 | `spec/selenium_helper.rb` | `ENV.fetch("TEST_RUN_INSIDE_DOCKER") { false }` |
 | `spec/system/mock_api_connection_spec.rb` | Own `MOCK_API_PING_URL` constant |
@@ -159,7 +159,7 @@ references the constant. `bin/check_env` enforces it.
 | `MISSION_CONTROL_PASSWORD` | `MISSION_CONTROL_PASSWORD` | `mission_control_password` | `secret` | `mission_control.rb` |
 | `TEST_ENV_NUMBER` | `TEST_ENV_NUMBER` | `test_env_number` | `""` | `meilisearch.rb`, `redis/shared.yml`, `spec/retry_helper.rb` |
 | `TEST_RUN_INSIDE_DOCKER` | `TEST_RUN_INSIDE_DOCKER` | `test_run_inside_docker` | `false` | `spec/selenium_helper.rb` |
-| `SKIP_TEST_RUN_SEED` | `SKIP_TEST_RUN_SEED` | `skip_test_run_seed` | `false` | `db/seeds.rb` |
+| `SKIP_DB_SEED` | `SKIP_DB_SEED` | `skip_test_run_seed` | `false` | `db/seeds.rb` |
 
 ### 5.2 Inline-only (cannot or must not use constants)
 
@@ -244,11 +244,11 @@ Load-order note: `config/initializers/constants.rb` loads after `assets.rb` and 
 
 ### Step 6 — Seeds, specs, compose
 
-1. `db/seeds.rb` → `return if SKIP_TEST_RUN_SEED`.
+1. `db/seeds.rb` → `return if SKIP_DB_SEED`.
 2. `spec/retry_helper.rb` → `TEST_ENV_NUMBER`.
 3. `spec/selenium_helper.rb` → `TEST_RUN_INSIDE_DOCKER`.
 4. `spec/system/mock_api_connection_spec.rb` → use the global `MOCK_API_PING_URL`.
-5. `docker-compose.rspec-test.yml` → `SKIP_TEST_RUN_SEED: true`.
+5. `docker-compose.rspec-test.yml` → `SKIP_DB_SEED: true`.
 
 ### Step 7 — Guardrail
 
@@ -336,7 +336,7 @@ Manual smoke:
   preserved, so production is unaffected once the key is present.
 - **`ENV.presence` semantics**: blank ENV values fall through to credentials/default. This is a small
   behaviour change from plain `||` in `meilisearch.rb` / `websocket.rb`, and it is the intended one.
-- **Boolean strictness**: `"false"` now means false. `SKIP_TEST_RUN_SEED: false` in the rspec compose file
+- **Boolean strictness**: `"false"` now means false. `SKIP_DB_SEED: false` in the rspec compose file
   was already skipping seeds only because the string was truthy; the compose value is corrected to `true`.
 - **Lazy YAML constant resolution**: verified that `ActiveSupport::ConfigurationFile.parse` resolves
   top-level constants. Storage/Redis/Queue config is parsed after initializers; if a future load-order
@@ -355,7 +355,7 @@ Manual smoke:
   configuration sourcing.
 - No renaming of existing ENV variables or credential keys.
 - No change to `mock_api/main.go`, `android/`, Kamal, compose, Dockerfile, or CI env values (except the
-  `SKIP_TEST_RUN_SEED` correction).
+  `SKIP_DB_SEED` correction).
 - No new hosting/secret-manager integration.
 
 ---
