@@ -84,7 +84,7 @@ export default class Companies_Employees_ShowController extends Companies_Layout
     const accountName = e.user?.name || [e.user?.first_name, e.user?.last_name].filter(Boolean).join(" ") || translate("N/A")
 
     const accountHTML = e.user ? `
-      <div class="border-t border-line pt-6 mt-6">
+      <div class="border-t border-line pt-6">
         <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("User Account")}</h3>
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div class="flex items-center gap-3">
@@ -183,6 +183,8 @@ export default class Companies_Employees_ShowController extends Companies_Layout
             </div>
           </div>
 
+          ${accountHTML}
+
           <div class="grid grid-cols-1 gap-6 border-t border-line pt-6 sm:grid-cols-2">
 
             <div class="flex items-center gap-3">
@@ -246,8 +248,6 @@ export default class Companies_Employees_ShowController extends Companies_Layout
             </div>
 
           </div>
-
-          ${accountHTML}
 
           ${dynamicFields}
 

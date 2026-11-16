@@ -28,6 +28,7 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
     expect(page).to have_content(branch.name)
     expect(page).to have_content("Account & Contact")
     expect(page).to have_content("Signed-in Account")
+    expect(page.text.index("Signed-in Account")).to be < page.text.index("Account & Contact")
     expect(page).to have_content("Account Email")
     expect(page).to have_content(user.email)
     expect(page).to have_content("Company Owner")

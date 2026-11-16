@@ -93,6 +93,7 @@ RSpec.feature "My Profile", type: :feature, js: true do
     expect(page).to have_content("Work Email", wait: 10)
     expect(page).to have_content(owner.email, wait: 10)
     expect(page).to have_content("Company Owner", wait: 10)
+    expect(page.text.downcase.index("user account")).to be < page.text.downcase.index("work email")
   end
 
   scenario "Attendance item shows current month and month dropdown" do

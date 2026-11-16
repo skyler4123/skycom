@@ -41,8 +41,8 @@ export default class Mobile_Companies_Employees_ShowController extends Controlle
       ${mobileMain(`
         <div class="flex flex-col gap-4">
           ${this.identityHTML(data)}
-          ${this.accountHTML(data)}
           ${this.signedInAccountHTML(data)}
+          ${this.accountHTML(data)}
           ${this.organizationHTML(data)}
           ${this.workHTML(data)}
           ${this.actionsHTML(data)}
