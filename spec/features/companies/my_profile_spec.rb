@@ -76,6 +76,16 @@ RSpec.feature "My Profile", type: :feature, js: true do
     expect(page).to have_content(employee.name, wait: 10)
   end
 
+  scenario "avatar Profile link navigates to current employee show page" do
+    visit company_dashboards_path(company)
+
+    find('[data-controller="avatar"]').click
+    click_link "Profile"
+
+    expect(page).to have_current_path(company_employee_path(company, employee), wait: 10)
+    expect(page).to have_content(employee.name, wait: 10)
+  end
+
   scenario "Employee profile shows the linked user account" do
     visit company_employee_path(company, employee)
 

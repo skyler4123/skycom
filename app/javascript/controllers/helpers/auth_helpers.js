@@ -1,4 +1,5 @@
 import { pathname } from "controllers/helpers/ui_helpers"
+import { admin_companies_path, company_employee_path, redirect_profile_path } from "controllers/helpers/url_helpers"
 
 // --- Cookie Logic ---
 /**
@@ -138,6 +139,23 @@ export const currentEmployee = () => {
 
 export const currentEmployeeId = () => {
   return currentEmployee()?.id || null
+}
+
+/**
+ * Where the signed-in user's "Profile" links point.
+ * System accounts have no employee record and live in the admin portal;
+ * everyone else gets their employee show page for the current company, or
+ * their first employee record on pages without a company (e.g. the homepage).
+ * Users with no employee record fall back to RedirectController#profile,
+ * which sends them home with a flash explaining the requirement.
+ * @returns {string}
+ */
+export const myProfilePath = () => {
+  const user = currentUser()
+  if (user?.system_role === "admin" || user?.system_role === "super_admin") return admin_companies_path()
+
+  const employee = currentEmployee() || currentEmployees()[0]
+  return employee ? company_employee_path(employee.company_id, employee.id) : redirect_profile_path()
 }
 
 export const exportPages = () => {

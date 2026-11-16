@@ -1,6 +1,7 @@
 // Shared sidebar registry — the single source of truth for the sidebar renderer
 // (companies/sidebars/show_controller.js). Sidebar visibility and favourites are
 // FE-only (localStorage, per employee) — see docs/SIDEBAR.md.
+import { myProfilePath } from "controllers/helpers/auth_helpers"
 
 // Group registry — array order is the sidebar render order.
 // `locked: true` groups can never be hidden via company settings.
@@ -29,7 +30,7 @@ export const SIDEBAR_GROUPS = [
 ]
 
 export const SIDEBAR_ITEMS = [
-  { key: "my_profile_employee", group: "my_profile", icon: "person", label: "Employee", href: (cid) => { const e = currentEmployee(); return e ? Helpers.company_employee_path(cid, e.id) : Helpers.company_employees_path(cid) } },
+  { key: "my_profile_employee", group: "my_profile", icon: "person", label: "Employee", href: () => myProfilePath() },
   { key: "my_profile_attendance", group: "my_profile", icon: "calendar_view_month", label: "Attendance", href: (cid) => Helpers.company_attendance_months_my_path(cid) },
   { key: "my_profile_payroll", group: "my_profile", icon: "payments", label: "Payroll", href: (cid) => Helpers.company_payroll_my_path(cid) },
   { key: "dashboard", group: "general", icon: "dashboard", label: "Dashboard", href: (cid) => Helpers.company_dashboards_path(cid) },

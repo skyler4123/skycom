@@ -16,6 +16,7 @@
 
 // --- Paths ---
 export const root_path = () => `/`
+export const redirect_profile_path = () => `/redirect/profile`
 export const sign_in_path = () => `/sign_in`
 export const sign_up_path = () => `/sign_up`
 export const new_identity_password_reset_path = () => `/identity/password_reset/new`

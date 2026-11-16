@@ -236,19 +236,36 @@ ${avatar({
 
 ---
 
-## 9. Avatar in Popover
+## 9. Avatar Dropdown Menu
 
 **File**: `app/javascript/controllers/users/avatar_popover_controller.js`
 
-When an editable avatar needs a popover menu (e.g., for profile options), render the popover in the `html` parameter:
+The popover menu holds two items: **Profile** and **Sign Out**. Shared by the
+company header (`companies/layout_controller.js`) and the homepage header
+(`home/header/authentication_controller.js`), so both behave the same.
+
+**Profile** is a real link (`Helpers.myProfilePath()` from
+`controllers/helpers/auth_helpers.js`), never a modal:
+
+| Viewer | Target |
+|---|---|
+| `admin` / `super_admin` | `/admin/companies` |
+| Owner/employee with an employee record | `/companies/:company_id/employees/:employee_id` for the current company, or the first cached employee record on pages without a company (homepage) |
+| Any other signed-in user (no employee record) | `/redirect/profile` → homepage with a flash: "You need an employee account of a company to see your profile." |
+
+The sidebar's "My Profile → Employee" item uses the same helper, so the two
+links can never disagree.
 
 ```javascript
 ${avatar({
-  url: currentUser().avatar,
+  url: currentUser()?.avatar,
   isEditable: true,
   updateUrl: Helpers.users_update_avatar_path(),
   paramName: "user[avatar_attachment]",
-  html: `<div data-controller="users--avatar-popover"></div>`
+  innerAttributes: popover({
+    position: "bottom",
+    html: `<div data-controller="users--avatar-popover"></div>`
+  })
 })}
 ```
 
