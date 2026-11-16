@@ -12,7 +12,7 @@ The avatar system consists of three main components:
 
 | Component | File | Responsibility |
 |-----------|------|---------------|
-| **Helper** | `ui_helpers.js` (line 623) | Generates avatar HTML markup |
+| **Helper** | `ui_helpers.js` (`avatar()`) | Generates avatar HTML markup |
 | **Controller** | `avatar_controller.js` | Handles file selection and upload |
 | **Backend** | `User::AvatarConcern` | Manages Active Storage attachment |
 
@@ -22,19 +22,23 @@ The avatar system consists of three main components:
 
 **File**: `app/javascript/controllers/helpers/ui_helpers.js`
 
-The `avatar()` helper generates HTML for displaying and optionally updating avatars.
+The `avatar()` helper generates HTML for displaying and optionally updating avatars. An avatar is editable only when **both** `updateUrl` and `paramName` are present; otherwise it renders read-only and emits no file input.
 
 ### Parameters
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `url` | string | Yes | URL of the avatar image |
-| `isEditable` | boolean | No | If true, enables click-to-edit (default: false) |
-| `updateUrl` | string | No | Endpoint for avatar upload (default: "/update_avatar") |
-| `paramName` | string | No | Form param key (e.g., "user[avatar_attachment]") |
-| `method` | string | No | HTTP method for upload (default: "PATCH") |
-| `attributes` | string | No | Additional HTML attributes for root element |
-| `html` | string | No | Additional HTML to render (e.g., popover) |
+| `url` | string | No | Current image URL; blank renders the fallback |
+| `updateUrl` | string | No | Upload endpoint; omit to make the avatar read-only |
+| `paramName` | string | No | Multipart key (e.g., `user[avatar_attachment]`) |
+| `method` | string | No | HTTP method for upload (default: `PATCH`) |
+| `className` | string | No | Sizing classes for the root element (default: `size-10`) |
+| `shape` | string | No | Corner classes (default: `rounded-full`) |
+| `fallback` | string | No | HTML for the empty state (e.g., mobile initials) |
+| `badge` | boolean | No | Persistent camera badge for touch devices (default: `false`) |
+| `reloadOnSuccess` | boolean | No | Reload after upload so client cache and header refresh (default: `false`) |
+| `attributes` | string | No | Attributes for the root element (tooltip, id, …) |
+| `innerAttributes` | string | No | Attributes for the inner circle (popover, …) |
 
 ### Usage Examples
 
@@ -50,9 +54,9 @@ ${avatar({
 ```javascript
 ${avatar({
   url: currentUser().avatar,
-  isEditable: true,
   updateUrl: Helpers.users_update_avatar_path(),
   paramName: "user[avatar_attachment]",
+  reloadOnSuccess: true,
   attributes: `id="user_avatar_${currentUser().id}"`
 })}
 ```
@@ -77,6 +81,7 @@ ${avatar({
 | `uploadUrl` | String | Endpoint for uploading avatar |
 | `paramName` | String | Form parameter name (e.g., "user[avatar_attachment]") |
 | `method` | String | HTTP method (default: "PATCH") |
+| `reloadOnSuccess` | Boolean | Clear the client cache and reload after upload (default: false) |
 
 ### Methods
 
@@ -94,7 +99,11 @@ Handles file selection and upload:
 
 1. **Instant Preview**: Reads selected file as DataURL and shows in `imageTarget`
 2. **Upload**: Sends FormData to server via `fetchJson`
-3. **Update**: Replaces preview with real URL from server response
+3. **Update**: Replaces the preview with the real URL from the server response.
+   If the empty state was a fallback `<div>`, it is swapped for an `<img>`.
+4. **Failure**: Restores the previous markup and toasts the server `errors`
+5. **Reload**: With `reloadOnSuccess`, calls `clearClientCacheAndReload` so the
+   header avatar and cached `currentUser().avatar` refresh together
 
 ```javascript
 async upload(event) {
@@ -182,7 +191,6 @@ PATCH /users/update_avatar
 def update_avatar
   if current_user.update(avatar_params)
     current_user.update_avatar
-    current_user.refresh_cache
     render json: { 
       url: current_user.avatar_url(:profile),
       message: "Avatar updated!" 
@@ -192,6 +200,9 @@ def update_avatar
   end
 end
 ```
+
+`User` already runs `after_commit :refresh_cache` on update, so the controller
+does not call it (the method is private and the callback owns cache refresh).
 
 ### Response
 
@@ -206,7 +217,7 @@ end
 **Error**:
 ```json
 {
-  "errors": ["Avatar is too big (500KB)"]
+  "errors": ["Avatar attachment is too big (500KB)"]
 }
 ```
 
@@ -259,9 +270,6 @@ links can never disagree.
 ```javascript
 ${avatar({
   url: currentUser()?.avatar,
-  isEditable: true,
-  updateUrl: Helpers.users_update_avatar_path(),
-  paramName: "user[avatar_attachment]",
   innerAttributes: popover({
     position: "bottom",
     html: `<div data-controller="users--avatar-popover"></div>`
@@ -269,14 +277,35 @@ ${avatar({
 })}
 ```
 
+The header avatar is read-only; editing lives on the Profile page.
+
 ---
 
-## 10. Best Practices
+## 10. Profile Pages (web + mobile)
+
+| Page | Controller | Behaviour |
+|---|---|---|
+| Web employee profile (`/companies/:company_id/employees/:id`) | `app/javascript/controllers/companies/employees/show_controller.js` | Renders `user.avatar` in the identity block. Editable **only** when the employee's linked user is the signed-in user; everyone else sees it read-only. Tooltip: "Change avatar · JPG or PNG, up to 500KB". `reloadOnSuccess: true` clears the client cache and reloads so the header avatar refreshes too. |
+| Mobile profile (`/mobile/companies/:company_id/employee`) | `app/javascript/controllers/mobile/companies/employees/show_controller.js` | Self-only page. Shows `user.avatar` with the employee's initials as fallback, a persistent camera badge, and the hint "Tap the photo to change it · JPG or PNG, up to 500KB". Upload updates the image in place and toasts — no reload. |
+
+Payloads:
+
+- Web: `Companies::EmployeesController#format_employee` includes `user.avatar`.
+- Mobile: `Mobile::Companies::EmployeesController#profile_payload` includes `user.avatar`.
+
+Both pages post to the same `PATCH /users/update_avatar`; no new endpoint or
+migration. Only the signed-in user's own avatar can be changed.
+
+---
+
+## 11. Best Practices
 
 1. **Always use `avatar()` helper** - Never manually write `<img>` tags for avatars
 2. **Provide fallback URL** - Handle cases where avatar is not yet set
 3. **Use appropriate variant** - `profile` (300x300) for most displays
 4. **Handle errors gracefully** - Show toast notifications on failure
+5. **Give touch users an affordance** - `badge: true` renders a camera badge; hover overlays are desktop-only
+6. **Only own avatar is editable** - The endpoint updates `current_user`, so gate the editor on `user.id === currentUser().id`
 
 ---
 

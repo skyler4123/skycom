@@ -138,6 +138,10 @@ that mounts a shared web console (the five operation consoles) keeps its existin
 `shell_html` div with the ids that controller needs; every other page uses
 `render_mobile_shell`.
 
+Avatar upload uses a plain `<input type="file">` rendered by the shared
+`avatar()` helper. Hotwire Native 1.3.2 ships a `FileChooserDelegate`, so the
+Android app opens the system picker without any native code.
+
 Failed native form POSTs (sign-in, payroll unlock, new request) re-render the
 same shell with HTTP 422 plus `data-errors` and `data-values`. The page controller
 renders the errors inline and restores what the user typed (passwords are never
@@ -182,7 +186,7 @@ same screen. Errors use `{ errors: [...] }` (plural array) per
 | Sign-in | `email` (kept after a failed attempt), errors |
 | Home | employee/company/branch/code, company UTC offset, company switcher, check-in state and every check-in time, today's shift/logs, monthly attendance totals, overtime, pending requests, paid-leave balance and pending days, latest published company announcement |
 | Notifications | every subscribed notification (name, description, severity, created_at) |
-| Profile | name/code/type/roles/category, email, phone, company, branch, departments, next shift, monthly attendance, group managers, contract renewal (`expiration_date`), Payroll entry point |
+| Profile | name/code/type/roles/category, signed-in avatar, email, phone, company, branch, departments, next shift, monthly attendance, group managers, contract renewal (`expiration_date`), Payroll entry point |
 | Attendance | month summary (worked/present/absent/overtime), daily in/out/duration/status/recorded method, prev/next month and whether next is disabled |
 | Operations | every accessible operation appointment for the company: Operation name/code/type, branch or warehouse location, operation workflow status, appointment workflow status; POS operations expose an **Open POS** action, Booking operations expose **Open Booking**, Reception operations expose **Open Reception**, Store Manager operations expose **Open Store Manager**, and warehouse Inventory operations expose **Open Inventory** |
 | POS | Shell-First page mounted by `Companies_Operations_Pos_ShowController`; the controller hydrates products, services, categories, payment methods, cart, receipt and customer lookup from the existing web JSON endpoint |
@@ -206,8 +210,9 @@ Rules:
   announcement`) linked to the employee through
   `DocumentEmployeeAppointment`.
 - Do not invent geofence validation, SSO/biometrics, QR scanning, payslip
-  downloads, a mobile profile editor, or attachment uploads. Disable or omit
-  them instead of shipping dead controls.
+  downloads, a mobile profile editor, or general attachment uploads — the avatar
+  uploader is the only exception. Disable or omit anything else instead of
+  shipping dead controls.
 - Activity feeds show real `AttendanceLog` rows only; use the empty state
   instead of fabricated leave/payslip events.
 
@@ -354,7 +359,7 @@ Coverage:
 | `spec/features/mobile/sign_in_spec.rb` | form, password toggle, invalid/valid auth, company-scoped redirect, sign-out |
 | `spec/features/mobile/home_spec.rb` | dashboard data, paid leave, company notice, check-in, company switcher, dark toggle, auth redirect |
 | `spec/features/mobile/check_in_spec.rb` | log creation, employee/company stamping, multiple check-ins, company-local day/timezone |
-| `spec/features/mobile/employee_info_spec.rb` | Profile title, sections, Payroll gate entry, group managers/contract, disabled editor, back/sign-out |
+| `spec/features/mobile/employee_info_spec.rb` | Profile title, sections, avatar change/rejection, Payroll gate entry, group managers/contract, disabled editor, back/sign-out |
 | `spec/features/mobile/attendance_month_spec.rb` | summary, daily rows, prev/next, empty state |
 | `spec/features/mobile/operations_spec.rb` | current-company operation list, another company's records hidden, empty state, auth |
 | `spec/features/mobile/pos_spec.rb` | Shell-First hydration, catalog, add-to-cart, ORDER/payment/receipt, Operations link, non-POS operations, missing appointment |

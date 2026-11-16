@@ -149,6 +149,7 @@ class Companies::EmployeesController < Companies::ApplicationController
         id: employee.user.id,
         email: employee.user.email,
         name: employee.user.name,
+        avatar: employee.user.avatar,
         first_name: employee.user.first_name,
         last_name: employee.user.last_name,
         system_role: employee.user.system_role,

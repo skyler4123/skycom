@@ -1,9 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
-import { escapeHtml, translate, form } from "controllers/helpers/ui_helpers"
+import { avatar, escapeHtml, translate, form } from "controllers/helpers/ui_helpers"
 import {
   mobileHeader,
   mobileMain,
-  mobileAvatar,
+  mobileInitials,
   mobileDate,
   mobileShortDate,
   mobileTime,
@@ -51,17 +51,21 @@ export default class Mobile_Companies_Employees_ShowController extends Controlle
     `
   }
 
-  identityHTML({ company, employee }) {
+  identityHTML({ company, employee, user }) {
     return `
       <section class="relative overflow-hidden rounded-xl border border-line bg-card p-6 text-center shadow-sm">
         <div class="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-primary/10"></div>
         <div class="relative flex flex-col items-center">
-          <div class="relative">
-            ${mobileAvatar({ name: employee.name, size: "h-20 w-20 text-2xl" })}
-            <span class="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-success text-success-foreground shadow-sm">
-              <span class="material-symbols-outlined text-base">check</span>
-            </span>
-          </div>
+          ${avatar({
+            url: user.avatar,
+            updateUrl: Helpers.users_update_avatar_path(),
+            paramName: "user[avatar_attachment]",
+            className: "h-20 w-20",
+            shape: "rounded-full",
+            fallback: `<span class="flex h-full w-full items-center justify-center bg-primary/10 text-2xl font-bold text-primary">${escapeHtml(mobileInitials(employee.name))}</span>`,
+            badge: true
+          })}
+          <p class="mt-2 text-xs text-muted-foreground">${translate("Tap the photo to change it")} · ${translate("JPG or PNG, up to 500KB")}</p>
           <div class="mt-3 flex flex-wrap items-center justify-center gap-2">
             <h2 class="text-xl font-bold text-foreground">${escapeHtml(employee.name)}</h2>
             ${employee.code ? `<span class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">${escapeHtml(employee.code)}</span>` : ""}

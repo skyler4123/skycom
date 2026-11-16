@@ -51,6 +51,17 @@ RSpec.feature "My Profile", type: :feature, js: true do
     page.execute_script("localStorage.setItem('open-cache-sidebar', 'sidebar')")
   end
 
+  def avatar_jpeg
+    Rails.root.join("faker/images/randoms/685-200x200.jpg")
+  end
+
+  def oversized_jpeg
+    file = Tempfile.new([ "oversized_avatar", ".jpg" ])
+    file.write("a" * 600.kilobytes)
+    file.rewind
+    file
+  end
+
   before do
     sign_in(owner)
     seed_client_cache!
@@ -94,6 +105,35 @@ RSpec.feature "My Profile", type: :feature, js: true do
     expect(page).to have_content(owner.email, wait: 10)
     expect(page).to have_content("Company Owner", wait: 10)
     expect(page.text.downcase.index("user account")).to be < page.text.downcase.index("work email")
+  end
+
+  scenario "own profile lets the user change their avatar" do
+    visit company_employee_path(company, employee)
+
+    find("input[type='file']", visible: :all).attach_file(avatar_jpeg, make_visible: true)
+
+    expect(page).to have_content("Avatar updated!", wait: 10)
+    expect(page).to have_selector("img[src*='/rails/active_storage/']", wait: 10)
+  end
+
+  scenario "another employee's profile keeps the avatar read-only" do
+    other = create(:employee, company: company)
+    visit company_employee_path(company, other)
+
+    expect(page).to have_content(other.name, wait: 10)
+    expect(page).not_to have_selector("input[type='file']", visible: :all)
+  end
+
+  scenario "rejected avatar upload keeps the previous avatar" do
+    oversized = oversized_jpeg
+
+    visit company_employee_path(company, employee)
+    find("input[type='file']", visible: :all).attach_file(oversized.path, make_visible: true)
+
+    expect(page).to have_content("is too big", wait: 10)
+    expect(page).not_to have_selector("img[src*='/rails/active_storage/']")
+  ensure
+    oversized&.close!
   end
 
   scenario "Attendance item shows current month and month dropdown" do

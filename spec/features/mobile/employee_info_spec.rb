@@ -17,6 +17,13 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
     create(:employee_employee_group_appointment, company: company, employee: employee, employee_group: employee_group)
   end
 
+  def oversized_jpeg
+    file = Tempfile.new([ "oversized_avatar", ".jpg" ])
+    file.write("a" * 600.kilobytes)
+    file.rewind
+    file
+  end
+
   scenario "shows employee profile details" do
     sign_in(user)
     visit mobile_company_employee_path(company)
@@ -37,6 +44,29 @@ RSpec.feature "Mobile Employee Info", type: :feature, js: true do
     expect(page).to have_content("Morgan Manager")
     expect(page).to have_content("30 November 2026")
     expect(page).not_to have_content("Sample")
+  end
+
+  scenario "changes the avatar from the profile" do
+    sign_in(user)
+    visit mobile_company_employee_path(company)
+
+    find("input[type='file']", visible: :all).attach_file(Rails.root.join("faker/images/randoms/685-200x200.jpg"), make_visible: true)
+
+    expect(page).to have_content("Avatar updated!", wait: 10)
+    expect(page).to have_selector("img[src*='/rails/active_storage/']", wait: 10)
+  end
+
+  scenario "rejected avatar upload keeps the initials" do
+    oversized = oversized_jpeg
+
+    sign_in(user)
+    visit mobile_company_employee_path(company)
+    find("input[type='file']", visible: :all).attach_file(oversized.path, make_visible: true)
+
+    expect(page).to have_content("is too big", wait: 10)
+    expect(page).not_to have_selector("img[src*='/rails/active_storage/']")
+  ensure
+    oversized&.close!
   end
 
   scenario "opens payroll through the password gate" do

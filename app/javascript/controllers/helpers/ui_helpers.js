@@ -697,9 +697,12 @@ export const picture = ({
  * @param {string} options.url - The current image source URL.
  * @param {string} options.updateUrl - The endpoint to upload the new file.
  * @param {string} options.paramName - The param key (e.g., 'company[avatar_attachment]').
- * @param {string} [options.className="size-24"] - Tailwind sizing for the container.
+ * @param {string} [options.className="size-10"] - Tailwind sizing for the container.
  * @param {string} [options.shape="rounded-full"] - 'rounded-full' or 'rounded-lg'.
  * @param {string} [options.method="PATCH"] - HTTP method.
+ * @param {string} [options.fallback=""] - Optional HTML for the empty state (e.g. initials).
+ * @param {boolean} [options.badge=false] - Show a persistent camera badge when editable (touch devices).
+ * @param {boolean} [options.reloadOnSuccess=false] - Reload after upload so cached user data refreshes.
  * @param {string} options.attributes - Attributes for the ROOT (avatar controller).
  * @param {string} options.innerAttributes - Attributes for the SUB-ELEMENT (popover controller, etc.).
  * @returns {string} HTML string.
@@ -730,6 +733,9 @@ export const avatar = ({
   className = "size-10",
   shape = "rounded-full",
   method = "PATCH",
+  fallback = "",
+  badge = false,
+  reloadOnSuccess = false,
   attributes = "",      
   innerAttributes = ""  
 }) => {
@@ -741,8 +747,8 @@ export const avatar = ({
   const avatarContent = hasUrl 
     ? `<img data-avatar-target="image" src="${url}" class="h-full w-full object-cover pointer-events-none" alt="Avatar" />`
     : `
-      <div data-avatar-target="image" class="h-full w-full flex items-center justify-center bg-muted text-muted-foreground pointer-events-none">
-        <span class="material-symbols-outlined text-[1.5em]">person</span>
+      <div data-avatar-target="image" class="h-full w-full flex items-center justify-center ${fallback ? '' : 'bg-muted text-muted-foreground'} pointer-events-none">
+        ${fallback || `<span class="material-symbols-outlined text-[1.5em]">person</span>`}
       </div>
     `;
 
@@ -751,12 +757,14 @@ export const avatar = ({
          data-avatar-upload-url-value="${updateUrl}"
          data-avatar-param-name-value="${paramName}"
          data-avatar-method-value="${method}"
+         data-avatar-reload-on-success-value="${reloadOnSuccess}"
          ${attributes} 
          class="group relative inline-block ${className} shrink-0">
          
       <div ${innerAttributes} 
+           ${isEditable ? `role="button" tabindex="0" aria-label="${translate("Change avatar")}"` : ''}
            class="${shape} h-full w-full overflow-hidden bg-muted border border-line ${isEditable ? 'cursor-pointer transition-transform hover:scale-[1.05]' : ''}"
-           ${isEditable ? 'data-action="click->avatar#browse"' : ''}>
+           ${isEditable ? 'data-action="click->avatar#browse keydown.enter->avatar#browse"' : ''}>
            
         ${avatarContent}
              
@@ -767,11 +775,19 @@ export const avatar = ({
         ` : ""}
       </div>
 
-      <input type="file" 
-             data-avatar-target="input" 
-             data-action="change->avatar#upload" 
-             class="hidden" 
-             accept="image/png, image/jpeg" />
+      ${isEditable && badge ? `
+        <span class="pointer-events-none absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full border-2 border-card bg-primary text-primary-foreground shadow-sm">
+          <span class="material-symbols-outlined text-[16px]">photo_camera</span>
+        </span>
+      ` : ""}
+
+      ${isEditable ? `
+        <input type="file" 
+               data-avatar-target="input" 
+               data-action="change->avatar#upload" 
+               class="hidden" 
+               accept="image/png, image/jpeg" />
+      ` : ""}
     </div>
   `.trim();
 };
