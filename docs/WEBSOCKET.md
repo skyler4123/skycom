@@ -40,6 +40,9 @@ websocket:
 
 - **WebSocket endpoint**: `ws://127.0.0.1:8000/connection/websocket`
 - **HTTP API endpoint**: `http://localhost:8000/api` (used by backend to publish)
+- Rails reads these through the `CENTRIFUGO_API_KEY`, `CENTRIFUGO_ENDPOINT`, and
+  `CENTRIFUGO_TOKEN_HMAC_SECRET_KEY` constants (ENV > credentials > default). The compose values
+  above must match. See `docs/ENVIRONMENT.md`.
 
 ---
 

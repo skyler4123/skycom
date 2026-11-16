@@ -35,14 +35,13 @@ local:
 
 amazon:
   service: S3
-  access_key_id: <%= Rails.application.credentials.dig(:aws_access_key_id) || "admin" %>
-  secret_access_key: <%= Rails.application.credentials.dig(:aws_secret_access_key) || "password" %>
+  access_key_id: <%= AWS_ACCESS_KEY_ID %>
+  secret_access_key: <%= AWS_SECRET_ACCESS_KEY %>
   region: us-east-1
   bucket: skycom-<%= Rails.env %>
   # Internal endpoint for Rails to connect to Storage.
-  # Use http://localhost:9000 for host-native dev, http://10.88.0.2:9000 when
-  # developing inside Distrobox (10.88.0.2 = current container IP; container IPs
-  # change per box — run `ip addr` inside the box and update if yours differs).
-  # endpoint: <%= Rails.application.credentials.dig(:aws_endpoint) || "http://localhost:9000" %>
-  endpoint: <%= Rails.application.credentials.dig(:aws_endpoint) || "http://10.88.0.2:9000" %>
+  # Set AWS_ENDPOINT_URL (or credentials aws_endpoint) to your host:
+  # http://localhost:9000 for host-native dev, http://10.88.0.2:9000 inside
+  # Distrobox (run `ip addr` in the box if its IP differs).
+  endpoint: <%= AWS_ENDPOINT_URL %>
   force_path_style: true

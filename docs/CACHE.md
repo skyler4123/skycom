@@ -505,17 +505,25 @@ Defines `Rails.ram_cache`, `Rails.local_cache`, `Rails.sync_cache`, and `Rails.g
 
 ```yaml
 production: &production
-  url: <%= Rails.application.credentials.dig(:redis_url_production) || "redis://127.0.0.1:6379/0" %>
+  url: <%= REDIS_URL_PRODUCTION %>
   timeout: 1
 
 development: &development
-  url: redis://127.0.0.1:6379/0
+  url: <%= REDIS_URL_DEVELOPMENT %>
   timeout: 1
 
 test:
-  url: redis://127.0.0.1:6379/0
+  # One Redis DB per parallel_tests worker.
+  url: <%=
+    uri = URI.parse(REDIS_URL_TEST)
+    uri.path = "/#{(TEST_ENV_NUMBER.presence || 1).to_i}"
+    uri.to_s
+  %>
   timeout: 1
 ```
+
+URLs come from the `REDIS_URL_*` constants (`ENV > credentials > default`); see
+`docs/ENVIRONMENT.md`.
 
 ---
 

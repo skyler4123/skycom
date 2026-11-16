@@ -8,16 +8,16 @@ require "opentelemetry-logs-sdk"
 require "opentelemetry/exporter/otlp_logs"
 require "opentelemetry/instrumentation/logger"
 
-# 1. FIX: Set explicit, signal-specific OTLP endpoints for OpenObserve
-# This stops the SDK from dropping your organization name ("default") from the path.
-ENV["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"] ||= "http://localhost:5080/api/default/v1/traces"
-ENV["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"]   ||= "http://localhost:5080/api/default/v1/logs"
-
-ENV["OTEL_EXPORTER_OTLP_HEADERS"]         ||= "Authorization=Basic YWRtaW5AZXhhbXBsZS5jb206UGFzc3dvcmRAMTIz,organization=default"
+# 1. The OTel SDK reads OTEL_* from ENV itself, so publish the resolved
+# constants (ENV > credentials > default) into ENV. This file is the documented
+# bridge; see docs/ENVIRONMENT.md.
+ENV["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"] = OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+ENV["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"]   = OTEL_EXPORTER_OTLP_LOGS_ENDPOINT
+ENV["OTEL_EXPORTER_OTLP_HEADERS"]         = OTEL_EXPORTER_OTLP_HEADERS
 
 # 2. Configure Traces & general instrumentation
 OpenTelemetry::SDK.configure do |c|
-  c.service_name = "skyceer-#{Rails.env}"
+  c.service_name = OTEL_SERVICE_NAME
 
   c.use_all(
     "OpenTelemetry::Instrumentation::Net::HTTP" => {

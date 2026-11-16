@@ -106,11 +106,11 @@ sqlite3: &sqlite3
 postgresql: &postgresql
   adapter: postgresql
   encoding: unicode
-  pool: 5
-  username: <%= Rails.application.credentials.dig(:postgres_username) || "postgres" %>
-  password: <%= Rails.application.credentials.dig(:postgres_password) || "password" %>
-  host: <%= Rails.application.credentials.dig(:postgres_host) || "localhost" %>
-  port: <%= Rails.application.credentials.dig(:postgres_port) || "5432" %>
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: <%= ENV["POSTGRES_USERNAME"].presence || Rails.application.credentials.dig(:postgres_username) || "postgres" %>
+  password: <%= ENV["POSTGRES_PASSWORD"].presence || Rails.application.credentials.dig(:postgres_password) || "password" %>
+  host: <%= ENV["POSTGRES_HOST"].presence || Rails.application.credentials.dig(:postgres_host) || "localhost" %>
+  port: <%= ENV["POSTGRES_PORT"].presence || Rails.application.credentials.dig(:postgres_port) || "5432" %>
 
 queue: &queue
   <<: *postgresql

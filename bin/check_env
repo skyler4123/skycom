@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# ENV guard.
+#
+# Environment-backed values are declared once in
+# config/initializers/constants.rb using ENV > credentials > default. App
+# code uses the constant, never ENV. This script fails when a raw ENV read
+# shows up anywhere else.
+#
+# Allowlisted files load before config/initializers/constants.rb, are
+# evaluated outside the initializer sequence, or bridge a third-party SDK
+# that only reads ENV. See docs/ENVIRONMENT.md.
+#
+# Usage:
+#   bin/check_env    # exit 1 when a raw ENV read is found outside the allowlist
+
+require "pathname"
+
+ROOT = Pathname.new(File.expand_path("..", __dir__))
+
+SCAN_GLOBS = %w[
+  app/**/*.rb
+  config/**/*.rb
+  config/**/*.yml
+  db/**/*.rb
+  lib/**/*.rb
+  lib/**/*.rake
+  spec/**/*.rb
+  Rakefile
+  config.ru
+].freeze
+
+ALLOWLIST = %w[
+  config/boot.rb
+  config/database.yml
+  config/environments/development.rb
+  config/environments/production.rb
+  config/environments/test.rb
+  config/initializers/constants.rb
+  config/initializers/opentelemetry.rb
+  config/puma.rb
+  spec/rails_helper.rb
+].freeze
+
+ENV_READ = /\bENV(?:\[|\.)/
+
+findings = []
+
+SCAN_GLOBS.each do |glob|
+  Dir[ROOT.join(glob)].sort.each do |absolute|
+    path = Pathname.new(absolute).relative_path_from(ROOT).to_s
+    next if ALLOWLIST.include?(path)
+
+    File.foreach(absolute).with_index(1) do |line, number|
+      next unless line.match?(ENV_READ)
+
+      findings << "#{path}:#{number}: #{line.strip}"
+    end
+  end
+end
+
+if findings.empty?
+  puts "ENV guard: OK"
+  exit 0
+end
+
+warn "Raw ENV reads found outside config/initializers/constants.rb:"
+findings.each { |finding| warn "  #{finding}" }
+warn ""
+warn "Declare the value in config/initializers/constants.rb and use the constant."
+warn "If the file loads before Rails, add it to ALLOWLIST in bin/check_env and"
+warn "document why in docs/ENVIRONMENT.md."
+exit 1
