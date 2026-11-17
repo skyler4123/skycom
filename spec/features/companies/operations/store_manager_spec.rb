@@ -94,4 +94,16 @@ RSpec.feature "Companies::Operations::StoreManager", type: :feature, js: true do
 
     expect(page).to have_content("No orders match this view.", wait: 5)
   end
+
+  scenario "spans the full viewport width on a wide desktop console" do
+    with_window_size(1920, 1080) do
+      visit store_manager_path
+      expect(page).to have_content("Store Fulfillment & Customer Orders Queue", wait: 10)
+
+      metrics = console_layout_metrics
+      expect(metrics["main_width"]).to be_within(1).of(metrics["viewport_width"])
+      expect(metrics["header_width"]).to be_within(1).of(metrics["viewport_width"])
+      expect(metrics["scroll_width"]).to be <= metrics["viewport_width"]
+    end
+  end
 end

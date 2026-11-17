@@ -167,7 +167,7 @@ export default class Companies_Operations_StoreManager_ShowController extends Co
     this.element.innerHTML = `
       <div class="min-h-screen bg-background text-foreground font-sans">
         ${this.renderHeader()}
-        <main class="mx-auto w-full max-w-[1440px] px-4 lg:px-6 py-4 flex flex-col gap-4">
+        <main class="w-full px-4 lg:px-6 py-4 flex flex-col gap-4">
           ${this.renderContextBanner()}
           ${this.renderKpis()}
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
@@ -200,7 +200,7 @@ export default class Companies_Operations_StoreManager_ShowController extends Co
 
     return `
       <header class="sticky top-0 z-40 border-b border-line bg-background/85 backdrop-blur-xl">
-        <div class="mx-auto w-full max-w-[1440px] px-4 lg:px-6">
+        <div class="w-full px-4 lg:px-6">
           <div class="h-16 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3 xl:gap-4 min-w-0">
               <a href="${Helpers.company_operations_path(this.companyId)}" class="flex items-center gap-2 shrink-0">
