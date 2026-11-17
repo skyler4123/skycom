@@ -74,11 +74,13 @@ class StoreManager::ConsoleService
   end
 
   def today_range
-    now.beginning_of_day..now.end_of_day
+    start = LocalTime.now(branch, at: now).beginning_of_day
+    start...(start + 1.day)
   end
 
   def yesterday_range
-    (now.beginning_of_day - 1.day)..(now.end_of_day - 1.day)
+    start = LocalTime.now(branch, at: now).beginning_of_day
+    (start - 1.day)...start
   end
 
   def base_orders_scope(range)
@@ -188,7 +190,7 @@ class StoreManager::ConsoleService
       code: order.code.presence || "ORD-#{order.id.to_s.first(8).upcase}",
       customer_name: order.customer&.name.presence || order.name.presence || "Walk-in customer",
       customer_meta: customer_meta(order),
-      placed_at: order.created_at.strftime("%-I:%M %p"),
+      placed_at: LocalTime.utc_iso(order.created_at),
       items_count: items_count(order),
       total_cents: order_total_cents(order),
       currency: order.currency || company.currency || "usd",

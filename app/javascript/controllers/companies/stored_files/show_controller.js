@@ -63,7 +63,7 @@ export default class Companies_StoredFiles_ShowController extends Companies_Layo
           <div class="mb-6">
             ${row(translate("Size"), escapeHtml(this.humanSize(sf.file_size)))}
             ${row(translate("Type"), escapeHtml(`${sf.extension || "—"} · ${sf.content_type || ""}`))}
-            ${row(translate("Created"), escapeHtml(Helpers.timeFormat(sf.created_at)))}
+            ${row(translate("Created"), escapeHtml(Helpers.companyTime(sf.created_at)))}
           </div>
 
           <div class="flex items-center gap-2">

@@ -87,9 +87,9 @@ export default class Companies_Payrolls_ShowController extends Companies_LayoutC
     `).join("")
     const daysHtml = this.attendanceDays.map(d => `
       <tr class="border-b border-line">
-        <td class="py-2 px-4 text-sm">${d.attendance_date || "—"}</td>
-        <td class="py-2 px-4 text-sm">${d.check_in ? new Date(d.check_in).toLocaleString() : "—"}</td>
-        <td class="py-2 px-4 text-sm">${d.check_out ? new Date(d.check_out).toLocaleString() : "—"}</td>
+        <td class="py-2 px-4 text-sm">${d.attendance_date ? Helpers.dateOnly(d.attendance_date) : "—"}</td>
+        <td class="py-2 px-4 text-sm">${d.check_in ? Helpers.companyTime(d.check_in) : "—"}</td>
+        <td class="py-2 px-4 text-sm">${d.check_out ? Helpers.companyTime(d.check_out) : "—"}</td>
         <td class="py-2 px-4 text-sm">${d.total_seconds_worked ?? "—"}</td>
         <td class="py-2 px-4 text-sm">${d.attendance_status || "—"}</td>
       </tr>

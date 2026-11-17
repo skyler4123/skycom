@@ -190,7 +190,7 @@ export default class Companies_MyExams_IndexController extends Companies_LayoutC
                   </span>
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-foreground">${attempt.score === null || attempt.score === undefined ? "—" : Number(attempt.score).toFixed(2)}</td>
-                <td class="px-4 py-3 text-center text-xs text-muted-foreground">${attempt.submitted_at ? Helpers.timeFormat(attempt.submitted_at) : "—"}</td>
+                <td class="px-4 py-3 text-center text-xs text-muted-foreground">${attempt.submitted_at ? Helpers.companyTime(attempt.submitted_at) : "—"}</td>
                 <td class="px-4 py-3 text-right">
                   <a href="${Helpers.company_my_exam_appointment_path(currentCompany()?.id, attempt.id)}"
                     class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-primary hover:bg-primary/10">

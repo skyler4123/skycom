@@ -69,6 +69,8 @@ RSpec.describe StoreManager::ConsoleService, type: :service do
     expect(payload[:kpis][:staff_on_duty]).to eq(1)
 
     expect(payload[:orders].map { |order| order[:id] }).to contain_exactly(paid_order.id, pending_order.id)
+    expect(payload[:orders].find { |order| order[:id] == paid_order.id }[:placed_at]).to eq(paid_order.created_at.iso8601)
+    expect(payload[:orders].map { |order| order[:placed_at] }).to all(match(/Z\z/))
     expect(payload[:orders_total]).to eq(2)
     expect(payload[:order_counts]).to include(all: 2, click_collect: 1, delivery: 1, completed: 1)
     expect(payload[:replenishments].first).to include(

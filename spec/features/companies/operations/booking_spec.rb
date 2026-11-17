@@ -6,7 +6,7 @@ RSpec.feature "Companies::Operations::Booking", type: :feature, js: true do
   let(:company_user) { create(:user, :company_owner) }
   let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :education).tap(&:save!) }
   let(:owner) { company.user }
-  let(:branch) { create(:branch, company: company) }
+  let(:branch) { create(:branch, company: company, timezone: :utc) }
   let(:operation_record) { create(:operation, company: company, branch: branch, operation_type: :booking) }
   let(:booking_path) { "/companies/#{company.id}/operations/booking/#{operation_record.id}?branch_id=#{branch.id}" }
   let(:event_category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "events") }
@@ -39,7 +39,7 @@ RSpec.feature "Companies::Operations::Booking", type: :feature, js: true do
     expect(page).to have_content("Day Timeline Grid")
     expect(page).to have_content("New Reservation")
     expect(page).to have_css("[data-booking-now-needle]")
-    expect(page).to have_css("[data-booking-block]", text: "Executive Board Review")
+    expect(page).to have_css("[data-booking-block][title*='Executive Board Review']")
   end
 
   scenario "keeps the current-time needle visible while rendering dynamic rows" do
@@ -48,6 +48,23 @@ RSpec.feature "Companies::Operations::Booking", type: :feature, js: true do
     expect(page).to have_content("Booking Operations Console", wait: 10)
     expect(page).to have_css("[data-booking-now-needle]")
     expect(page).to have_css("[data-booking-now-label]", text: /(AM|PM)/)
+  end
+
+  scenario "renders booking blocks and the current-time needle on the branch clock" do
+    branch.update!(timezone: :plus_7)
+
+    travel_to Time.utc(2026, 11, 17, 2, 0, 0) do
+      create(:event, company: company, branch: branch, category: event_category,
+        name: "Local Time Review", code: "BKG-LOCAL",
+        start_at: Time.utc(2026, 11, 17, 2, 0, 0), end_at: Time.utc(2026, 11, 17, 3, 0, 0),
+        workflow_status: :confirmed)
+
+      visit booking_path
+
+      expect(page).to have_css("[data-booking-block][title*='Local Time Review']", wait: 10)
+      expect(page).to have_css("[data-booking-block][title*='9:00 AM - 10:00 AM']")
+      expect(page).to have_css("[data-booking-now-label]", text: /(AM|PM)/)
+    end
   end
 
   scenario "creates a reservation from the instant reservation form" do
@@ -67,6 +84,27 @@ RSpec.feature "Companies::Operations::Booking", type: :feature, js: true do
     expect(event).to be_present
     expect(event.workflow_status).to eq("confirmed")
     expect(event.facilities).to include(pod)
+  end
+
+  scenario "stores a reservation entered in branch time as UTC" do
+    branch.update!(timezone: :plus_7)
+
+    travel_to Time.utc(2026, 11, 17, 2, 0, 0) do
+      visit booking_path
+      expect(page).to have_content("Booking Operations Console", wait: 10)
+
+      find('input[name="booking[title]"]').set("Branch Time Session")
+      find('select[name="booking[facility_id]"]').find("option[value='#{pod.id}']").select_option
+      find('input[name="booking[start_time]"]').set("14:00")
+      find('input[name="booking[end_time]"]').set("15:00")
+      click_button "Confirm & Lock Booking"
+
+      expect(page).to have_content("Reservation confirmed for Branch Time Session.", wait: 5)
+
+      event = Event.find_by(company: company, name: "Branch Time Session")
+      expect(event.start_at).to eq(Time.utc(2026, 11, 17, 7, 0, 0))
+      expect(event.end_at).to eq(Time.utc(2026, 11, 17, 8, 0, 0))
+    end
   end
 
   scenario "rejects a reservation whose end time is before its start time" do

@@ -103,7 +103,7 @@ export default class Companies_Exams_ShowController extends Companies_LayoutCont
           <div>
             <h3 class="text-sm font-bold uppercase tracking-wider text-muted-foreground">${translate("Exam Summary")}</h3>
             <p class="text-xs text-muted-foreground">
-              ${summary.computed_at ? `${translate("Last computed")}: ${Helpers.timeFormat(summary.computed_at)}` : translate("Not computed yet")}
+              ${summary.computed_at ? `${translate("Last computed")}: ${Helpers.companyTime(summary.computed_at)}` : translate("Not computed yet")}
             </p>
           </div>
           <button type="button" data-action="click->${this.identifier}#refreshSummary"
@@ -170,7 +170,7 @@ export default class Companies_Exams_ShowController extends Companies_LayoutCont
                   </span>
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-foreground">${appointment.score === null || appointment.score === undefined ? "—" : Number(appointment.score).toFixed(2)}</td>
-                <td class="px-4 py-3 text-center text-xs text-muted-foreground">${appointment.submitted_at ? Helpers.timeFormat(appointment.submitted_at) : "—"}</td>
+                <td class="px-4 py-3 text-center text-xs text-muted-foreground">${appointment.submitted_at ? Helpers.companyTime(appointment.submitted_at) : "—"}</td>
               </tr>
             `).join("")}
           </tbody>

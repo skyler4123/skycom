@@ -21,7 +21,7 @@ export default class Companies_Payrolls_IndexController extends Companies_Layout
     super.connect()
 
     const params = new URLSearchParams(window.location.search)
-    this.month = params.get("month") || new Date().toISOString().slice(0, 7)
+    this.month = params.get("month") || Helpers.localMonth()
 
     const companyId = window.location.pathname.split("/")[2]
 

@@ -149,7 +149,7 @@ export default class Companies_Tickets_ShowController extends Companies_LayoutCo
       case 'decimal':
         return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
       case 'datetime': {
-        return `<span class="text-sm text-foreground">${new Date(value).toLocaleString()}</span>`
+        return `<span class="text-sm text-foreground">${Helpers.companyTime(value)}</span>`
       }
       default:
         return `<span class="text-sm text-foreground">${value}</span>`
@@ -188,8 +188,8 @@ export default class Companies_Tickets_ShowController extends Companies_LayoutCo
               ${this.outcomeBadge(log.outcome)}
               <span class="font-medium text-foreground">${log.step_name || "—"}</span>
               <span class="text-muted-foreground">${log.employee_name || "—"}</span>
-              ${log.note ? `<span class="text-muted-foreground italic">"${log.note}"</span>` : ""}
-              <span class="text-xs text-muted-foreground ml-auto">${new Date(log.created_at).toLocaleString()}</span>
+              ${log.note ? `<span class="text-muted-foreground italic">"${Helpers.escapeHtml(log.note)}"</span>` : ""}
+              <span class="text-xs text-muted-foreground ml-auto">${Helpers.companyTime(log.created_at)}</span>
             </div>`).join('')}
         </div>
       </div>` : ""
@@ -240,8 +240,8 @@ export default class Companies_Tickets_ShowController extends Companies_LayoutCo
               <span class="material-symbols-outlined text-4xl text-success ">shopping_cart</span>
             </div>
             <div class="flex flex-1 flex-col text-center sm:text-left">
-              <h2 class="text-2xl font-black text-foreground">${p.name}</h2>
-              <p class="font-semibold text-success ">${p.description || ''}</p>
+              <h2 class="text-2xl font-black text-foreground">${Helpers.escapeHtml(p.name)}</h2>
+              <p class="font-semibold text-success ">${Helpers.escapeHtml(p.description || '')}</p>
               <div class="mt-2 flex flex-wrap justify-center gap-2 sm:justify-start">
                 <span class="inline-flex items-center rounded-lg bg-success/10 px-3 py-1 text-xs font-bold text-success uppercase">${p.code || "N/A"}</span>
                 ${Helpers.statusBadge(p.workflow_status)}
@@ -276,7 +276,7 @@ export default class Companies_Tickets_ShowController extends Companies_LayoutCo
               </div>
               <div>
                 <p class="text-xs font-medium text-muted-foreground">${translate("Needed By")}</p>
-                <p class="text-sm font-semibold text-foreground">${p.needed_by ? new Date(p.needed_by).toLocaleString() : "N/A"}</p>
+                <p class="text-sm font-semibold text-foreground">${p.needed_by ? Helpers.companyTime(p.needed_by) : "N/A"}</p>
               </div>
             </div>
 
@@ -302,9 +302,9 @@ export default class Companies_Tickets_ShowController extends Companies_LayoutCo
             <div class="p-3 rounded-lg bg-muted">
               <div class="flex items-center gap-2 mb-1">
                 <span class="text-xs font-bold text-foreground">${c.employee_name || "—"}</span>
-                <span class="text-xs text-muted-foreground">${new Date(c.created_at).toLocaleString()}</span>
+                <span class="text-xs text-muted-foreground">${Helpers.companyTime(c.created_at)}</span>
               </div>
-              <p class="text-sm text-foreground">${c.message}</p>
+              <p class="text-sm text-foreground">${Helpers.escapeHtml(c.message)}</p>
             </div>`).join('')}
         </div>
         <form data-action="submit->${this.identifier}#handleCommentSubmit" class="flex gap-2">

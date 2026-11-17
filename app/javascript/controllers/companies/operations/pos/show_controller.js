@@ -869,7 +869,7 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
               <h3 class="text-sm font-black uppercase tracking-widest text-muted-foreground">${translate("Receipt")}</h3>
               ${Helpers.statusBadge(receipt.payment_status)}
             </div>
-            <div class="text-[11px] text-muted-foreground font-mono">${this.escape(receipt.invoice_code || "")}${receipt.issued_at ? ` · ${new Date(receipt.issued_at).toLocaleString()}` : ""}</div>
+            <div class="text-[11px] text-muted-foreground font-mono">${this.escape(receipt.invoice_code || "")}${receipt.issued_at ? ` · ${Helpers.locationTime(receipt.issued_at, Helpers.TIMESTAMP_FORMAT, this.appointment?.location)}` : ""}</div>
             <div class="border-t border-dashed border-line pt-3 space-y-2">
               ${(receipt.items || []).map((item) => `
                 <div class="flex justify-between text-sm text-foreground gap-2">

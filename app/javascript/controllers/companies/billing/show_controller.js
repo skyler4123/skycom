@@ -62,7 +62,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
             <tr class="border-b border-line">
               <td class="py-4 px-4 text-sm">
                 <p class="font-mono text-xs text-muted-foreground">${this.shortId(o.id)}</p>
-                <p class="text-xs text-muted-foreground">${o.created_at ? new Date(o.created_at).toLocaleDateString() : "—"}</p>
+                <p class="text-xs text-muted-foreground">${o.created_at ? Helpers.companyTime(o.created_at, Helpers.DATE_FORMAT) : "—"}</p>
               </td>
               <td class="py-4 px-4 text-sm font-semibold text-foreground">${this.formatCents(o.money_amount_cents)}</td>
               <td class="py-4 px-4 text-sm font-mono text-success ">${this.formatCredits(o.credit_amount)}</td>

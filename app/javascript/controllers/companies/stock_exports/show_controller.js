@@ -59,7 +59,7 @@ export default class Companies_StockExports_ShowController extends Companies_Lay
       case 'decimal':
         return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
       case 'datetime': {
-        return `<span class="text-sm text-foreground">${new Date(value).toLocaleString()}</span>`
+        return `<span class="text-sm text-foreground">${Helpers.companyTime(value)}</span>`
       }
       default:
         return `<span class="text-sm text-foreground">${value}</span>`
@@ -113,7 +113,7 @@ export default class Companies_StockExports_ShowController extends Companies_Lay
                 <td class="py-2 px-2 text-sm capitalize">${t.direction || "—"}</td>
                 <td class="py-2 px-2 text-sm capitalize">${t.transaction_type || "—"}</td>
                 <td class="py-2 px-2 text-sm text-right font-mono">${t.quantity ?? "—"}</td>
-                <td class="py-2 px-2 text-sm text-right text-muted-foreground">${t.created_at ? new Date(t.created_at).toLocaleString() : "—"}</td>
+                <td class="py-2 px-2 text-sm text-right text-muted-foreground">${t.created_at ? Helpers.companyTime(t.created_at) : "—"}</td>
               </tr>`).join('')}
           </tbody>
         </table>

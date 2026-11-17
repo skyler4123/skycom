@@ -187,7 +187,7 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
         </td>
         <td class="py-3 px-6">${this.statusBadge(d.status)}</td>
         <td class="py-3 px-6 text-sm text-foreground">${d.amount_cents != null ? this.formatMoney(d.amount_cents) : "—"}</td>
-        <td class="py-3 px-6 text-sm text-muted-foreground">${d.used_at ? new Date(d.used_at).toLocaleString() : "—"}</td>
+        <td class="py-3 px-6 text-sm text-muted-foreground">${d.used_at ? Helpers.companyTime(d.used_at) : "—"}</td>
         <td class="py-3 px-6 text-sm text-muted-foreground">${d.customer?.name || "—"}</td>
         <td class="py-3 px-6 text-right">
           <button type="button" data-action="click->${this.identifier}#copyCode" data-${this.identifier}-code-param="${d.code}"
@@ -275,7 +275,7 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
             </div>
             <div>
               <p class="text-xs font-medium text-muted-foreground">${translate("Validity")}</p>
-              <p class="text-sm font-semibold text-foreground">${g.start_at ? new Date(g.start_at).toLocaleDateString() : "—"} → ${g.end_at ? new Date(g.end_at).toLocaleDateString() : "—"}</p>
+              <p class="text-sm font-semibold text-foreground">${g.start_at ? Helpers.companyTime(g.start_at, Helpers.DATE_FORMAT) : "—"} → ${g.end_at ? Helpers.companyTime(g.end_at, Helpers.DATE_FORMAT) : "—"}</p>
             </div>
           </div>
 

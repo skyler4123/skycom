@@ -62,8 +62,7 @@ export default class Companies_Events_ShowController extends Companies_LayoutCon
       case 'decimal':
         return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
       case 'datetime': {
-        const d = new Date(value)
-        return `<span class="text-sm text-foreground">${d.toLocaleString()}</span>`
+        return `<span class="text-sm text-foreground">${Helpers.companyTime(value)}</span>`
       }
       default:
         return `<span class="text-sm text-foreground">${value}</span>`
@@ -153,7 +152,7 @@ export default class Companies_Events_ShowController extends Companies_LayoutCon
               </div>
               <div>
                 <p class="text-xs font-medium text-muted-foreground">${translate("Start At")}</p>
-                <p class="text-sm font-semibold text-foreground">${e.start_at ? new Date(e.start_at).toLocaleString() : translate("N/A")}</p>
+                <p class="text-sm font-semibold text-foreground">${e.start_at ? Helpers.companyTime(e.start_at) : translate("N/A")}</p>
               </div>
             </div>
 
@@ -163,7 +162,7 @@ export default class Companies_Events_ShowController extends Companies_LayoutCon
               </div>
               <div>
                 <p class="text-xs font-medium text-muted-foreground">${translate("End At")}</p>
-                <p class="text-sm font-semibold text-foreground">${e.end_at ? new Date(e.end_at).toLocaleString() : translate("N/A")}</p>
+                <p class="text-sm font-semibold text-foreground">${e.end_at ? Helpers.companyTime(e.end_at) : translate("N/A")}</p>
               </div>
             </div>
 

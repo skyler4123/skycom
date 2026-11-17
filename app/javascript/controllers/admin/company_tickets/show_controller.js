@@ -182,7 +182,7 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
         <div class="flex items-center gap-2">
           <span class="text-sm font-bold text-foreground">${escapeHtml(c.author_name) || this.humanize(c.author_type)}</span>
           ${c.author_type === "User" ? `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-primary/10 text-primary ">Skycom Support</span>` : ""}
-          <span class="text-xs text-muted-foreground">${c.created_at ? Helpers.timeFormat(c.created_at) : ""}</span>
+          <span class="text-xs text-muted-foreground">${c.created_at ? Helpers.utcTime(c.created_at) : ""}</span>
         </div>
         <p class="text-sm text-foreground whitespace-pre-line">${escapeHtml(c.message)}</p>
         ${(c.attachments || []).length > 0 ? `<div class="flex flex-wrap gap-2 mt-2">${c.attachments.map((a) => this.attachmentHTML(a)).join("")}</div>` : ""}
@@ -193,7 +193,7 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
         <span class="material-symbols-outlined text-[16px]">history</span>
         <span>${this.humanize(l.action)}${l.from_status ? ` (${l.from_status} → ${l.to_status})` : ""}</span>
         ${l.note ? `<span class="truncate">— ${escapeHtml(l.note)}</span>` : ""}
-        <span class="ml-auto shrink-0">${l.created_at ? Helpers.timeFormat(l.created_at) : ""}</span>
+        <span class="ml-auto shrink-0">${l.created_at ? Helpers.utcTime(l.created_at) : ""}</span>
       </div>`).join("")
 
     return `
@@ -217,7 +217,7 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-6 pt-6 border-t border-line text-sm">
             <div><p class="text-xs font-medium text-muted-foreground">Assignee</p><p class="font-semibold text-foreground">${escapeHtml(t.assigned_user?.name || t.assigned_user?.email) || "—"}</p></div>
             <div><p class="text-xs font-medium text-muted-foreground">Raised by</p><p class="font-semibold text-foreground">${escapeHtml(t.employee?.name) || "—"}</p></div>
-            <div><p class="text-xs font-medium text-muted-foreground">First response (UTC)</p><p class="font-semibold text-foreground">${t.first_responded_at ? Helpers.timeFormat(t.first_responded_at) : "—"}</p></div>
+            <div><p class="text-xs font-medium text-muted-foreground">First response (UTC)</p><p class="font-semibold text-foreground">${t.first_responded_at ? Helpers.utcTime(t.first_responded_at) : "—"}</p></div>
             <div><p class="text-xs font-medium text-muted-foreground">Rating</p><p class="font-semibold text-foreground">${t.rate ? `${t.rate} / 5` : "—"}</p></div>
           </div>
 

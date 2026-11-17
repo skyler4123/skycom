@@ -114,7 +114,7 @@ export default class Admin_CompanyTickets_IndexController extends Admin_LayoutCo
                 priority: (value) => `${Helpers.statusBadge(value || "medium")}`,
                 status: (value) => `${Helpers.statusBadge(value || "open")}`,
                 assigned_user: (value) => `<span class="text-sm text-muted-foreground">${escapeHtml(value?.name || value?.email) || "—"}</span>`,
-                updated_at: (value) => `<span class="text-xs text-muted-foreground">${value ? Helpers.timeFormat(value) : "—"}</span>`,
+                updated_at: (value) => `<span class="text-xs text-muted-foreground">${value ? Helpers.utcTime(value) : "—"}</span>`,
                 actions: (value, record) => record.assigned_user
                   ? ""
                   : `<button type="button" data-action="click->${this.identifier}#pickUp" data-${this.identifier}-ticket-id-param="${record.id}" class="px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 rounded-lg cursor-pointer">Pick Up</button>`

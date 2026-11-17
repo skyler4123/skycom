@@ -64,8 +64,8 @@ export default class Admin_PromoCampaigns_IndexController extends Admin_LayoutCo
                 amount: (value) => `<span class="font-mono text-sm font-medium text-success ">${Number(value || 0).toLocaleString()}</span>`,
                 max_cap: (value) => `<span class="font-mono text-sm text-muted-foreground">${Number(value || 0).toLocaleString()}</span>`,
                 status: (value) => `${Helpers.statusBadge(value)}`,
-                scheduled_at: (value) => value ? `<span class="text-sm text-muted-foreground" title="UTC time">${Helpers.timeFormat(value)}</span>` : "—",
-                created_at: (value) => value ? `<span class="text-sm text-muted-foreground">${Helpers.timeFormat(value)}</span>` : "—"
+                scheduled_at: (value) => value ? `<span class="text-sm text-muted-foreground" title="UTC time">${Helpers.utcTime(value)}</span>` : "—",
+                created_at: (value) => value ? `<span class="text-sm text-muted-foreground">${Helpers.utcTime(value)}</span>` : "—"
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">

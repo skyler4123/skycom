@@ -82,7 +82,7 @@ export default class Admin_Companies_IndexController extends Admin_LayoutControl
                 phone_number: (value) => value ? `<span class="text-sm text-muted-foreground">${value}</span>` : '<span class="text-muted-foreground/60">—</span>',
                 owner: (value, record) => record.user?.name || '<span class="text-muted-foreground/60">—</span>',
                 workflow_status: (value) => `${Helpers.statusBadge(value)}`,
-                created_at: (value) => value ? `<span class="text-sm text-muted-foreground">${Helpers.timeFormat(value)}</span>` : '—'
+                created_at: (value) => value ? `<span class="text-sm text-muted-foreground">${Helpers.utcTime(value)}</span>` : '—'
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">

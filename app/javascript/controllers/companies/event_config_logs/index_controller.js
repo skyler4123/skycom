@@ -46,7 +46,7 @@ export default class Companies_EventConfigLogs_IndexController extends Companies
 
   formatDateTime(dt) {
     if (!dt) return '—'
-    return new Date(dt).toLocaleString()
+    return Helpers.companyTime(dt)
   }
 
   contentHTML() {

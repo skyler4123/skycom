@@ -63,7 +63,7 @@ export default class Companies_EventConfigLogs_ShowController extends Companies_
               <p class="text-sm font-semibold">${this.actionBadge(l.action)}</p>
             </div>
             ${this.field("Changed By", l.employee?.name)}
-            ${this.field("Changed At", l.created_at ? new Date(l.created_at).toLocaleString() : null)}
+            ${this.field("Changed At", l.created_at ? Helpers.companyTime(l.created_at) : null)}
             ${this.field("Category", l.category?.name || l.category_name)}
             ${this.field("Hold Stock", this.flag(l.create_stock_pending))}
             ${this.field("Strict Hold", this.flag(l.strict_stock_hold))}
@@ -73,7 +73,7 @@ export default class Companies_EventConfigLogs_ShowController extends Companies_
             ${this.field("Lifecycle Status", l.lifecycle_status)}
             ${this.field("Workflow Status", l.workflow_status)}
             ${this.field("Business Type", l.business_type)}
-            ${this.field("Discarded At", l.discarded_at ? new Date(l.discarded_at).toLocaleString() : null)}
+            ${this.field("Discarded At", l.discarded_at ? Helpers.companyTime(l.discarded_at) : null)}
           </div>
         </div>
       </div>`

@@ -69,7 +69,7 @@ export default class Companies_PermissionLogs_ShowController extends Companies_L
               <p class="text-sm font-semibold">${this.actionBadge(l.action)}</p>
             </div>
             ${this.field("Changed By", l.employee?.name)}
-            ${this.field("Changed At", l.created_at ? new Date(l.created_at).toLocaleString() : null)}
+            ${this.field("Changed At", l.created_at ? Helpers.companyTime(l.created_at) : null)}
             ${this.field("Role", l.role?.name || l.role_name)}
             ${this.field("Policy", l.policy?.name || l.policy_name)}
             ${this.field("Resource", l.resource_name)}

@@ -18,7 +18,7 @@ class Booking::ReservationService
     @appointment = appointment
     @branch = appointment.branch
     @params = params
-    @date = date || Date.current
+    @date = date || LocalTime.today(@branch)
   end
 
   def call
@@ -65,9 +65,7 @@ class Booking::ReservationService
   def parse_time(value)
     return nil if value.blank?
 
-    Time.zone.parse("#{date.to_date} #{value}")
-  rescue ArgumentError
-    nil
+    LocalTime.parse(date.to_date, value, branch)
   end
 
   def create_event!

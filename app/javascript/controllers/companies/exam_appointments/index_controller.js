@@ -114,7 +114,7 @@ export default class Companies_ExamAppointments_IndexController extends Companie
                         </span>
                       </td>
                       <td class="px-4 py-3 text-center text-sm text-foreground">${appointment.score === null || appointment.score === undefined ? "—" : Number(appointment.score).toFixed(2)}</td>
-                      <td class="px-4 py-3 text-center text-xs text-muted-foreground">${appointment.submitted_at ? Helpers.timeFormat(appointment.submitted_at) : "—"}</td>
+                      <td class="px-4 py-3 text-center text-xs text-muted-foreground">${appointment.submitted_at ? Helpers.companyTime(appointment.submitted_at) : "—"}</td>
                       <td class="px-4 py-3 text-right">
                         <a href="${Helpers.company_exam_appointment_path(companyId, exam.id, appointment.id)}"
                           class="inline-flex items-center justify-center rounded-lg p-2 text-muted-foreground hover:bg-primary/10 hover:text-primary">

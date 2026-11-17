@@ -68,6 +68,6 @@ export default class Companies_ShiftTemplates_ShowController extends Companies_L
 
   formatTime(timeStr) {
     if (!timeStr) return ''
-    return new Date(timeStr).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
+    return Helpers.timeOnly(timeStr, "HH:mm")
   }
 }

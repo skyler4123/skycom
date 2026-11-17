@@ -6,7 +6,7 @@ RSpec.feature "Companies::Operations::StoreManager", type: :feature, js: true do
   let(:company_user) { create(:user, :company_owner) }
   let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :retail).tap(&:save!) }
   let(:owner) { company.user }
-  let(:branch) { create(:branch, company: company, name: "Downtown Flagship", code: "STORE-104") }
+  let(:branch) { create(:branch, company: company, name: "Downtown Flagship", code: "STORE-104", timezone: :utc) }
   let(:operation) { create(:operation, company: company, branch: branch, operation_type: :store_manager) }
   let(:store_manager_path) { "/companies/#{company.id}/operations/store_manager/#{operation.id}?branch_id=#{branch.id}" }
   let(:employee) do
@@ -93,5 +93,30 @@ RSpec.feature "Companies::Operations::StoreManager", type: :feature, js: true do
     fill_in "store-manager-order-search", with: "Nobody"
 
     expect(page).to have_content("No orders match this view.", wait: 5)
+  end
+
+  scenario "shows order times on the branch clock instead of UTC" do
+    branch.update!(timezone: :plus_7)
+
+    travel_to Time.utc(2026, 11, 17, 2, 15, 0) do
+      create_order(workflow_status: :pending, business_type: :in_store, employee: employee, customer: customer)
+
+      visit store_manager_path
+
+      expect(page).to have_content("Marcus Vance", wait: 10)
+      expect(page).to have_content("9:15 AM")
+    end
+  end
+
+  scenario "spans the full viewport width on a wide desktop console" do
+    with_window_size(1920, 1080) do
+      visit store_manager_path
+      expect(page).to have_content("Store Fulfillment & Customer Orders Queue", wait: 10)
+
+      metrics = console_layout_metrics
+      expect(metrics["main_width"]).to be_within(1).of(metrics["viewport_width"])
+      expect(metrics["header_width"]).to be_within(1).of(metrics["viewport_width"])
+      expect(metrics["scroll_width"]).to be <= metrics["viewport_width"]
+    end
   end
 end

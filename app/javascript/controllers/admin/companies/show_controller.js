@@ -52,7 +52,7 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
       { label: "VAT ID", value: c.vat_id },
       { label: "Ownership", value: c.ownership_type ? c.ownership_type.replace('_', ' ') : null },
       { label: "Currency", value: c.currency?.toUpperCase() },
-      { label: "Timezone", value: c.timezone != null ? `UTC${c.timezone > 0 ? '+' : ''}${c.timezone}` : null },
+      { label: "Timezone", value: c.timezone != null ? Helpers.timezoneLabel(c.timezone) : null },
       { label: "Description", value: c.description, type: "full" }
     ]
 
@@ -81,8 +81,8 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
                 </div>
               </div>
               <div class="text-right text-xs text-muted-foreground">
-                <div>Created (UTC) ${c.created_at ? Helpers.timeFormat(c.created_at) : '—'}</div>
-                <div class="mt-0.5">Updated (UTC) ${c.updated_at ? Helpers.timeFormat(c.updated_at) : '—'}</div>
+                <div>Created (UTC) ${c.created_at ? Helpers.utcTime(c.created_at) : '—'}</div>
+                <div class="mt-0.5">Updated (UTC) ${c.updated_at ? Helpers.utcTime(c.updated_at) : '—'}</div>
               </div>
             </div>
           </div>

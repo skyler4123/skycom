@@ -105,7 +105,7 @@ export default class Companies_Notifications_IndexController extends Companies_L
                   </a>`,
                 severity: (value) => `${Helpers.statusBadge(value || "info")}`,
                 tags: (value) => `${(value || []).map((t) => `<span class="inline-block font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium mr-1">${t.name}</span>`).join("") || '<span class="text-muted-foreground/60">—</span>'}`,
-                created_at: (value) => `<span class="text-xs text-muted-foreground">${value ? new Date(value).toLocaleString() : "—"}</span>`,
+                created_at: (value) => `<span class="text-xs text-muted-foreground">${value ? Helpers.companyTime(value) : "—"}</span>`,
                 read: (value, record) => value
                   ? `<span class="text-xs text-muted-foreground">${translate("Read")}</span>`
                   : `<button type="button" data-action="click->${this.identifier}#markAsRead" data-${this.identifier}-notification-id-param="${record.id}" class="px-3 py-1 text-xs font-medium text-primary hover:bg-primary/10 rounded-lg cursor-pointer">${translate("Mark as read")}</button>`

@@ -23,7 +23,7 @@
   </head>
   <body
   class="min-h-dvh bg-background font-sans text-foreground antialiased "
-  data-controller="websocket"
+  data-controller="websocket client-cache"
   data-user-avatar="<%= current_user&.avatar %>"
   <% if is_signed_in? && @channels.present? %>
     data-websocket-url-value="ws://localhost:8000/connection/websocket"

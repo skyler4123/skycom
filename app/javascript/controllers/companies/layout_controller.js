@@ -107,7 +107,7 @@ export default class Companies_LayoutController extends Controller {
           .map(c => ({ key: c.key, label: c.name || c.label || c.key }))
       }
 
-      const filename = `${resource}-${new Date().toISOString().slice(0, 10)}.csv`
+      const filename = `${resource}-${Helpers.localToday()}.csv`
       downloadCSV(all, columns, filename)
     } catch (error) {
       toast({ type: "error", message: error.errors?.join(", ") || translate("Export failed") })
@@ -130,7 +130,7 @@ export default class Companies_LayoutController extends Controller {
 
     button.disabled = true
 
-    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")
+    const stamp = Helpers.companyTime(new Date().toISOString(), "YYYY-MM-DD-HH-mm-ss")
     const name = `${targetTableLabel(table)} import ${stamp}`
 
     try {

@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.feature "Mobile Attendance Month", type: :feature, js: true do
-  let(:company) { create(:company) }
+  let(:company) { create(:company).tap { |record| record.update!(timezone: :plus_1) } }
   let(:user) { company.user }
   let(:employee) { company.employees.find_by(user: user) }
   let(:day_date) { Date.current.beginning_of_month + 2.days }
@@ -43,8 +43,8 @@ RSpec.feature "Mobile Attendance Month", type: :feature, js: true do
     expect(page).to have_content("2 Days")
     expect(page).to have_content(day_date.strftime("%d %B %Y"))
     expect(page).to have_content("Present")
-    expect(page).to have_content("09:00 AM")
-    expect(page).to have_content("05:00 PM")
+    expect(page).to have_content("10:00 AM")
+    expect(page).to have_content("06:00 PM")
     expect(page).to have_content("8h 00m")
   end
 

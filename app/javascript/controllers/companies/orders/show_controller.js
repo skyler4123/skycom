@@ -51,7 +51,7 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
       case 'decimal':
         return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
       case 'datetime':
-        return `<span class="text-sm text-foreground">${new Date(value).toLocaleString()}</span>`
+        return `<span class="text-sm text-foreground">${Helpers.companyTime(value)}</span>`
       default:
         return `<span class="text-sm text-foreground">${value}</span>`
     }

@@ -30,12 +30,12 @@ export default class Companies_AttendanceRequests_ShowController extends Compani
 
   formatDate(dateStr) {
     if (!dateStr) return '—'
-    return new Date(dateStr + 'T00:00:00').toLocaleDateString()
+    return Helpers.dateOnly(dateStr, Helpers.DATE_FORMAT)
   }
 
   formatTime(dt) {
     if (!dt) return '—'
-    return new Date(dt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
+    return Helpers.companyTime(dt, "HH:mm")
   }
 
   async approve(event) {

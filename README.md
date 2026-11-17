@@ -113,7 +113,7 @@ The following are available globally via the `Helpers` object:
 - **Navigation/URL**: `pathname()`, `href()`, `pagination(data)`.
 - **UI**: `openModal(html)`, `closeModal()`, `openPopover()`, `toast(message, type)`.
 - **Data Handling**: `isPresent(val)`, `isEmpty(val)`, `each(collection, callback)`, `map()`, `sort()`.
-- **Time**: `timeFormat(time, format, timezone)` — dayjs format; defaults to ISO 8601 UTC (`YYYY-MM-DDTHH:mm:ss[Z]` → `2026-10-13T14:30:45Z`); `timezone` defaults to `"UTC"` (also accepts an IANA name or a numeric hour offset); returns `"—"` when blank/invalid. Admin pages display UTC.
+- **Time**: every displayed time goes through the time helper — `Helpers.utcTime(value, format?)` for admin, `Helpers.companyTime(value, format?)` for company/mobile pages, `Helpers.locationTime(value, format?, location)` for operation consoles, and `Helpers.dateOnly(value, format?)` for calendar dates. The wire is always ISO 8601 UTC; the helper converts it to the owning location's clock. Never use `toLocaleString()` or print a raw ISO value. See `docs/TIME_DISPLAY.md`.
 - **Storage**: `Cookie.set(name, value)`, `Cookie.get(name)`.
 
 ### Development Principles

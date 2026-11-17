@@ -150,8 +150,8 @@ export default class Companies_Events_IndexController extends Companies_LayoutCo
                 code: (value) => `<span class="font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium">${value || '—'}</span>`,
                 workflow_status: (value) => `${Helpers.statusBadge(value)}`,
                 category: (value, record) => record.category?.name || '<span class="text-muted-foreground/60">—</span>',
-                start_at: (value) => value ? `<span class="text-sm text-muted-foreground">${new Date(value).toLocaleString()}</span>` : '<span class="text-muted-foreground/60">—</span>',
-                end_at: (value) => value ? `<span class="text-sm text-muted-foreground">${new Date(value).toLocaleString()}</span>` : '<span class="text-muted-foreground/60">—</span>',
+                start_at: (value) => value ? `<span class="text-sm text-muted-foreground">${Helpers.companyTime(value)}</span>` : '<span class="text-muted-foreground/60">—</span>',
+                end_at: (value) => value ? `<span class="text-sm text-muted-foreground">${Helpers.companyTime(value)}</span>` : '<span class="text-muted-foreground/60">—</span>',
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">

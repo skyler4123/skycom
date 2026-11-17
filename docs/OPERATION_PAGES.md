@@ -79,6 +79,7 @@ It does **not** mean:
 | **No dead controls** | Every visible button, link, tab, filter, and field either works or is disabled with a visible reason. Remove decorative controls that do nothing. |
 | **One Stimulus controller** | Web and mobile mount the same `Companies_Operations_<Type>_ShowController`. Do not create a mobile-only operation controller. |
 | **Two orientations** | Phone portrait, phone landscape, tablet portrait, and tablet landscape must all be usable. Tables scroll inside their card instead of widening the page. |
+| **Full-width desktop console** | The console owns the whole viewport on desktop. Keep the container at `w-full px-4 lg:px-6` — never add `mx-auto max-w-[1440px]` (or any capped `max-w-*`) to the console `<main>` or header row, or the page shows gutters on wide monitors. |
 | **Semantic colors only** | Use `bg-card`, `text-foreground`, `text-muted-foreground`, `border-line`, `bg-primary`, `text-danger`, etc. No raw palette classes, no `dark:` on themed colors. |
 | **Translate everything** | Every user-facing string goes through `translate()` and gets a Vietnamese entry in `app/javascript/controllers/helpers/dictionary.js`. |
 | **Feature test is the proof** | A request spec passing is not proof. The feature test must assert the real rendered values for the real flow. |
@@ -625,7 +626,7 @@ export default class Companies_Operations_Housekeeping_ShowController extends Co
     this.element.innerHTML = `
       <div class="min-h-screen bg-background text-foreground">
         ${this.renderHeader()}
-        <main class="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 py-4 lg:px-6">
+        <main class="w-full flex flex-col gap-4 px-4 py-4 lg:px-6">
           <div data-operation-block="kpis">${this.renderKpis()}</div>
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
             <div data-housekeeping-main-column class="lg:col-span-8 flex flex-col gap-4 min-w-0">
@@ -1001,6 +1002,7 @@ Remove stale comments such as “this first pass ships demo data” when the pag
 - [ ] Write actions persist and reload; failure contract tested.
 - [ ] Web and mobile share one Stimulus controller.
 - [ ] Four viewport sizes tested; tables scroll inside cards.
+- [ ] Console `<main>` and header row span the full viewport at 1920px (no `max-w-*` cap).
 - [ ] Semantic tokens only; `bin/check_colors --strict` passes.
 - [ ] Every user-facing string has `translate()` + Vietnamese dictionary entry.
 - [ ] No raw JSON/metadata UI.

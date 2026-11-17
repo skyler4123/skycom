@@ -61,7 +61,7 @@ export default class Companies_TableConfigLogs_ShowController extends Companies_
               <p class="text-sm font-semibold">${this.actionBadge(l.action)}</p>
             </div>
             ${this.field("Changed By", l.employee?.name)}
-            ${this.field("Changed At", l.created_at ? new Date(l.created_at).toLocaleString() : null)}
+            ${this.field("Changed At", l.created_at ? Helpers.companyTime(l.created_at) : null)}
             ${this.field("Name", l.name)}
             ${this.field("Category", l.category?.name || l.category_name)}
             ${this.field("Property Mapping", l.property_mapping_name)}

@@ -51,7 +51,7 @@ export default class Companies_Invoices_ShowController extends Companies_LayoutC
       case 'decimal':
         return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
       case 'datetime':
-        return `<span class="text-sm text-foreground">${new Date(value).toLocaleString()}</span>`
+        return `<span class="text-sm text-foreground">${Helpers.companyTime(value)}</span>`
       default:
         return `<span class="text-sm text-foreground">${value}</span>`
     }
@@ -147,7 +147,7 @@ export default class Companies_Invoices_ShowController extends Companies_LayoutC
               </div>
               <div>
                 <p class="text-xs font-medium text-muted-foreground">${translate("Due Date")}</p>
-                <p class="text-sm font-semibold text-foreground">${i.due_date ? new Date(i.due_date).toLocaleDateString() : translate("N/A")}</p>
+                <p class="text-sm font-semibold text-foreground">${i.due_date ? Helpers.companyTime(i.due_date, Helpers.DATE_FORMAT) : translate("N/A")}</p>
               </div>
             </div>
 

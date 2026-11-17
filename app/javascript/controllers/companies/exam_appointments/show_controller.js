@@ -163,11 +163,11 @@ export default class Companies_ExamAppointments_ShowController extends Companies
             </div>
             <div class="rounded-xl border border-line bg-card p-3">
               <p class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">${translate("Submitted")}</p>
-              <p class="mt-1 text-sm font-medium text-foreground">${appointment.submitted_at ? Helpers.timeFormat(appointment.submitted_at) : "—"}</p>
+              <p class="mt-1 text-sm font-medium text-foreground">${appointment.submitted_at ? Helpers.companyTime(appointment.submitted_at) : "—"}</p>
             </div>
             <div class="rounded-xl border border-line bg-card p-3">
               <p class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">${translate("Graded")}</p>
-              <p class="mt-1 text-sm font-medium text-foreground">${appointment.graded_at ? Helpers.timeFormat(appointment.graded_at) : "—"}</p>
+              <p class="mt-1 text-sm font-medium text-foreground">${appointment.graded_at ? Helpers.companyTime(appointment.graded_at) : "—"}</p>
             </div>
           </div>
 

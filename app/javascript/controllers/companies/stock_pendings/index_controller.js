@@ -55,8 +55,8 @@ export default class Companies_StockPendings_IndexController extends Companies_L
 
   rowHTML(record) {
     const companyId = currentCompany().id
-    const heldAt = record.status_changed_at ? new Date(record.status_changed_at).toLocaleString() : "—"
-    const releasedAt = record.released_at ? new Date(record.released_at).toLocaleString() : "—"
+    const heldAt = record.status_changed_at ? Helpers.companyTime(record.status_changed_at) : "—"
+    const releasedAt = record.released_at ? Helpers.companyTime(record.released_at) : "—"
     return `
       <tr class="border-b border-line hover:bg-muted/50">
         <td class="py-3 px-4 text-sm">

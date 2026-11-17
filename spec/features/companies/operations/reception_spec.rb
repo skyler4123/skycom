@@ -6,7 +6,7 @@ RSpec.feature "Companies::Operations::Reception", type: :feature, js: true do
   let(:company_user) { create(:user, :company_owner) }
   let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :education).tap(&:save!) }
   let(:owner) { company.user }
-  let(:branch) { create(:branch, company: company) }
+  let(:branch) { create(:branch, company: company, timezone: :utc) }
   let(:operation_record) { create(:operation, company: company, branch: branch, operation_type: :reception) }
   let(:reception_path) { "/companies/#{company.id}/operations/reception/#{operation_record.id}?branch_id=#{branch.id}" }
   let(:event_category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "events") }
@@ -137,6 +137,21 @@ RSpec.feature "Companies::Operations::Reception", type: :feature, js: true do
 
     expect(page).to have_content("Maya Lindqvist checked out", wait: 5)
     expect(active_visit.reload.workflow_status).to eq("completed")
+  end
+
+  scenario "shows arrival times on the branch clock instead of UTC" do
+    branch.update!(timezone: :plus_7)
+
+    travel_to Time.utc(2026, 11, 17, 2, 0, 0) do
+      create_visit(customer_name: "Nora Local", status: :confirmed,
+        start_at: Time.utc(2026, 11, 17, 2, 0, 0), host: host, code: "VIS-NORA")
+
+      visit reception_path
+
+      expect(page).to have_content("Nora Local", wait: 10)
+      expect(page).to have_content("9:00 AM")
+      expect(page).not_to have_content("2:00 AM")
+    end
   end
 
   scenario "notifies the host and stamps the visit metadata" do

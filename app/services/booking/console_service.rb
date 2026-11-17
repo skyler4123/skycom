@@ -29,7 +29,7 @@ class Booking::ConsoleService
     @appointment = appointment
     @branch = appointment.branch
     @now = now
-    @date = date || now.to_date
+    @date = date || LocalTime.today(@branch, at: now)
   end
 
   def call
@@ -58,12 +58,11 @@ class Booking::ConsoleService
 
   def events
     @events ||= begin
-      day_start = date.beginning_of_day
-      day_end = day_start + 1.day
+      day_range = LocalTime.day_range(date, branch)
 
       company.events
         .where(branch_id: branch.id)
-        .where("start_at >= :start AND start_at < :end", start: day_start, end: day_end)
+        .where("start_at >= :start AND start_at < :end", start: day_range.begin, end: day_range.end)
         .where.not(workflow_status: :cancelled)
         .includes(
           :category,
@@ -118,8 +117,6 @@ class Booking::ConsoleService
       resource_ids: facility_ids,
       start_at: event.start_at&.iso8601,
       end_at: event.end_at&.iso8601,
-      start_label: format_time(event.start_at),
-      end_label: format_time(event.end_at),
       organizer: host&.name.presence || customer&.name.presence || "—",
       customer: customer&.name,
       attendees: event.customer_event_appointments.length + event.employee_event_appointments.length,
@@ -176,11 +173,5 @@ class Booking::ConsoleService
 
   def searchable_resource_text(resource)
     [ resource[:category], resource[:name] ].compact.join(" ")
-  end
-
-  def format_time(time)
-    return "—" if time.blank?
-
-    time.strftime("%-I:%M %p")
   end
 end

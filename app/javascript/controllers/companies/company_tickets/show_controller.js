@@ -149,7 +149,7 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
         <div class="flex items-center gap-2">
           <span class="text-sm font-bold text-foreground">${escapeHtml(c.author_name) || this.humanize(c.author_type)}</span>
           ${c.author_type === "User" ? `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-primary/10 text-primary ">${translate("Skycom Support")}</span>` : ""}
-          <span class="text-xs text-muted-foreground">${c.created_at ? new Date(c.created_at).toLocaleString() : ""}</span>
+          <span class="text-xs text-muted-foreground">${c.created_at ? Helpers.companyTime(c.created_at) : ""}</span>
         </div>
         <p class="text-sm text-foreground whitespace-pre-line">${escapeHtml(c.message)}</p>
         ${(c.attachments || []).length > 0 ? `<div class="flex flex-wrap gap-2 mt-2">${c.attachments.map((a) => this.attachmentHTML(a)).join("")}</div>` : ""}
@@ -160,7 +160,7 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
         <span class="material-symbols-outlined text-[16px]">history</span>
         <span>${this.humanize(l.action)}${l.from_status ? ` (${l.from_status} → ${l.to_status})` : ""}</span>
         ${l.note ? `<span class="truncate">— ${escapeHtml(l.note)}</span>` : ""}
-        <span class="ml-auto shrink-0">${l.created_at ? new Date(l.created_at).toLocaleString() : ""}</span>
+        <span class="ml-auto shrink-0">${l.created_at ? Helpers.companyTime(l.created_at) : ""}</span>
       </div>`).join("")
 
     const ratingBlock = t.rate
@@ -196,8 +196,8 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-6 pt-6 border-t border-line text-sm">
             <div><p class="text-xs font-medium text-muted-foreground">${translate("Assignee")}</p><p class="font-semibold text-foreground">${escapeHtml(t.assigned_user?.name || t.assigned_user?.email) || "—"}</p></div>
             <div><p class="text-xs font-medium text-muted-foreground">${translate("Raised by")}</p><p class="font-semibold text-foreground">${escapeHtml(t.employee?.name) || "—"}</p></div>
-            <div><p class="text-xs font-medium text-muted-foreground">${translate("Created")}</p><p class="font-semibold text-foreground">${t.created_at ? new Date(t.created_at).toLocaleString() : "—"}</p></div>
-            <div><p class="text-xs font-medium text-muted-foreground">${translate("First response")}</p><p class="font-semibold text-foreground">${t.first_responded_at ? new Date(t.first_responded_at).toLocaleString() : "—"}</p></div>
+            <div><p class="text-xs font-medium text-muted-foreground">${translate("Created")}</p><p class="font-semibold text-foreground">${t.created_at ? Helpers.companyTime(t.created_at) : "—"}</p></div>
+            <div><p class="text-xs font-medium text-muted-foreground">${translate("First response")}</p><p class="font-semibold text-foreground">${t.first_responded_at ? Helpers.companyTime(t.first_responded_at) : "—"}</p></div>
           </div>
 
           ${(t.attachments || []).length > 0 ? `

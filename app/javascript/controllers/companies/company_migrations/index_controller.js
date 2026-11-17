@@ -126,7 +126,7 @@ export default class Companies_CompanyMigrations_IndexController extends Compani
                           </span>
                         </td>
                         <td class="py-2 pr-4 text-muted-foreground">${migration.processed_rows}/${migration.total_rows}</td>
-                        <td class="py-2 pr-4 text-muted-foreground">${Helpers.timeFormat(migration.created_at, "YYYY-MM-DD HH:mm")}</td>
+                        <td class="py-2 pr-4 text-muted-foreground">${Helpers.companyTime(migration.created_at, "YYYY-MM-DD HH:mm")}</td>
                         <td class="py-2 text-right">
                           ${migration.workflow_status === "draft" ? `
                             <button type="button" title="${translate("Delete")}" aria-label="${translate("Delete")}"

@@ -82,6 +82,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | Marketing homepage, sign-in/up, company page | `docs/HOMEPAGE.md` — caching contract + SEO rules, read before touching |
 | Semantic colors, Tailwind classes, dark mode, mobile layout | `docs/STYLING_GUIDELINES.md` |
 | Any `/mobile/*` page, mobile controller, or Android shell work | `docs/MOBILE.md` — implementation contract; `docs/MOBILE_FEATURE_MATRIX.md` — web parity, backlog, native audit |
+| Any date/time display, formatting, or date-time input | `docs/TIME_DISPLAY.md` — UTC wire, Branch/Warehouse clock on operation pages, Company clock elsewhere, Admin UTC; the helper API and banned patterns |
 | User-facing strings or translations | `docs/LANGUAGE.md` — **mandatory**: `translate()` usage + dictionary entries in `app/javascript/controllers/helpers/dictionary.js` |
 | User avatars | `docs/AVATAR.md` — helper + controller + concerns |
 | Dynamic property slot validation | `docs/PROPERTY_SLOT_VALIDATION.md` — built-in column limits + affected models |
@@ -112,6 +113,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - `bin/rubocop` - Lint Ruby code
 - `bin/check_colors --strict` - Reject raw Tailwind palette classes (semantic tokens only)
 - `bin/check_env` - Reject raw ENV reads outside `config/initializers/constants.rb` (see `docs/ENVIRONMENT.md`)
+- `bin/check_time` - Reject browser-clock / raw-ISO time display in Stimulus controllers (see `docs/TIME_DISPLAY.md`)
 - `bin/brakeman` - Security scan
 - `bin/rails` - Standard Rails commands
 - `bundle exec parallel_rspec -n 14 [paths]` - Run tests (parallel, 14 workers). See `docs/PARALLEL_TESTS.md`.
@@ -124,6 +126,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - **Client cache** — If any mutation affects data stored in `currentCompany()` (branches, roles, categories, permissions, features, etc.), call `clearClientCacheAndReload()` after the server confirms the change, OR call `clearClientCache()` followed by a page reload.
 - **Language (mandatory)** — Every new or changed user-facing string must be added to `app/javascript/controllers/helpers/dictionary.js` with a Vietnamese translation. See `docs/LANGUAGE.md`. Missing entries break `translate()` output.
 - **Metadata editing** — Never edit JSON/metadata through a textarea in a user-facing form. Give every editable metadata key its own typed input (text, number, select, checkbox, …) and preserve keys the form does not own. See "Metadata & JSON editing" below.
+- **Time display (mandatory)** — UTC is the only wire format. Operation pages render the Branch/Warehouse clock, company pages the Company clock, admin UTC. Use `Helpers.locationTime` / `Helpers.companyTime` / `Helpers.utcTime` / `Helpers.dateOnly`; never `toLocaleString()` or raw ISO. `bin/check_time` enforces this. See `docs/TIME_DISPLAY.md`.
 - **Semantic colors (mandatory)** — Use only the semantic tokens (`bg-card`, `text-foreground`, `text-muted-foreground`, `border-line`, `bg-primary`, `text-danger`, …). Never raw palette classes (`bg-white`, `text-slate-500`, `border-slate-200`, `text-white`) and never `dark:` on a themed color — the CSS variable switches itself. `bin/check_colors --strict` enforces this. See `docs/STYLING_GUIDELINES.md`.
 - **Dark mode & grouping** — Every UI group (title+value, card, dropdown, table, section) must have a border (`border border-line`) or distinct background (`bg-card` / `bg-muted`). One class covers both modes; do not add `dark:` variants. See `docs/STYLING_GUIDELINES.md` §3 and §5.
 - **BE↔FE link** — When you add, remove, or change an endpoint, update the file-header link comments in **both** the BE controller (`Serves Stimulus:`) and the FE Stimulus controller (`Depends on BE:` / `Endpoints:`). See the template in `V1Controller`, `OrdersController`, `PagesController`, `MockQrGatewayController`, `RetailCashierController`. Links are living — remove stale pairs, add new ones per feature.

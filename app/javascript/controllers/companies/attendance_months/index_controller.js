@@ -29,8 +29,7 @@ export default class Companies_AttendanceMonths_IndexController extends Companie
 
   formatDate(dateStr) {
     if (!dateStr) return '—'
-    const d = new Date(dateStr + 'T00:00:00')
-    return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+    return Helpers.dateOnly(dateStr, "MMMM YYYY")
   }
 
   async collect() {

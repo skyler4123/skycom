@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Time display guard.
+#
+# UTC is the only wire format. Every displayed time goes through
+# Helpers.utcTime / Helpers.companyTime / Helpers.locationTime /
+# Helpers.dateOnly. This script fails when a page controller reaches for the
+# browser clock, a direct UTC formatter, or a UTC date slice.
+#
+# See docs/TIME_DISPLAY.md.
+#
+# Usage:
+#   bin/check_time    # exit 1 when a banned time pattern is found
+
+require "pathname"
+
+ROOT = Pathname.new(File.expand_path("..", __dir__))
+
+SCAN_GLOB = "app/javascript/controllers/**/*.js"
+
+ALLOWLIST = %w[
+  app/javascript/controllers/helpers/ui_helpers.js
+  app/javascript/controllers/helpers/time_helpers.js
+  app/javascript/controllers/calendar_controller.js
+].freeze
+
+PATTERNS = [
+  [ /\.toLocaleDateString\s*\(/, "toLocaleDateString" ],
+  [ /\.toLocaleTimeString\s*\(/, "toLocaleTimeString" ],
+  [ /new Date\([^)]*\)\.toLocaleString\s*\(/, "new Date(...).toLocaleString()" ],
+  [ /\bHelpers\.timeFormat\s*\(/, "direct Helpers.timeFormat" ],
+  [ /\.getUTCHours\s*\(/, "getUTCHours" ],
+  [ /\.getUTCFullYear\s*\(/, "getUTCFullYear" ],
+  [ /\.getUTCMonth\s*\(/, "getUTCMonth" ],
+  [ /\.getUTCDate\s*\(/, "getUTCDate" ],
+  [ /\.toISOString\(\)\.slice\(\s*0\s*,\s*(?:7|10|19)\s*\)/, "UTC date slice" ]
+].freeze
+
+findings = []
+
+Dir[ROOT.join(SCAN_GLOB)].sort.each do |absolute|
+  path = Pathname.new(absolute).relative_path_from(ROOT).to_s
+  next if ALLOWLIST.include?(path)
+
+  File.foreach(absolute).with_index(1) do |line, number|
+    PATTERNS.each do |pattern, label|
+      next unless line.match?(pattern)
+
+      findings << "#{path}:#{number}: [#{label}] #{line.strip}"
+    end
+  end
+end
+
+if findings.empty?
+  puts "Time guard: OK"
+  exit 0
+end
+
+warn "Banned time display patterns found:"
+findings.each { |finding| warn "  #{finding}" }
+warn ""
+warn "Use Helpers.utcTime (admin), Helpers.companyTime (company/mobile),"
+warn "Helpers.locationTime (operation consoles), or Helpers.dateOnly (calendar dates)."
+warn "The wire format is always UTC. See docs/TIME_DISPLAY.md."
+exit 1

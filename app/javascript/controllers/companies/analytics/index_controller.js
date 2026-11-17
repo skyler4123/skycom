@@ -622,6 +622,6 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
 
   formatMonth(value) {
     if (!value) return "—"
-    return Helpers.timeFormat(`${value}-01`, "MMM YYYY")
+    return Helpers.dateOnly(`${value}-01`, "MMM YYYY")
   }
 }
