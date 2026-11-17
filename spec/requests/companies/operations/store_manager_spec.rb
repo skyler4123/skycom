@@ -71,6 +71,17 @@ RSpec.describe "Companies::Operations::StoreManagerController", type: :request d
       expect(body.dig("store_manager", "footfall", "connected")).to be(false)
     end
 
+    it "ships the location timezone with the appointment" do
+      branch.update!(timezone: :plus_7)
+
+      get store_manager_company_operations_path(company, operation), params: { branch_id: branch.id }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body.dig("appointment", "location", "timezone")).to eq("plus_7")
+      expect(body.dig("appointment", "location", "utc_offset")).to eq(25_200)
+    end
+
     it "rejects a branch appointment that is not active" do
       appointment.update!(workflow_status: :inactive)
 

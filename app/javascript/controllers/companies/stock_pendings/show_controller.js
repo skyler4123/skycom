@@ -89,7 +89,7 @@ export default class Companies_StockPendings_ShowController extends Companies_La
             <tr class="border-b border-line">
               <td class="py-2 px-2 text-sm font-mono text-muted-foreground">${t.transaction_type}</td>
               <td class="py-2 px-2 text-sm font-mono text-foreground">${Number(t.quantity || 0).toLocaleString()}</td>
-              <td class="py-2 px-2 text-sm text-muted-foreground">${t.created_at ? new Date(t.created_at).toLocaleString() : "—"}</td>
+              <td class="py-2 px-2 text-sm text-muted-foreground">${t.created_at ? Helpers.companyTime(t.created_at) : "—"}</td>
             </tr>`).join("")}
         </tbody>
       </table>`
@@ -100,8 +100,8 @@ export default class Companies_StockPendings_ShowController extends Companies_La
     if (!doc) return `<div class="p-8 text-center">${translate("Stock Pending")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const heldAt = doc.status_changed_at ? new Date(doc.status_changed_at).toLocaleString() : "—"
-    const releasedAt = doc.released_at ? new Date(doc.released_at).toLocaleString() : "—"
+    const heldAt = doc.status_changed_at ? Helpers.companyTime(doc.status_changed_at) : "—"
+    const releasedAt = doc.released_at ? Helpers.companyTime(doc.released_at) : "—"
 
     return `
       <div class="p-4 overflow-y-auto">

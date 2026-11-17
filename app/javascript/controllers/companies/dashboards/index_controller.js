@@ -137,7 +137,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     const owner = c.owner
     const ownerName = owner ? [ owner.first_name, owner.last_name ].filter(Boolean).join(" ") || owner.email : "—"
     const address = [ c.address_line_1, c.city, c.postal_code ].filter(Boolean).join(", ") || "—"
-    const timezone = this.timezoneLabel(c.timezone)
+    const timezone = Helpers.timezoneLabel(c.timezone)
 
     return `
       <div data-dashboard-block="company_meta" class="bg-card border border-line rounded-xl p-4">
@@ -563,7 +563,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
         dataLabels: { enabled: false },
         grid: { borderColor: chartGridColor(), strokeDashArray: 4, xaxis: { lines: { show: false } } },
         xaxis: {
-          categories: trend.map((row) => Helpers.timeFormat(row.date, "MMM D")),
+          categories: trend.map((row) => Helpers.dateOnly(row.date, "MMM D")),
           labels: { style: { colors: chartLabelColor(), fontSize: "10px" }, rotate: 0, hideOverlappingLabels: true },
           axisBorder: { show: false },
           axisTicks: { show: false }
@@ -672,15 +672,6 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
   }
 
   formatDate(value, format = "MMM D, YYYY") {
-    return Helpers.timeFormat(value, format)
-  }
-
-  timezoneLabel(value) {
-    if (!value) return "—"
-    const minus = value.match(/minus_(\d+)/)
-    if (minus) return `UTC-${minus[1]}`
-    const plus = value.match(/plus_(\d+)/)
-    if (plus) return `UTC+${plus[1]}`
-    return value === "utc" ? "UTC" : value
+    return Helpers.dateOnly(value, format)
   }
 }

@@ -43,7 +43,7 @@ export default class Companies_PermissionLogs_IndexController extends Companies_
 
   formatDateTime(dt) {
     if (!dt) return '—'
-    return new Date(dt).toLocaleString()
+    return Helpers.companyTime(dt)
   }
 
   contentHTML() {

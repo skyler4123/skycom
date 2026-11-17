@@ -34,8 +34,11 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
 
     const params = new URLSearchParams(window.location.search)
     this.tab = params.get("tab") || "invoices"
-    this.from = params.get("from") || new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10)
-    this.to = params.get("to") || new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().slice(0, 10)
+    const today = Helpers.localToday()
+    const [year, month] = today.split("-")
+    const lastDay = new Date(Number(year), Number(month), 0).getDate()
+    this.from = params.get("from") || `${year}-${month}-01`
+    this.to = params.get("to") || `${year}-${month}-${String(lastDay).padStart(2, "0")}`
 
     const companyId = window.location.pathname.split("/")[2]
 
@@ -149,7 +152,7 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
       rowsHtml = this.invoices.map(r => `
         <tr class="border-b border-line">
           <td class="py-2 px-4 text-sm">${r.code || "—"}</td>
-          <td class="py-2 px-4 text-sm">${r.created_at ? new Date(r.created_at).toLocaleString() : "—"}</td>
+          <td class="py-2 px-4 text-sm">${r.created_at ? Helpers.companyTime(r.created_at) : "—"}</td>
           <td class="py-2 px-4 text-sm">${r.payment_status || "—"}</td>
           <td class="py-2 px-4 text-sm">${r.price_cents ?? "—"}</td>
         </tr>
@@ -159,7 +162,7 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
         <tr class="border-b border-line">
           <td class="py-2 px-4 text-sm">${r.code || "—"}</td>
           <td class="py-2 px-4 text-sm">${r.name || "—"}</td>
-          <td class="py-2 px-4 text-sm">${r.created_at ? new Date(r.created_at).toLocaleString() : "—"}</td>
+          <td class="py-2 px-4 text-sm">${r.created_at ? Helpers.companyTime(r.created_at) : "—"}</td>
           <td class="py-2 px-4 text-sm">${r.workflow_status || "—"}</td>
           <td class="py-2 px-4 text-sm">${r.total_price ?? "—"}</td>
         </tr>
@@ -169,7 +172,7 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
         <tr class="border-b border-line">
           <td class="py-2 px-4 text-sm">${r.code || "—"}</td>
           <td class="py-2 px-4 text-sm">${r.name || "—"}</td>
-          <td class="py-2 px-4 text-sm">${r.created_at ? new Date(r.created_at).toLocaleString() : "—"}</td>
+          <td class="py-2 px-4 text-sm">${r.created_at ? Helpers.companyTime(r.created_at) : "—"}</td>
           <td class="py-2 px-4 text-sm">${r.business_type || "—"}</td>
           <td class="py-2 px-4 text-sm">${r.quantity ?? "—"}</td>
         </tr>

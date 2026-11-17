@@ -99,6 +99,14 @@ export default class Companies_Operations_StoreManager_ShowController extends Co
     return Helpers.currentCompany()?.name || translate("Company")
   }
 
+  get location() {
+    return this.appointment?.location || {}
+  }
+
+  time(value, format = "h:mm A") {
+    return Helpers.locationTime(value, format, this.location)
+  }
+
   get userName() {
     return this.element.dataset.userName || Helpers.currentUser()?.name || Helpers.currentUser()?.email || translate("Manager")
   }
@@ -109,9 +117,7 @@ export default class Companies_Operations_StoreManager_ShowController extends Co
   }
 
   get currentHour() {
-    const value = this.store.generated_at
-    const date = value ? new Date(value) : new Date()
-    return Number.isNaN(date.getTime()) ? new Date().getUTCHours() : date.getUTCHours()
+    return Helpers.locationNow(this.location).hour()
   }
 
   get currentShift() {
@@ -501,7 +507,7 @@ export default class Companies_Operations_StoreManager_ShowController extends Co
         <td class="py-3 px-3">
           <a href="${this.escape(order.order_path)}" class="font-display text-[14px] font-bold text-primary hover:underline">${this.escape(order.code)}</a>
           <div class="text-foreground font-semibold mt-0.5">${this.escape(order.customer_name)}</div>
-          <div class="text-[10px] text-muted-foreground truncate max-w-[190px]">${translate("Placed")} ${this.escape(order.placed_at)} • ${this.escape(translate(order.customer_meta))}</div>
+          <div class="text-[10px] text-muted-foreground truncate max-w-[190px]">${translate("Placed")} ${this.escape(this.time(order.placed_at))} • ${this.escape(translate(order.customer_meta))}</div>
         </td>
         <td class="py-3 px-3">
           <div class="text-foreground font-medium">${order.items_count} ${translate("Items")}</div>
@@ -809,9 +815,7 @@ export default class Companies_Operations_StoreManager_ShowController extends Co
   }
 
   renderAuditStrip() {
-    const generatedAt = this.store.generated_at
-      ? this.timeLabel(this.store.generated_at)
-      : this.timeLabel(new Date().toISOString())
+    const generatedAt = this.time(this.store.generated_at || new Date().toISOString())
 
     return `
       <section class="rounded-xl border border-line bg-muted p-3 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-2 text-[11px] text-muted-foreground">
@@ -932,12 +936,6 @@ export default class Companies_Operations_StoreManager_ShowController extends Co
 
   money(minorUnits, currency = this.currency) {
     return Helpers.formatMoney(minorUnits || 0, currency)
-  }
-
-  timeLabel(value) {
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return "—"
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   }
 
   initialsFor(name) {

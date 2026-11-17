@@ -192,6 +192,15 @@ preserved when the form is saved. Raw metadata is never exposed in the UI.
 | Store Manager | `Companies_Operations_StoreManager_ShowController` (`companies--operations--store-manager--show`) | `Companies::Operations::StoreManagerController#show` |
 | Placeholders | `Companies_Operations_<Type>_ShowController` | `Companies::Operations::<Type>Controller#show` |
 
+### 7.1 Time contract
+
+Every operation console belongs to one physical location, so its clock is the
+appointment Branch/Warehouse timezone — never the browser and never UTC on
+screen. `OperationSerializer.location` ships `timezone` and `utc_offset`
+(seconds). Console services return ISO UTC timestamps only; the Stimulus
+controller formats with `Helpers.locationTime(value, format, appointment.location)`.
+"Today" is the location's calendar day. The full rule is `docs/TIME_DISPLAY.md`.
+
 Reception reuses the existing domain instead of adding visitor/parcel tables:
 
 - **Visit** = `Event` (branch-scoped). `pending` → upcoming, `confirmed` → lobby,

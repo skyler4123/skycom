@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
-  let(:company) { create(:company) }
+  let(:company) { create(:company).tap { |record| record.update!(timezone: :plus_7) } }
   let(:user) { company.user }
   let!(:manager) { create(:employee, company: company, name: "Alex Approver") }
   let!(:employee) { company.employees.find_by(user: user) }
@@ -34,7 +34,8 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
     visit_new_request_form(company)
 
     expect(page).to have_content("New Request")
-    set_native_field("attendance_date", Date.yesterday.strftime("%Y-%m-%d"))
+    attendance_date = Date.yesterday.strftime("%Y-%m-%d")
+    set_native_field("attendance_date", attendance_date)
     select "Remote Work", from: "Type"
     set_native_field("check_in_time", "09:00")
     set_native_field("check_out_time", "17:00")
@@ -52,6 +53,7 @@ RSpec.feature "Mobile Attendance Request", type: :feature, js: true do
     expect(AttendanceRequest.last.employee).to eq(employee)
     expect(AttendanceRequest.last).to be_status_pending
     expect(AttendanceRequest.last.business_type).to eq("remote_work")
+    expect(AttendanceRequest.last.check_in).to eq(Time.zone.parse("#{attendance_date} 02:00"))
   end
 
   scenario "shows the employee's group managers" do

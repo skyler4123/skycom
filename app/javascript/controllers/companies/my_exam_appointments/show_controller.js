@@ -123,7 +123,7 @@ export default class Companies_MyExamAppointments_ShowController extends Compani
                   ${this.statusLabel()}
                 </span>
                 <span class="text-xs text-muted-foreground">${translate("Attempt")} #${appointment.attempt_number}</span>
-                ${appointment.submitted_at ? `<span class="text-xs text-muted-foreground">${translate("Submitted")}: ${Helpers.timeFormat(appointment.submitted_at)}</span>` : ""}
+                ${appointment.submitted_at ? `<span class="text-xs text-muted-foreground">${translate("Submitted")}: ${Helpers.companyTime(appointment.submitted_at)}</span>` : ""}
               </div>
               <h2 class="text-xl font-bold text-foreground">${escapeHtml(this.exam?.name || "")}</h2>
             </div>

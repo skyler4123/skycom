@@ -54,8 +54,7 @@ export default class Companies_Brands_ShowController extends Companies_LayoutCon
       case 'decimal':
         return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
       case 'datetime': {
-        const d = new Date(value)
-        return `<span class="text-sm text-foreground">${d.toLocaleString()}</span>`
+        return `<span class="text-sm text-foreground">${Helpers.companyTime(value)}</span>`
       }
       default:
         return `<span class="text-sm text-foreground">${value}</span>`

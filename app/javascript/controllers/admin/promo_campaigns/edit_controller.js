@@ -30,7 +30,7 @@ export default class Admin_PromoCampaigns_EditController extends Admin_LayoutCon
     if (!c) return '<div class="p-8 text-center">Campaign not found.</div>'
 
     const conds = c.conditions || {}
-    const scheduledValue = c.scheduled_at ? Helpers.timeFormat(c.scheduled_at, "YYYY-MM-DDTHH:mm") : ""
+    const scheduledValue = c.scheduled_at ? Helpers.utcTime(c.scheduled_at, "YYYY-MM-DDTHH:mm") : ""
 
     const fields = `
       <div class="space-y-6">

@@ -11,11 +11,12 @@ class Mobile::Companies::AttendanceRequestsController < Mobile::Companies::BaseC
   before_action :set_managers, only: %i[new create]
 
   def new
+    company_today = LocalTime.today(@company)
     @attendance_request = AttendanceRequest.new(
-      attendance_date: Date.current,
+      attendance_date: company_today,
       business_type: :onsite_miss,
-      check_in: Time.zone.parse("#{Date.current} 09:00"),
-      check_out: Time.zone.parse("#{Date.current} 17:30")
+      check_in: LocalTime.parse(company_today, "09:00", @company),
+      check_out: LocalTime.parse(company_today, "17:30", @company)
     )
 
     respond_to do |format|
@@ -78,8 +79,8 @@ class Mobile::Companies::AttendanceRequestsController < Mobile::Companies::BaseC
       defaults: {
         attendance_date: @attendance_request.attendance_date&.iso8601,
         business_type: @attendance_request.business_type,
-        check_in_time: @attendance_request.check_in&.strftime("%H:%M"),
-        check_out_time: @attendance_request.check_out&.strftime("%H:%M")
+        check_in_time: local_time_label(@attendance_request.check_in),
+        check_out_time: local_time_label(@attendance_request.check_out)
       }
     }
   end
@@ -113,8 +114,12 @@ class Mobile::Companies::AttendanceRequestsController < Mobile::Companies::BaseC
   def combine_date_and_time(date, time)
     return nil if date.blank? || time.blank?
 
-    Time.zone.parse("#{date} #{time}")
-  rescue ArgumentError
-    nil
+    LocalTime.parse(date, time, @company)
+  end
+
+  def local_time_label(time)
+    return nil if time.blank?
+
+    LocalTime.now(@company, at: time).strftime("%H:%M")
   end
 end

@@ -72,15 +72,29 @@ export default class Companies_Operations_Booking_ShowController extends Control
 
   // --- Time helpers ---------------------------------------------------------------
 
+  get location() {
+    return this.appointment?.location || {}
+  }
+
+  time(value, format = "h:mm A") {
+    return Helpers.locationTime(value, format, this.location)
+  }
+
+  minutesOfDay(value) {
+    const label = this.time(value, "HH:mm")
+    if (label === "—") return null
+    const [hours, minutes] = label.split(":").map(Number)
+    return hours * 60 + minutes
+  }
+
   get timelineStartHour() { return this.timeline.start_hour ?? 8 }
   get timelineEndHour() { return this.timeline.end_hour ?? 18 }
   get timelineSpan() { return Math.max(1, this.timelineEndHour - this.timelineStartHour) }
 
   percentForTime(value) {
     if (!value) return 0
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return 0
-    const minutes = date.getHours() * 60 + date.getMinutes()
+    const minutes = this.minutesOfDay(value)
+    if (minutes === null) return 0
     const start = this.timelineStartHour * 60
     return this.clampPercent(((minutes - start) / (this.timelineSpan * 60)) * 100)
   }
@@ -95,8 +109,8 @@ export default class Companies_Operations_Booking_ShowController extends Control
   }
 
   nowPercent() {
-    const now = new Date()
-    const minutes = now.getHours() * 60 + now.getMinutes()
+    const minutes = this.minutesOfDay(new Date().toISOString())
+    if (minutes === null) return 0
     const start = this.timelineStartHour * 60
     return this.clampPercent(((minutes - start) / (this.timelineSpan * 60)) * 100)
   }
@@ -111,7 +125,7 @@ export default class Companies_Operations_Booking_ShowController extends Control
   }
 
   todayIso() {
-    return this.isoDate(new Date())
+    return Helpers.localToday(this.location)
   }
 
   isoDate(date) {
@@ -121,12 +135,11 @@ export default class Companies_Operations_Booking_ShowController extends Control
   }
 
   get dateLabel() {
-    const date = this.selectedDate ? new Date(`${this.selectedDate}T12:00:00`) : new Date()
-    return date.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", year: "numeric" })
+    return Helpers.dateOnly(this.selectedDate || this.todayIso(), "dddd, MMM D, YYYY", this.location)
   }
 
   get nowLabel() {
-    return new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+    return this.time(new Date().toISOString())
   }
 
   startNeedleTimer() {
@@ -589,13 +602,13 @@ export default class Companies_Operations_Booking_ShowController extends Control
       <div data-booking-block data-booking-id="${this.escape(booking.id)}"
         class="absolute top-1.5 bottom-1.5 z-10 cursor-pointer rounded-lg p-2 border ${tone} transition-all hover:shadow-md overflow-hidden"
         style="left: ${left}%; width: ${width}%;"
-        title="${this.escape(booking.title)} · ${this.escape(booking.start_label)} - ${this.escape(booking.end_label)}">
+        title="${this.escape(booking.title)} · ${this.escape(this.time(booking.start_at))} - ${this.escape(this.time(booking.end_at))}">
         <div class="flex items-center justify-between gap-1 leading-none">
           <span class="text-[11px] font-bold tracking-wide truncate">${this.escape(booking.title)}</span>
           ${statusLabel ? `<span class="px-1.5 py-0.5 rounded-full text-[9px] uppercase font-bold shrink-0 ${this.bookingBadgeTone(booking.status)}">${statusLabel}</span>` : ""}
         </div>
         <div class="text-[11px] truncate mt-1 opacity-90">${this.escape(booking.organizer)} • ${booking.attendees} ${translate("Att.")}</div>
-        <div class="text-[10px] truncate mt-1 opacity-75">${this.escape(booking.start_label)} - ${this.escape(booking.end_label)}</div>
+        <div class="text-[10px] truncate mt-1 opacity-75">${this.escape(this.time(booking.start_at))} - ${this.escape(this.time(booking.end_at))}</div>
       </div>
     `
   }
@@ -725,7 +738,7 @@ export default class Companies_Operations_Booking_ShowController extends Control
           </div>
           <div class="pt-1">
             <span class="text-[16px] font-bold text-foreground block">${this.escape(booking.title)}</span>
-            <span class="text-[12px] text-muted-foreground">${translate("Scheduled:")} ${this.escape(booking.start_label)} – ${this.escape(booking.end_label)}</span>
+            <span class="text-[12px] text-muted-foreground">${translate("Scheduled:")} ${this.escape(this.time(booking.start_at))} – ${this.escape(this.time(booking.end_at))}</span>
           </div>
         </div>
         <div class="bg-muted rounded-lg p-2 flex flex-col gap-2">
@@ -861,7 +874,7 @@ export default class Companies_Operations_Booking_ShowController extends Control
       <div class="p-2.5 rounded-lg bg-muted flex items-center justify-between gap-2">
         <div class="flex flex-col min-w-0 pr-2">
           <span class="text-[13px] font-semibold text-foreground truncate">${this.escape(booking.title)}</span>
-          <span class="text-[11px] text-muted-foreground truncate">${this.escape(booking.resource_name || translate("Unassigned room"))} • ${translate("Starts")} ${this.escape(booking.start_label)}</span>
+          <span class="text-[11px] text-muted-foreground truncate">${this.escape(booking.resource_name || translate("Unassigned room"))} • ${translate("Starts")} ${this.escape(this.time(booking.start_at))}</span>
         </div>
         <div class="flex items-center gap-1 shrink-0">
           <button type="button" data-action="click->${this.identifier}#checkInBooking" class="p-1 rounded bg-success text-success-foreground hover:brightness-110 transition-colors" title="${translate("Check In Now")}">
@@ -914,7 +927,7 @@ export default class Companies_Operations_Booking_ShowController extends Control
   }
 
   async shiftDay(offset) {
-    const base = this.selectedDate ? new Date(`${this.selectedDate}T12:00:00`) : new Date()
+    const base = new Date(`${this.selectedDate || this.todayIso()}T12:00:00`)
     base.setDate(base.getDate() + offset)
     this.selectedDate = this.isoDate(base)
     await this.reloadConsole()

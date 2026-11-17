@@ -121,7 +121,7 @@ export default class Admin_PromoCampaigns_ShowController extends Admin_LayoutCon
             </div>
             <div>
               <p class="text-xs font-medium text-muted-foreground">${translate("Scheduled At")} (UTC)</p>
-              <p class="text-sm font-semibold text-foreground">${c.scheduled_at ? Helpers.timeFormat(c.scheduled_at) : "—"}</p>
+              <p class="text-sm font-semibold text-foreground">${c.scheduled_at ? Helpers.utcTime(c.scheduled_at) : "—"}</p>
             </div>
             <div>
               <p class="text-xs font-medium text-muted-foreground">Matched / Granted / Skipped</p>

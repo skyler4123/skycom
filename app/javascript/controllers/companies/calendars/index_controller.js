@@ -27,7 +27,7 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
   view = "month"
 
   /** @type {string} */
-  anchor = new Date().toISOString().split("T")[0]
+  anchor = Helpers.localToday()
 
   /** @type {any[]} */
   events = []
@@ -38,7 +38,7 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
   async connect() {
     super.connect()
 
-    this.today = new Date().toISOString().split("T")[0]
+    this.today = Helpers.localToday()
     window.addEventListener("calendar:refresh", this.handleRefresh)
     await this.fetchEvents()
 
@@ -82,8 +82,17 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
     }
   }
 
+  parseDate(value) {
+    return new Date(`${value}T12:00:00`)
+  }
+
+  isoDate(date) {
+    const pad = (n) => String(n).padStart(2, "0")
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+  }
+
   getCurrentRange() {
-    const d = new Date(this.anchor)
+    const d = this.parseDate(this.anchor)
     let start, end
     if (this.view === "month") {
       start = new Date(d.getFullYear(), d.getMonth(), 1)
@@ -96,18 +105,18 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
     } else {
       start = end = d
     }
-    return { start: start.toISOString().split("T")[0], end: end.toISOString().split("T")[0] }
+    return { start: this.isoDate(start), end: this.isoDate(end) }
   }
 
   prev() { this.move(-1); this.refresh() }
   next() { this.move(+1); this.refresh() }
 
   move(delta) {
-    const d = new Date(this.anchor)
+    const d = this.parseDate(this.anchor)
     if (this.view === "month") d.setMonth(d.getMonth() + delta)
     else if (this.view === "week") d.setDate(d.getDate() + delta * 7)
     else d.setDate(d.getDate() + delta)
-    this.anchor = d.toISOString().split("T")[0]
+    this.anchor = this.isoDate(d)
   }
 
   showMonth() { this.view = "month"; this.refresh() }
@@ -176,11 +185,12 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
   }
 
   getTitle() {
-    const d = new Date(this.anchor)
-    if (this.view === "month") return d.toLocaleDateString("en-US", { month: "long", year: "numeric" })
-    if (this.view === "day") return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
+    const anchor = this.anchor
+    if (this.view === "month") return Helpers.dateOnly(anchor, "MMMM YYYY")
+    if (this.view === "day") return Helpers.dateOnly(anchor, "dddd, MMMM D, YYYY")
+    const d = this.parseDate(anchor)
     const s = new Date(d); s.setDate(s.getDate() - (s.getDay() || 7) + 1); const e = new Date(s); e.setDate(e.getDate() + 6)
-    return s.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " – " + e.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    return `${Helpers.dateOnly(this.isoDate(s), "MMM D")} – ${Helpers.dateOnly(this.isoDate(e), "MMM D, YYYY")}`
   }
 
   boardHTML() {
@@ -217,7 +227,7 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
   }
 
   monthViewHTML() {
-    const d = new Date(this.anchor), y = d.getFullYear(), m = d.getMonth()
+    const d = this.parseDate(this.anchor), y = d.getFullYear(), m = d.getMonth()
     const first = new Date(y, m, 1), daysInMonth = new Date(y, m + 1, 0).getDate(), startWeekday = first.getDay() || 7
     let html = this.weekdayHeaderHTML() + '<div class="grid grid-cols-7 gap-2">'
     for (let i = 1; i < startWeekday; i++) html += '<div class="h-32 bg-background/30 rounded-lg"></div>'
@@ -228,10 +238,11 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
   }
 
   weekViewHTML() {
-    const d = new Date(this.anchor); d.setDate(d.getDate() - (d.getDay() || 7) + 1)
+    const d = this.parseDate(this.anchor); d.setDate(d.getDate() - (d.getDay() || 7) + 1)
     const days = Array.from({ length: 7 }, (_, i) => {
       const dayDate = new Date(d); dayDate.setDate(dayDate.getDate() + i)
-      return { dateStr: dayDate.toISOString().split("T")[0], dayNumber: dayDate.getDate(), isToday: dayDate.toISOString().split("T")[0] === this.today }
+      const dateStr = this.isoDate(dayDate)
+      return { dateStr, dayNumber: dayDate.getDate(), isToday: dateStr === this.today }
     })
 
     const timeSlots = []
@@ -258,7 +269,7 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
       <div class="border rounded-lg overflow-hidden">
         <div class="grid grid-cols-8 bg-muted border-b ">
           <div class="p-3 text-sm font-semibold text-muted-foreground text-right">Time</div>
-          ${days.map(day => `<div class="p-3 text-center text-sm font-semibold ${day.isToday ? 'bg-primary/10 text-primary ' : ''}">${new Date(day.dateStr).toLocaleString('en-US', { weekday: 'short' })} ${day.dayNumber}</div>`).join('')}
+          ${days.map(day => `<div class="p-3 text-center text-sm font-semibold ${day.isToday ? 'bg-primary/10 text-primary ' : ''}">${Helpers.dateOnly(day.dateStr, "ddd")} ${day.dayNumber}</div>`).join('')}
         </div>
         ${timeSlots.join('')}
       </div>
@@ -285,7 +296,7 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
     return `
       <div class="border rounded-lg overflow-hidden">
         <div class="bg-muted p-4 border-b text-center font-bold text-lg ${isToday ? 'bg-primary/10 text-primary ' : ''}">
-          ${new Date(dateStr).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+          ${Helpers.dateOnly(dateStr, "dddd, MMMM D, YYYY")}
         </div>
         ${timeSlots.join('')}
       </div>`

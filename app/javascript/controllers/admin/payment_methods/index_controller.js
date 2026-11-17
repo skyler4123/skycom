@@ -81,7 +81,7 @@ export default class Admin_PaymentMethods_IndexController extends Admin_LayoutCo
                   return `<span class="text-sm text-muted-foreground">${names[value] || value || '—'}</span>`
                 },
                 lifecycle_status: (value) => `${Helpers.statusBadge(value)}`,
-                created_at: (value) => value ? `<span class="text-sm text-muted-foreground">${Helpers.timeFormat(value)}</span>` : '—'
+                created_at: (value) => value ? `<span class="text-sm text-muted-foreground">${Helpers.utcTime(value)}</span>` : '—'
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">

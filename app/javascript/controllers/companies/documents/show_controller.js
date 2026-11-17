@@ -60,8 +60,7 @@ export default class Companies_Documents_ShowController extends Companies_Layout
       case 'decimal':
         return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
       case 'datetime': {
-        const d = new Date(value)
-        return `<span class="text-sm text-foreground">${d.toLocaleString()}</span>`
+        return `<span class="text-sm text-foreground">${Helpers.companyTime(value)}</span>`
       }
       default:
         return `<span class="text-sm text-foreground">${escapeHtml(value)}</span>`

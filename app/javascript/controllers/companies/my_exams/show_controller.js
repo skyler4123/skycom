@@ -112,7 +112,7 @@ export default class Companies_MyExams_ShowController extends Companies_LayoutCo
                   </span>
                 </td>
                 <td class="px-4 py-3 text-center text-sm text-foreground">${attempt.score === null || attempt.score === undefined ? "—" : Number(attempt.score).toFixed(2)}</td>
-                <td class="px-4 py-3 text-center text-xs text-muted-foreground">${attempt.submitted_at ? Helpers.timeFormat(attempt.submitted_at) : "—"}</td>
+                <td class="px-4 py-3 text-center text-xs text-muted-foreground">${attempt.submitted_at ? Helpers.companyTime(attempt.submitted_at) : "—"}</td>
                 <td class="px-4 py-3 text-right">
                   ${["graded", "expired", "submitted"].includes(attempt.workflow_status)
                     ? `<a href="${Helpers.company_my_exam_appointment_path(currentCompany()?.id, attempt.id)}"

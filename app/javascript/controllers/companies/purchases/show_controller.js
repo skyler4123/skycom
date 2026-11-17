@@ -99,7 +99,7 @@ export default class Companies_Purchases_ShowController extends Companies_Layout
       case 'decimal':
         return `<span class="font-mono font-medium text-primary">${Number(value).toFixed(2)}</span>`
       case 'datetime': {
-        return `<span class="text-sm text-foreground">${new Date(value).toLocaleString()}</span>`
+        return `<span class="text-sm text-foreground">${Helpers.companyTime(value)}</span>`
       }
       default:
         return `<span class="text-sm text-foreground">${value}</span>`
@@ -167,7 +167,7 @@ export default class Companies_Purchases_ShowController extends Companies_Layout
               <span class="font-medium text-foreground">${log.step_name || "—"}</span>
               <span class="text-muted-foreground">${log.employee_name || "—"}</span>
               ${log.note ? `<span class="text-muted-foreground italic">"${log.note}"</span>` : ""}
-              <span class="text-xs text-muted-foreground ml-auto">${new Date(log.created_at).toLocaleString()}</span>
+              <span class="text-xs text-muted-foreground ml-auto">${Helpers.companyTime(log.created_at)}</span>
             </div>`).join('')}
         </div>
       </div>` : ""
@@ -254,7 +254,7 @@ export default class Companies_Purchases_ShowController extends Companies_Layout
               </div>
               <div>
                 <p class="text-xs font-medium text-muted-foreground">${translate("Needed By")}</p>
-                <p class="text-sm font-semibold text-foreground">${p.needed_by ? new Date(p.needed_by).toLocaleString() : "N/A"}</p>
+                <p class="text-sm font-semibold text-foreground">${p.needed_by ? Helpers.companyTime(p.needed_by) : "N/A"}</p>
               </div>
             </div>
 

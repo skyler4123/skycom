@@ -89,7 +89,7 @@ export default class Companies_DiscountGroups_IndexController extends Companies_
                 discount_type: (value, record) => `<span class="text-sm text-muted-foreground">${value === "percentage" ? `${record.percentage}%` : this.formatMoney(record.amount_cents)}</span>`,
                 budget: (value, record) => this.budgetBar(record),
                 campaign_status: (value) => `${Helpers.statusBadge(value)}`,
-                validity: (value, record) => `<span class="text-xs text-muted-foreground">${record.start_at ? new Date(record.start_at).toLocaleDateString() : "—"} → ${record.end_at ? new Date(record.end_at).toLocaleDateString() : "—"}</span>`,
+                validity: (value, record) => `<span class="text-xs text-muted-foreground">${record.start_at ? Helpers.companyTime(record.start_at, Helpers.DATE_FORMAT) : "—"} → ${record.end_at ? Helpers.companyTime(record.end_at, Helpers.DATE_FORMAT) : "—"}</span>`,
                 generated_codes_count: (value) => `<span class="text-sm font-medium text-foreground">${value ?? 0}</span>`
               },
               renderActions: (record) => `

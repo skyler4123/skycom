@@ -4,9 +4,11 @@
 // dictionary.js); colors use semantic tokens only (bin/check_colors --strict).
 //
 // Depends on: controllers/helpers/ui_helpers.js (translate, timeFormat, escapeHtml)
+//             controllers/helpers/time_helpers.js (companyOffsetHours, dateOnly)
 //             controllers/helpers/money_helpers.js (formatMoney)
-// Docs: docs/MOBILE.md §2
+// Docs: docs/MOBILE.md §2, docs/TIME_DISPLAY.md
 import { translate, timeFormat, escapeHtml } from "controllers/helpers/ui_helpers"
+import { companyOffsetHours, dateOnly } from "controllers/helpers/time_helpers"
 import { formatMoney } from "controllers/helpers/money_helpers"
 
 // --- Chrome ---------------------------------------------------------------
@@ -242,26 +244,26 @@ export const mobileDuration = (minutes) => {
 export const mobileDurationFromSeconds = (seconds) => mobileDuration(Math.floor(Number(seconds || 0) / 60))
 
 /**
- * "09:00 AM" in UTC or a numeric hour offset.
+ * "09:00 AM" in the company timezone (or an explicit numeric hour offset).
  * @param {string|Date} value
  * @param {number|null} [offsetHours]
  */
 export const mobileTime = (value, offsetHours = null) => {
-  if (offsetHours === null || offsetHours === undefined) return timeFormat(value, "hh:mm A", "UTC")
-  return timeFormat(value, "hh:mm A", Number(offsetHours))
+  const offset = offsetHours === null || offsetHours === undefined ? companyOffsetHours() : Number(offsetHours)
+  return timeFormat(value, "hh:mm A", offset === null ? "UTC" : offset)
 }
 
-/** "05 November 2026" */
-export const mobileDate = (value) => timeFormat(value, "DD MMMM YYYY", "UTC")
+/** "05 November 2026" (date-only values are never shifted) */
+export const mobileDate = (value) => dateOnly(value, "DD MMMM YYYY")
 
 /** "Wed" */
-export const mobileWeekday = (value) => timeFormat(value, "ddd", "UTC")
+export const mobileWeekday = (value) => dateOnly(value, "ddd")
 
 /** "30 Nov" */
-export const mobileShortDate = (value) => timeFormat(value, "DD MMM", "UTC")
+export const mobileShortDate = (value) => dateOnly(value, "DD MMM")
 
 /** "November 2026" */
-export const mobileMonthLabel = (value) => timeFormat(value, "MMMM YYYY", "UTC")
+export const mobileMonthLabel = (value) => dateOnly(value, "MMMM YYYY")
 
 /** Stored cents to "$1,234.56" / "1.234.567 ₫". */
 export const mobileMoney = (cents, currency) => formatMoney(cents, currency)

@@ -137,7 +137,7 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
   }
 
   formatLogTime(isoString) {
-    return new Date(isoString).toLocaleTimeString("en-US", { hour12: false })
+    return Helpers.companyTime(isoString, "HH:mm:ss")
   }
 
   formatChange(value) {

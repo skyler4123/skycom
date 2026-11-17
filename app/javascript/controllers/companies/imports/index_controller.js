@@ -105,7 +105,7 @@ export default class Companies_Imports_IndexController extends Companies_LayoutC
         <td class="py-2 pr-4 text-sm text-muted-foreground">${escapeHtml(target)}</td>
         <td class="py-2 pr-4">${this.statusBadgeHTML(importRecord.workflow_status)}</td>
         <td class="py-2 pr-4 text-sm text-muted-foreground">${rows}</td>
-        <td class="py-2 pr-4 text-sm text-muted-foreground">${Helpers.timeFormat(importRecord.created_at, "YYYY-MM-DD HH:mm")}</td>
+        <td class="py-2 pr-4 text-sm text-muted-foreground">${Helpers.companyTime(importRecord.created_at, "YYYY-MM-DD HH:mm")}</td>
         <td class="py-2 text-right">
           <a href="${Helpers.company_import_path(currentCompany().id, importRecord.id)}"
             class="text-xs text-primary hover:underline mr-3">${translate("Open")}</a>

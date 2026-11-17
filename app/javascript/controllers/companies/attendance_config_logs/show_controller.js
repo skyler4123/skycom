@@ -59,7 +59,7 @@ export default class Companies_AttendanceConfigLogs_ShowController extends Compa
               <p class="text-sm font-semibold">${this.actionBadge(l.action)}</p>
             </div>
             ${this.field("Changed By", l.employee?.name)}
-            ${this.field("Changed At", l.created_at ? new Date(l.created_at).toLocaleString() : null)}
+            ${this.field("Changed At", l.created_at ? Helpers.companyTime(l.created_at) : null)}
             ${this.field("Branch", l.branch?.name)}
             ${this.field("Latitude", l.latitude)}
             ${this.field("Longitude", l.longitude)}
@@ -67,7 +67,7 @@ export default class Companies_AttendanceConfigLogs_ShowController extends Compa
             ${this.field("WiFi SSID", l.allowed_wifi_ssid)}
             ${this.field("Require Photo", l.require_photo ? translate("True") : translate("False"))}
             ${this.field("Resolution Strategy", l.resolution_strategy)}
-            ${this.field("Discarded At", l.discarded_at ? new Date(l.discarded_at).toLocaleString() : null)}
+            ${this.field("Discarded At", l.discarded_at ? Helpers.companyTime(l.discarded_at) : null)}
           </div>
         </div>
       </div>`

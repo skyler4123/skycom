@@ -57,14 +57,13 @@ class Reception::ConsoleService
 
   def visits
     @visits ||= begin
-      day_start = now.beginning_of_day
-      day_end = day_start + 1.day
+      day_range = LocalTime.day_range(LocalTime.today(branch, at: now), branch)
       scope = base_events
         .where.not(id: parcels.map(&:id))
         .where(
           "start_at >= :start AND start_at < :end OR workflow_status IN (:statuses)",
-          start: day_start,
-          end: day_end,
+          start: day_range.begin,
+          end: day_range.end,
           statuses: [ Event.workflow_statuses.fetch("confirmed"), Event.workflow_statuses.fetch("in_progress") ]
         )
         .where.not(workflow_status: :cancelled)
@@ -86,7 +85,7 @@ class Reception::ConsoleService
     host = event.employee_event_appointments.first&.employee
     facility = event.event_facility_appointments.first&.facility
     status = visit_status(event)
-    note_key, note_time = visit_note(event, status)
+    note_key, note_at = visit_note(event, status)
     kind = event.metadata&.dig("visitor_kind").presence || event.category&.name.presence
     kind = "Visit" if kind.blank? || kind == "Events"
     host_role = host&.category&.name.presence
@@ -102,10 +101,10 @@ class Reception::ConsoleService
       kind: kind,
       badge: event.code.presence || "V-#{event.id.to_s.first(6).upcase}",
       status: status,
-      arrival: format_time(event.start_at),
+      arrival_at: LocalTime.utc_iso(event.start_at),
       waitMin: wait_minutes(event, status),
       note_key: note_key,
-      note_time: note_time,
+      note_at: note_at,
       vip: event.metadata&.dig("vip") == true,
       zone: facility&.name.presence || event.metadata&.dig("zone").presence || "Reception",
       start_at: event.start_at&.iso8601,
@@ -130,7 +129,7 @@ class Reception::ConsoleService
       title: metadata["item"].presence || event.name,
       recipient: employee&.name.presence || metadata["recipient_name"].presence || "—",
       location: locker || "Held at desk",
-      received_at: received_at && format_time(received_at),
+      received_at: LocalTime.utc_iso(received_at),
       tone: "primary",
       action: "Notify",
       workflow_status: event.workflow_status
@@ -172,7 +171,7 @@ class Reception::ConsoleService
         name: facility.name,
         capacity: facility.property_integer_1,
         status: busy ? "busy" : "reserved",
-        time_label: format_time(busy ? current.end_at : current.start_at),
+        time_at: LocalTime.utc_iso(busy ? current.end_at : current.start_at),
         detail: current.name
       }
     elsif upcoming
@@ -181,7 +180,7 @@ class Reception::ConsoleService
         name: facility.name,
         capacity: facility.property_integer_1,
         status: "reserved",
-        time_label: format_time(upcoming.start_at),
+        time_at: LocalTime.utc_iso(upcoming.start_at),
         detail: upcoming.name
       }
     else
@@ -190,7 +189,7 @@ class Reception::ConsoleService
         name: facility.name,
         capacity: facility.property_integer_1,
         status: "available",
-        time_label: nil,
+        time_at: nil,
         detail: nil
       }
     end
@@ -209,7 +208,7 @@ class Reception::ConsoleService
 
       {
         id: event.id,
-        time: format_time(event.start_at),
+        start_at: LocalTime.utc_iso(event.start_at),
         minutes_until: [ ((event.start_at - now) / 60).ceil, 0 ].max,
         title: customer&.name.presence || event.name,
         host: host&.name.presence || "—",
@@ -220,11 +219,13 @@ class Reception::ConsoleService
   end
 
   def counts
+    day_range = LocalTime.day_range(LocalTime.today(branch, at: now), branch)
+
     {
       inside: visits.count { |event| visit_status(event) == "active" },
       lobby: visits.count { |event| visit_status(event) == "lobby" },
       departed: visits.count { |event| visit_status(event) == "departed" },
-      expected_today: visits.count { |event| event.start_at && event.start_at >= now.beginning_of_day && event.start_at < now.beginning_of_day + 1.day },
+      expected_today: visits.count { |event| event.start_at && day_range.cover?(event.start_at) },
       remaining: visits.count { |event| %w[lobby active upcoming].include?(visit_status(event)) },
       parcels: parcels.length,
       rooms_available: rooms.count { |room| room[:status] == "available" },
@@ -253,10 +254,10 @@ class Reception::ConsoleService
       [ "waiting", nil ]
     when "active"
       checked_in = parse_time(event.metadata&.dig("checked_in_at"))
-      checked_in ? [ "checked_in", format_time(checked_in) ] : [ "inside", nil ]
+      checked_in ? [ "checked_in", LocalTime.utc_iso(checked_in) ] : [ "inside", nil ]
     when "departed"
       checked_out = parse_time(event.metadata&.dig("checked_out_at"))
-      checked_out ? [ "checked_out", format_time(checked_out) ] : [ "completed", nil ]
+      checked_out ? [ "checked_out", LocalTime.utc_iso(checked_out) ] : [ "completed", nil ]
     else
       [ "pre_registered", nil ]
     end
@@ -276,10 +277,5 @@ class Reception::ConsoleService
     Time.zone.parse(value.to_s)
   rescue ArgumentError
     nil
-  end
-
-  def format_time(time)
-    return "—" if time.blank?
-    time.strftime("%-I:%M %p")
   end
 end

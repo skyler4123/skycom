@@ -129,7 +129,7 @@ export default class Companies_CompanyTickets_IndexController extends Companies_
                 status: (value) => `${Helpers.statusBadge(value || "open")}`,
                 employee: (value) => `<span class="text-sm text-muted-foreground">${escapeHtml(value?.name) || "—"}</span>`,
                 assigned_user: (value) => `<span class="text-sm text-muted-foreground">${escapeHtml(value?.name || value?.email) || "—"}</span>`,
-                updated_at: (value) => `<span class="text-xs text-muted-foreground">${value ? new Date(value).toLocaleString() : "—"}</span>`
+                updated_at: (value) => `<span class="text-xs text-muted-foreground">${value ? Helpers.companyTime(value) : "—"}</span>`
               }
             })}
           </div>

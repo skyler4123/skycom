@@ -40,7 +40,7 @@ export default class Companies_AttendanceConfigLogs_IndexController extends Comp
 
   formatDateTime(dt) {
     if (!dt) return '—'
-    return new Date(dt).toLocaleString()
+    return Helpers.companyTime(dt)
   }
 
   contentHTML() {

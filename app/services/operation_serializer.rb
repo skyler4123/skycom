@@ -40,11 +40,14 @@ class OperationSerializer
     end
 
     def location(appointment)
-      if appointment.is_a?(BranchOperationAppointment)
-        { "id" => appointment.branch_id, "name" => appointment.branch.name }
-      else
-        { "id" => appointment.warehouse_id, "name" => appointment.warehouse.name }
-      end
+      record = appointment.is_a?(BranchOperationAppointment) ? appointment.branch : appointment.warehouse
+
+      {
+        "id" => record.id,
+        "name" => record.name,
+        "timezone" => record.timezone,
+        "utc_offset" => LocalTime.offset_seconds(record)
+      }
     end
   end
 end

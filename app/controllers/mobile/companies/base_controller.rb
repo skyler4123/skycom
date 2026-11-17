@@ -24,7 +24,7 @@ class Mobile::Companies::BaseController < Mobile::BaseController
   end
 
   def company_utc_offset
-    @company_utc_offset ||= Company.timezones.fetch(@company.timezone.to_s, 0) * 3600
+    @company_utc_offset ||= LocalTime.offset_seconds(@company)
   end
 
   def employee_includes

@@ -790,7 +790,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   defaultBucketsFor(column) {
     const type = columnType(column.key, this.propertyEntries, this.extraColumns)
     if (type === "datetime") {
-      const year = new Date().getFullYear()
+      const year = Number(Helpers.localToday().slice(0, 4))
       return [ [ null, year - 1 ], [ year - 1, year ], [ year, null ] ]
     }
     if (type === "decimal") return [ [ null, 10 ], [ 10, null ] ]

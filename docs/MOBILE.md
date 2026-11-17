@@ -162,6 +162,13 @@ attendance/payroll badges, and employee/business-type labels. Reused as-is:
 `Helpers.form`, `Helpers.fetchJson`, `Helpers.timeFormat`, `Helpers.formatMoney`,
 `translate`, `toast`.
 
+Mobile time display follows `docs/TIME_DISPLAY.md`: the wire carries ISO UTC,
+and `mobileTime` renders it in the company timezone (`company.utc_offset` when
+present, otherwise `currentCompany().timezone`). `mobileDate`/`mobileWeekday`/
+`mobileShortDate`/`mobileMonthLabel` treat date-only values as calendar dates
+and never shift them. The mobile layout mounts the `client-cache` controller so
+`currentCompany()` is available for the company timezone.
+
 Small Stimulus controllers live in `app/javascript/controllers/mobile/`:
 `theme`, `flash`, `password_visibility`, `clock`, `copy`,
 `character_counter`, `select_nav`. They are local UI only — no JSON calls.

@@ -51,7 +51,7 @@ export default class Companies_Notifications_ShowController extends Companies_La
             ${(n.tags || []).map((t) => `<span class="font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium">${t.name}</span>`).join("")}
           </div>
           <h2 class="text-2xl font-black text-foreground">${n.name || translate("Untitled notification")}</h2>
-          <p class="text-xs text-muted-foreground mt-1">${n.created_at ? new Date(n.created_at).toLocaleString() : ""}</p>
+          <p class="text-xs text-muted-foreground mt-1">${n.created_at ? Helpers.companyTime(n.created_at) : ""}</p>
           <p class="text-sm text-foreground mt-4 whitespace-pre-line">${n.description || ""}</p>
           ${n.url ? `<a href="${n.url}" class="inline-flex items-center gap-1 mt-4 text-sm text-primary hover:text-primary cursor-pointer">${translate("Open linked record")}<span class="material-symbols-outlined text-[18px]!">open_in_new</span></a>` : ""}
         </div>

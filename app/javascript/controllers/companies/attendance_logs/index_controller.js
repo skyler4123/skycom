@@ -29,12 +29,12 @@ export default class Companies_AttendanceLogs_IndexController extends Companies_
 
   formatDate(dt) {
     if (!dt) return '—'
-    return new Date(dt).toLocaleDateString()
+    return Helpers.companyTime(dt, Helpers.DATE_FORMAT)
   }
 
   formatTime(dt) {
     if (!dt) return '—'
-    return new Date(dt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
+    return Helpers.companyTime(dt, "HH:mm")
   }
 
   logTypeBadge(type) {

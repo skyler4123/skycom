@@ -471,7 +471,7 @@ hydrateReception(reception) {
     const statusChip = {
       lobby: `<span class="flex items-center gap-1 text-warning font-semibold"><span class="material-symbols-outlined text-[15px]">timer</span> ${translate("Waiting")} ${visitor.waitMin} ${translate("mins")}</span>`,
       active: `<span class="flex items-center gap-1 text-success font-medium"><span class="material-symbols-outlined text-[15px]">check_circle</span> ${translate("Inside")}</span>`,
-      upcoming: `<span class="flex items-center gap-1 text-info font-medium"><span class="material-symbols-outlined text-[15px]">event</span> ${translate("Expected")} ${this.escape(visitor.arrival)}</span>`,
+      upcoming: `<span class="flex items-center gap-1 text-info font-medium"><span class="material-symbols-outlined text-[15px]">event</span> ${translate("Expected")} ${this.escape(this.time(visitor.arrival_at))}</span>`,
       departed: `<span class="flex items-center gap-1 text-muted-foreground"><span class="material-symbols-outlined text-[15px]">logout</span> ${translate("Departed")}</span>`
     }[visitor.status] || ""
 
@@ -506,7 +506,7 @@ hydrateReception(reception) {
               ${statusChip}
             </div>
             <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-[11px] text-muted-foreground">
-              <span>${translate("Arrival:")} <strong class="text-foreground">${this.escape(visitor.arrival)}</strong></span>
+              <span>${translate("Arrival:")} <strong class="text-foreground">${this.escape(this.time(visitor.arrival_at))}</strong></span>
               <span>·</span>
               <span>${this.escape(this.visitorNote(visitor))}</span>
               <span>·</span>
@@ -693,8 +693,8 @@ hydrateReception(reception) {
     const label = room.status === "available"
       ? translate("Available")
       : room.status === "busy"
-        ? `${translate("Busy until")} ${room.time_label}`
-        : `${translate("Reserved")} ${room.time_label}`
+        ? `${translate("Busy until")} ${this.time(room.time_at)}`
+        : `${translate("Reserved")} ${this.time(room.time_at)}`
 
     return `
       <div class="p-2 rounded-lg bg-muted border border-line flex flex-col items-center text-center">
@@ -715,7 +715,7 @@ hydrateReception(reception) {
     return `
       <div class="p-2 rounded-lg bg-muted border border-line hover:bg-line/40 transition-colors flex items-start gap-2">
         <div class="w-12 text-center shrink-0 pt-0.5">
-          <span class="text-[13px] font-bold text-foreground block leading-tight">${this.escape(appointment.time)}</span>
+          <span class="text-[13px] font-bold text-foreground block leading-tight">${this.escape(this.time(appointment.start_at))}</span>
           <span class="text-[9px] text-muted-foreground font-medium">${this.escape(this.appointmentInLabel(appointment))}</span>
         </div>
         <div class="flex-1 min-w-0">
@@ -812,7 +812,7 @@ hydrateReception(reception) {
           <div class="flex flex-col min-w-0">
             <span class="text-[12px] font-bold text-foreground truncate">${this.escape(translate(delivery.title))}</span>
             <span class="text-[11px] text-muted-foreground truncate">${translate("For:")} <strong class="text-foreground">${this.escape(delivery.recipient)}</strong></span>
-            <span class="text-[10px] text-success font-semibold truncate">${this.escape(translate(delivery.location))}${delivery.received_at ? ` · ${this.escape(delivery.received_at)}` : ""}</span>
+            <span class="text-[10px] text-success font-semibold truncate">${this.escape(translate(delivery.location))}${delivery.received_at ? ` · ${this.escape(this.time(delivery.received_at))}` : ""}</span>
           </div>
         </div>
         <div class="flex items-center gap-1 shrink-0">
@@ -1158,13 +1158,21 @@ hydrateReception(reception) {
 
   // --- Helpers ---------------------------------------------------------------------
 
+  get location() {
+    return this.appointment?.location || {}
+  }
+
+  time(value, format = "h:mm A") {
+    return Helpers.locationTime(value, format, this.location)
+  }
+
   findVisitor(id) {
     return this.visitors.find((visitor) => visitor.id === id)
   }
 
   visitorNote(visitor) {
-    if (visitor.note_key === "checked_in") return `${translate("Checked in at")} ${visitor.note_time}`
-    if (visitor.note_key === "checked_out") return `${translate("Checked out at")} ${visitor.note_time}`
+    if (visitor.note_key === "checked_in") return `${translate("Checked in at")} ${this.time(visitor.note_at)}`
+    if (visitor.note_key === "checked_out") return `${translate("Checked out at")} ${this.time(visitor.note_at)}`
 
     const notes = {
       waiting: "Waiting at reception",
@@ -1182,7 +1190,7 @@ hydrateReception(reception) {
   }
 
   get currentShift() {
-    const hour = new Date().getHours()
+    const hour = Helpers.locationNow(this.location).hour()
     if (hour < 12) return translate("Morning (08:00 - 17:00)")
     if (hour < 17) return translate("Afternoon (12:00 - 21:00)")
     return translate("Evening (17:00 - 01:00)")

@@ -848,7 +848,7 @@ export default class Companies_Imports_ShowController extends Companies_LayoutCo
         </div>
         <p class="text-xs ${result.passed ? "text-success" : "text-danger"}">${escapeHtml(verdict)}</p>
         <p class="text-xs text-muted-foreground">
-          ${translate("Checked at")}: ${Helpers.timeFormat(result.checked_at, "YYYY-MM-DD HH:mm")} ·
+          ${translate("Checked at")}: ${Helpers.companyTime(result.checked_at, "YYYY-MM-DD HH:mm")} ·
           ${translate("Total")}: ${result.total_rows} ·
           ${translate("Valid")}: ${result.valid_rows} ·
           ${translate("Invalid")}: ${result.invalid_rows}

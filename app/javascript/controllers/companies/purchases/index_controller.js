@@ -143,7 +143,7 @@ export default class Companies_Purchases_IndexController extends Companies_Layou
                 code: (value) => `<span class="font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium">${value || '—'}</span>`,
                 workflow_status: (value) => `${Helpers.statusBadge(value)}`,
                 needed_by: (value) => value
-                  ? `<span class="text-sm text-muted-foreground">${new Date(value).toLocaleString()}</span>`
+                  ? `<span class="text-sm text-muted-foreground">${Helpers.companyTime(value)}</span>`
                   : '<span class="text-muted-foreground/60">—</span>',
                 category: (value, record) => record.category?.name || '<span class="text-muted-foreground/60">—</span>',
               },
