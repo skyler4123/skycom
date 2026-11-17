@@ -2,7 +2,7 @@
 require 'rspec/retry'
 
 # Only enable retries when running under parallel_tests worker processes
-if ENV['TEST_ENV_NUMBER'].present?
+if TEST_ENV_NUMBER.present?
   RSpec.configure do |config|
     # show retry status in spec process
     # config.verbose_retry = true

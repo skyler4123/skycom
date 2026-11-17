@@ -15,6 +15,19 @@ See `docs/CACHE.md` §6 for examples (e.g., `COOKIE_EXPIRY` lives in
 - **Eliminates duplication** — image limits, owner strings, cache TTLs were duplicated across up to 9 files
 - **Inline hardcoding is prohibited**
 
+## Environment-backed constants
+
+Values that can come from the environment follow one extra rule:
+
+```text
+ENV["VARIABLE"].presence  >  Rails.application.credentials.dig(:variable)  >  hardcoded default
+```
+
+They are declared once in `config/initializers/constants.rb` (constant name = ENV name) and every
+other file uses the constant. The full catalog, pre-boot exceptions, and the production warning
+live in `docs/ENVIRONMENT.md`. The single-file exception below **does not apply** to env-backed
+constants: they always live in `config/initializers/constants.rb`.
+
 ## What Belongs Here
 
 | Type | Examples |
@@ -31,13 +44,14 @@ See `docs/CACHE.md` §6 for examples (e.g., `COOKIE_EXPIRY` lives in
 | Credit purchase tiers | `CREDIT_RATES` — per-country `{ money_cents => credits }` map |
 | Credit action costs | `CREDIT_USAGE_RATES` — global per-action credit cost (not country-based) |
 | Signup credit grant | `SIGNUP_PROMO_CREDITS` — promo credits granted to every new company, including system-owned companies |
+| Environment-backed config | `MEILISEARCH_HOST`, `AWS_ACCESS_KEY_ID` — see `docs/ENVIRONMENT.md` |
 
 ## What Stays Local
 
 | Scope | Reason |
 |-------|--------|
 | Single-file constants | Used in exactly one file — declared at the usage site |
-| Environment-specific infrastructure config (`database.yml`, `cache.yml`, `queue.yml`) | Per-environment, not app-wide |
+| Environment-specific infrastructure config (`database.yml`, `cache.yml`, `queue.yml`) | Per-environment, not app-wide. `database.yml` repeats the ENV > credentials > default rule inline; see `docs/ENVIRONMENT.md` |
 | Migration/schema defaults | Historical snapshots, not runtime config |
 | Seed/fixture data (brand names, facility names, test counts) | Test/fixture data, not configuration |
 | Test configuration (`spec/retry_helper.rb`) | Testing scope only |

@@ -1,7 +1,7 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_Employees_ShowController extends Companies_LayoutController {
-  /** @type {(Employee & { departments: Department[], roles: Role[], branch: Branch, user: { id: string, email: string, name: string, first_name: string, last_name: string, system_role: string, phone_number: string, username: string } }) | null} */
+  /** @type {(Employee & { departments: Department[], roles: Role[], branch: Branch, user: { id: string, email: string, name: string, avatar: string, first_name: string, last_name: string, system_role: string, phone_number: string, username: string } }) | null} */
   employee = null
 
   /** @type {Array<{key: string, label: string, type: string}>} */
@@ -68,6 +68,19 @@ export default class Companies_Employees_ShowController extends Companies_Layout
 
     const companyId = window.location.pathname.split("/")[2]
     const category = currentCategories().find(c => c.id === e.category_id)
+    const isOwnProfile = Boolean(e.user && currentUser() && String(e.user.id) === String(currentUser().id))
+
+    const avatarHTML = avatar({
+      url: e.user?.avatar,
+      updateUrl: isOwnProfile ? Helpers.users_update_avatar_path() : "",
+      paramName: isOwnProfile ? "user[avatar_attachment]" : "",
+      className: "size-24 shadow-lg",
+      shape: "rounded-xl",
+      reloadOnSuccess: isOwnProfile,
+      attributes: isOwnProfile
+        ? tooltip(`${translate("Change avatar")} · ${translate("JPG or PNG, up to 500KB")}`)
+        : ""
+    })
 
     const rolesHTML = (e.roles || []).map(r =>
       `<span class="px-2 py-0.5 bg-muted text-muted-foreground text-[10px] font-bold rounded border border-line">${r.name}</span>`
@@ -84,7 +97,7 @@ export default class Companies_Employees_ShowController extends Companies_Layout
     const accountName = e.user?.name || [e.user?.first_name, e.user?.last_name].filter(Boolean).join(" ") || translate("N/A")
 
     const accountHTML = e.user ? `
-      <div class="border-t border-line pt-6 mt-6">
+      <div class="border-t border-line pt-6">
         <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">${translate("User Account")}</h3>
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div class="flex items-center gap-3">
@@ -170,9 +183,7 @@ export default class Companies_Employees_ShowController extends Companies_Layout
           </a>
 
           <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-start mb-6">
-            <div class="size-24 shrink-0 overflow-hidden rounded-xl border-4 border-line bg-muted shadow-lg flex items-center justify-center">
-              <span class="material-symbols-outlined text-4xl text-muted-foreground">person</span>
-            </div>
+            ${avatarHTML}
             <div class="flex flex-1 flex-col text-center sm:text-left">
               <h2 class="text-2xl font-black text-foreground">${e.name}</h2>
               <p class="font-semibold text-muted-foreground">${e.description || ''}</p>
@@ -182,6 +193,8 @@ export default class Companies_Employees_ShowController extends Companies_Layout
               </div>
             </div>
           </div>
+
+          ${accountHTML}
 
           <div class="grid grid-cols-1 gap-6 border-t border-line pt-6 sm:grid-cols-2">
 
@@ -246,8 +259,6 @@ export default class Companies_Employees_ShowController extends Companies_Layout
             </div>
 
           </div>
-
-          ${accountHTML}
 
           ${dynamicFields}
 

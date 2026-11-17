@@ -321,8 +321,8 @@ To opt a model **out** of searchable: do not include the concern (or add `meilis
 |------|-------|
 | Gem | `meilisearch-rails` 0.16.0 (`Gemfile`) |
 | Server | Meilisearch v1.53.1 (`docker-compose.yml`, port 7700) |
-| URL | `MEILISEARCH_HOST` / credentials `meilisearch_host`, default `http://localhost:7700` |
-| API key | `MEILISEARCH_API_KEY` / credentials `meilisearch_api_key`, default `skycom_master_key_password_2026` |
+| URL | Constant `MEILISEARCH_HOST` — ENV > credentials `meilisearch_host` > `http://localhost:7700` (`docs/ENVIRONMENT.md`) |
+| API key | Constant `MEILISEARCH_API_KEY` — ENV > credentials `meilisearch_api_key` > `skycom_master_key_password_2026` |
 | Index UID | `ClassName_<env>` (e.g. `Product_development`) — `per_environment: true` |
 | Queue | `meilisearch` (Solid Queue, `queues: "*"`) |
 | `raise_on_failure` | not set (default false — failures log, don't raise) |

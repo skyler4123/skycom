@@ -48,6 +48,7 @@ class Mobile::Companies::EmployeesController < Mobile::Companies::BaseController
         name: current_user.name.presence ||
           [ current_user.first_name, current_user.last_name ].compact.join(" ").presence,
         email: current_user.email,
+        avatar: current_user.avatar,
         phone_number: current_user.phone_number,
         system_role_label: current_user.system_role&.titleize,
         username: current_user.username

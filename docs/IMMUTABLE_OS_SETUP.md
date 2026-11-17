@@ -330,8 +330,8 @@ bin/dev
 | `.ruby-version` | Ruby pin consumed by rbenv |
 | `Gemfile` | Rails 8.0.4, pg/sqlite, selenium (needs chromium) |
 | `config/database.yml` | pg primary/queue (needs postgres :5432), sqlite cache/cable |
-| `config/redis/shared.yml` | Redis URL default `redis://127.0.0.1:6379/0` |
-| `config/initializers/meilisearch.rb` | Host default `http://localhost:7700` |
+| `config/redis/shared.yml` | Redis URL from the `REDIS_URL_*` constants (default `redis://127.0.0.1:6379/0`) |
+| `config/initializers/meilisearch.rb` | Consumes `MEILISEARCH_HOST` / `MEILISEARCH_API_KEY` (default `http://localhost:7700`); see `docs/ENVIRONMENT.md` |
 | `Procfile.dev` / `bin/dev` | foreman web + css + job |
 | `bin/setup` | bundle + `db:prepare` entry point |
 | `COMMANDS.md` | canonical compose + credentials commands |

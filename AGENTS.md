@@ -38,6 +38,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 |---|---|
 | Returning JSON from any controller/service action, success or failure | `docs/API_ERROR_FORMAT.md` — failures **must** be `{ errors: [...] }` (plural array) with `:unprocessable_content`; singular `error:` breaks the frontend toast |
 | Adding an app-wide constant | `docs/CONSTANTS.md` — belongs in `config/initializers/constants.rb`, never hardcoded inline |
+| Reading or adding an environment variable / credential | `docs/ENVIRONMENT.md` — declare once in `config/initializers/constants.rb`; precedence is ENV > `Rails.application.credentials` > default; never read `ENV` in app code |
 | Touching counters or cached state (Kredis) | `docs/KREDIS.md` — owning model wraps storage behind domain-named methods; never low-level `Kredis.redis` in services/controllers/jobs |
 | Adding a jsonb-backed model attribute | `docs/STORE_ACCESSOR.md` — `store_accessor` convention, not a separate column |
 | Creating or restructuring `app/models/*.rb` | `docs/MODEL_STRUCTURE.md` — canonical section order |
@@ -110,6 +111,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - `bin/dev` - Start dev server (web + css + job via foreman)
 - `bin/rubocop` - Lint Ruby code
 - `bin/check_colors --strict` - Reject raw Tailwind palette classes (semantic tokens only)
+- `bin/check_env` - Reject raw ENV reads outside `config/initializers/constants.rb` (see `docs/ENVIRONMENT.md`)
 - `bin/brakeman` - Security scan
 - `bin/rails` - Standard Rails commands
 - `bundle exec parallel_rspec -n 14 [paths]` - Run tests (parallel, 14 workers). See `docs/PARALLEL_TESTS.md`.
@@ -118,6 +120,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - **Credit deduction is controller-only** — never call `CompanyCreditDeduction::*`, `CompanyWallet#deduct_from!`, or `Company#record_credit_usage!` from a background job, import, seed, or migration. Background jobs are free-credit and may still process suspended companies. See `docs/CREDIT_DEDUCTION.md`.
 - **Update** `docs/MODEL_CALLBACKS.md` if model/concern callbacks were added or modified
 - **Constants** — All app-wide constants must be in `config/initializers/constants.rb`, never hardcoded inline. See `docs/CONSTANTS.md`.
+- **Environment variables** — Declare every env-backed value once in `config/initializers/constants.rb` with `ENV[...].presence || Rails.application.credentials.dig(:key) || default`; consumers use only the constant. Run `bin/check_env`. See `docs/ENVIRONMENT.md`.
 - **Client cache** — If any mutation affects data stored in `currentCompany()` (branches, roles, categories, permissions, features, etc.), call `clearClientCacheAndReload()` after the server confirms the change, OR call `clearClientCache()` followed by a page reload.
 - **Language (mandatory)** — Every new or changed user-facing string must be added to `app/javascript/controllers/helpers/dictionary.js` with a Vietnamese translation. See `docs/LANGUAGE.md`. Missing entries break `translate()` output.
 - **Metadata editing** — Never edit JSON/metadata through a textarea in a user-facing form. Give every editable metadata key its own typed input (text, number, select, checkbox, …) and preserve keys the form does not own. See "Metadata & JSON editing" below.

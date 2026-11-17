@@ -109,6 +109,19 @@ RSpec.feature "Homepage", type: :feature, js: true do
       expect(page).to have_current_path(%r{/companies/[^/]+/dashboards})
     end
 
+    it "Profile in the avatar menu goes to the owner's employee show page" do
+      company = create(:company, user: user)
+      employee = company.employees.find_by(user: user)
+
+      visit root_path
+
+      find('[data-controller="avatar"]').click
+      click_link "Profile"
+
+      expect(page).to have_current_path(company_employee_path(company, employee), wait: 10)
+      expect(page).to have_content(employee.name, wait: 10)
+    end
+
     it "clicking New Company goes to the new company page" do
       visit root_path
 
@@ -213,6 +226,24 @@ RSpec.feature "Homepage", type: :feature, js: true do
     end
   end
 
+  describe "Signed in employee without an employee record" do
+    let(:user) { create(:user) }
+
+    before do
+      sign_in(user)
+    end
+
+    it "Profile sends them home with a flash explaining the requirement" do
+      visit root_path
+
+      find('[data-controller="avatar"]').click
+      click_link "Profile"
+
+      expect(page).to have_current_path(root_path, wait: 10)
+      expect(page).to have_selector("#alert", text: "You need an employee account of a company to see your profile.", wait: 10)
+    end
+  end
+
   describe "Signed in admin" do
     let(:admin) { create(:user, :admin, password: "Password@1234", password_confirmation: "Password@1234") }
 
@@ -232,6 +263,15 @@ RSpec.feature "Homepage", type: :feature, js: true do
       expect(page).to have_link("Admin Dashboard", href: "/admin/companies", wait: 10)
       expect(page).not_to have_link("Go to Dashboard")
       expect(page).not_to have_link("New Company")
+    end
+
+    it "Profile in the avatar menu goes to the admin dashboard" do
+      visit root_path
+
+      find('[data-controller="avatar"]').click
+      click_link "Profile"
+
+      expect(page).to have_current_path(admin_companies_path, wait: 10)
     end
   end
 end

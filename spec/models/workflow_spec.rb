@@ -52,7 +52,12 @@ RSpec.describe Workflow, type: :model do
     it { should define_enum_for(:lifecycle_status) }
 
     it "defines process_type values" do
-      expect(Workflow.process_types).to eq("purchase_process" => 0, "leave_process" => 1, "ticket_process" => 2)
+      expect(Workflow.process_types).to eq(
+        "purchase_process" => 0,
+        "leave_process" => 1,
+        "ticket_process" => 2,
+        "refund_process" => 3
+      )
     end
   end
 

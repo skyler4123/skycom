@@ -23,6 +23,12 @@ export const mobileMain = (html, attributes = "") => `
 `
 
 /**
+ * Signed-in user's avatar URL, stamped on <body> by the mobile layout.
+ * @returns {string}
+ */
+export const currentUserAvatarUrl = () => document.body?.dataset?.userAvatar || ""
+
+/**
  * Sticky top bar: brand (or back link) on the left, theme toggle + avatar on
  * the right.
  * @param {object} options
@@ -30,9 +36,10 @@ export const mobileMain = (html, attributes = "") => `
  * @param {string|null} [options.backPath]
  * @param {string|null} [options.avatarName]
  * @param {string|null} [options.avatarPath]
+ * @param {string} [options.avatarUrl] - Defaults to the layout-provided user avatar
  * @param {boolean} [options.replaceNavigation]
  */
-export const mobileHeader = ({ title, backPath = null, avatarName = null, avatarPath = null, replaceNavigation = false }) => {
+export const mobileHeader = ({ title, backPath = null, avatarName = null, avatarPath = null, avatarUrl = currentUserAvatarUrl(), replaceNavigation = false }) => {
   const navigationAttribute = replaceNavigation ? `data-turbo-action="replace"` : ""
   const left = backPath
     ? `
@@ -67,8 +74,11 @@ export const mobileHeader = ({ title, backPath = null, avatarName = null, avatar
           </button>
           ${avatarName
             ? `<a href="${avatarPath || "#"}" ${navigationAttribute} aria-label="${translate("Profile")}"
-                class="ml-1 flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                class="relative ml-1 flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-primary text-xs font-bold text-primary-foreground">
                 ${escapeHtml(mobileInitials(avatarName))}
+                <img data-current-user-avatar alt=""
+                  ${avatarUrl ? `src="${escapeHtml(avatarUrl)}"` : ""}
+                  class="absolute inset-0 h-full w-full object-cover ${avatarUrl ? "" : "hidden"}" />
               </a>`
             : ""}
         </div>

@@ -49,6 +49,7 @@ Rails.application.routes.draw do
   resources :redirect do
     collection do
       get :companies
+      get :profile
     end
   end
   resources :demo, only: [ :index ] do

@@ -2,8 +2,6 @@
 
 require "rails_helper"
 
-MOCK_API_PING_URL = ENV["MOCK_API_PING_URL"] || Rails.application.credentials.mock_api_ping_url || "http://localhost:4000/api/v1/ping"
-
 RSpec.describe "Mock API Server Connection", type: :request do
   let(:connection) do
     Faraday.new(url: MOCK_API_PING_URL) do |f|
