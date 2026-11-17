@@ -55,6 +55,11 @@ class Stock < ApplicationRecord
   has_many :stock_pendings, dependent: :restrict_with_error
   has_many :event_stock_appointments, dependent: :destroy
   has_many :events, through: :event_stock_appointments
+  has_many :stock_serials, dependent: :destroy
+  has_many :stock_count_lines, dependent: :destroy
+  has_many :pick_tasks, dependent: :destroy
+  has_many :landed_cost_allocations, dependent: :destroy
+  has_many :service_visit_parts, dependent: :nullify
   # --- Validations ---
   validates :quantity, :pending, presence: true, numericality: { only_integer: true }
   validates :warehouse_id, uniqueness: { scope: :product_id, message: "already holds a tracking SKU row mapping for this layout" }

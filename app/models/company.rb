@@ -210,6 +210,35 @@ class Company < ApplicationRecord
   has_many :imports, dependent: :destroy
   has_many :import_logs, dependent: :destroy
   has_many :permission_logs, dependent: :destroy
+  has_many :ledger_accounts, dependent: :restrict_with_error
+  has_many :fiscal_periods, dependent: :restrict_with_error
+  has_many :journal_entries, dependent: :restrict_with_error
+  has_many :cost_centers, dependent: :restrict_with_error
+  has_many :budgets, dependent: :destroy
+  has_many :fixed_assets, dependent: :destroy
+  has_many :tax_codes, dependent: :destroy
+  has_many :payment_terms, dependent: :destroy
+  has_many :exchange_rates, dependent: :destroy
+  has_many :invoice_reminders, dependent: :destroy
+  has_many :disbursement_batches, dependent: :destroy
+  has_many :signature_requests, dependent: :destroy
+  has_many :price_lists, dependent: :destroy
+  has_many :commission_plans, dependent: :destroy
+  has_many :loyalty_programs, dependent: :destroy
+  has_many :channel_connections, dependent: :destroy
+  has_many :job_openings, dependent: :destroy
+  has_many :courses, dependent: :destroy
+  has_many :notification_channels, dependent: :destroy
+  has_many :webhook_endpoints, dependent: :destroy
+  has_many :api_keys, dependent: :destroy
+  has_many :company_entitlements, dependent: :destroy
+  has_many :brand_profiles, dependent: :destroy
+  has_many :data_exports, dependent: :destroy
+  has_many :data_retention_policies, dependent: :destroy
+  has_many :data_subject_requests, dependent: :destroy
+  has_many :identity_providers, dependent: :destroy
+  has_many :network_policies, dependent: :destroy
+  has_many :record_comments, dependent: :destroy
 
   # --- Scopes ---
   scope :system_companies, -> { where(id: System.select(:company_id)) }

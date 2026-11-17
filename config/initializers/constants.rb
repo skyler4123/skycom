@@ -661,3 +661,179 @@ WORKFLOW_STEP_COLORS = {
 }.freeze
 WORKFLOW_STEP_TEXT_COLORS = WORKFLOW_STEP_COLORS.values.map { |c| c[:text] }.freeze
 WORKFLOW_STEP_BACKGROUND_COLORS = WORKFLOW_STEP_COLORS.values.map { |c| c[:background] }.freeze
+
+# =============================================================================
+# ERP domain enums (ledger, commercial, inventory, projects, platform, MRP)
+#
+# One constant per column so models and services share a single vocabulary.
+# Integer values are permanent: add new keys at the end, never renumber.
+# =============================================================================
+
+# Chart of accounts type. Determines which financial statement an account feeds.
+LEDGER_ACCOUNT_TYPES = { asset: 0, liability: 1, equity: 2, revenue: 3, expense: 4 }.freeze
+
+# Side of the double entry an account grows on. Stored explicitly because contra
+# accounts (accumulated depreciation, sales returns) sit opposite their type.
+NORMAL_BALANCES = { debit: 0, credit: 1 }.freeze
+
+# Accounting period lifecycle. locked/closed periods reject new postings.
+FISCAL_PERIOD_STATUSES = { open: 0, locked: 1, closed: 2 }.freeze
+
+# Journal entry lifecycle. posted entries are immutable; corrections are reversals.
+JOURNAL_ENTRY_STATUSES = { draft: 0, posted: 1, reversed: 2 }.freeze
+
+# Tax classification used to pick the right calculation and reporting box.
+TAX_CODE_KINDS = { vat: 0, gst: 1, sales: 2, withholding: 3 }.freeze
+
+# Fixed-asset depreciation formula.
+DEPRECIATION_METHODS = { straight_line: 0, declining_balance: 1 }.freeze
+
+# What a budget's ceiling covers.
+BUDGET_SCOPES = { company: 0, branch: 1, cost_center: 2 }.freeze
+
+# Delivery channel for an overdue-invoice reminder.
+DUNNING_CHANNELS = { email: 0, sms: 1, in_app: 2, letter: 3 }.freeze
+
+# Reminder attempt lifecycle (a failed send stays visible as its own row).
+INVOICE_REMINDER_STATUSES = { scheduled: 0, sent: 1, failed: 2, skipped: 3 }.freeze
+
+# Salary payment batch lifecycle.
+DISBURSEMENT_BATCH_STATUSES = { draft: 0, approved: 1, exported: 2, paid: 3, failed: 4 }.freeze
+
+# E-signature request lifecycle.
+SIGNATURE_REQUEST_STATUSES = { pending: 0, completed: 1, declined: 2, expired: 3, canceled: 4 }.freeze
+
+# Sales document kind. One orders table carries quotes through returns.
+ORDER_DOCUMENT_TYPES = { quote: 0, sales_order: 1, credit_note: 2, sales_return: 3 }.freeze
+
+# Purchase document kind. One purchases table carries requisitions through bills.
+PURCHASE_DOCUMENT_TYPES = {
+  requisition: 0,
+  rfq: 1,
+  purchase_order: 2,
+  blanket_order: 3,
+  vendor_bill: 4,
+  supplier_return: 5
+}.freeze
+
+# Meaning of a Purchase ↔ Purchase self-link.
+PURCHASE_LINK_TYPES = { rfq_response: 0, blanket_call_off: 1 }.freeze
+
+# Three-way match state of a PO / goods receipt / vendor bill triple.
+PURCHASE_MATCH_STATUSES = { unmatched: 0, partial: 1, matched: 2, disputed: 3 }.freeze
+
+# What a commission plan pays on.
+COMMISSION_BASES = { revenue: 0, margin: 1, collected: 2 }.freeze
+
+# Commission earning lifecycle, ending in payroll consumption.
+COMMISSION_ENTRY_STATUSES = { pending: 0, approved: 1, paid: 2, cancelled: 3 }.freeze
+
+# Recurrence unit for subscription billing.
+BILLING_INTERVALS = { weekly: 0, monthly: 1, quarterly: 2, yearly: 3 }.freeze
+
+# Direction of a loyalty points movement.
+LOYALTY_DIRECTIONS = { earn: 0, redeem: 1, expire: 2, adjust: 3 }.freeze
+
+# External sales channel a connection talks to.
+CHANNEL_KINDS = { shopify: 0, woocommerce: 1, amazon: 2, shopee: 3, lazada: 4, tiktok: 5 }.freeze
+
+# Direction of a channel sync attempt.
+SYNC_DIRECTIONS = { inbound: 0, outbound: 1 }.freeze
+
+# Channel sync attempt lifecycle.
+CHANNEL_SYNC_STATUSES = { pending: 0, running: 1, completed: 2, failed: 3 }.freeze
+
+# Permission level of a B2B portal user on one customer record.
+PORTAL_ROLES = { viewer: 0, buyer: 1, approver: 2, admin: 3 }.freeze
+
+# Warehouse location tree level.
+STORAGE_LOCATION_TYPES = { zone: 0, aisle: 1, rack: 2, bin: 3 }.freeze
+
+# Lot/batch availability state (quarantine keeps history without shipping it).
+STOCK_LOT_STATUSES = { open: 0, quarantine: 1, consumed: 2, expired: 3, scrapped: 4 }.freeze
+
+# Serialised unit lifecycle.
+SERIAL_STATUSES = { in_stock: 0, reserved: 1, sold: 2, returned: 3, scrapped: 4 }.freeze
+
+# What a reorder rule does when the trigger is breached.
+REORDER_ACTIONS = { purchase_requisition: 0, stock_transfer: 1, notify_only: 2 }.freeze
+
+# Stocktake scope.
+STOCK_COUNT_TYPES = { full: 0, cycle: 1, spot: 2, blind: 3 }.freeze
+
+# Non-material cost attached to a goods receipt.
+LANDED_COST_CHARGE_TYPES = { freight: 0, duty: 1, insurance: 2, handling: 3, other: 4 }.freeze
+
+# Basis used to spread a landed cost across received stock.
+ALLOCATION_METHODS = { by_quantity: 0, by_value: 1, by_weight: 2, by_volume: 3, equal: 4 }.freeze
+
+# Task precedence relationship type (Gantt / critical path).
+TASK_DEPENDENCY_TYPES = { finish_to_start: 0, start_to_start: 1, finish_to_finish: 2, start_to_finish: 3 }.freeze
+
+# How a project is billed.
+PROJECT_BILLING_MODELS = { fixed_price: 0, milestone: 1, time_and_materials: 2, retainer: 3 }.freeze
+
+# Reporting-line type between an employee and a manager.
+EMPLOYEE_MANAGER_RELATIONSHIPS = { primary: 0, dotted: 1, mentor: 2 }.freeze
+
+# Applicant pipeline stage (drives time-to-hire and funnel reporting).
+APPLICANT_STAGES = {
+  applied: 0,
+  screening: 1,
+  interview: 2,
+  offer: 3,
+  hired: 4,
+  rejected: 5,
+  withdrawn: 6
+}.freeze
+
+# Interview conclusion.
+INTERVIEW_OUTCOMES = { pending: 0, advance: 1, hold: 2, reject: 3 }.freeze
+
+# Course enrolment and certification lifecycle.
+ENROLLMENT_STATUSES = { enrolled: 0, in_progress: 1, completed: 2, expired: 3, dropped: 4 }.freeze
+
+# SSO provider protocol.
+IDENTITY_PROVIDER_TYPES = { saml: 0, oidc: 1 }.freeze
+
+# Second-factor type.
+MFA_METHODS = { totp: 0, webauthn: 1, sms: 2, email: 3 }.freeze
+
+# Which area of the product an IP allowlist rule protects.
+NETWORK_POLICY_SCOPES = { all: 0, finance: 1, hr: 2, admin: 3 }.freeze
+
+# What a retention policy does when the window ends.
+RETENTION_ACTIONS = { anonymize: 0, destroy: 1, archive: 2 }.freeze
+
+# Privacy request kind.
+DATA_SUBJECT_REQUEST_TYPES = { access: 0, erasure: 1, portability: 2, rectification: 3 }.freeze
+
+# Privacy request lifecycle.
+DATA_SUBJECT_REQUEST_STATUSES = { received: 0, in_progress: 1, completed: 2, rejected: 3 }.freeze
+
+# Outbound notification transport.
+NOTIFICATION_CHANNEL_KINDS = { email: 0, slack: 1, teams: 2, zalo: 3, whatsapp: 4, push: 5, sms: 6 }.freeze
+
+# Notification delivery attempt result.
+NOTIFICATION_DELIVERY_STATUSES = { pending: 0, sent: 1, failed: 2, bounced: 3 }.freeze
+
+# Outbound webhook delivery attempt result.
+WEBHOOK_DELIVERY_STATUSES = { pending: 0, delivered: 1, failed: 2, exhausted: 3 }.freeze
+
+# Tenant data export lifecycle.
+DATA_EXPORT_STATUSES = { queued: 0, running: 1, completed: 2, failed: 3 }.freeze
+
+# Quality inspection checkpoint.
+QUALITY_INSPECTION_TYPES = { receiving: 0, in_process: 1, final: 2 }.freeze
+
+# Quality check outcome.
+QUALITY_RESULTS = { pass: 0, fail: 1, conditional: 2 }.freeze
+
+# Non-conformance severity.
+NON_CONFORMANCE_SEVERITIES = { minor: 0, major: 1, critical: 2 }.freeze
+
+# Non-conformance disposition (what happens to the affected goods).
+NON_CONFORMANCE_DISPOSITIONS = { use_as_is: 0, rework: 1, scrap: 2, return_to_supplier: 3 }.freeze
+
+# Subcontract job lifecycle.
+SUBCONTRACT_STATUSES = { draft: 0, sent: 1, partially_received: 2, received: 3, cancelled: 4 }.freeze

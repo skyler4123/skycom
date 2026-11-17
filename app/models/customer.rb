@@ -44,6 +44,7 @@ class Customer < ApplicationRecord
   belongs_to :branch, optional: true
   belongs_to :category
   belongs_to :property_mapping
+  belongs_to :payment_term, optional: true
 
   has_many :orders, dependent: :destroy
   has_many :customer_customer_group_appointments, dependent: :destroy
@@ -62,6 +63,10 @@ class Customer < ApplicationRecord
   has_many :events, through: :customer_event_appointments
   has_many :customer_profiles, dependent: :destroy
   has_many :customer_subprofiles, dependent: :destroy
+  has_many :credit_profiles, dependent: :destroy
+  has_many :loyalty_entries, dependent: :destroy
+  has_many :customer_user_appointments, dependent: :destroy
+  has_many :service_visits, dependent: :restrict_with_error
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

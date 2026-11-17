@@ -44,6 +44,9 @@ class Order < ApplicationRecord
   belongs_to :employee, optional: true
   belongs_to :category
   belongs_to :property_mapping
+  belongs_to :payment_term, optional: true
+  belongs_to :price_list, optional: true
+  belongs_to :channel_connection, optional: true
 
   has_many :invoices, dependent: :destroy
   has_many :discounts, dependent: :destroy
@@ -59,6 +62,10 @@ class Order < ApplicationRecord
   has_many :subscription_plans, through: :order_subscription_plan_appointments
   has_many :event_order_appointments, dependent: :destroy
   has_many :events, through: :event_order_appointments
+  has_many :order_pick_wave_appointments, dependent: :destroy
+  has_many :pick_waves, through: :order_pick_wave_appointments, source: :pick_wave, class_name: "PickWave"
+  has_many :commission_entries, dependent: :nullify
+  has_many :journal_entries, as: :source, dependent: :restrict_with_error
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

@@ -434,7 +434,16 @@ Auto-derives `company_id` on atomic pairwise Appointment records from the associ
 |----------|------|--------|-------------|
 | `before_validation :set_default_company_from_resource` | 34 | `set_default_company_from_resource` | Derives `company_id` from the first associated record that responds to `company_id` (e.g., `employee.company_id` for `EmployeeTaskAppointment`). Only sets if not already present. Iterates all `belongs_to` associations except `company`; falls back to the company pair side (e.g., `AddressCompanyAppointment#company`). |
 
-**Included in (108 models):** All atomic `*_appointments` tables, named alphabetically per pair (`A_B_appointments`, e.g., `ArticleEmployeeAppointment`, `DepartmentEmployeeAppointment`, `EmployeeTaskAppointment`, `CustomerCustomerGroupAppointment`, `FacilityFacilityGroupAppointment`, `ProductProductGroupAppointment`, `ServiceServiceGroupAppointment`, `EmployeeServiceAppointment`, `CustomerServiceAppointment`, plus address/tag/order/payment/policy/role/purchase/subscription pairs owned by their domain docs).
+**Included in (127 models):** All atomic `*_appointments` tables, named alphabetically per pair (`A_B_appointments`, e.g., `ArticleEmployeeAppointment`, `DepartmentEmployeeAppointment`, `EmployeeTaskAppointment`, `CustomerCustomerGroupAppointment`, `FacilityFacilityGroupAppointment`, `ProductProductGroupAppointment`, `ServiceServiceGroupAppointment`, `EmployeeServiceAppointment`, `CustomerServiceAppointment`, plus address/tag/order/payment/policy/role/purchase/subscription pairs owned by their domain docs).
+
+The ERP schema wave (2026-11-17) added 21 more includers — they are child rows or atomic
+pairs whose company must derive from the owning record rather than from the caller:
+`ApplicantInterview`, `BomLine`, `CommentMention`, `CommissionTier`, `CourseLesson`,
+`CustomerUserAppointment`, `EmployeeManagerAppointment`, `LandedCostAllocation`,
+`MaintenanceCheck`, `OrderPickWaveAppointment`, `PickTask`, `PriceListItem`,
+`ProductBundleComponent`, `ProductionOperation`, `ProductionOrderMaterial`,
+`ProductionOrderOperation`, `PurchaseMatchAppointment`, `PurchaseParentAppointment`,
+`QualityCheck`, `ServiceVisitPart`, `StockCountLine`.
 
 ---
 

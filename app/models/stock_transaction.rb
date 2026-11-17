@@ -32,6 +32,9 @@ class StockTransaction < ApplicationRecord
   belongs_to :appoint_to, polymorphic: true, optional: true
   belongs_to :appoint_for, polymorphic: true, optional: true # Anchor document (Import/Export/Transfer)
   belongs_to :appoint_by, polymorphic: true, optional: true  # Operator identity profile
+  belongs_to :stock_lot, optional: true
+  belongs_to :stock_serial, optional: true
+  belongs_to :storage_location, optional: true
 
   validates :quantity, presence: true, numericality: { only_integer: true, greater_than: 0 }
 
