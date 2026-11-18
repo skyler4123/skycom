@@ -4,6 +4,9 @@ class CreateProjects < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :project_group, null: false, foreign_key: true, type: :uuid
+      t.references :customer, null: true, foreign_key: true, type: :uuid
+      t.references :manager_employee, null: true, foreign_key: { to_table: :employees }, type: :uuid
+      t.references :cost_center, null: true, type: :uuid
       t.references :category, null: false, foreign_key: true, type: :uuid
       t.references :property_mapping, null: false, foreign_key: true, type: :uuid
 
@@ -16,6 +19,15 @@ class CreateProjects < ActiveRecord::Migration[8.0]
       t.integer :currency
       t.integer :country
       t.integer :timezone
+
+      # --- Delivery ---
+      t.integer :billing_model, null: false, default: 2
+      t.bigint :budget_cents, null: false, default: 0
+      t.date :planned_start_on
+      t.date :planned_end_on
+      t.date :actual_start_on
+      t.date :actual_end_on
+      t.integer :progress_percent, null: false, default: 0
 
       t.string :external_id, index: true
 

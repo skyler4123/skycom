@@ -27,5 +27,7 @@ class CreateStockLots < ActiveRecord::Migration[8.0]
 
     add_index :stock_lots, [ :company_id, :product_id, :warehouse_id, :lot_code ], unique: true, name: "idx_stock_lots_unique"
     add_index :stock_lots, [ :company_id, :expires_on ]
+
+    add_foreign_key :stock_transactions, :stock_lots, column: :stock_lot_id
   end
 end

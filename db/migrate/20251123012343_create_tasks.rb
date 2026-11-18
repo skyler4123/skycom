@@ -4,6 +4,8 @@ class CreateTasks < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :task_group, null: false, foreign_key: true, type: :uuid
+      t.references :parent_task, null: true, foreign_key: { to_table: :tasks }, type: :uuid
+      t.references :project_milestone, null: true, type: :uuid
       t.references :category, null: false, foreign_key: true, type: :uuid
       t.references :property_mapping, null: false, foreign_key: true, type: :uuid
 
@@ -16,6 +18,15 @@ class CreateTasks < ActiveRecord::Migration[8.0]
       t.integer :currency
       t.integer :country
       t.integer :timezone
+
+      # --- Schedule & Effort (Gantt) ---
+      t.datetime :planned_start_at
+      t.datetime :planned_end_at
+      t.datetime :actual_start_at
+      t.datetime :actual_end_at
+      t.integer :estimated_minutes, null: false, default: 0
+      t.integer :actual_minutes, null: false, default: 0
+      t.integer :progress_percent, null: false, default: 0
 
       t.string :external_id, index: true
 
@@ -38,5 +49,7 @@ class CreateTasks < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_index :tasks, [ :company_id, :planned_start_at ]
   end
 end

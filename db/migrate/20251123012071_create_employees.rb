@@ -4,6 +4,8 @@ class CreateEmployees < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :user, null: true, foreign_key: true, type: :uuid
+      t.references :cost_center, null: true, type: :uuid
+      t.references :job_opening, null: true, type: :uuid
       t.references :category, null: false, foreign_key: true, type: :uuid
       t.references :property_mapping, null: false, foreign_key: true, type: :uuid
 
@@ -18,6 +20,13 @@ class CreateEmployees < ActiveRecord::Migration[8.0]
       t.integer :timezone
       t.bigint  :monthly_salary_cents, null: false, default: 0
       t.bigint  :monthly_allowance_cents, null: false, default: 0
+
+      # --- Employment ---
+      t.date :hire_date
+      t.date :termination_date
+      t.string :employment_type
+      t.string :bank_account
+      t.string :tax_id
 
       t.string :external_id, index: true
 
@@ -40,6 +49,8 @@ class CreateEmployees < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_index :employees, [ :company_id, :termination_date ]
 
     # employee_groups is created before employees, so its manager foreign key
     # is declared here, right after the referenced table exists.

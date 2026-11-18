@@ -27,5 +27,7 @@ class CreateStorageLocations < ActiveRecord::Migration[8.0]
 
     add_index :storage_locations, [ :warehouse_id, :code ], unique: true
     add_index :storage_locations, [ :warehouse_id, :pick_sequence ]
+
+    add_foreign_key :stock_transactions, :storage_locations, column: :storage_location_id
   end
 end

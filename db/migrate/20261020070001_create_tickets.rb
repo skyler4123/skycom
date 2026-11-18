@@ -12,6 +12,12 @@ class CreateTickets < ActiveRecord::Migration[8.0]
       t.text :description
       t.integer :priority, null: false, default: 1
 
+      # --- Support clocks ---
+      t.datetime :sla_due_at
+      t.datetime :first_response_at
+      t.datetime :resolved_at
+      t.datetime :escalated_at
+
       t.string :external_id, index: true
 
       # --- System Fields ---
@@ -34,6 +40,7 @@ class CreateTickets < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
+    add_index :tickets, [ :company_id, :sla_due_at ]
     add_index :tickets, [ :company_id, :workflow_status ]
     add_index :tickets, [ :company_id, :assigned_employee_id ]
     add_index :tickets, [ :company_id, :updated_at ]

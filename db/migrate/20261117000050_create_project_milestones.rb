@@ -26,5 +26,7 @@ class CreateProjectMilestones < ActiveRecord::Migration[8.0]
     end
 
     add_index :project_milestones, [ :company_id, :project_id, :due_on ]
+
+    add_foreign_key :tasks, :project_milestones, column: :project_milestone_id
   end
 end

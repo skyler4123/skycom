@@ -7,6 +7,8 @@ class CreateProducts < ActiveRecord::Migration[8.0]
       t.references :brand,   null: true,  foreign_key: true, type: :uuid
       t.references :category, null: false, foreign_key: true, type: :uuid
       t.references :property_mapping, null: false, foreign_key: true, type: :uuid
+      t.references :tax_code, null: true, type: :uuid
+      t.references :default_supplier, null: true, type: :uuid
 
       # --- Identity ---
       t.string :email, null: true, index: { unique: true }
@@ -20,6 +22,16 @@ class CreateProducts < ActiveRecord::Migration[8.0]
       t.integer :timezone
 
       t.string :external_id, index: true
+
+      # --- Costing & Logistics ---
+      t.bigint :cost_cents, null: false, default: 0
+      t.boolean :is_kit, null: false, default: false
+      t.boolean :track_lot, null: false, default: false
+      t.boolean :track_serial, null: false, default: false
+      t.string :unit_of_measure
+      t.string :commodity_code
+      t.integer :weight_grams, null: false, default: 0
+      t.integer :volume_cm3, null: false, default: 0
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

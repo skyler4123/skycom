@@ -26,5 +26,7 @@ class CreateJobOpenings < ActiveRecord::Migration[8.0]
     end
 
     add_index :job_openings, [ :company_id, :status ]
+
+    add_foreign_key :employees, :job_openings, column: :job_opening_id
   end
 end

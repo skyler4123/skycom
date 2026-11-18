@@ -24,5 +24,11 @@ class CreatePaymentTerms < ActiveRecord::Migration[8.0]
     end
 
     add_index :payment_terms, [ :company_id, :name ], unique: true
+
+    add_foreign_key :orders, :payment_terms, column: :payment_term_id
+    add_foreign_key :purchases, :payment_terms, column: :payment_term_id
+    add_foreign_key :invoices, :payment_terms, column: :payment_term_id
+    add_foreign_key :customers, :payment_terms, column: :payment_term_id
+    add_foreign_key :suppliers, :payment_terms, column: :payment_term_id
   end
 end

@@ -27,5 +27,7 @@ class CreateDisbursementBatches < ActiveRecord::Migration[8.0]
     end
 
     add_index :disbursement_batches, [ :company_id, :payment_on ]
+
+    add_foreign_key :payrolls, :disbursement_batches, column: :disbursement_batch_id
   end
 end

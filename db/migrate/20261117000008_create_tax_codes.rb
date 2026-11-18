@@ -28,5 +28,7 @@ class CreateTaxCodes < ActiveRecord::Migration[8.0]
     end
 
     add_index :tax_codes, [ :company_id, :code ], unique: true
+
+    add_foreign_key :products, :tax_codes, column: :tax_code_id
   end
 end

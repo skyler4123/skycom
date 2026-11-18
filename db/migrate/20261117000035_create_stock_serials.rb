@@ -28,5 +28,7 @@ class CreateStockSerials < ActiveRecord::Migration[8.0]
 
     add_index :stock_serials, [ :company_id, :serial_number ], unique: true
     add_index :stock_serials, [ :company_id, :status ]
+
+    add_foreign_key :stock_transactions, :stock_serials, column: :stock_serial_id
   end
 end

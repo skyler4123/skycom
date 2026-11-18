@@ -25,5 +25,7 @@ class CreatePriceLists < ActiveRecord::Migration[8.0]
     end
 
     add_index :price_lists, [ :company_id, :name ], unique: true
+
+    add_foreign_key :orders, :price_lists, column: :price_list_id
   end
 end

@@ -26,5 +26,9 @@ class CreateCostCenters < ActiveRecord::Migration[8.0]
 
     add_index :cost_centers, [ :company_id, :code ], unique: true
     add_index :cost_centers, [ :company_id, :parent_id ]
+
+    add_foreign_key :employees, :cost_centers, column: :cost_center_id
+    add_foreign_key :payrolls, :cost_centers, column: :cost_center_id
+    add_foreign_key :projects, :cost_centers, column: :cost_center_id
   end
 end

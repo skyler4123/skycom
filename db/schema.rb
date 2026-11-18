@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_000091) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1436,6 +1436,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.string "website"
     t.integer "employee_count"
     t.integer "fiscal_year_end_month"
+    t.integer "base_currency", default: 840, null: false
+    t.boolean "is_legal_entity", default: true, null: false
     t.string "external_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -1446,8 +1448,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "base_currency", default: 840, null: false
-    t.boolean "is_legal_entity", default: true, null: false
     t.index ["business_type"], name: "index_companies_on_business_type"
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
     t.index ["external_id"], name: "index_companies_on_external_id"
@@ -1832,6 +1832,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.integer "rate"
     t.datetime "first_responded_at"
     t.datetime "resolved_at"
+    t.datetime "sla_due_at"
+    t.datetime "first_response_at"
     t.string "external_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -1842,8 +1844,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "sla_due_at"
-    t.datetime "first_response_at"
     t.index ["assigned_user_id"], name: "index_company_tickets_on_assigned_user_id"
     t.index ["business_type"], name: "index_company_tickets_on_business_type"
     t.index ["company_id", "assigned_user_id"], name: "index_company_tickets_on_company_id_and_assigned_user_id"
@@ -2626,6 +2626,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "user_id"
+    t.uuid "payment_term_id"
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
     t.string "email"
@@ -2636,6 +2637,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.integer "currency"
     t.integer "country"
     t.integer "timezone"
+    t.string "tax_id"
+    t.string "vat_id"
     t.string "external_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -2676,9 +2679,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "payment_term_id"
-    t.string "tax_id"
-    t.string "vat_id"
     t.index ["branch_id"], name: "index_customers_on_branch_id"
     t.index ["business_type"], name: "index_customers_on_business_type"
     t.index ["category_id"], name: "index_customers_on_category_id"
@@ -4001,6 +4001,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "user_id"
+    t.uuid "cost_center_id"
+    t.uuid "job_opening_id"
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
     t.string "email"
@@ -4013,6 +4015,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.integer "timezone"
     t.bigint "monthly_salary_cents", default: 0, null: false
     t.bigint "monthly_allowance_cents", default: 0, null: false
+    t.date "hire_date"
+    t.date "termination_date"
+    t.string "employment_type"
+    t.string "bank_account"
+    t.string "tax_id"
     t.string "external_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -4053,13 +4060,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "cost_center_id"
-    t.uuid "job_opening_id"
-    t.date "hire_date"
-    t.date "termination_date"
-    t.string "employment_type"
-    t.string "bank_account"
-    t.string "tax_id"
     t.index ["branch_id"], name: "index_employees_on_branch_id"
     t.index ["business_type"], name: "index_employees_on_business_type"
     t.index ["category_id"], name: "index_employees_on_category_id"
@@ -4964,6 +4964,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.uuid "order_id", null: false
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
+    t.uuid "payment_term_id"
+    t.uuid "billing_schedule_id"
+    t.uuid "credited_invoice_id"
     t.string "email"
     t.string "name"
     t.text "description"
@@ -4975,6 +4978,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.integer "country"
     t.integer "timezone"
     t.string "external_id"
+    t.bigint "total_cents", default: 0, null: false
+    t.bigint "tax_cents", default: 0, null: false
+    t.decimal "currency_rate", precision: 18, scale: 10, default: "1.0"
+    t.datetime "paid_at"
+    t.integer "dunning_level", default: 0, null: false
+    t.datetime "last_reminded_at"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "payment_status", default: 0, null: false
@@ -5015,15 +5024,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "payment_term_id"
-    t.uuid "billing_schedule_id"
-    t.uuid "credited_invoice_id"
-    t.bigint "total_cents", default: 0, null: false
-    t.bigint "tax_cents", default: 0, null: false
-    t.decimal "currency_rate", precision: 18, scale: 10, default: "1.0"
-    t.datetime "paid_at"
-    t.integer "dunning_level", default: 0, null: false
-    t.datetime "last_reminded_at"
     t.index ["billing_schedule_id"], name: "index_invoices_on_billing_schedule_id"
     t.index ["branch_id"], name: "index_invoices_on_branch_id"
     t.index ["business_type"], name: "index_invoices_on_business_type"
@@ -5629,6 +5629,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.text "description"
     t.integer "severity", default: 0, null: false
     t.string "url"
+    t.string "subject_type"
+    t.uuid "subject_id"
+    t.string "group_key"
+    t.datetime "expires_at"
     t.string "external_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -5639,10 +5643,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "subject_type"
-    t.uuid "subject_id"
-    t.string "group_key"
-    t.datetime "expires_at"
     t.index ["business_type"], name: "index_notifications_on_business_type"
     t.index ["company_id", "created_at"], name: "index_notifications_on_company_id_and_created_at"
     t.index ["company_id"], name: "index_notifications_on_company_id"
@@ -6029,6 +6029,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
     t.uuid "employee_id"
+    t.uuid "payment_term_id"
+    t.uuid "price_list_id"
+    t.uuid "channel_connection_id"
     t.string "email"
     t.string "name"
     t.text "description"
@@ -6038,6 +6041,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.integer "country"
     t.integer "timezone"
     t.string "external_id"
+    t.integer "document_type", default: 1, null: false
+    t.bigint "total_cents", default: 0, null: false
+    t.bigint "tax_cents", default: 0, null: false
+    t.decimal "currency_rate", precision: 18, scale: 10, default: "1.0"
+    t.datetime "converted_at"
+    t.string "external_order_number"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -6077,15 +6086,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "payment_term_id"
-    t.uuid "price_list_id"
-    t.uuid "channel_connection_id"
-    t.integer "document_type", default: 1, null: false
-    t.bigint "total_cents", default: 0, null: false
-    t.bigint "tax_cents", default: 0, null: false
-    t.decimal "currency_rate", precision: 18, scale: 10, default: "1.0"
-    t.datetime "converted_at"
-    t.string "external_order_number"
     t.index ["branch_id"], name: "index_orders_on_branch_id"
     t.index ["business_type"], name: "index_orders_on_business_type"
     t.index ["category_id"], name: "index_orders_on_category_id"
@@ -6176,6 +6176,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.uuid "employee_id", null: false
     t.uuid "attendance_month_id"
     t.uuid "payroll_config_id"
+    t.uuid "disbursement_batch_id"
+    t.uuid "cost_center_id"
     t.date "month", null: false
     t.integer "status", default: 0, null: false
     t.text "notes"
@@ -6187,13 +6189,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.bigint "tax_amount_cents", default: 0, null: false
     t.bigint "deduction_amount_cents", default: 0, null: false
     t.bigint "net_amount_cents", default: 0, null: false
+    t.datetime "approved_at"
+    t.datetime "paid_at"
     t.jsonb "metadata", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "disbursement_batch_id"
-    t.uuid "cost_center_id"
-    t.datetime "approved_at"
-    t.datetime "paid_at"
     t.index ["attendance_month_id"], name: "index_payrolls_on_attendance_month_id"
     t.index ["branch_id"], name: "index_payrolls_on_branch_id"
     t.index ["company_id", "employee_id", "month"], name: "index_payrolls_on_company_id_and_employee_id_and_month", unique: true
@@ -6826,6 +6826,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.uuid "brand_id"
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
+    t.uuid "tax_code_id"
+    t.uuid "default_supplier_id"
     t.string "email"
     t.string "name"
     t.text "description"
@@ -6836,6 +6838,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.integer "country"
     t.integer "timezone"
     t.string "external_id"
+    t.bigint "cost_cents", default: 0, null: false
+    t.boolean "is_kit", default: false, null: false
+    t.boolean "track_lot", default: false, null: false
+    t.boolean "track_serial", default: false, null: false
+    t.string "unit_of_measure"
+    t.string "commodity_code"
+    t.integer "weight_grams", default: 0, null: false
+    t.integer "volume_cm3", default: 0, null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -6875,16 +6885,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "tax_code_id"
-    t.uuid "default_supplier_id"
-    t.bigint "cost_cents", default: 0, null: false
-    t.boolean "is_kit", default: false, null: false
-    t.boolean "track_lot", default: false, null: false
-    t.boolean "track_serial", default: false, null: false
-    t.string "unit_of_measure"
-    t.string "commodity_code"
-    t.integer "weight_grams", default: 0, null: false
-    t.integer "volume_cm3", default: 0, null: false
     t.index ["branch_id"], name: "index_products_on_branch_id"
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["business_type"], name: "index_products_on_business_type"
@@ -7119,6 +7119,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "project_group_id", null: false
+    t.uuid "customer_id"
+    t.uuid "manager_employee_id"
+    t.uuid "cost_center_id"
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
     t.string "email"
@@ -7129,6 +7132,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.integer "currency"
     t.integer "country"
     t.integer "timezone"
+    t.integer "billing_model", default: 2, null: false
+    t.bigint "budget_cents", default: 0, null: false
+    t.date "planned_start_on"
+    t.date "planned_end_on"
+    t.date "actual_start_on"
+    t.date "actual_end_on"
+    t.integer "progress_percent", default: 0, null: false
     t.string "external_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -7169,16 +7179,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "customer_id"
-    t.uuid "manager_employee_id"
-    t.uuid "cost_center_id"
-    t.integer "billing_model", default: 2, null: false
-    t.bigint "budget_cents", default: 0, null: false
-    t.date "planned_start_on"
-    t.date "planned_end_on"
-    t.date "actual_start_on"
-    t.date "actual_end_on"
-    t.integer "progress_percent", default: 0, null: false
     t.index ["branch_id"], name: "index_projects_on_branch_id"
     t.index ["business_type"], name: "index_projects_on_business_type"
     t.index ["category_id"], name: "index_projects_on_category_id"
@@ -7491,6 +7491,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.uuid "workflow_step_id"
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
+    t.uuid "payment_term_id"
     t.string "name"
     t.text "description"
     t.string "code"
@@ -7499,6 +7500,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.integer "country"
     t.integer "timezone"
     t.string "external_id"
+    t.integer "document_type", default: 2, null: false
+    t.bigint "total_cents", default: 0, null: false
+    t.decimal "currency_rate", precision: 18, scale: 10, default: "1.0"
+    t.datetime "converted_at"
+    t.datetime "approved_at"
+    t.datetime "received_at"
+    t.datetime "billed_at"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -7538,14 +7546,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "payment_term_id"
-    t.integer "document_type", default: 2, null: false
-    t.bigint "total_cents", default: 0, null: false
-    t.decimal "currency_rate", precision: 18, scale: 10, default: "1.0"
-    t.datetime "converted_at"
-    t.datetime "approved_at"
-    t.datetime "received_at"
-    t.datetime "billed_at"
     t.index ["branch_id"], name: "index_purchases_on_branch_id"
     t.index ["business_type"], name: "index_purchases_on_business_type"
     t.index ["category_id"], name: "index_purchases_on_category_id"
@@ -8624,6 +8624,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.uuid "branch_id"
     t.uuid "warehouse_id", null: false
     t.uuid "product_id"
+    t.uuid "purchase_id"
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
     t.string "appoint_to_type"
@@ -8643,6 +8644,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.integer "country"
     t.integer "timezone"
     t.integer "quantity"
+    t.datetime "received_at"
+    t.integer "quality_status"
+    t.bigint "landed_cost_total_cents", default: 0, null: false
     t.string "external_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -8683,10 +8687,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "purchase_id"
-    t.datetime "received_at"
-    t.integer "quality_status"
-    t.bigint "landed_cost_total_cents", default: 0, null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_imports_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_stock_imports_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_imports_on_appoint_from"
@@ -8842,6 +8842,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.uuid "branch_id"
     t.uuid "warehouse_id", null: false
     t.uuid "product_id", null: false
+    t.uuid "stock_lot_id"
+    t.uuid "stock_serial_id"
+    t.uuid "storage_location_id"
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
     t.string "appoint_to_type"
@@ -8863,6 +8866,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.integer "quantity", null: false
     t.integer "direction", null: false
     t.integer "transaction_type", null: false
+    t.bigint "unit_cost_cents", default: 0, null: false
     t.string "external_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -8903,10 +8907,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "stock_lot_id"
-    t.uuid "stock_serial_id"
-    t.uuid "storage_location_id"
-    t.bigint "unit_cost_cents", default: 0, null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_transactions_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_stock_transactions_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_transactions_on_appoint_from"
@@ -9179,10 +9179,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
   create_table "stored_files", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "folder_id", null: false
+    t.uuid "parent_stored_file_id"
     t.string "name", null: false
     t.bigint "file_size", default: 0
     t.string "extension"
     t.string "content_type"
+    t.integer "version_no", default: 1, null: false
+    t.string "checksum"
+    t.text "ocr_text"
+    t.integer "ocr_status"
+    t.datetime "indexed_at"
     t.string "attachable_type"
     t.uuid "attachable_id"
     t.string "external_id"
@@ -9195,12 +9201,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "parent_stored_file_id"
-    t.integer "version_no", default: 1, null: false
-    t.string "checksum"
-    t.text "ocr_text"
-    t.integer "ocr_status"
-    t.datetime "indexed_at"
     t.index ["attachable_type", "attachable_id"], name: "index_stored_files_on_attachable_type_and_attachable_id"
     t.index ["company_id", "folder_id"], name: "index_stored_files_on_company_id_and_folder_id"
     t.index ["company_id"], name: "index_stored_files_on_company_id"
@@ -9398,6 +9398,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.uuid "company_id", null: false
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
+    t.uuid "payment_term_id"
     t.string "email"
     t.string "name"
     t.text "description"
@@ -9406,6 +9407,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.integer "currency"
     t.integer "country"
     t.integer "timezone"
+    t.string "tax_id"
+    t.integer "lead_time_days", default: 0, null: false
     t.string "external_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -9446,9 +9449,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "payment_term_id"
-    t.string "tax_id"
-    t.integer "lead_time_days", default: 0, null: false
     t.index ["business_type"], name: "index_suppliers_on_business_type"
     t.index ["category_id"], name: "index_suppliers_on_category_id"
     t.index ["code"], name: "index_suppliers_on_code", unique: true
@@ -9785,6 +9785,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "task_group_id", null: false
+    t.uuid "parent_task_id"
+    t.uuid "project_milestone_id"
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
     t.string "email"
@@ -9795,6 +9797,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.integer "currency"
     t.integer "country"
     t.integer "timezone"
+    t.datetime "planned_start_at"
+    t.datetime "planned_end_at"
+    t.datetime "actual_start_at"
+    t.datetime "actual_end_at"
+    t.integer "estimated_minutes", default: 0, null: false
+    t.integer "actual_minutes", default: 0, null: false
+    t.integer "progress_percent", default: 0, null: false
     t.string "external_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -9835,15 +9844,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "parent_task_id"
-    t.uuid "project_milestone_id"
-    t.datetime "planned_start_at"
-    t.datetime "planned_end_at"
-    t.datetime "actual_start_at"
-    t.datetime "actual_end_at"
-    t.integer "estimated_minutes", default: 0, null: false
-    t.integer "actual_minutes", default: 0, null: false
-    t.integer "progress_percent", default: 0, null: false
     t.index ["branch_id"], name: "index_tasks_on_branch_id"
     t.index ["business_type"], name: "index_tasks_on_business_type"
     t.index ["category_id"], name: "index_tasks_on_category_id"
@@ -9959,6 +9959,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.string "name", null: false
     t.text "description"
     t.integer "priority", default: 1, null: false
+    t.datetime "sla_due_at"
+    t.datetime "first_response_at"
+    t.datetime "resolved_at"
+    t.datetime "escalated_at"
     t.string "external_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -9999,10 +10003,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000095) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "sla_due_at"
-    t.datetime "first_response_at"
-    t.datetime "resolved_at"
-    t.datetime "escalated_at"
     t.index ["assigned_employee_id"], name: "index_tickets_on_assigned_employee_id"
     t.index ["business_type"], name: "index_tickets_on_business_type"
     t.index ["category_id"], name: "index_tickets_on_category_id"

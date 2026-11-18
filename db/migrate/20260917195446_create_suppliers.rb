@@ -4,6 +4,7 @@ class CreateSuppliers < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :category, null: false, foreign_key: true, type: :uuid
       t.references :property_mapping, null: false, foreign_key: true, type: :uuid
+      t.references :payment_term, null: true, type: :uuid
 
       # --- Identity ---
       t.string :email
@@ -14,6 +15,8 @@ class CreateSuppliers < ActiveRecord::Migration[8.0]
       t.integer :currency
       t.integer :country
       t.integer :timezone
+      t.string :tax_id
+      t.integer :lead_time_days, null: false, default: 0
 
       t.string :external_id, index: true
 
@@ -36,5 +39,7 @@ class CreateSuppliers < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_foreign_key :products, :suppliers, column: :default_supplier_id
   end
 end

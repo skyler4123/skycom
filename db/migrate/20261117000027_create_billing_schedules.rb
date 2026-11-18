@@ -25,5 +25,7 @@ class CreateBillingSchedules < ActiveRecord::Migration[8.0]
     end
 
     add_index :billing_schedules, [ :company_id, :next_run_on ]
+
+    add_foreign_key :invoices, :billing_schedules, column: :billing_schedule_id
   end
 end

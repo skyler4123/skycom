@@ -24,5 +24,7 @@ class CreateChannelConnections < ActiveRecord::Migration[8.0]
     end
 
     add_index :channel_connections, [ :company_id, :channel ]
+
+    add_foreign_key :orders, :channel_connections, column: :channel_connection_id
   end
 end

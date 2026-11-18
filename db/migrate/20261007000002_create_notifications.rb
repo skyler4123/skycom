@@ -8,6 +8,12 @@ class CreateNotifications < ActiveRecord::Migration[8.0]
       t.integer :severity, default: 0, null: false
       t.string :url
 
+      # --- Deep link & grouping ---
+      t.string :subject_type
+      t.uuid :subject_id
+      t.string :group_key
+      t.datetime :expires_at
+
       t.string :external_id, index: true
 
       # --- System Fields ---
@@ -23,5 +29,6 @@ class CreateNotifications < ActiveRecord::Migration[8.0]
     end
 
     add_index :notifications, [ :company_id, :created_at ]
+    add_index :notifications, [ :subject_type, :subject_id ]
   end
 end

@@ -6,6 +6,10 @@ class CreateStockTransactions < ActiveRecord::Migration[8.0]
       t.references :warehouse, null: false, foreign_key: true, type: :uuid
       t.references :product, null: false, foreign_key: true, type: :uuid
 
+      t.references :stock_lot, null: true, type: :uuid
+      t.references :stock_serial, null: true, type: :uuid
+      t.references :storage_location, null: true, type: :uuid
+
       t.references :appoint_from, polymorphic: true, null: true, type: :uuid
       t.references :appoint_to, polymorphic: true, null: true, type: :uuid
       t.references :appoint_for, polymorphic: true, null: true, type: :uuid
@@ -28,6 +32,7 @@ class CreateStockTransactions < ActiveRecord::Migration[8.0]
       t.integer :quantity, null: false
       t.integer :direction, null: false, index: true        # 0: add, 1: remove
       t.integer :transaction_type, null: false, index: true  # e.g., import, export, transfer, adjustment
+      t.bigint :unit_cost_cents, null: false, default: 0
 
       t.string :external_id, index: true
 

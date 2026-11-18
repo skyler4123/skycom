@@ -20,6 +20,8 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.string :website
       t.integer :employee_count
       t.integer :fiscal_year_end_month
+      t.integer :base_currency, null: false, default: 840
+      t.boolean :is_legal_entity, null: false, default: true
 
       t.string :external_id, index: true
 
