@@ -34,7 +34,13 @@ RSpec.feature "Companies::CompanyTickets New", type: :feature, js: true do
     select "High", from: "company_ticket[priority]"
     click_button "Save Ticket"
 
-    expect(page).to have_current_path(company_company_ticket_path(company, CompanyTicket.last), wait: 10)
+    # Wait for the POST redirect to leave the form before reading the DB —
+    # reading CompanyTicket.last in the matcher below races the request and
+    # sees nil (FLAKY_TESTS §10).
+    expect(page).to have_no_current_path(new_company_company_ticket_path(company), wait: 10)
+
+    ticket = CompanyTicket.find_by!(name: "WiFi down in lobby")
+    expect(page).to have_current_path(company_company_ticket_path(company, ticket), wait: 10)
     expect(page).to have_content("WiFi down in lobby", wait: 10)
   end
 end

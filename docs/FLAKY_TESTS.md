@@ -435,3 +435,44 @@ end
 - Search for similar risk: `grep -rn 'create(:product' spec/features` and verify each file that mixes `Faker` products with hardcoded names.
 
 ---
+
+### 10. Eager DB Lookup in an Assertion Argument (`Model.last` inside `have_current_path`)
+
+**Problem**: `spec/features/companies/company_tickets/new_spec.rb:27` fails intermittently with:
+
+```
+ActionController::UrlGenerationError:
+  No route matches {action: "show", company_id: #<Company ...>, id: nil}
+# ./spec/features/companies/company_tickets/new_spec.rb:37
+```
+
+**Root cause**: Matcher arguments are evaluated **eagerly**, when the expectation line runs:
+
+```ruby
+click_button "Save Ticket"
+expect(page).to have_current_path(company_company_ticket_path(company, CompanyTicket.last), wait: 10)
+#                                ^^^ runs immediately after the click
+```
+
+`click_button` can return **before the form POST navigation completes**. If the POST hasn't inserted the ticket yet, `CompanyTicket.last` is `nil`, and `company_company_ticket_path(company, nil)` raises before Capybara ever polls. `wait: 10` only retries the *browser URL check* — it cannot re-evaluate the matcher argument. In local reproduction this failed ~3 of 8 runs.
+
+**Fix — wait until the form page is left, then read the DB**:
+
+```ruby
+click_button "Save Ticket"
+
+# Wait for the POST redirect to leave the form before reading the DB.
+expect(page).to have_no_current_path(new_company_company_ticket_path(company), wait: 10)
+
+ticket = CompanyTicket.find_by!(name: "WiFi down in lobby")
+expect(page).to have_current_path(company_company_ticket_path(company, ticket), wait: 10)
+expect(page).to have_content("WiFi down in lobby", wait: 10)
+```
+
+The negative guard is the key: it needs no ticket id, so it can be written before the record exists. Once the browser has left the form URL, the POST has been processed and the row is committed, so the `find_by!` and the exact `have_current_path` are safe. Do not replace it with a positive regex on the show URL — a loose `[^/]+` segment also matches the form page's own `/company_tickets/new` and passes instantly, turning the flake into `ActiveRecord::RecordNotFound`.
+
+**Prevention Checklist**:
+- Never put `Model.last`, `Model.first`, or `find_by` inside an assertion argument that follows a request-triggering action. Evaluate the record only after the redirect has been observed.
+- Order on create flows: `click_button` → `have_no_current_path(<form path>)` → DB lookup → exact `have_current_path` → `have_content` (§8 still applies for stale-DOM safety).
+- If the redirect target cannot be identified without a record id, a negative path assertion is preferable to a UUID-matching regex.
+- Search for the anti-pattern: `grep -rn 'have_current_path(.*\.last' spec/features`.
