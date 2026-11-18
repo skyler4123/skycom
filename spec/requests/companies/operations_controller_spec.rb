@@ -29,7 +29,12 @@ RSpec.describe "Companies::OperationsController", type: :request do
 
       appointment = body.fetch("operation_appointments").find { |row| row.fetch("id") == branch_appointment.id }
       expect(appointment.fetch("operation").fetch("operation_type")).to eq("pos")
-      expect(appointment.fetch("location")).to eq("id" => branch.id, "name" => "Main Branch")
+      expect(appointment.fetch("location")).to eq(
+        "id" => branch.id,
+        "name" => "Main Branch",
+        "timezone" => branch.timezone,
+        "utc_offset" => LocalTime.offset_seconds(branch)
+      )
       expect(appointment.fetch("branch")).to eq("id" => branch.id, "name" => "Main Branch")
       expect(appointment.fetch("effective_config")).to eq(
         "roles" => [],
