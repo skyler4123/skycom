@@ -47,11 +47,13 @@ class StockImport < ApplicationRecord
   belongs_to :appoint_to, polymorphic: true, optional: true
   belongs_to :appoint_for, polymorphic: true, optional: true
   belongs_to :appoint_by, polymorphic: true, optional: true
+  belongs_to :purchase, optional: true
 
   # Documents connect directly to the logs they spawn via appoint_for anchor context
   has_many :stock_transactions, as: :appoint_for, dependent: :restrict_with_error
   has_many :stock_import_stock_appointments, dependent: :destroy
   has_many :stocks, through: :stock_import_stock_appointments
+  has_many :landed_cost_charges, dependent: :destroy
 
   validates :code, presence: true, uniqueness: true
 end

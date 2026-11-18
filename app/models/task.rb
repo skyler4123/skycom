@@ -37,9 +37,14 @@ class Task < ApplicationRecord
   belongs_to :task_group
   belongs_to :category
   belongs_to :property_mapping
+  belongs_to :parent_task, class_name: "Task", optional: true
+  belongs_to :project_milestone, optional: true
 
   has_many :employee_task_appointments, dependent: :destroy
   has_many :employees, through: :employee_task_appointments
+  has_many :subtasks, class_name: "Task", foreign_key: :parent_task_id, dependent: :destroy, inverse_of: :parent_task
+  has_many :task_dependencies, foreign_key: :predecessor_task_id, dependent: :destroy, inverse_of: :predecessor_task
+  has_many :project_time_entries, dependent: :nullify
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

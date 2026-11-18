@@ -35,6 +35,9 @@ class Supplier < ApplicationRecord
   belongs_to :company
   belongs_to :category
   belongs_to :property_mapping
+  belongs_to :payment_term, optional: true
+  has_many :stock_lots, dependent: :nullify
+  has_many :subcontract_orders, dependent: :restrict_with_error
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

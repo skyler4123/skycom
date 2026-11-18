@@ -30,7 +30,12 @@ RSpec.describe "Company operation appointment updates", type: :request do
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body).fetch("appointment")
       expect(body.fetch("kind")).to eq("branch")
-      expect(body.fetch("location")).to eq("id" => branch.id, "name" => branch.name)
+      expect(body.fetch("location")).to eq(
+        "id" => branch.id,
+        "name" => branch.name,
+        "timezone" => branch.timezone,
+        "utc_offset" => LocalTime.offset_seconds(branch)
+      )
       expect(body.fetch("operation").fetch("operation_type")).to eq("pos")
     end
 
@@ -44,7 +49,12 @@ RSpec.describe "Company operation appointment updates", type: :request do
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body).fetch("appointment")
       expect(body.fetch("kind")).to eq("warehouse")
-      expect(body.fetch("location")).to eq("id" => warehouse.id, "name" => warehouse.name)
+      expect(body.fetch("location")).to eq(
+        "id" => warehouse.id,
+        "name" => warehouse.name,
+        "timezone" => warehouse.timezone,
+        "utc_offset" => LocalTime.offset_seconds(warehouse)
+      )
     end
 
     it "does not expose another company's appointment" do

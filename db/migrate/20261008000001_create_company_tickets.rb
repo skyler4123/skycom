@@ -14,6 +14,10 @@ class CreateCompanyTickets < ActiveRecord::Migration[8.0]
       t.datetime :first_responded_at
       t.datetime :resolved_at
 
+      # --- Support clocks ---
+      t.datetime :sla_due_at
+      t.datetime :first_response_at
+
       t.string :external_id, index: true
 
       # --- System Fields ---

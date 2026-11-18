@@ -44,11 +44,17 @@ class Purchase < ApplicationRecord
   belongs_to :workflow_step, optional: true
   belongs_to :category
   belongs_to :property_mapping
+  belongs_to :payment_term, optional: true
 
   has_many :purchase_purchase_item_appointments, dependent: :destroy
   has_many :purchase_items, through: :purchase_purchase_item_appointments
   has_many :workflow_step_logs, as: :subject, dependent: :destroy
   has_many :stock_imports, as: :appoint_from, dependent: :restrict_with_error
+  has_many :purchase_parent_appointments, foreign_key: :purchase_id, dependent: :destroy, inverse_of: :purchase
+  has_many :related_purchases, through: :purchase_parent_appointments
+  has_many :purchase_match_appointments, dependent: :destroy
+  has_many :goods_receipts, class_name: "StockImport", foreign_key: :purchase_id, dependent: :restrict_with_error, inverse_of: :purchase
+  has_many :journal_entries, as: :source, dependent: :restrict_with_error
 
   # NOTE: must follow the associations — accepts_nested_attributes_for requires
   # its target association to already exist (docs/MODEL_STRUCTURE.md exception).

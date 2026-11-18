@@ -5,6 +5,7 @@ class CreateStockImports < ActiveRecord::Migration[8.0]
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :warehouse, null: false, foreign_key: true, type: :uuid
       t.references :product, null: true, foreign_key: true, type: :uuid
+      t.references :purchase, null: true, type: :uuid
 
       t.references :appoint_from, polymorphic: true, null: true, type: :uuid
       t.references :appoint_to, polymorphic: true, null: true, type: :uuid
@@ -25,6 +26,11 @@ class CreateStockImports < ActiveRecord::Migration[8.0]
       t.integer :timezone
 
       t.integer :quantity
+
+      # --- Receiving ---
+      t.datetime :received_at
+      t.integer :quality_status
+      t.bigint :landed_cost_total_cents, null: false, default: 0
 
       t.string :external_id, index: true
 
@@ -47,5 +53,7 @@ class CreateStockImports < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_index :stock_imports, [ :company_id, :received_at ]
   end
 end

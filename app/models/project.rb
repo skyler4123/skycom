@@ -36,9 +36,16 @@ class Project < ApplicationRecord
   belongs_to :project_group
   belongs_to :category
   belongs_to :property_mapping
+  belongs_to :customer, optional: true
+  belongs_to :manager_employee, class_name: "Employee", optional: true
+  belongs_to :cost_center, optional: true
 
   has_many :employee_project_appointments, dependent: :destroy
   has_many :employees, through: :employee_project_appointments
+  has_many :project_time_entries, dependent: :destroy
+  has_many :project_billing_terms, dependent: :destroy
+  has_many :project_milestones, dependent: :destroy
+  has_many :service_visits, dependent: :nullify
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

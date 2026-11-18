@@ -46,6 +46,8 @@ class Product < ApplicationRecord
   belongs_to :brand, optional: true
   belongs_to :category
   belongs_to :property_mapping
+  belongs_to :tax_code, optional: true
+  belongs_to :default_supplier, class_name: "Supplier", optional: true
 
   # Core Business Orders (atomic pairwise)
   has_many :order_product_appointments, dependent: :destroy
@@ -68,6 +70,12 @@ class Product < ApplicationRecord
   has_many :stock_imports,   through: :stock_transactions, source: :appoint_for, source_type: "StockImport"
   has_many :stock_exports,   through: :stock_transactions, source: :appoint_for, source_type: "StockExport"
   has_many :stock_transfers, through: :stock_transactions, source: :appoint_for, source_type: "StockTransfer"
+  has_many :product_barcodes, dependent: :destroy
+  has_many :product_bundles, dependent: :destroy
+  has_many :stock_lots, dependent: :destroy
+  has_many :reorder_rules, dependent: :destroy
+  has_many :bill_of_materials, dependent: :destroy
+  has_many :production_orders, dependent: :restrict_with_error
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

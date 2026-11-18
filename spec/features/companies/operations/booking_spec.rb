@@ -53,10 +53,16 @@ RSpec.feature "Companies::Operations::Booking", type: :feature, js: true do
   scenario "renders booking blocks and the current-time needle on the branch clock" do
     branch.update!(timezone: :plus_7)
 
-    travel_to Time.utc(2026, 11, 17, 2, 0, 0) do
+    # The needle only renders when the browser's real "today" matches the day the
+    # server rendered (show_controller.js#isToday). Pin the branch-local today, not
+    # a literal date, or this example passes only on the day it was written.
+    booked_on = LocalTime.today(branch)
+    started_at = Time.utc(booked_on.year, booked_on.month, booked_on.day, 2, 0, 0)
+
+    travel_to started_at do
       create(:event, company: company, branch: branch, category: event_category,
         name: "Local Time Review", code: "BKG-LOCAL",
-        start_at: Time.utc(2026, 11, 17, 2, 0, 0), end_at: Time.utc(2026, 11, 17, 3, 0, 0),
+        start_at: started_at, end_at: started_at + 1.hour,
         workflow_status: :confirmed)
 
       visit booking_path

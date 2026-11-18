@@ -6,6 +6,9 @@ class CreateInvoices < ActiveRecord::Migration[8.0]
       t.references :order, null: false, foreign_key: true, type: :uuid
       t.references :category, null: false, foreign_key: true, type: :uuid
       t.references :property_mapping, null: false, foreign_key: true, type: :uuid
+      t.references :payment_term, null: true, type: :uuid
+      t.references :billing_schedule, null: true, type: :uuid
+      t.references :credited_invoice, foreign_key: { to_table: :invoices }, type: :uuid
 
       # --- Identity ---
       t.string :email, null: true, index: { unique: true }
@@ -20,6 +23,14 @@ class CreateInvoices < ActiveRecord::Migration[8.0]
       t.integer :timezone
 
       t.string :external_id, index: true
+
+      # --- Commercial Document ---
+      t.bigint :total_cents, null: false, default: 0
+      t.bigint :tax_cents, null: false, default: 0
+      t.decimal :currency_rate, precision: 18, scale: 10, default: "1.0"
+      t.datetime :paid_at
+      t.integer :dunning_level, null: false, default: 0
+      t.datetime :last_reminded_at
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
@@ -41,5 +52,7 @@ class CreateInvoices < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_index :invoices, [ :company_id, :dunning_level ]
   end
 end

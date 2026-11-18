@@ -36,6 +36,7 @@ class Document < ApplicationRecord
 
   has_many :document_employee_appointments, dependent: :destroy
   has_many :employees, through: :document_employee_appointments
+  has_many :signature_requests, dependent: :destroy
 
   # --- Scopes ---
   scope :announcements, -> { where(business_type: :announcement) }

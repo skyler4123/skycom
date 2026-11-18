@@ -2,6 +2,34 @@
 
 > Auto-generated from `db/schema.rb` — all tables declared in migration files, categorized by role.
 
+> **⚠️ Partially stale.** The tables listed below were catalogued before the ERP schema
+> wave (2026-11-17), which added **91 tables** and **4 ALTER migrations**. `db/schema.rb`
+> is the source of truth for table existence and columns; this doc is still the reference
+> for the *role* of each pre-existing table. Counts in the summary below reflect the
+> pre-wave schema (185), not today's 312.
+>
+> New domains introduced by the wave: ledger (`ledger_accounts`, `fiscal_periods`,
+> `journal_entries`, `journal_lines`, `cost_centers`, `exchange_rates`, `posting_rules`,
+> `tax_codes`, `fixed_assets`, `depreciation_entries`, `budgets`, `budget_lines`,
+> `payment_terms`, `invoice_reminders`), commercial (`price_lists`, `credit_profiles`,
+> `commission_*`, `billing_schedules`, `loyalty_*`, `channel_*`, `purchase_*_appointments`),
+> warehouse depth (`storage_locations`, `stock_lots`, `stock_serials`, `reorder_rules`,
+> `product_barcodes`, `stock_counts`, `stock_count_lines`, `landed_cost_*`,
+> `product_bundles`, `product_bundle_components`, `pick_waves`, `pick_tasks`,
+> `order_pick_wave_appointments`), delivery (`project_time_entries`,
+> `project_billing_terms`, `project_milestones`, `task_dependencies`, `service_visits`,
+> `service_visit_parts`, `maintenance_plans`, `maintenance_checks`), HR
+> (`employee_manager_appointments`, `job_openings`, `applicants`, `applicant_interviews`,
+> `courses`, `course_lessons`, `course_enrollments`), platform (`identity_providers`,
+> `user_mfa_methods`, `network_policies`, `data_retention_policies`,
+> `data_subject_requests`, `brand_profiles`, `company_entitlements`, `record_comments`,
+> `comment_mentions`, `notification_channels`, `notification_deliveries`, `api_keys`,
+> `webhook_endpoints`, `webhook_deliveries`, `data_exports`, `idempotency_keys`), and
+> manufacturing (`bill_of_materials`, `bom_lines`, `work_centers`, `production_routings`,
+> `production_operations`, `production_orders`, `production_order_*`, `quality_*`,
+> `non_conformances`, `subcontract_orders`, `machine_readings`, `mrp_runs`).
+
+
 ---
 
 ## 1. Gem Resources

@@ -33,6 +33,10 @@ class Payroll < ApplicationRecord
   belongs_to :employee
   belongs_to :attendance_month, optional: true
   belongs_to :payroll_config, optional: true
+  belongs_to :disbursement_batch, optional: true
+  belongs_to :cost_center, optional: true
+  has_many :commission_entries, dependent: :nullify
+  has_many :journal_entries, as: :source, dependent: :restrict_with_error
 
   # --- Validations ---
   validates :company_id, presence: true

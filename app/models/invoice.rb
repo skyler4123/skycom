@@ -44,9 +44,17 @@ class Invoice < ApplicationRecord
   belongs_to :order
   belongs_to :category
   belongs_to :property_mapping
+  belongs_to :payment_term, optional: true
+  belongs_to :billing_schedule, optional: true
+  belongs_to :credited_invoice, class_name: "Invoice", optional: true
 
   has_many :transactions, dependent: :destroy
   has_many :discounts, dependent: :destroy
+  has_many :credit_notes, class_name: "Invoice", foreign_key: :credited_invoice_id, dependent: :nullify, inverse_of: :credited_invoice
+  has_many :invoice_reminders, dependent: :destroy
+  has_many :project_time_entries, dependent: :nullify
+  has_many :project_milestones, dependent: :nullify
+  has_many :journal_entries, as: :source, dependent: :restrict_with_error
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

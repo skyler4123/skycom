@@ -8,6 +8,7 @@ class CreatePurchases < ActiveRecord::Migration[8.0]
       t.references :workflow_step, null: true, foreign_key: true, type: :uuid
       t.references :category, null: false, foreign_key: true, type: :uuid
       t.references :property_mapping, null: false, foreign_key: true, type: :uuid
+      t.references :payment_term, null: true, type: :uuid
 
       # --- Identity ---
       t.string :name
@@ -19,6 +20,15 @@ class CreatePurchases < ActiveRecord::Migration[8.0]
       t.integer :timezone
 
       t.string :external_id, index: true
+
+      # --- Commercial Document ---
+      t.integer :document_type, null: false, default: 2
+      t.bigint :total_cents, null: false, default: 0
+      t.decimal :currency_rate, precision: 18, scale: 10, default: "1.0"
+      t.datetime :converted_at
+      t.datetime :approved_at
+      t.datetime :received_at
+      t.datetime :billed_at
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
@@ -39,5 +49,8 @@ class CreatePurchases < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_index :purchases, [ :company_id, :document_type ]
+    add_foreign_key :stock_imports, :purchases, column: :purchase_id
   end
 end

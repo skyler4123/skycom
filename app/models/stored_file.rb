@@ -27,6 +27,9 @@ class StoredFile < ApplicationRecord
   belongs_to :company, touch: true
   belongs_to :folder
   belongs_to :attachable, polymorphic: true, optional: true
+  belongs_to :parent_stored_file, class_name: "StoredFile", optional: true
+  has_many :versions, class_name: "StoredFile", foreign_key: :parent_stored_file_id, dependent: :nullify, inverse_of: :parent_stored_file
+  has_many :signature_requests, dependent: :destroy
 
   has_one_attached :file, dependent: :purge_later
 

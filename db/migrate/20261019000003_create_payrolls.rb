@@ -8,6 +8,8 @@ class CreatePayrolls < ActiveRecord::Migration[8.1]
       t.uuid :employee_id, null: false
       t.uuid :attendance_month_id
       t.uuid :payroll_config_id
+      t.uuid :disbursement_batch_id
+      t.uuid :cost_center_id
       t.date :month, null: false
       t.integer :status, null: false, default: 0
       t.text :notes
@@ -19,6 +21,8 @@ class CreatePayrolls < ActiveRecord::Migration[8.1]
       t.bigint :tax_amount_cents, null: false, default: 0
       t.bigint :deduction_amount_cents, null: false, default: 0
       t.bigint :net_amount_cents, null: false, default: 0
+      t.datetime :approved_at
+      t.datetime :paid_at
       t.jsonb :metadata, null: false, default: {}
       t.datetime :created_at, null: false
       t.datetime :updated_at, null: false
@@ -28,7 +32,10 @@ class CreatePayrolls < ActiveRecord::Migration[8.1]
       t.index :employee_id
       t.index :attendance_month_id
       t.index :payroll_config_id
+      t.index :disbursement_batch_id
+      t.index :cost_center_id
       t.index [ :company_id, :employee_id, :month ], unique: true
+      t.index [ :company_id, :paid_at ]
       t.index :month
     end
 

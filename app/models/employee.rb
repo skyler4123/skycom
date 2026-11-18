@@ -55,6 +55,8 @@ class Employee < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :category
   belongs_to :property_mapping
+  belongs_to :cost_center, optional: true
+  belongs_to :job_opening, optional: true
 
   has_many :attendance_balances, dependent: :destroy
   has_many :attendance_leaves, dependent: :destroy
@@ -130,6 +132,12 @@ class Employee < ApplicationRecord
   # for the company + admin pool). Soft-delete (discard) is unaffected.
   has_many :company_tickets, dependent: :restrict_with_error
   has_many :company_ticket_comments, as: :author, dependent: :restrict_with_error
+  has_many :employee_manager_appointments, foreign_key: :employee_id, dependent: :destroy, inverse_of: :employee
+  has_many :manager_appointments, class_name: "EmployeeManagerAppointment", foreign_key: :manager_employee_id, dependent: :destroy, inverse_of: :manager_employee
+  has_many :course_enrollments, dependent: :destroy
+  has_many :project_time_entries, dependent: :destroy
+  has_many :commission_entries, dependent: :restrict_with_error
+  has_many :service_visits, foreign_key: :assigned_employee_id, dependent: :nullify, inverse_of: :assigned_employee
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }

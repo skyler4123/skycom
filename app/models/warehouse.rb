@@ -47,4 +47,10 @@ class Warehouse < ApplicationRecord
   has_many :stock_pendings, dependent: :restrict_with_error
   has_many :operation_warehouse_appointments, dependent: :destroy
   has_many :operations, through: :operation_warehouse_appointments
+  has_many :storage_locations, dependent: :destroy
+  has_many :stock_lots, dependent: :restrict_with_error
+  has_many :stock_counts, dependent: :destroy
+  has_many :reorder_rules, dependent: :destroy
+  has_many :pick_waves, class_name: "PickWave", dependent: :destroy
+  has_many :production_orders, dependent: :restrict_with_error
 end
