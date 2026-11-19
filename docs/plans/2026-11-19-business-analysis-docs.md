@@ -456,15 +456,15 @@ group, including the three coming-soon groups),
 **Reads:** `companies/dashboards/index_controller.js` + `blocks.js` +
 `show_controller.js`, `DashboardsController`, `Dashboards::OverviewService`.
 
-- [ ] **Step 1:** Run procedure A–E for all ten blocks.
-- [ ] **Step 2:** §1–§3 — the daily "how is the company doing" page.
-- [ ] **Step 3:** §4 — block config toggles, links, period selectors.
-- [ ] **Step 4:** §5 — each KPI, chart, and list: source and verdict. Note the
+- [x] **Step 1:** Run procedure A–E for all ten blocks.
+- [x] **Step 2:** §1–§3 — the daily "how is the company doing" page.
+- [x] **Step 3:** §4 — block config toggles, links, period selectors.
+- [x] **Step 4:** §5 — each KPI, chart, and list: source and verdict. Note the
   5-minute cache and financial-visibility gate in business terms.
-- [ ] **Step 5:** §6–§7 — decisions on empty company, what a new company sees,
+- [x] **Step 5:** §6–§7 — decisions on empty company, what a new company sees,
   which blocks a cashier may see.
-- [ ] **Step 6:** §8–§9.
-- [ ] **Step 7:** Verify, update README, commit `docs(ba): add dashboard analysis`.
+- [x] **Step 6:** §8–§9.
+- [x] **Step 7:** Verify, update README, commit `docs(ba): add dashboard analysis`.
 
 ---
 
@@ -476,15 +476,15 @@ group, including the three coming-soon groups),
 `AnalyticsController`, `Analytics::DashboardService`,
 `Analytics::PeriodRange`, `Analytics::RevenueCalculator`.
 
-- [ ] **Step 1:** Run procedure A–E for all nine blocks.
-- [ ] **Step 2:** §1–§3 — the periodic review page.
-- [ ] **Step 3:** §4 — period selector, block toggles, exports.
-- [ ] **Step 4:** §5 — pillars, secondary metrics, margin, revenue mix, top items,
+- [x] **Step 1:** Run procedure A–E for all nine blocks.
+- [x] **Step 2:** §1–§3 — the periodic review page.
+- [x] **Step 3:** §4 — period selector, block toggles, exports.
+- [x] **Step 4:** §5 — pillars, secondary metrics, margin, revenue mix, top items,
   cohorts, inventory, workforce, CLV. Mark anything estimated.
-- [ ] **Step 5:** §6–§7 — decisions on missing data, period comparisons, what
+- [x] **Step 5:** §6–§7 — decisions on missing data, period comparisons, what
   counts as revenue.
-- [ ] **Step 6:** §8–§9.
-- [ ] **Step 7:** Verify, update README, commit `docs(ba): add analytics analysis`.
+- [x] **Step 6:** §8–§9.
+- [x] **Step 7:** Verify, update README, commit `docs(ba): add analytics analysis`.
 
 ---
 

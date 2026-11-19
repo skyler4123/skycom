@@ -92,8 +92,8 @@
 | [04-reception](04-reception.md) | Reception console (visitors, parcels, rooms) | 🔴 | 45 | 9 | 2026-11-19 |
 | [05-inventory](05-inventory.md) | Inventory console (warehouse) | 🔴 | 29 | 9 | 2026-11-19 |
 | [06-store-manager](06-store-manager.md) | Store Manager console | 🔴 | 28 | 11 | 2026-11-19 |
-| [07-dashboard](07-dashboard.md) | Company dashboard | — | — | — | — |
-| [08-analytics](08-analytics.md) | Analytics | — | — | — | — |
+| [07-dashboard](07-dashboard.md) | Company dashboard | 🟠 | 29 | 7 | 2026-11-19 |
+| [08-analytics](08-analytics.md) | Analytics | 🟠 | 13 | 6 | 2026-11-19 |
 
 Counts will be filled as each page is audited. They are counts of interactive
 controls (buttons, links, inputs, tabs), not of every element on the page.
