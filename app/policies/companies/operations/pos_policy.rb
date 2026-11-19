@@ -5,4 +5,16 @@ class Companies::Operations::PosPolicy < Companies::Operations::BasePolicy
   def customer_lookup?
     show?
   end
+
+  def catalog?
+    show?
+  end
+
+  def lock?
+    show?
+  end
+
+  def unlock?
+    show?
+  end
 end

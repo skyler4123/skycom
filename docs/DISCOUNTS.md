@@ -135,33 +135,42 @@ per `docs/ATOMIC_PURPOSE.md`.
 
 ## 6. POS Integration Sequence
 
+The till applies the code **after ORDER**, before payment. This freezes the
+discount snapshot on the pending order, so the total the cashier sees is the
+total the invoice will charge.
+
 ```
-POS → POST /companies/:id/order_processing/v1/pay
-                   { order_id, payment_method_appointment_id, discount_code? }
+POS → POST /companies/:id/order_processing/v1/apply_discount
+                   { order_id, discount_code }
       │
       ▼
-InitiatePaymentService.call(order:, appointment:, discount_code:, employee:)
-  ├── validate_appointment!
-  ├── apply_discount!                     Discounts::ApplyService → code unused → pending
-  ├── ReserveStockService                 (any failure here → discount&.release!)
-  ├── transaction:
-  │     ├── create_invoice                price_cents = gross - discount.amount_cents
-  │     ├── create_transaction            price_cents = invoice.price_cents (net)
-  │     ├── CASH → CompletePaymentService → txn completed
-  │     │     └─ Transaction callback derives Invoice.payment_status = paid
-  │     │         └─ Invoice#sync_discount_state → discount.consume! → group budget +
-  │     └── QR  → gateway (merchant identity) → txn pending; code stays pending
-  │           └─ webhook → CompletePaymentService → same consumption chain
-  │
-  └── pay_cancel → CancelPaymentService → ReleaseReservedStockService
-                    + Discounts::ReleaseService (code → unused) + txn failed
+Discounts::ApplyService → code unused → pending; amount snapshot
+      └── returns discount + subtotal/discount/tax/total cents
+      │
+      ├── POST remove_discount → Discounts::ReleaseService → pending → unused
+      │
+      └── POST pay { order_id, payment_method_appointment_id, cash_received_cents? }
+            │
+            ▼
+      InitiatePaymentService.call(order:, appointment:, discount_code?, ...)
+        ├── use the pending discount, or reserve a pay-time code
+        ├── OrderTotalsService: tax on (subtotal − discount)
+        ├── ReserveStockService (selling stock row persisted at checkout)
+        ├── Invoice: price_cents = total = subtotal − discount + tax;
+        │            tax_cents + pos_tax_rate_bp/name snapshot
+        ├── CASH → CompletePaymentService → Invoice paid
+        │     └─ Invoice#sync_discount_state → discount.consume! → budget +
+        └── QR → gateway → txn pending; code stays pending
+              └─ webhook → CompletePaymentService → consumption chain
 ```
 
-- Pay accepts `discount_code` (optional). Invalid code → `InvalidDiscountError` →
-  422 `{ errors: [...] }` — nothing created, code untouched, stock untouched
-  (discount is applied **before** stock reservation).
-- Response gains `discount_amount_cents` when a discount was applied.
-- Receipt payload gains `discount_amount`.
+- Apply invalid code → `422 { errors: [...] }`; the order and total are unchanged.
+- A different code replaces the old reservation only after the new reservation
+  succeeds. Applying the same pending code is idempotent.
+- Void (`POST cancel`), remove, abandoned QR, and initiation failure release the
+  pending code. Paid invoices consume it exactly once.
+- Receipt returns `discount_cents` + `discount_code`; the slip shows the row only
+  when the discount is greater than zero.
 
 ## 7. Permission Model
 

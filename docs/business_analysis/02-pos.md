@@ -2,9 +2,13 @@
 
 > **Last audited:** 2026-11-19 · **Audit scope:** frontend controller, POS
 > controller payload, order-processing V1 create/pay path, receipt endpoint,
-> feature and request specs. No live browser run.
-> **Ship readiness:** 🔴 not shippable — three dead controls, a hardcoded 10% tax
-> shown as if it were the company's tax, and services that cannot be sold.
+> feature and request specs. Re-audited after the Slice 1–3 implementation.
+> **Ship readiness:** 🟢 shippable for a single-rate retail counter — dead
+> controls removed or wired, tax comes from Tax Config, services sell at their
+> configured price, prices are server-owned, discounts and void work, and the
+> register survives refresh/lock. Remaining limits: one company-wide tax rate,
+> browser-print slip (no thermal printer), no offline/refund/price override,
+> and open tabs are per browser profile.
 > **Who this is for:** the cashier at the counter.
 > **Mobile:** same console, mounted through the Hotwire shell.
 > **Read first:** [README](README.md) · **Related:** [00-app-overview](00-app-overview.md),
@@ -69,24 +73,32 @@ user, a dark-mode toggle, and a lock button.
   **New Customer**.
 - A single search field that doubles as the barcode input, marked **F1**.
 - Category pills: All, then one per catalog category.
-- A **Products Gallery** grid with grid/list toggle buttons.
-- A **Retail Services** list below the products.
+- A **Products Gallery** grid/list (both work; choice persists) and a
+  **Retail Services** list below the products, each with its configured price.
 
 **Right column (the sale):** the current order header with item count and
-**Clear Cart**, a customer card with lookup, the cart lines with quantity
-steppers, and the payment block: subtotal, "Tax (10%)", total, payment-method
-buttons, the cash panel (received, quick amounts, change due), and the primary
-action (**ORDER**, then **COMPLETE PAYMENT**). Below that: **Print Receipt** and
-**Open Drawer**.
+**Clear Cart**, a customer card with lookup + Clear, the cart lines with
+quantity steppers capped at the selling pile, and the payment block: subtotal,
+an optional discount code + amount off, the configured tax label/rate, total,
+payment-method buttons, the cash panel (received, currency-aware quick amounts,
+change due), and the primary action (**ORDER**, then **COMPLETE PAYMENT**).
+Under a paid sale: **Print Receipt** and **New Sale**. There is no drawer
+button.
 
 **States**
 
 - *Empty cart:* "Cart is empty"; ORDER warns "Cart is empty".
-- *Services only in the cart:* ORDER warns "No stock-tracked items in cart" —
-  services cannot be checked out.
-- *Order created:* cart locks, ORDER becomes Cancel / COMPLETE PAYMENT.
-- *QR awaiting payment:* QR code, "Waiting for payment confirmation…", Cancel.
-- *Receipt:* items, subtotal, tax, total, payment method, New Sale.
+- *Services only in the cart:* ORDER creates a service-line order and payment
+  works; services have no stock cap.
+- *Order created:* cart locks, ORDER becomes Cancel / COMPLETE PAYMENT, and the
+  discount field appears.
+- *Discount applied:* code + amount off; Remove restores the total.
+- *QR awaiting payment:* QR code, "Waiting for payment confirmation…", Cancel
+  (voids the order after releasing the pending transaction).
+- *Receipt:* branch, time, cashier, lines, subtotal, discount, tax, total,
+  tender, change, Print Receipt, New Sale.
+- *Locked:* server-enforced overlay with cashier name and password unlock; the
+  cart stays behind it.
 - *Load failure:* a full-screen red "Failed to load cashier screen."
 - *Responsive:* catalog and sale stack on phones; the sale panel is sticky on
   desktop.
@@ -127,10 +139,37 @@ action (**ORDER**, then **COMPLETE PAYMENT**). Below that: **Print Receipt** and
 | POS-26 | Receipt | New Sale | Clears the receipt and cart lock | ✅ | — |
 | POS-27 | Payment | Cancel (awaiting QR) | Cancels the pending transaction, then the order | ✅ | — |
 | POS-28 | Payment | Print Receipt | Opens the browser print dialog on the whole page | 🟡 | Not a receipt-formatted printout |
-| POS-29 | Payment | Open Drawer | Toast: "Cash drawer is not connected." | 🗑️ | Cash handling is incomplete |
+| POS-29 | Payment | Open Drawer | Toast: "Cash drawer is not connected." | 🗑️ | Removed in the 2026-11-19 update; there is no drawer, float, or shift. |
+| POS-30 | Payment | Discount code + Apply/Remove | Reserves/releases a code on the pending order and shows the amount off. | ✅ | New in 2026-11-19. |
+| POS-31 | Lock | Password unlock | Server-verified password; clears the terminal lock. | ✅ | New in 2026-11-19. |
 
-**Count by status:** ✅ 23 · 🟡 4 · ⛔ 3 · 🗑️ 1 · 💤 0 · 🔢 0. Fabricated
-figures are in §5, not in the controls.
+**Status tally after the 2026-11-19 update:** ✅ 25 · 🟡 4 · ⛔ 3 · 🗑️ 1 ·
+💤 0 · 🔢 0. The original audit listed 29 controls; POS-30/POS-31 were added
+without renumbering existing IDs. Fabricated figures are in §5, not in the
+controls.
+
+### 2026-11-19 implementation update
+
+| Original control / gap | Now |
+|---|---|
+| POS-03 Lock Terminal | ✅ Server-enforced company session flag; password unlock; checkout/pay return 423 while locked. |
+| POS-09 / POS-10 Grid/list | ✅ Both render; active state; choice persists in localStorage. |
+| POS-12 Service card | ✅ Sells through `OrderServiceAppointment` at the configured price; no stock ledger. |
+| POS-13 Clear Cart | ✅ Confirms “Discard this sale?”; clears only the active tab. |
+| POS-16 Change customer | ✅ Change + Clear; Clear returns the active tab to Walk-in. |
+| POS-18 Plus past stock | ✅ Capped at the selling pile; plus disabled; server rejects over-stock. |
+| POS-23 Cancel after ORDER | ✅ “Void this order?” → cancelled in DB; stock/discount released. |
+| POS-28 Print Receipt | ✅ Print-only 80 mm slip with branch, cashier, lines, discount, tax, tender, change. |
+| POS-29 Open Drawer | 🗑️ Removed. |
+| POS-D2 Tax | ✅ Tax Config owns `pos_tax_rate_bp` / `pos_tax_name`; order/invoice/receipt snapshots; 0% hides the row. |
+| POS-D3 Discount | ✅ Apply after ORDER reserves the code; Remove/void/close releases; receipt shows the row. |
+| POS-D5 Held sales | ✅ Tabs/customers/quantities persist in the browser; paid receipts are not restored. |
+| POS-D7 Catalog cap | ✅ “Showing 50 of N”; Slice 3 Meilisearch search finds past the cap by name/code. |
+| POS-D8 Price integrity | ✅ Browser sends ids + quantities only; server prices and returns authoritative lines. |
+| POS-D9 Receipt printing | ✅ Browser print of the slip only; thermal printing remains future work. |
+| POS-D10 Currency | ✅ Company currency + `Helpers.formatMoney`; no hardcoded `$`. |
+| G11 Unknown barcode | ✅ “Code not found” under the field; cart unchanged; service codes work. |
+| G9 Stock pile | ✅ Main-first/oldest resolver; label names the pile; line persists `stock_id`. |
 
 ---
 
@@ -138,24 +177,24 @@ figures are in §5, not in the controls.
 
 | Claim on screen | What it appears to mean | Where it actually comes from | Verdict |
 |---|---|---|---|
-| Product price (`$xx.xx`) | The selling price | The product's current price at load time | ✅ value; 🟡 the `$` symbol is hardcoded, so a non-dollar company sees the wrong currency |
-| "N in stock" | Units available at this branch | One stock row, from the first matching warehouse | 🟡 ignores other warehouses serving the branch |
-| "N in cart" badge | Units of this product in the active cart | Local cart count | ✅ |
-| Subtotal | Sum of cart lines | Client-side arithmetic on the prices shown | ✅ matches the screen, 🟡 it is also what the server records (see §9) |
-| **"Tax (10%)"** | The company's sales tax | A hardcoded 10% of the subtotal | 🔢 no tax configuration is read; the number is invented |
-| Total Amount | What the customer owes | Subtotal plus the invented 10% | 🔢 |
-| Change Due | Cash back | Received minus the invented total | 🔢 derived |
-| Quick-cash amounts | Convenient notes | Total rounded up to 5 / 50 / 100 | ✅ derived from the displayed total |
-| Receipt subtotal | Invoice price | The invoice price, or line totals when no invoice exists | ✅ |
-| Receipt "Tax (10%)" | Tax charged | Hardcoded 10% of the subtotal | 🔢 |
-| Receipt total | Amount paid | Subtotal + hardcoded tax | 🔢 |
-| Receipt discount line | — | The receipt payload carries a discount amount, but the POS receipt **never displays it** | 🚧 a discounted sale shows a total that ignores the discount |
-| Membership chip | The customer's plan | The customer's membership record | ✅ |
+| Product price (`$xx.xx` / `₫`) | The selling price | Server `price_cents`, formatted with the company currency via `Helpers.formatMoney` | ✅ |
+| "N in stock · Warehouse" | Units available at this branch | The selling pile from `Pos::SellingStockResolver` (main-first/oldest); label names the warehouse | ✅ |
+| "N in cart" badge | Units of this product in the active cart | Local cart count, capped at the selling pile | ✅ |
+| Subtotal | Sum of cart lines | Client cents before ORDER; server cents after ORDER | ✅ |
+| Discount | Code amount off | `appliedDiscount.amountCents` from the reserve response | ✅ |
+| **"Tax (8%)"** | The company's sales tax | `TaxConfig#pos_tax_rate_bp`/`pos_tax_name`, snapshotted on the order/invoice | ✅ 0% hides it |
+| Total Amount | What the customer owes | `(subtotal − discount) + tax`, integer cents | ✅ |
+| Change Due | Cash back | Received cents minus total cents | ✅ |
+| Quick-cash amounts | Convenient notes | Currency-aware round-ups (USD cents / VND dong) | ✅ |
+| Receipt subtotal | Pre-discount lines | `order.line_total` in cents | ✅ |
+| Receipt tax | Tax charged | `invoice.tax_cents` + rate/name snapshot | ✅ |
+| Receipt total | Amount paid | `invoice.total_cents` / `price_cents` | ✅ |
+| Receipt discount line | Code amount off | `invoice` used discount amount + code | ✅ |
+| Receipt tender/change | Cash received/back | Transaction `cash_received_cents`/`change_cents` | ✅ |
 
-**The tax problem in one line:** the company has Tax Data and Tax Config pages,
-but POS neither reads them nor sends a tax to the server — it shows 10% on screen
-and the receipt repeats the same 10%, so the two agree with each other and
-disagree with the company's actual tax settings.
+**The tax problem is closed:** Tax Config owns the POS rate, the order and
+invoice snapshot it, and the receipt prints the same figure. A later rate change
+does not rewrite an open sale or a paid receipt.
 
 ---
 
@@ -315,23 +354,22 @@ recovery. A network drop stops selling.
 
 ## 8. Safe demo path
 
-1. Open **Operations** → **POS** for a branch with products and a cash payment
-   method.
-2. Scan or search a product, add it, change quantity.
-3. Open **New Customer**, look up a customer, show the membership chip.
-4. Choose **Cash**, type the received amount, show the change.
-5. Press **ORDER**, then **COMPLETE PAYMENT**, show the receipt.
-6. Press **New Sale**.
+1. Open **Operations** → **POS** for a branch with products, one service, cash,
+   and a real Tax Config rate.
+2. Scan a product, add a service, change a quantity.
+3. Attach a customer, apply a valid discount code, show the amount off.
+4. Pay cash, show change, print the slip, press **New Sale**.
+5. Press **ORDER** on another sale, then **Cancel** → **Void this order?**, show
+   the order cancelled.
+6. Lock the terminal, reload, unlock with the password, show the cart preserved.
 
-**Do not demo:**
+**Do not demo (still out of scope):**
 
-- A service — it will sit in the cart at 0.00 and then refuse to order.
-- The tax line as "your tax" — it is always 10%.
-- Any discount or promo code — there is no field.
-- Refund, void, hold, float, or cash drawer.
-- The lock, grid, or list buttons.
-- Multi-currency — the `$` is hardcoded.
-- A large catalog — only the first 50 products load.
+- Refund/exchange from the till (use Orders).
+- Server-side held sales, float/shift close, or a cash drawer.
+- Price override, thermal printing, or offline selling.
+- Tax-inclusive or mixed per-product tax rates.
+- A second register in the same browser profile (localStorage is shared).
 
 ---
 
@@ -350,36 +388,49 @@ recovery. A network drop stops selling.
 `#customer_lookup` (payload built inline; there is no POS console service),
 `Companies::OrderProcessing::V1Controller`, `Companies::OrdersController#receipt`.
 
-**Order path:** `OrderProcessingV1::CreateOrderService` sums
-`quantity × unit_price` from the request, writes `Order` + line appointments,
-then `pay` records the transaction. **The client supplies `unit_price`; the
-server does not re-price.**
+**Order path:** `OrderProcessingV1::CheckoutService` (implemented as
+`CreateOrderService`) resolves the catalog record and selling stock row from
+`product_id`/`service_id` + quantity only. It prices from the server, writes
+`Order` + `OrderProductAppointment`/`OrderServiceAppointment`, and snapshots
+`pos_tax_rate_bp`/`pos_tax_name`. `OrderTotalsService` supplies subtotal,
+discount, tax, and total cents. `pay` records the transaction at the invoice
+total.
 
 **Frontend:** `app/javascript/controllers/companies/operations/pos/show_controller.js`
 (`Companies_Operations_Pos_ShowController`). F1 focuses `#barcode-input`;
-QR payments subscribe to the `pos_payment_completed` websocket event.
+non-blank queries ask `/catalog` (Meilisearch); QR payments subscribe to the
+`pos_payment_completed` websocket event. The register state (tabs, customers,
+quantities, view mode, discount, pending QR token) lives in localStorage; the
+lock is server-enforced.
 
-**Money gaps in code:**
+**Current money behavior:**
 
-- `getTax()` returns `getSubtotal() * 0.10`; the receipt endpoint repeats
-  `subtotal * 0.10` and totals `subtotal + tax`. Neither reads tax config.
-- `initiateOrder` filters `items.filter((item) => item.stockId)` — services have
-  no `stock_id`, so they are silently dropped.
-- The receipt payload includes `discount_amount`, but the receipt renderer never
-  shows it.
-- Currency is rendered as a literal `$` in the catalog, cart, payments and
-  receipt, although `product.currency` exists in the payload.
-- `OrdersController#receipt` computes `tax` and `total` independently of the
-  invoice's stored amounts.
+- Tax comes from `TaxConfig#pos_tax_rate_bp` / `pos_tax_name`, is snapshotted on
+  the order and invoice, and is hidden at 0%. The receipt reads the snapshot.
+- Services sell at `Service#price_cents` through `OrderServiceAppointment`.
+- Discounts reserve at Apply, are released by Remove/void/close, and the receipt
+  shows the discount/code.
+- Every amount is integer cents (whole dong for VND) through
+  `Helpers.formatMoney`; no hardcoded `$`.
+- `OrdersController#receipt` returns cents and reads the invoice/order snapshot;
+  it never recomputes a percentage.
 
 **Source tables:** `products`, `services`, `stocks`, `orders`,
 `order_product_appointments`, `order_service_appointments`, `invoices`,
 `transactions`, `payment_methods`, `branch_payment_method_appointments`,
 `customers`.
 
-**Proof:** `spec/features/companies/operations/pos_spec.rb`,
-`spec/requests/companies/operations/pos_spec.rb`, plus the order-processing and
-receipt specs.
+**Proof:** `spec/features/companies/operations/pos_spec.rb` (39 scenarios:
+tax 0/8, VND, grid/list persistence, lock/reload/password, unknown code, cap,
+stock label, confirmations, refresh/paid-sale persistence, service sale,
+discount apply/remove/invalid, clear customer, receipt slip/print, stock cap,
+server search, two-warehouse pile), `spec/features/mobile/pos_spec.rb`,
+`spec/requests/companies/operations/pos_spec.rb`,
+`spec/requests/companies/order_processing/v1_controller_spec.rb`,
+`spec/requests/companies/order_receipt_spec.rb`,
+`spec/requests/companies/tax_configs_controller_spec.rb`, plus the POS/order
+service specs.
 
-**Not covered by tests:** service checkout, tax correctness, discount display,
-dead controls, currency formatting, and the 50-item cap.
+**Not covered by tests:** tax-inclusive pricing, mixed per-product tax rates,
+thermal printing, offline queueing, refunds from the till, and browser-profile
+multi-register conflicts. These are documented limits, not silent gaps.

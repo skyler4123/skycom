@@ -281,10 +281,14 @@ is Shell-First: the response contains only a mount `<div>` with
 `data-controller="companies--operations--pos--show darkmode"` plus the company
 and operation ids. The shared POS Stimulus controller fetches the web JSON
 endpoint (`/companies/:company_id/operations/pos/:operation_id.json`) and renders
-the catalog, cart, payment and receipt. The Operations card links with the
-chosen appointment's `branch_id`; without it the resolver falls back to the
-employee's branch. Tablet layout is width-driven: below `lg` the order panel
-stacks under the catalog, at `lg` and above they sit side by side.
+the catalog, cart, payment and receipt. The same controller now sells services,
+uses the company currency/tax snapshot, applies discount codes, voids a pending
+order, prints the receipt slip, and supports the server-enforced terminal lock.
+The Operations card links with the chosen appointment's `branch_id`; without it
+the resolver falls back to the employee's branch. Tablet layout is width-driven:
+below `lg` the order panel stacks under the catalog, at `lg` and above they sit
+side by side. Limits: no offline queue, order history, thermal printer, or
+price override.
 
 **Booking** — `GET /mobile/companies/:company_id/operations/booking/:operation_id`
 uses the same Shell-First contract:

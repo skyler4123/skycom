@@ -225,7 +225,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(Order.last.workflow_status).to eq("pending")
   end
 
-  scenario "Cancel after ORDER returns to ORDER state" do
+  scenario "Cancel after ORDER voids the order and returns to ORDER state" do
     visit pos_path
 
     add_to_cart(product_a)
@@ -233,10 +233,14 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(page).to have_button("COMPLETE PAYMENT", wait: 10)
 
     click_button "Cancel"
+    expect(page).to have_content("Void this order?", wait: 5)
+    find(".swal2-confirm").click
+
     expect(page).to have_button("ORDER", wait: 10)
     expect(page).not_to have_button("COMPLETE PAYMENT")
 
     expect(Order.count).to eq(1)
+    expect(Order.last.workflow_status).to eq("cancelled")
   end
 
   scenario "COMPLETE PAYMENT processes order and shows the receipt" do
@@ -317,6 +321,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     add_to_cart(product_a)
     click_button "Mock QR"
     click_button "ORDER"
+    click_button "COMPLETE PAYMENT"
 
     expect(page).to have_content("Scan to Pay", wait: 10)
     expect(page).to have_selector("#cashier-qr-container", wait: 5)
@@ -361,6 +366,362 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(page).to have_content("Cart is empty", wait: 5)
   end
 
+  scenario "shows the configured tax on the till, invoice, and receipt" do
+    company.update!(currency: :usd)
+    product_a.update!(price_cents: 5_000)
+    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+
+    visit pos_path
+    add_to_cart(product_a)
+
+    expect(page).to have_content("Sales tax (8%)", wait: 10)
+    expect(page).to have_content("$4.00")
+    expect(page).to have_content("$54.00")
+
+    click_button "ORDER"
+    click_button "COMPLETE PAYMENT"
+
+    expect(page).to have_content(/receipt/i, wait: 10)
+    expect(page).to have_content("Sales tax (8%)")
+    expect(page).to have_content("$4.00")
+
+    invoice = Invoice.order(:created_at).last
+    expect(invoice.tax_cents).to eq(400)
+    expect(invoice.total_cents).to eq(5_400)
+    expect(invoice.price_cents).to eq(5_400)
+    expect(Transaction.order(:created_at).last.price_cents).to eq(5_400)
+  end
+
+  scenario "hides the tax row when the configured rate is zero" do
+    company.update!(currency: :usd)
+    product_a.update!(price_cents: 5_000)
+    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 0, pos_tax_name: "Sales tax")
+
+    visit pos_path
+    add_to_cart(product_a)
+
+    expect(page).to have_content("$50.00", wait: 10)
+    expect(page).not_to have_content("Sales tax (")
+
+    click_button "ORDER"
+    click_button "COMPLETE PAYMENT"
+    expect(page).to have_content(/receipt/i, wait: 10)
+    expect(Invoice.order(:created_at).last.tax_cents).to eq(0)
+    expect(Invoice.order(:created_at).last.total_cents).to eq(5_000)
+  end
+
+  scenario "uses the company currency instead of a hardcoded dollar sign" do
+    company.update!(country: :vn, currency: :vnd)
+    product_a.update!(price_cents: 50_000)
+    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 0)
+
+    visit pos_path
+    add_to_cart(product_a)
+
+    expect(page).to have_content("₫", wait: 10)
+    expect(page).not_to have_content("$")
+
+    click_button "ORDER"
+    click_button "COMPLETE PAYMENT"
+    expect(page).to have_content(/receipt/i, wait: 10)
+    expect(Invoice.order(:created_at).last.currency).to eq("vnd")
+    expect(Invoice.order(:created_at).last.total_cents).to eq(50_000)
+  end
+
+  scenario "switches between grid and list and remembers the choice" do
+    visit pos_path
+
+    find('button[title="List view"]', wait: 10).click
+    expect(page).to have_selector('#pos-product-grid[data-view-mode="list"]', wait: 10)
+
+    visit pos_path
+    expect(page).to have_selector('#pos-product-grid[data-view-mode="list"]', wait: 10)
+  end
+
+  scenario "locks the terminal, survives refresh, and unlocks with a password" do
+    visit pos_path
+    add_to_cart(product_a)
+
+    find('button[title="Lock Terminal"]', wait: 10).click
+    expect(page).to have_content("Terminal locked", wait: 10)
+
+    visit pos_path
+    expect(page).to have_content("Terminal locked", wait: 10)
+
+    find("#pos-unlock-password").set("WrongPassword@1234")
+    click_button "Unlock"
+    expect(page).to have_content("Incorrect password", wait: 10)
+    expect(page).to have_content("Terminal locked")
+
+    find("#pos-unlock-password").set("Password@1234")
+    click_button "Unlock"
+
+    expect(page).not_to have_content("Terminal locked", wait: 10)
+    within('[data-operation-block="cart"]') do
+      expect(page).to have_content(product_a.name)
+    end
+  end
+
+  scenario "shows code not found without changing the cart" do
+    visit pos_path
+
+    find("#barcode-input", wait: 10).set("NOPE-404")
+    find("#barcode-input").send_keys(:enter)
+
+    expect(page).to have_content("Code not found", wait: 10)
+    expect(page).to have_content("Cart is empty")
+  end
+
+  scenario "tells the cashier when the catalog is capped" do
+    48.times do |index|
+      create(:product, company: company, branch: branch, name: "Extra #{index} #{SecureRandom.hex(4)}")
+    end
+
+    visit pos_path
+
+    expect(page).to have_content("Showing 50 of 51", wait: 10)
+  end
+
+  scenario "names the warehouse the stock count came from" do
+    visit pos_path
+
+    expect(page).to have_content("10 in stock · #{warehouse.name}", wait: 10)
+  end
+
+  scenario "asks before clearing the cart and clears only the active tab" do
+    visit pos_path
+    add_to_cart(product_a)
+
+    find('button[title="Clear Cart"]', wait: 10).click
+    expect(page).to have_content("Discard this sale?", wait: 5)
+    find(".swal2-cancel").click
+    expect(page).to have_content(product_a.name)
+
+    find('button[title="Clear Cart"]').click
+    expect(page).to have_content("Discard this sale?", wait: 5)
+    find(".swal2-confirm").click
+    expect(page).to have_content("Cart is empty", wait: 5)
+  end
+
+  scenario "restores open tabs after a refresh but not a paid sale" do
+    visit pos_path
+    add_to_cart(product_a)
+
+    visit pos_path
+    within('[data-operation-block="cart"]') do
+      expect(page).to have_content(product_a.name, wait: 10)
+    end
+
+    click_button "ORDER"
+    click_button "COMPLETE PAYMENT"
+    expect(page).to have_content(/receipt/i, wait: 10)
+
+    visit pos_path
+    expect(page).to have_content("Cart is empty", wait: 10)
+  end
+
+  scenario "sells a service at its configured price" do
+    company.update!(currency: :usd)
+    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 0)
+    service = Seed::ServiceService.create(company: company, branch: branch, name: "Assembly")
+    service.update!(price_cents: 2_500)
+
+    visit pos_path
+    find('[data-action*="addToCart"]', text: "Assembly", wait: 10).click
+
+    expect(page).to have_content("$25.00", wait: 10)
+    click_button "ORDER"
+    click_button "COMPLETE PAYMENT"
+
+    expect(page).to have_content(/receipt/i, wait: 10)
+    expect(page).to have_content("Assembly")
+
+    line = OrderServiceAppointment.order(:created_at).last
+    expect(line.unit_price.to_f).to eq(25.0)
+    expect(line.total_price.to_f).to eq(25.0)
+    expect(Order.last.workflow_status).to eq("paid")
+  end
+
+  scenario "applies and removes a discount code" do
+    company.update!(currency: :usd)
+    product_a.update!(price_cents: 5_000)
+    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+    group = Seed::DiscountGroupService.create(company: company, name: "POS Discounts", prefix: "POS",
+      discount_type: :percentage, percentage: 10, campaign_status: :active)
+    discount = Seed::DiscountService.create(company: company, discount_group: group, code: "POS-DISC")
+
+    visit pos_path
+    add_to_cart(product_a)
+    click_button "ORDER"
+    expect(page).to have_button("COMPLETE PAYMENT", wait: 10)
+
+    find("#pos-discount-code", wait: 10).set("POS-DISC")
+    click_button "Apply"
+
+    expect(page).to have_content("POS-DISC", wait: 10)
+    expect(page).to have_content("$48.60")
+
+    click_button "COMPLETE PAYMENT"
+    expect(page).to have_content(/receipt/i, wait: 10)
+    expect(page).to have_content("Discount")
+    invoice = Invoice.order(:created_at).last
+    expect(invoice.discounts.where(status: :used).sum(:amount_cents)).to eq(500)
+    expect(invoice.tax_cents).to eq(360)
+    expect(invoice.total_cents).to eq(4_860)
+    expect(discount.reload).to be_status_used
+  end
+
+  scenario "a bad discount code leaves the total unchanged" do
+    company.update!(currency: :usd)
+    product_a.update!(price_cents: 5_000)
+    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+
+    visit pos_path
+    add_to_cart(product_a)
+    click_button "ORDER"
+    expect(page).to have_button("COMPLETE PAYMENT", wait: 10)
+
+    find("#pos-discount-code", wait: 10).set("NOPE")
+    click_button "Apply"
+
+    expect(page).to have_content("$54.00", wait: 10)
+    expect(page).to have_content(/not found|not valid/i)
+  end
+
+  scenario "clears the attached customer back to Walk-in" do
+    customer = create(:customer, company: company, name: "Sarah Clear")
+    visit pos_path
+
+    within('[data-operation-block="customer"]') do
+      find("#pos-customer-lookup").set(customer.id)
+      click_button "Find"
+      expect(page).to have_content("Sarah Clear", wait: 10)
+      click_button "Clear"
+      expect(page).to have_content("Walk-in customer", wait: 10)
+    end
+  end
+
+  scenario "finds a product past the first fifty by name and adds it" do
+    company.update!(currency: :usd)
+    48.times do |index|
+      create(:product, company: company, branch: branch, name: "Extra #{index} #{SecureRandom.hex(4)}")
+    end
+    hidden = create(:product, company: company, branch: branch,
+      name: "ZZZ Find Me", code: "FIND-ME-51", price_cents: 1_000)
+    hidden_category = hidden.category
+    Stock.create!(
+      company: company, warehouse: warehouse, product: hidden,
+      quantity: 5, pending: 0, category: hidden_category,
+      property_mapping: hidden_category.default_property_mapping
+    ).tap { |record| record.send(:sync_available_counter) }
+    hidden.ms_index!(true)
+
+    visit pos_path
+    find("#barcode-input", wait: 10).set("ZZZ Find Me")
+
+    expect(page).to have_content("ZZZ Find Me", wait: 10)
+    find('[data-action*="addToCart"]', text: "ZZZ Find Me").click
+    within('[data-operation-block="cart"]') do
+      expect(page).to have_content("ZZZ Find Me")
+    end
+
+    find("#barcode-input").set("")
+    expect(page).to have_content("Showing 50 of 52", wait: 10)
+
+    within('[data-operation-block="cart"]') do
+      find('[data-action*="removeFromCart"]').click
+    end
+    expect(page).to have_content("Cart is empty")
+
+    find("#barcode-input").set("FIND-ME-51")
+    find("#barcode-input").send_keys(:enter)
+    within('[data-operation-block="cart"]') do
+      expect(page).to have_content("ZZZ Find Me", wait: 10)
+    end
+  end
+
+  scenario "stops the quantity at the available stock and disables the stepper" do
+    company.update!(currency: :usd)
+    capped = create(:product, company: company, branch: branch, name: "Capped Widget", price_cents: 1_000)
+    category = capped.category
+    Stock.create!(
+      company: company, warehouse: warehouse, product: capped,
+      quantity: 2, pending: 0, category: category,
+      property_mapping: category.default_property_mapping
+    ).tap { |record| record.send(:sync_available_counter) }
+
+    visit pos_path
+    card = find('[data-action*="addToCart"]', text: "Capped Widget", wait: 10)
+    card.click
+    card.click
+    card.click
+
+    within('[data-operation-block="cart"]') do
+      expect(page).to have_content("Capped Widget")
+      expect(page).to have_content("Stock limit: 2")
+      expect(page).to have_selector("button[disabled]", wait: 5)
+    end
+  end
+
+  scenario "shows and sells from the branch's main warehouse pile" do
+    company.update!(currency: :usd)
+    main = create(:warehouse, company: company, branch: branch,
+      name: "Main warehouse", business_type: :main, created_at: 2.days.ago)
+    overflow = create(:warehouse, company: company, branch: branch,
+      name: "Overflow", business_type: :distribution, created_at: 1.day.ago)
+    product = create(:product, company: company, branch: branch,
+      name: "Warehoused Widget", price_cents: 1_000)
+    category = product.category
+    main_stock = Stock.create!(
+      company: company, warehouse: main, product: product,
+      quantity: 3, pending: 0, category: category,
+      property_mapping: category.default_property_mapping
+    ).tap { |record| record.send(:sync_available_counter) }
+    Stock.create!(
+      company: company, warehouse: overflow, product: product,
+      quantity: 10, pending: 0, category: category,
+      property_mapping: category.default_property_mapping
+    ).tap { |record| record.send(:sync_available_counter) }
+
+    visit pos_path
+    expect(page).to have_content("3 in stock · Main warehouse", wait: 10)
+
+    find('[data-action*="addToCart"]', text: "Warehoused Widget").click
+    click_button "ORDER"
+    expect(page).to have_button("COMPLETE PAYMENT", wait: 10)
+
+    expect(OrderProductAppointment.order(:created_at).last.stock_id).to eq(main_stock.id)
+  end
+
+  scenario "prints only the receipt slip" do
+    company.update!(currency: :usd)
+    product_a.update!(price_cents: 5_000)
+    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+
+    visit pos_path
+    add_to_cart(product_a)
+    click_button "ORDER"
+    click_button "COMPLETE PAYMENT"
+    expect(page).to have_content(/receipt/i, wait: 10)
+
+    print_root = find("#pos-print-root", visible: :all)
+    print_text = print_root.text(:all)
+    expect(print_text).to include(product_a.name)
+    expect(print_text).to include("Sales tax (8%)")
+    expect(print_text).to include("$54.00")
+
+    page.execute_script("window.__printed = false; window.print = () => { window.__printed = true }")
+    click_button "Print Receipt"
+    expect(page.evaluate_script("window.__printed")).to be(true)
+  end
+
+  scenario "does not claim a cash drawer is connected" do
+    visit pos_path
+
+    expect(page).not_to have_content("Open Drawer")
+    expect(page).not_to have_content("Cash drawer")
+  end
+
   scenario "mock QR cancel releases stock and restores the cart" do
     allow(Payments::MockQrGateway).to receive(:new).and_return(
       double(call: { success: true, gateway_reference: "MOCK_QR_FE2", gateway_payload: { "qr_string" => "FEQRDATA2" } })
@@ -371,6 +732,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     add_to_cart(product_a)
     click_button "Mock QR"
     click_button "ORDER"
+    click_button "COMPLETE PAYMENT"
     expect(page).to have_selector("#cashier-qr-container", wait: 10)
 
     click_button "Cancel"

@@ -44,7 +44,7 @@ dynamic properties, location appointments, and access policies.
 
 | Console | What it is for | Verdict | Why |
 |---|---|---|---|
-| [POS](02-pos.md) | Taking money at the counter | 🔴 | Hardcoded 10% tax, services cannot be sold, three dead controls |
+| [POS](02-pos.md) | Taking money at the counter | 🟢 | Tax/currency from config, services, server prices, discounts, void, receipt slip, real lock, persisted tabs; one company-wide tax rate |
 | [Booking](03-booking.md) | Reserving rooms and spaces | 🔴 | No double-booking check, dead inspector, invented floor map |
 | [Reception](04-reception.md) | Front desk, visitors, parcels | 🔴 | Four dead tabs, badge printing only toasts, fake "connected" systems |
 | [Inventory](05-inventory.md) | Warehouse stock command screen | 🔴 | BOM panel is hardcoded zeros, invented zone occupancy, fake dock data |
@@ -80,7 +80,7 @@ document exists, it owns the detail.
 | **Schedule** | Calendar, events, event configs | Built | Backbone of Booking and Reception |
 | **Attendance** | Shift templates, shifts, attendance days, requests, configs, logs | Built; production job gap | Months are not refreshed by a scheduled job in production |
 | **Inventory** | Warehouses, stocks, transfers, imports, exports, adjustments, pendings, suppliers | Built | Stock is the source of truth for every movement |
-| **Tax** | Tax data and tax config | Built, **not used by POS** | The console ignores it (POS-D2) |
+| **Tax** | Tax data and tax config | Built, **used by POS** | POS reads the Tax Config POS rate/name, snapshots it on the order/invoice, and prints it on the receipt (0% hides it). |
 | **Payroll** | Payroll data and config | Partial | Money fields are seed-only; no results editor |
 | **Authorization** | Roles, policies, permissions, logs | Built | ABAC is the only permission system |
 | **Chat & Help Desk** | Support conversations | 💤 Coming soon | Group marked coming soon |

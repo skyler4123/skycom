@@ -122,7 +122,11 @@ All appointments start `active`. Companies disable the ones they do not use.
 | GET | `/companies/:company_id/operation_warehouse_appointments/:id` | `Companies::OperationWarehouseAppointmentsController#show` | Warehouse appointment details |
 | GET | `/companies/:company_id/operation_warehouse_appointments/:id/edit` | `Companies::OperationWarehouseAppointmentsController#edit` | Warehouse appointment edit page |
 | PATCH | `/companies/:company_id/operation_warehouse_appointments/:id` | `Companies::OperationWarehouseAppointmentsController#update` | Update warehouse metadata/status |
-| GET | `/companies/:company_id/operations/pos/:operation_id` | `Companies::Operations::PosController#show` | POS |
+| GET | `/companies/:company_id/operations/pos/:operation_id` | `Companies::Operations::PosController#show` | POS (server cents, tax, selling stock, payment methods, locked state) |
+| GET | `/companies/:company_id/operations/pos/:operation_id/catalog` | `Companies::Operations::PosController#catalog` | POS search/gallery refresh (Meilisearch `q`) |
+| GET | `/companies/:company_id/operations/pos/:operation_id/customer_lookup` | `Companies::Operations::PosController#customer_lookup` | POS customer lookup |
+| POST | `/companies/:company_id/operations/pos/:operation_id/lock` | `Companies::Operations::PosController#lock` | Server-enforced terminal lock |
+| POST | `/companies/:company_id/operations/pos/:operation_id/unlock` | `Companies::Operations::PosController#unlock` | Password unlock |
 | GET | `/companies/:company_id/operations/booking/:operation_id` | `Companies::Operations::BookingController#show` | Booking console (Events/Facilities) |
 | POST | `/companies/:company_id/operations/booking/:operation_id/reservations` | `Companies::Operations::BookingController#create_reservation` | Create a reservation Event + facility link |
 | GET | `/companies/:company_id/operations/inventory/:operation_id` | `Companies::Operations::InventoryController#show` | Placeholder |

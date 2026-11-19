@@ -175,6 +175,14 @@ export const pos_customer_lookup_company_operation_path = (companyId, operationI
   const query = new URLSearchParams(params).toString()
   return `/companies/${companyId}/operations/pos/${operationId}/customer_lookup${query ? `?${query}` : ""}`
 }
+export const pos_catalog_company_operation_path = (companyId, operationId, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `/companies/${companyId}/operations/pos/${operationId}/catalog${query ? `?${query}` : ""}`
+}
+export const pos_lock_company_operation_path = (companyId, operationId) =>
+  `/companies/${companyId}/operations/pos/${operationId}/lock`
+export const pos_unlock_company_operation_path = (companyId, operationId) =>
+  `/companies/${companyId}/operations/pos/${operationId}/unlock`
 export const booking_company_operation_path = (companyId, operationId, params = {}) => operationPath("booking", companyId, operationId, params)
 export const booking_reservations_company_operation_path = (companyId, operationId, params = {}) => {
   const query = new URLSearchParams(params).toString()
@@ -193,6 +201,9 @@ export const store_manager_company_operation_path = (companyId, operationId, par
 export const order_processing_v1_checkout_path = (companyId) => `/companies/${companyId}/order_processing/v1/checkout`
 export const order_processing_v1_pay_path = (companyId) => `/companies/${companyId}/order_processing/v1/pay`
 export const order_processing_v1_pay_cancel_path = (companyId) => `/companies/${companyId}/order_processing/v1/pay_cancel`
+export const order_processing_v1_apply_discount_path = (companyId) => `/companies/${companyId}/order_processing/v1/apply_discount`
+export const order_processing_v1_remove_discount_path = (companyId) => `/companies/${companyId}/order_processing/v1/remove_discount`
+export const order_processing_v1_cancel_path = (companyId) => `/companies/${companyId}/order_processing/v1/cancel`
 export const receipt_company_order_path = (companyId, orderId) => `/companies/${companyId}/orders/${orderId}/receipt`
 
 export const company_permissions_path = (companyId) => `/companies/${companyId}/permissions`

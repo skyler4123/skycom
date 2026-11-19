@@ -7,7 +7,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
   let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :education).tap(&:save!) }
   let(:owner_user) { company.user }
   let(:branch) { create(:branch, company: company) }
-  let(:product) { create(:product, company: company) }
+  let(:product) { create(:product, company: company, branch: branch, price_cents: 5_000) }
   let(:warehouse) { create(:warehouse, company: company, branch: branch) }
   let!(:stock) do
     cat = product.category
@@ -40,21 +40,22 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
       {
         branch_id: branch.id,
         items: [
-          { stock_id: stock.id, product_id: product.id, quantity: 2, unit_price: 50.00 }
+          { product_id: product.id, quantity: 2 }
         ]
       }
     end
 
-    it "returns 201 with order_id and total_price" do
+    it "returns 201 with order_id and cent totals" do
       post "/companies/#{company.id}/order_processing/v1/checkout", params: checkout_params, headers: headers
       expect(response).to have_http_status(:created)
       body = JSON.parse(response.body)
       expect(body["order_id"]).to be_present
-      expect(body["total_price"]).to eq(100.0)
+      expect(body["subtotal_cents"]).to eq(10_000)
+      expect(body["total_cents"]).to eq(10_000)
     end
 
     context "with multiple items" do
-      let(:product2) { create(:product, company: company) }
+      let(:product2) { create(:product, company: company, branch: branch, price_cents: 2_500) }
       let!(:stock2) do
         Stock.create!(company:, warehouse:, product: product2, quantity: 5, pending: 0,
           category: stock.category, property_mapping: stock.property_mapping)
@@ -62,43 +63,43 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
       end
       let(:checkout_params) do
         { branch_id: branch.id, items: [
-          { stock_id: stock.id, product_id: product.id, quantity: 2, unit_price: 50.00 },
-          { stock_id: stock2.id, product_id: product2.id, quantity: 1, unit_price: 25.00 }
+          { product_id: product.id, quantity: 2 },
+          { product_id: product2.id, quantity: 1 }
         ] }
       end
 
-      it "returns 201 with correct combined total_price" do
+      it "returns 201 with the combined cents total" do
         post "/companies/#{company.id}/order_processing/v1/checkout", params: checkout_params, headers: headers
         expect(response).to have_http_status(:created)
         body = JSON.parse(response.body)
         expect(body["order_id"]).to be_present
-        expect(body["total_price"]).to eq(125.0)
+        expect(body["subtotal_cents"]).to eq(12_500)
       end
     end
 
     context "with string quantity param" do
       let(:checkout_params) do
-        { branch_id: branch.id, items: [ { stock_id: stock.id, product_id: product.id, quantity: "2", unit_price: 50.00 } ] }
+        { branch_id: branch.id, items: [ { product_id: product.id, quantity: "2" } ] }
       end
 
       it "returns 201 (handles .to_i conversion)" do
         post "/companies/#{company.id}/order_processing/v1/checkout", params: checkout_params, headers: headers
         expect(response).to have_http_status(:created)
         body = JSON.parse(response.body)
-        expect(body["total_price"]).to eq(100.0)
+        expect(body["subtotal_cents"]).to eq(10_000)
       end
     end
 
     context "when stock insufficient" do
       let(:checkout_params) do
-        { branch_id: branch.id, items: [ { stock_id: stock.id, product_id: product.id, quantity: 20, unit_price: 50.00 } ] }
+        { branch_id: branch.id, items: [ { product_id: product.id, quantity: 20 } ] }
       end
 
       it "returns 422" do
         post "/companies/#{company.id}/order_processing/v1/checkout", params: checkout_params, headers: headers
         expect(response).to have_http_status(:unprocessable_content)
         body = JSON.parse(response.body)
-        expect(body["errors"]).to contain_exactly("Insufficient stock")
+        expect(body["errors"].first).to match(/Insufficient stock/)
       end
     end
 
@@ -142,7 +143,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
 
   def checkout_order
     post "/companies/#{company.id}/order_processing/v1/checkout",
-      params: { branch_id: branch.id, items: [ { stock_id: stock.id, product_id: product.id, quantity: 2, unit_price: 50.00 } ] },
+      params: { branch_id: branch.id, items: [ { product_id: product.id, quantity: 2 } ] },
       headers: headers
     JSON.parse(response.body)["order_id"]
   end
@@ -224,11 +225,11 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
-    it "renders 422 with errors when the product is not stocked in the order branch" do
+    it "renders 422 with errors when the product leaves the order branch before pay" do
+      order_id = checkout_order
       other_branch = create(:branch, company: company)
       other_warehouse = create(:warehouse, company: company, branch: other_branch)
       stock.update!(warehouse: other_warehouse)
-      order_id = checkout_order
 
       post "/companies/#{company.id}/order_processing/v1/pay",
         params: { order_id: order_id, payment_method_appointment_id: cash_appts.last.id }, headers: headers
@@ -269,9 +270,102 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
     end
   end
 
+  describe "discount and void" do
+    let(:group) do
+      Seed::DiscountGroupService.create(company: company, name: "POS Discounts", prefix: "POS",
+        discount_type: :percentage, percentage: 10, campaign_status: :active)
+    end
+    let!(:discount) { Seed::DiscountService.create(company: company, discount_group: group, code: "POS-DISC") }
+
+    before { TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax") }
+
+    it "applies, removes, and then voids the order" do
+      order_id = checkout_order
+
+      post "/companies/#{company.id}/order_processing/v1/apply_discount",
+        params: { order_id: order_id, discount_code: "POS-DISC" }, headers: headers
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body.dig("discount", "amount_cents")).to eq(1_000)
+      expect(body["total_cents"]).to eq(9_720)
+      expect(discount.reload).to be_status_pending
+
+      post "/companies/#{company.id}/order_processing/v1/remove_discount",
+        params: { order_id: order_id }, headers: headers
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["total_cents"]).to eq(10_800)
+      expect(discount.reload).to be_status_unused
+
+      post "/companies/#{company.id}/order_processing/v1/cancel",
+        params: { order_id: order_id }, headers: headers
+      expect(response).to have_http_status(:ok)
+      expect(Order.find(order_id).workflow_status).to eq("cancelled")
+    end
+
+    it "rejects an unknown discount without changing the order" do
+      order_id = checkout_order
+
+      post "/companies/#{company.id}/order_processing/v1/apply_discount",
+        params: { order_id: order_id, discount_code: "NOPE" }, headers: headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body)["errors"]).to be_present
+      expect(Order.find(order_id).workflow_status).to eq("pending")
+    end
+
+    it "voids a pending QR payment and releases its stock" do
+      allow(Payments::MockQrGateway).to receive(:new).and_return(
+        double(call: { success: true, gateway_reference: "MOCK_VOID_QR", gateway_payload: { "qr_string" => "VOIDQR" } })
+      )
+      order_id = checkout_order
+      post "/companies/#{company.id}/order_processing/v1/pay",
+        params: { order_id: order_id, payment_method_appointment_id: qr_appts.last.id }, headers: headers
+      expect(response).to have_http_status(:ok)
+      expect(stock.reload.pending).to eq(2)
+
+      post "/companies/#{company.id}/order_processing/v1/cancel",
+        params: { order_id: order_id }, headers: headers
+
+      expect(response).to have_http_status(:ok)
+      expect(Order.find(order_id).workflow_status).to eq("cancelled")
+      expect(Transaction.last.status).to eq("failed")
+      expect(stock.reload.pending).to eq(0)
+    end
+
+    it "refuses to void a paid order" do
+      order_id = checkout_order
+      post "/companies/#{company.id}/order_processing/v1/pay",
+        params: { order_id: order_id, payment_method_appointment_id: cash_appts.last.id }, headers: headers
+      expect(response).to have_http_status(:ok)
+
+      post "/companies/#{company.id}/order_processing/v1/cancel",
+        params: { order_id: order_id }, headers: headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(Order.find(order_id).workflow_status).to eq("paid")
+    end
+  end
+
+  describe "locked terminal" do
+    it "rejects checkout with 423 while the POS is locked" do
+      operation = create(:operation, company: company, branch: branch, operation_type: :pos)
+      post "/companies/#{company.id}/operations/pos/#{operation.id}/lock",
+        params: { branch_id: branch.id }, headers: headers
+      expect(response).to have_http_status(:ok)
+
+      post "/companies/#{company.id}/order_processing/v1/checkout",
+        params: { branch_id: branch.id, items: [ { product_id: product.id, quantity: 1 } ] },
+        headers: headers
+
+      expect(response).to have_http_status(:locked)
+      expect(JSON.parse(response.body)["errors"]).to include("Terminal is locked")
+      expect(Order.count).to eq(0)
+    end
+  end
+
   describe "full checkout + pay flow" do
     let(:checkout_params) do
-      { branch_id: branch.id, items: [ { stock_id: stock.id, product_id: product.id, quantity: 2, unit_price: 50.00 } ] }
+      { branch_id: branch.id, items: [ { product_id: product.id, quantity: 2 } ] }
     end
 
     it "decrements Redis counter and creates payment artifacts" do

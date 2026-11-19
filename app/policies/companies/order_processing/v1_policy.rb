@@ -12,4 +12,16 @@ class Companies::OrderProcessing::V1Policy < ApplicationPolicy
   def pay_cancel?
     record.can?(:update, Order)
   end
+
+  def apply_discount?
+    pay?
+  end
+
+  def remove_discount?
+    pay?
+  end
+
+  def cancel?
+    pay?
+  end
 end

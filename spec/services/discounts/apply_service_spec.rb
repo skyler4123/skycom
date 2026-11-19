@@ -63,6 +63,20 @@ RSpec.describe Discounts::ApplyService do
     expect(apply).to eq({ success: false, errors: [ "Discount campaign is not active" ] })
   end
 
+  it "computes VND discounts in whole dong, not multiplied by 100" do
+    vnd_group = Seed::DiscountGroupService.create(company: company, name: "VND Summer", prefix: "VND",
+      discount_type: :percentage, percentage: 10, currency: :vnd, campaign_status: :active)
+    vnd_discount = Seed::DiscountService.create(company: company, discount_group: vnd_group, code: "VND-10")
+    vnd_order = Seed::OrderService.create(company: company, customer: customer, currency: :vnd)
+    OrderProductAppointment.create!(company: company, order: vnd_order, product: product,
+      quantity: 1, unit_price: 50_000.0, total_price: 50_000.0)
+
+    result = described_class.call(company: company, order: vnd_order, code: "VND-10", employee: employee)
+
+    expect(result[:success]).to be(true)
+    expect(vnd_discount.reload.amount_cents).to eq(5_000)
+  end
+
   it "fails on currency mismatch" do
     euro_order = Seed::OrderService.create(company: company, customer: customer, currency: :vnd)
     OrderProductAppointment.create!(company: company, order: euro_order, product: product,

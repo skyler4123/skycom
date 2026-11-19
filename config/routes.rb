@@ -242,7 +242,10 @@ Rails.application.routes.draw do
 
         collection do
           get "pos/:operation_id", to: "operations/pos#show", as: :pos
+          get "pos/:operation_id/catalog", to: "operations/pos#catalog", as: :pos_catalog
           get "pos/:operation_id/customer_lookup", to: "operations/pos#customer_lookup", as: :pos_customer_lookup
+          post "pos/:operation_id/lock", to: "operations/pos#lock", as: :pos_lock
+          post "pos/:operation_id/unlock", to: "operations/pos#unlock", as: :pos_unlock
           get "booking/:operation_id", to: "operations/booking#show", as: :booking
           post "booking/:operation_id/reservations", to: "operations/booking#create_reservation", as: :booking_reservations
           get "inventory/:operation_id", to: "operations/inventory#show", as: :inventory
@@ -297,6 +300,9 @@ Rails.application.routes.draw do
       post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
       post "order_processing/v1/pay", to: "order_processing/v1#pay"
       post "order_processing/v1/pay_cancel", to: "order_processing/v1#pay_cancel"
+      post "order_processing/v1/apply_discount", to: "order_processing/v1#apply_discount"
+      post "order_processing/v1/remove_discount", to: "order_processing/v1#remove_discount"
+      post "order_processing/v1/cancel", to: "order_processing/v1#cancel"
     end
   end
 

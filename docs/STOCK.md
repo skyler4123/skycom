@@ -112,6 +112,12 @@ Cancel   ─► ReleaseService per line (pending -= qty, row → completed/cance
              + mark transaction failed
 ```
 
+- **Selling pile.** `Pos::SellingStockResolver` orders the branch's warehouses
+  by `main` first, then oldest. For each product it picks the first warehouse
+  in that order with sellable stock; when none has stock it returns the first
+  warehouse with zero. The catalog label names that warehouse, checkout persists
+  its `stock_id` on the line, and pay reserves that exact row. One product shows
+  one pile, not a mix of warehouses.
 - Pay resolves stock against the order's **branch warehouses only** — never a
   company-wide first match. A product stocked only elsewhere is a 422
   availability failure, not a 404.

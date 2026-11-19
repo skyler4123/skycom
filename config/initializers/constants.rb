@@ -191,6 +191,13 @@ COUNTRY_CODES = {
   vn: 704
 }
 
+# 100% expressed in basis points. Tax rates are stored as integer bp so no
+# float ever touches money (1000 = 10.00%; 825 = 8.25%).
+TAX_RATE_BP_MAX = 10_000
+
+# POS catalog page size before server-side search takes over.
+POS_CATALOG_LIMIT = 50
+
 # Lifecycle statuses used across all business models (lifecycle_status enum).
 LIFECYCLE_STATUS = {
   active: 0,

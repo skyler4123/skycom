@@ -27,4 +27,43 @@ RSpec.describe TaxConfig, type: :model do
     expect(reloaded.branch_ids).to eq([ "abc" ])
     expect(reloaded.metadata).to include("date_basis" => "updated_at")
   end
+
+  describe "POS tax" do
+    it "defaults to no tax" do
+      config = TaxConfig.for_company!(company)
+
+      expect(config.pos_tax_rate_bp).to eq(0)
+      expect(config.pos_tax_rate).to eq(0.0)
+      expect(config.pos_tax_rate_percent).to eq(0.0)
+      expect(config.pos_tax_name).to eq("Tax")
+      expect(config.pos_tax?).to be(false)
+    end
+
+    it "stores basis points and exposes the rate" do
+      config = TaxConfig.for_company!(company)
+      config.update!(pos_tax_rate_bp: 825, pos_tax_name: "Sales tax")
+
+      reloaded = TaxConfig.find(config.id)
+      expect(reloaded.pos_tax_rate_bp).to eq(825)
+      expect(reloaded.pos_tax_rate).to eq(0.0825)
+      expect(reloaded.pos_tax_rate_percent).to eq(8.25)
+      expect(reloaded.pos_tax_name).to eq("Sales tax")
+      expect(reloaded.pos_tax?).to be(true)
+    end
+
+    it "rejects a rate above 100%" do
+      config = TaxConfig.for_company!(company)
+      config.pos_tax_rate_bp = 10_001
+
+      expect(config).not_to be_valid
+      expect(config.errors[:pos_tax_rate_bp]).to be_present
+    end
+
+    it "rejects a negative rate" do
+      config = TaxConfig.for_company!(company)
+      config.pos_tax_rate_bp = -1
+
+      expect(config).not_to be_valid
+    end
+  end
 end

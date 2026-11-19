@@ -496,6 +496,21 @@ Each one is a broken link in the product today.
 - [ ] Dashboard/analytic blocks and `EXPORT_ENABLED_RESOURCES` are global
       constants; confirm this is intended before item 87 is attempted.
 
+### POS follow-ups (after the 2026-11-19 till completion)
+
+- [ ] **Stale pending discount cleanup** — if a browser dies after Apply, the
+      code stays `pending` on the order. Add a lazy release (or a small
+      recurring job) for pending POS discounts older than a documented TTL.
+- [ ] **Category-correct pagination** — the category pills filter the loaded
+      50; a category with no items in the first page can look empty. Pass
+      `category_id` to the catalog service when the catalog grows beyond 50
+      per category.
+- [ ] **Tax-inclusive / per-line TaxCode rates** — POS currently uses one
+      company-wide Tax Config rate added on top. Mixed-rate or inclusive
+      pricing needs the TaxCode owner and per-line tax totals.
+- [ ] **POS refund / exchange** — void is before payment only; paid sales still
+      go to Orders/Refunds. Build the reason-coded flow from the paid receipt.
+
 ---
 
 *See also: `docs/WEBSOCKET.md` (channels/events), `docs/CACHE.md` (tiers),
