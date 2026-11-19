@@ -435,17 +435,17 @@ group, including the three coming-soon groups),
 `PURCHASE_WORKFLOW`, `HR`, `KPI`, `EXAMS`, `EVENTS`, `DISCOUNTS`,
 `PAYMENT_METHODS`, `CREDIT_DEDUCTION`, `IMPORT`, `DATA_MIGRATION`, `SIDEBAR`.
 
-- [ ] **Step 1:** Build a module table: group · business purpose · key pages ·
+- [x] **Step 1:** Build a module table: group · business purpose · key pages ·
   status (real / partial / coming soon) · doc that owns the detail.
-- [ ] **Step 2:** Add the five operation consoles with verdicts from Tasks 2–7.
-- [ ] **Step 3:** Describe who buys Skycom and which industries fit, noting that
+- [x] **Step 2:** Add the five operation consoles with verdicts from Tasks 2–7.
+- [x] **Step 3:** Describe who buys Skycom and which industries fit, noting that
   `business_type` does not change runtime behavior.
-- [ ] **Step 4:** Describe the commercial shape (plans, company credits, top-up,
+- [x] **Step 4:** Describe the commercial shape (plans, company credits, top-up,
   billing) in business terms.
-- [ ] **Step 5:** Write "what is genuinely not ready" — a short, honest list
+- [x] **Step 5:** Write "what is genuinely not ready" — a short, honest list
   linking to `docs/TODO.md` rather than repeating it.
-- [ ] **Step 6:** Verify every sidebar group appears exactly once.
-- [ ] **Step 7:** Commit `docs(ba): add app overview`.
+- [x] **Step 6:** Verify every sidebar group appears exactly once.
+- [x] **Step 7:** Commit `docs(ba): add app overview`.
 
 ---
 
@@ -495,16 +495,16 @@ group, including the three coming-soon groups),
 - Modify: `docs/OPERATION_PAGES.md` (Phase 6 — update the BA doc)
 - Modify: `docs/business_analysis/README.md` (final index + audit log)
 
-- [ ] **Step 1:** Add to `AGENTS.md` Doc Map, under "Working method":
+- [x] **Step 1:** Add to `AGENTS.md` Doc Map, under "Working method":
   `| Deciding what an Operation page still needs | docs/business_analysis/README.md — per-page control inventory, gaps and BA decisions |`
-- [ ] **Step 2:** Add one line to `OPERATION_PAGES.md` Phase 6: "Update the
+- [x] **Step 2:** Add one line to `OPERATION_PAGES.md` Phase 6: "Update the
   page's record in `docs/business_analysis/` (inventory, numbers, verdict)."
-- [ ] **Step 3:** Consistency sweep: badge vocabulary identical everywhere, every
+- [x] **Step 3:** Consistency sweep: badge vocabulary identical everywhere, every
   ID unique across all docs, every internal link resolves, every page doc has
   `Last audited`.
-- [ ] **Step 4:** Cross-doc contradiction check: any claim in `00-app-overview.md`
+- [x] **Step 4:** Cross-doc contradiction check: any claim in `00-app-overview.md`
   about a console must match that console's page doc.
-- [ ] **Step 5:** Commit `docs(ba): link business analysis from agent guides`.
+- [x] **Step 5:** Commit `docs(ba): link business analysis from agent guides`.
 
 ---
 
@@ -521,12 +521,12 @@ grep -c '^| SM-' docs/business_analysis/06-store-manager.md  # matches stated co
 
 Per page:
 
-- [ ] Every `<button>`, `<a href>`, `<input>`, `<select>` in the controller is in
+- [x] Every `<button>`, `<a href>`, `<input>`, `<select>` in the controller is in
   the inventory, or is listed under "intentionally not a control" (layout only).
-- [ ] Every payload figure rendered in the frontend appears in §5.
-- [ ] Every 🔢/⛔ has a matching decision in §7.
-- [ ] The ship-readiness verdict follows §3.2 mechanically.
-- [ ] No file path or method name outside §9.
+- [x] Every payload figure rendered in the frontend appears in §5.
+- [x] Every 🔢/⛔ has a matching decision in §7.
+- [x] The ship-readiness verdict follows §3.2 mechanically.
+- [x] No file path or method name outside §9.
 
 Accuracy spot-check (run once at the end, per console):
 
@@ -571,14 +571,14 @@ Expected output: only names that appear in the header comment (`show`).
 
 ## 9. Definition of done
 
-- [ ] `docs/business_analysis/` holds the ten documents listed in §2.
-- [ ] `README.md` explains the folder to a person, a team, and an AI, with a
+- [x] `docs/business_analysis/` holds the ten documents listed in §2.
+- [x] `README.md` explains the folder to a person, a team, and an AI, with a
   legend, a glossary, and a complete index.
-- [ ] Every page doc follows the nine-section contract and carries a
+- [x] Every page doc follows the nine-section contract and carries a
   ship-readiness verdict.
-- [ ] Every control and every number on every page is accounted for with evidence.
-- [ ] Every fabricated number (🔢) and dead control (⛔) has a decision entry.
-- [ ] Every page has a safe demo path and a "do not demo" list.
-- [ ] IDs are unique and stable; links resolve; no TBD.
-- [ ] `AGENTS.md` and `docs/OPERATION_PAGES.md` point at the folder.
-- [ ] No application code changed.
+- [x] Every control and every number on every page is accounted for with evidence.
+- [x] Every fabricated number (🔢) and dead control (⛔) has a decision entry.
+- [x] Every page has a safe demo path and a "do not demo" list.
+- [x] IDs are unique and stable; links resolve; no TBD.
+- [x] `AGENTS.md` and `docs/OPERATION_PAGES.md` point at the folder.
+- [x] No application code changed.

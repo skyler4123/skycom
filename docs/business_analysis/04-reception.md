@@ -25,7 +25,7 @@ visitor has left and the lobby count is correct.
 
 The console reuses the Event domain: each visit is an Event, the visitor is a
 linked Customer, the host is a linked Employee, and the room is a linked
-Facility. Parcels are Events with a `parcel` marker in their metadata.
+Facility. Parcels are Events carrying a parcel marker in their metadata.
 
 ---
 
@@ -117,13 +117,13 @@ Deliveries (list plus the parcel form), and Speed Dial & Emergency Desk.
 | RCP-15 | Queue | Active in Bldg tab | Shows checked-in visitors | ✅ | — |
 | RCP-16 | Queue | Next Hour tab | Shows expected visitors | ✅ | — |
 | RCP-17 | Queue | Departed tab | Shows completed visits | ✅ | — |
-| RCP-18 | Visitor card | Re-Notify Host | Stamps `host_notified_at` | ✅ | No message is actually sent |
+| RCP-18 | Visitor card | Re-Notify Host | Records the host-notified time | ✅ | No message is actually sent |
 | RCP-19 | Visitor card | Print visitor badge | Toast: "Badge … sent to the printer" | 🗑️ | Claims printing that never happens |
 | RCP-20 | Visitor card | Check in visitor | Moves the visit to in progress | ✅ | — |
 | RCP-21 | Visitor card | Complete Check-Out | Completes the visit | ✅ | — |
 | RCP-22 | Visitor card | Manage key | Toast: "Key station unlocked…" | 🗑️ | No key or access model |
 | RCP-23 | Visitor card | Badge details | Toast: badge sent to printer | 🗑️ | Duplicate of printing |
-| RCP-24 | Visitor card | Notify Host (expected) | Stamps `host_notified_at` | ✅ | Same as RCP-18 |
+| RCP-24 | Visitor card | Notify Host (expected) | Records the host-notified time | ✅ | Same as RCP-18 |
 | RCP-25 | Visitor card | Pre-print badge | Toast: badge sent to printer | 🗑️ | — |
 | RCP-26 | Visitor card | Re-open visit | Returns a departed visit to in progress | ✅ | — |
 | RCP-27 | Walk-in form | Full guest name | Required text | ✅ | — |
@@ -318,6 +318,19 @@ hospitality language.
 - A. Keep it. Effort S. Risk: alienates office, clinic, and school customers.
 - B. Use neutral front-desk copy. Effort S.
 - *Recommendation:* B.
+
+**RCP-D10 — Terminal identity and health claims?**
+- A. Remove "Desk Station A1 (Central Turnstile)", "Terminal Active", and
+  "Terminal Operational". Effort S.
+- B. Let each reception desk be named and report real health. Effort M.
+- *Recommendation:* A. A desk identity is only useful once there is more than one
+  desk, and there is no health signal to report.
+
+**RCP-D11 — The "Current Shift" label?**
+- A. Remove it; the header already shows the branch. Effort S.
+- B. Derive it from today's scheduled shifts, as recommended for Store Manager
+  (SM-D11). Effort M.
+- *Recommendation:* B, shared with SM-D11 so both consoles use one source.
 
 ---
 

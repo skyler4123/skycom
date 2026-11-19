@@ -305,6 +305,13 @@ Export downloads all stocks, ignoring the tab and search.
 - B. Keep them as a roadmap hint. Effort S. Risk: two consoles look unfinished.
 - *Recommendation:* A, with the decisions recorded in `06-store-manager.md` (SM-D1).
 
+**INV-D10 — Static operational claims?**
+- A. Remove "Cloud Sync Active", "Sync: Real-time", "Primary Fulfillment Node",
+  and "Cycle verified against…". Effort S.
+- B. Replace them with a real last-synced time and a real node role. Effort M.
+- *Recommendation:* A now. The page already has a real "Refreshed at" pattern to
+  copy later if a health signal is built.
+
 ---
 
 ## 8. Safe demo path

@@ -328,6 +328,13 @@ Facilities and reference lists are capped at 100, events at 200, with no notice.
 - *Recommendation:* A for v1. It is the largest item on this page and the least
   demanded by a single-site customer.
 
+**BKG-D11 — Status pills and footer branding?**
+- A. Remove the "Live Scheduling Engine" pills and "Synced with live Event
+  reservations"; correct the footer to say Booking, not Reception. Effort S.
+- B. Wire the pills to real engine health and keep a corrected footer. Effort M.
+- *Recommendation:* A now, B only if a health signal is ever built. Wrong product
+  names in a footer are the kind of detail a buyer notices.
+
 ---
 
 ## 8. Safe demo path

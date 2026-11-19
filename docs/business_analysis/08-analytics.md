@@ -144,8 +144,8 @@ period", "Not enough paid order history yet", "No stock movement yet", …).
 | Period boundaries | The exact dates compared | Application time zone (UTC) | 🟡 companies away from UTC can see a boundary off by one day |
 
 **No hardcoded values were found.** When a baseline or a cost is missing the
-service returns `nil` and the page renders "—", not a fake zero — the right
-behaviour to preserve.
+service returns a blank value and the page renders "—", not a fake zero — the
+right behaviour to preserve.
 
 ---
 

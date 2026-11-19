@@ -7,7 +7,7 @@
 > **Audience:** a person, a team, or an AI assistant. Every document must stand
 > alone for all three.
 >
-> **Status:** in progress — rows marked `—` in the index have not been audited yet.
+> **Status:** complete — ten documents, audited 2026-11-19. See the audit log in §7.
 
 ---
 
@@ -85,18 +85,19 @@
 
 | Doc | Surface | Verdict | Controls | Open decisions | Last audited |
 |---|---|---|---|---|---|
-| [00-app-overview](00-app-overview.md) | Whole application, module by module | — | — | — | — |
+| [00-app-overview](00-app-overview.md) | Whole application, module by module | Mixed | 21 modules | 6 | 2026-11-19 |
 | [01-operations-landing](01-operations-landing.md) | Operations list, activation, config, roles | 🟠 | 30 | 8 | 2026-11-19 |
 | [02-pos](02-pos.md) | POS console (point of sale) | 🔴 | 29 | 10 | 2026-11-19 |
-| [03-booking](03-booking.md) | Booking console (facilities and reservations) | 🔴 | 30 | 10 | 2026-11-19 |
-| [04-reception](04-reception.md) | Reception console (visitors, parcels, rooms) | 🔴 | 45 | 9 | 2026-11-19 |
-| [05-inventory](05-inventory.md) | Inventory console (warehouse) | 🔴 | 29 | 9 | 2026-11-19 |
+| [03-booking](03-booking.md) | Booking console (facilities and reservations) | 🔴 | 30 | 11 | 2026-11-19 |
+| [04-reception](04-reception.md) | Reception console (visitors, parcels, rooms) | 🔴 | 45 | 11 | 2026-11-19 |
+| [05-inventory](05-inventory.md) | Inventory console (warehouse) | 🔴 | 29 | 10 | 2026-11-19 |
 | [06-store-manager](06-store-manager.md) | Store Manager console | 🔴 | 28 | 11 | 2026-11-19 |
 | [07-dashboard](07-dashboard.md) | Company dashboard | 🟠 | 29 | 7 | 2026-11-19 |
 | [08-analytics](08-analytics.md) | Analytics | 🟠 | 13 | 6 | 2026-11-19 |
 
-Counts will be filled as each page is audited. They are counts of interactive
-controls (buttons, links, inputs, tabs), not of every element on the page.
+Counts are counts of interactive controls (buttons, links, inputs, tabs), not of
+every element on the page. The whole-app row uses "Mixed" because its modules
+differ; `00-app-overview.md` §2 gives the per-console verdicts.
 
 ---
 
@@ -170,3 +171,12 @@ These docs are only useful if they are true. The rules:
 | Date | Scope | Change |
 |---|---|---|
 | 2026-11-19 | Folder | Created index, legend, glossary, and the page-document contract |
+| 2026-11-19 | Store Manager | Full console audit (28 controls, 11 decisions) |
+| 2026-11-19 | POS | Full console audit (29 controls, 10 decisions) |
+| 2026-11-19 | Booking | Full console audit (30 controls, 10 decisions) |
+| 2026-11-19 | Reception | Full console audit (45 controls, 9 decisions) |
+| 2026-11-19 | Inventory | Full console audit (29 controls, 9 decisions) |
+| 2026-11-19 | Operations landing | List, config, appointment audit (30 controls, 8 decisions) |
+| 2026-11-19 | Dashboard | Page and config audit (29 controls, 7 decisions) |
+| 2026-11-19 | Analytics | Page and config audit (13 controls, 6 decisions) |
+| 2026-11-19 | App overview | Module map, commercial model, cross-cutting decisions |

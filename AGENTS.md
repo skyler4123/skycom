@@ -30,6 +30,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | When your task involves… | Read first |
 |---|---|
 | Planning a multi-step feature or refactor | `docs/PLAN_TEMPLATE.md` — copy the skeleton; keep the plan self-contained and executable by a fresh session |
+| Deciding what an Operation page still needs | `docs/business_analysis/README.md` — per-page control inventory, numbers, gaps, and BA decisions |
 | Any multi-step UI refactor, complex settings page, or UX rethink | `docs/AGENT_PLAYBOOK.md` — understanding, planning, UI/UX rules, frontend/backend mechanics, definition of done |
 
 ### Contracts (backend responses, shared conventions)

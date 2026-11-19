@@ -103,10 +103,10 @@ error text; there are no partial-empty states beyond "No … found".
 
 | ID | Screen | Control | What it does today | Status |
 |---|---|---|---|---|
-| OPS-01 | Operations list | Search field | Submits `q` to the server | ✅ |
-| OPS-02 | Operations list | Type filter | Submits `operation_type` | ✅ |
-| OPS-03 | Operations list | Status filter | Submits `workflow_status` | ✅ |
-| OPS-04 | Operations list | Location filter | Submits `location` (kind + id) | ✅ |
+| OPS-01 | Operations list | Search field | Reloads the list filtered by the typed text | ✅ |
+| OPS-02 | Operations list | Type filter | Reloads the list filtered by operation type | ✅ |
+| OPS-03 | Operations list | Status filter | Reloads the list filtered by active or inactive | ✅ |
+| OPS-04 | Operations list | Location filter | Reloads the list filtered by one branch or warehouse | ✅ |
 | OPS-05 | Operations list | Search button | Reloads the filtered page | ✅ |
 | OPS-06 | Operations list | Operation name link | Opens the location appointment | ✅ |
 | OPS-07 | Operations list | Launch icon | Launches when active and allowed; otherwise disabled with a reason | ✅ |
