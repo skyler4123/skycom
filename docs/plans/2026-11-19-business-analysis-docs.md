@@ -410,17 +410,17 @@ OrderProcessing V1 controller/routes, `docs/ORDER_PROCESSING_V1.md`,
 the four backend controllers, `OperationLaunchService`,
 `docs/OPERATIONS.md`, `docs/OPERATION_PAGES.md` §1–§3.
 
-- [ ] **Step 1:** Run procedure A–E.
-- [ ] **Step 2:** §1–§3 — what a company admin sees: operation list, statuses,
+- [x] **Step 1:** Run procedure A–E.
+- [x] **Step 2:** §1–§3 — what a company admin sees: operation list, statuses,
   launch, config, roles.
-- [ ] **Step 3:** §4 — launch button, filters, config edit fields, active/inactive
+- [x] **Step 3:** §4 — launch button, filters, config edit fields, active/inactive
   toggle, role selection.
-- [ ] **Step 4:** §5 — status counts, location assignment.
-- [ ] **Step 5:** §6–§7 — decide: delete housekeeping/kitchen stubs; whether a
+- [x] **Step 4:** §5 — status counts, location assignment.
+- [x] **Step 5:** §6–§7 — decide: delete housekeeping/kitchen stubs; whether a
   company can add an operation type later; what an inactive operation looks like
   to an operator; role narrowing.
-- [ ] **Step 6:** §8–§9.
-- [ ] **Step 7:** Verify, update README, commit `docs(ba): add operations landing analysis`.
+- [x] **Step 6:** §8–§9.
+- [x] **Step 7:** Verify, update README, commit `docs(ba): add operations landing analysis`.
 
 ---
 

@@ -86,7 +86,7 @@
 | Doc | Surface | Verdict | Controls | Open decisions | Last audited |
 |---|---|---|---|---|---|
 | [00-app-overview](00-app-overview.md) | Whole application, module by module | — | — | — | — |
-| [01-operations-landing](01-operations-landing.md) | Operations list, activation, config, roles | — | — | — | — |
+| [01-operations-landing](01-operations-landing.md) | Operations list, activation, config, roles | 🟠 | 30 | 8 | 2026-11-19 |
 | [02-pos](02-pos.md) | POS console (point of sale) | 🔴 | 29 | 10 | 2026-11-19 |
 | [03-booking](03-booking.md) | Booking console (facilities and reservations) | 🔴 | 30 | 10 | 2026-11-19 |
 | [04-reception](04-reception.md) | Reception console (visitors, parcels, rooms) | 🔴 | 45 | 9 | 2026-11-19 |
