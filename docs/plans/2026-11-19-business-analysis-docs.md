@@ -388,15 +388,15 @@ OrderProcessing V1 controller/routes, `docs/ORDER_PROCESSING_V1.md`,
 `app/services/inventory/console_service.rb`,
 `app/controllers/companies/operations/inventory_controller.rb`, `docs/STOCK.md`.
 
-- [ ] **Step 1:** Run procedure A–E.
-- [ ] **Step 2:** §1–§3 — warehouse view: stock ledger, zones, inbound/outbound.
-- [ ] **Step 3:** §4 — filters, search, row actions, links (all read-only).
-- [ ] **Step 4:** §5 — total SKUs, low stock, utilization (hardcoded 84), zone
+- [x] **Step 1:** Run procedure A–E.
+- [x] **Step 2:** §1–§3 — warehouse view: stock ledger, zones, inbound/outbound.
+- [x] **Step 3:** §4 — filters, search, row actions, links (all read-only).
+- [x] **Step 4:** §5 — total SKUs, low stock, utilization (hardcoded 84), zone
   occupancy, audit card (available:false).
-- [ ] **Step 5:** §6–§7 — decisions on writes (transfers/adjustments from here?),
+- [x] **Step 5:** §6–§7 — decisions on writes (transfers/adjustments from here?),
   the fabricated utilization, synthesized zone names, audit domain.
-- [ ] **Step 6:** §8–§9.
-- [ ] **Step 7:** Verify, update README, commit `docs(ba): add inventory console analysis`.
+- [x] **Step 6:** §8–§9.
+- [x] **Step 7:** Verify, update README, commit `docs(ba): add inventory console analysis`.
 
 ---
 
