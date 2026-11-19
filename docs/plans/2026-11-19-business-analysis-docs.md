@@ -368,15 +368,15 @@ OrderProcessing V1 controller/routes, `docs/ORDER_PROCESSING_V1.md`,
 `app/services/reception/console_service.rb`,
 `app/controllers/companies/operations/reception_controller.rb`.
 
-- [ ] **Step 1:** Run procedure A–E.
-- [ ] **Step 2:** §1–§3 — front desk: lobby, expected, checked-in, parcels, rooms.
-- [ ] **Step 3:** §4 — walk-in check-in, check-out/re-open, notify host, parcel
+- [x] **Step 1:** Run procedure A–E.
+- [x] **Step 2:** §1–§3 — front desk: lobby, expected, checked-in, parcels, rooms.
+- [x] **Step 3:** §4 — walk-in check-in, check-out/re-open, notify host, parcel
   log/notify/pickup, tab filters, search.
-- [ ] **Step 4:** §5 — waiting time, visit counts, room availability, parcel counts.
-- [ ] **Step 5:** §6–§7 — decisions on notifications delivery (toast only vs real),
+- [x] **Step 4:** §5 — waiting time, visit counts, room availability, parcel counts.
+- [x] **Step 5:** §6–§7 — decisions on notifications delivery (toast only vs real),
   badge printing, walk-in customer creation, host lookup.
-- [ ] **Step 6:** §8–§9.
-- [ ] **Step 7:** Verify, update README, commit `docs(ba): add reception console analysis`.
+- [x] **Step 6:** §8–§9.
+- [x] **Step 7:** Verify, update README, commit `docs(ba): add reception console analysis`.
 
 ---
 
