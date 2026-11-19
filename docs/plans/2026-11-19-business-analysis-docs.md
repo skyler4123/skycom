@@ -349,14 +349,14 @@ OrderProcessing V1 controller/routes, `docs/ORDER_PROCESSING_V1.md`,
 `app/services/booking/console_service.rb`,
 `app/controllers/companies/operations/booking_controller.rb`, `docs/EVENTS.md`.
 
-- [ ] **Step 1:** Run procedure A–E.
-- [ ] **Step 2:** §1–§3 — reservations desk, calendar/day view, resources.
-- [ ] **Step 3:** §4 — reservation form, date navigation, filters, resource cards.
-- [ ] **Step 4:** §5 — occupancy, busy/available counts, booking status.
-- [ ] **Step 5:** §6–§7 — decisions on conflicts/overbooking, cancellation,
+- [x] **Step 1:** Run procedure A–E.
+- [x] **Step 2:** §1–§3 — reservations desk, calendar/day view, resources.
+- [x] **Step 3:** §4 — reservation form, date navigation, filters, resource cards.
+- [x] **Step 4:** §5 — occupancy, busy/available counts, booking status.
+- [x] **Step 5:** §6–§7 — decisions on conflicts/overbooking, cancellation,
   deposits/payment, recurring bookings.
-- [ ] **Step 6:** §8–§9.
-- [ ] **Step 7:** Verify, update README, commit `docs(ba): add booking console analysis`.
+- [x] **Step 6:** §8–§9.
+- [x] **Step 7:** Verify, update README, commit `docs(ba): add booking console analysis`.
 
 ---
 

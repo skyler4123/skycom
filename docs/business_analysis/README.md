@@ -88,7 +88,7 @@
 | [00-app-overview](00-app-overview.md) | Whole application, module by module | — | — | — | — |
 | [01-operations-landing](01-operations-landing.md) | Operations list, activation, config, roles | — | — | — | — |
 | [02-pos](02-pos.md) | POS console (point of sale) | 🔴 | 29 | 10 | 2026-11-19 |
-| [03-booking](03-booking.md) | Booking console (facilities and reservations) | — | — | — | — |
+| [03-booking](03-booking.md) | Booking console (facilities and reservations) | 🔴 | 30 | 10 | 2026-11-19 |
 | [04-reception](04-reception.md) | Reception console (visitors, parcels, rooms) | — | — | — | — |
 | [05-inventory](05-inventory.md) | Inventory console (warehouse) | — | — | — | — |
 | [06-store-manager](06-store-manager.md) | Store Manager console | 🔴 | 28 | 11 | 2026-11-19 |
