@@ -91,7 +91,7 @@
 | [03-booking](03-booking.md) | Booking console (facilities and reservations) | — | — | — | — |
 | [04-reception](04-reception.md) | Reception console (visitors, parcels, rooms) | — | — | — | — |
 | [05-inventory](05-inventory.md) | Inventory console (warehouse) | — | — | — | — |
-| [06-store-manager](06-store-manager.md) | Store Manager console | — | — | — | — |
+| [06-store-manager](06-store-manager.md) | Store Manager console | 🔴 | 28 | 11 | 2026-11-19 |
 | [07-dashboard](07-dashboard.md) | Company dashboard | — | — | — | — |
 | [08-analytics](08-analytics.md) | Analytics | — | — | — | — |
 

@@ -265,8 +265,8 @@ defensible, every number traced, every button present.
 **Produces:** the legend, the glossary, and the index table that every later
 task appends to.
 
-- [ ] **Step 1: Create the folder and README** with the seven sections in §3.3.
-- [ ] **Step 2: Write the glossary.** Cover at minimum: Company, Branch,
+- [x] **Step 1: Create the folder and README** with the seven sections in §3.3.
+- [x] **Step 2: Write the glossary.** Cover at minimum: Company, Branch,
   Warehouse, Employee, Customer, Operation, Operation type, Branch/Warehouse
   appointment, Operation config, Workflow status, Lifecycle status, Category,
   Dynamic property, Dynamic table, Policy/Role/Permission, Event, Facility,
@@ -274,12 +274,12 @@ task appends to.
   Ticket, KPI, Exam, Attendance month/day, Payroll, Shift template, Scheduled
   shift, Import, Company migration, Notification, Document/Folder.
   One sentence each, business meaning first.
-- [ ] **Step 3: Seed the index table** with all ten rows, verdict column empty
+- [x] **Step 3: Seed the index table** with all ten rows, verdict column empty
   except for pages already audited.
-- [ ] **Step 4: Add the audit log** with today's date and "initial set".
-- [ ] **Step 5: Verify** every glossary term is used somewhere in the app (grep
+- [x] **Step 4: Add the audit log** with today's date and "initial set".
+- [x] **Step 5: Verify** every glossary term is used somewhere in the app (grep
   the sidebar or routes) and that no term has two names.
-- [ ] **Step 6: Commit** `docs(ba): add business analysis index, legend and glossary`.
+- [x] **Step 6: Commit** `docs(ba): add business analysis index, legend and glossary`.
 
 ---
 
@@ -297,22 +297,22 @@ task appends to.
 
 **Produces:** the reference document every other console doc is modelled on.
 
-- [ ] **Step 1: Run the shared procedure (§4) steps A–E.**
-- [ ] **Step 2: Write §1–§3.** Name the operator (store manager on a shift), the
+- [x] **Step 1: Run the shared procedure (§4) steps A–E.**
+- [x] **Step 2: Write §1–§3.** Name the operator (store manager on a shift), the
   job, and what the seven header tabs promise versus what exists.
-- [ ] **Step 3: Write §4.** Include the six dead tabs, both placeholder quick
+- [x] **Step 3: Write §4.** Include the six dead tabs, both placeholder quick
   actions, and the dark-mode toggle (wired). Record the control count.
-- [ ] **Step 4: Write §5.** Trace gross sales, active POS counters, orders to
+- [x] **Step 4: Write §5.** Trace gross sales, active POS counters, orders to
   fulfill, shelf alerts, staff on duty, footfall, hourly volume, registers.
   Label invented register names and the static "Fully Operational" badge.
-- [ ] **Step 5: Write §6–§7.** At minimum decide: keep or remove the six tabs;
+- [x] **Step 5: Write §6–§7.** At minimum decide: keep or remove the six tabs;
   build or cut the shift report; replace index-based register names; branch
   clock vs browser clock.
-- [ ] **Step 6: Write §8–§9.** Safe demo path = overview only, no header tabs,
+- [x] **Step 6: Write §8–§9.** Safe demo path = overview only, no header tabs,
   no shift report.
-- [ ] **Step 7: Verify** with §4 step G and the counts in §1.1.
-- [ ] **Step 8: Update the README index row** with verdict and counts.
-- [ ] **Step 9: Commit** `docs(ba): add store manager console analysis`.
+- [x] **Step 7: Verify** with §4 step G and the counts in §1.1.
+- [x] **Step 8: Update the README index row** with verdict and counts.
+- [x] **Step 9: Commit** `docs(ba): add store manager console analysis`.
 
 > **Checkpoint:** show the user the sample and ask whether the format is right
 > before writing the other four consoles. Adjust the template here, not later.
