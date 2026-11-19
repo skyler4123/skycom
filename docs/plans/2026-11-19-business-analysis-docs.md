@@ -328,16 +328,16 @@ task appends to.
 OrderProcessing V1 controller/routes, `docs/ORDER_PROCESSING_V1.md`,
 `docs/PAYMENT_METHODS.md`.
 
-- [ ] **Step 1:** Run procedure A–E.
-- [ ] **Step 2:** §1–§3 — cashier flow, tabs (open orders), cart, payment.
-- [ ] **Step 3:** §4 — every button including checkout, pay, cancel, receipt,
+- [x] **Step 1:** Run procedure A–E.
+- [x] **Step 2:** §1–§3 — cashier flow, tabs (open orders), cart, payment.
+- [x] **Step 3:** §4 — every button including checkout, pay, cancel, receipt,
   customer lookup, tab management, category filters.
-- [ ] **Step 4:** §5 — product price, stock, service price (0!), totals, tax,
+- [x] **Step 4:** §5 — product price, stock, service price (0!), totals, tax,
   payment methods. Explain the 50-product cap.
-- [ ] **Step 5:** §6–§7 — decisions on service pricing, catalog cap, stock source
+- [x] **Step 5:** §6–§7 — decisions on service pricing, catalog cap, stock source
   (branch vs warehouse), refunds/voids.
-- [ ] **Step 6:** §8–§9.
-- [ ] **Step 7:** Verify, update README, commit `docs(ba): add POS console analysis`.
+- [x] **Step 6:** §8–§9.
+- [x] **Step 7:** Verify, update README, commit `docs(ba): add POS console analysis`.
 
 ---
 
