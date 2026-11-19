@@ -101,6 +101,7 @@ module Pos
         category_name: product.category&.name,
         price_cents: product.price_cents,
         price_set: !product.price_cents.nil?,
+        stock_id: stock&.id,
         stock_quantity: stock ? stock.available_count : 0,
         stock_warehouse_id: stock&.warehouse_id,
         stock_warehouse_name: stock&.warehouse&.name,
