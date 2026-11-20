@@ -188,6 +188,17 @@ export const booking_reservations_company_operation_path = (companyId, operation
   const query = new URLSearchParams(params).toString()
   return `${booking_company_operation_path(companyId, operationId)}/reservations${query ? `?${query}` : ""}`
 }
+export const booking_customers_company_operation_path = (companyId, operationId, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `${booking_company_operation_path(companyId, operationId)}/customers${query ? `?${query}` : ""}`
+}
+const bookingReservationActionPath = (companyId, operationId, reservationId, action, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `${booking_company_operation_path(companyId, operationId)}/reservations/${encodeURIComponent(reservationId)}/${action}${query ? `?${query}` : ""}`
+}
+export const booking_reservation_extend_company_operation_path = (companyId, operationId, reservationId, params = {}) => bookingReservationActionPath(companyId, operationId, reservationId, "extend", params)
+export const booking_reservation_end_company_operation_path = (companyId, operationId, reservationId, params = {}) => bookingReservationActionPath(companyId, operationId, reservationId, "end", params)
+export const booking_reservation_cancel_company_operation_path = (companyId, operationId, reservationId, params = {}) => bookingReservationActionPath(companyId, operationId, reservationId, "cancel", params)
 export const inventory_company_operation_path = (companyId, operationId, params = {}) => operationPath("inventory", companyId, operationId, params)
 export const reception_company_operation_path = (companyId, operationId, params = {}) => operationPath("reception", companyId, operationId, params)
 export const reception_check_in_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/check_in`

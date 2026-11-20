@@ -319,6 +319,12 @@ CACHE_DEFAULT_EXPIRY = 1.hour
 # change rarely. Explicit deletes keep them fresh; the TTL is a backstop.
 OPERATIONS_CACHE_EXPIRY = 1.day
 
+# Booking console reference/day caps. Lists are capped and labelled; KPI counts
+# are computed over the full data set. See docs/OPERATIONS.md §7.
+BOOKING_DAY_BOOKING_LIMIT = 200
+BOOKING_FACILITY_LIMIT = 100
+BOOKING_HOST_LIMIT = 100
+
 # =============================================================================
 # Owner Role Constants (ABAC)
 # Magic-string values used across the permission system to identify

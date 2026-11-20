@@ -247,7 +247,11 @@ Rails.application.routes.draw do
           post "pos/:operation_id/lock", to: "operations/pos#lock", as: :pos_lock
           post "pos/:operation_id/unlock", to: "operations/pos#unlock", as: :pos_unlock
           get "booking/:operation_id", to: "operations/booking#show", as: :booking
+          get "booking/:operation_id/customers", to: "operations/booking#customers", as: :booking_customers
           post "booking/:operation_id/reservations", to: "operations/booking#create_reservation", as: :booking_reservations
+          post "booking/:operation_id/reservations/:reservation_id/extend", to: "operations/booking#extend_reservation", as: :booking_reservation_extend
+          post "booking/:operation_id/reservations/:reservation_id/end", to: "operations/booking#finish_reservation", as: :booking_reservation_end
+          post "booking/:operation_id/reservations/:reservation_id/cancel", to: "operations/booking#cancel_reservation", as: :booking_reservation_cancel
           get "inventory/:operation_id", to: "operations/inventory#show", as: :inventory
           get "reception/:operation_id", to: "operations/reception#show", as: :reception
           post "reception/:operation_id/check_in", to: "operations/reception#check_in", as: :reception_check_in

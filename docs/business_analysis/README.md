@@ -7,7 +7,7 @@
 > **Audience:** a person, a team, or an AI assistant. Every document must stand
 > alone for all three.
 >
-> **Status:** complete — ten documents, audited 2026-11-19. See the audit log in §7.
+> **Status:** complete — ten documents, audited through 2026-11-20. See the audit log in §7.
 
 ---
 
@@ -88,7 +88,7 @@
 | [00-app-overview](00-app-overview.md) | Whole application, module by module | Mixed | 21 modules | 6 | 2026-11-19 |
 | [01-operations-landing](01-operations-landing.md) | Operations list, activation, config, roles | 🟠 | 30 | 8 | 2026-11-19 |
 | [02-pos](02-pos.md) | POS console (point of sale) | 🔴 | 29 | 10 | 2026-11-19 |
-| [03-booking](03-booking.md) | Booking console (facilities and reservations) | 🔴 | 30 | 11 | 2026-11-19 |
+| [03-booking](03-booking.md) | Booking console (facilities and reservations) | 🟢 | 26 | 0 | 2026-11-20 |
 | [04-reception](04-reception.md) | Reception console (visitors, parcels, rooms) | 🔴 | 45 | 11 | 2026-11-19 |
 | [05-inventory](05-inventory.md) | Inventory console (warehouse) | 🔴 | 29 | 10 | 2026-11-19 |
 | [06-store-manager](06-store-manager.md) | Store Manager console | 🔴 | 28 | 11 | 2026-11-19 |
@@ -180,3 +180,4 @@ These docs are only useful if they are true. The rules:
 | 2026-11-19 | Dashboard | Page and config audit (29 controls, 7 decisions) |
 | 2026-11-19 | Analytics | Page and config audit (13 controls, 6 decisions) |
 | 2026-11-19 | App overview | Module map, commercial model, cross-cutting decisions |
+| 2026-11-20 | Booking | Shippable pass: conflict-safe reservations, click inspector, real host/customer, extend/end/cancel, run sheet, caps; 🟢 26 controls |

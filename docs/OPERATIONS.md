@@ -127,8 +127,12 @@ All appointments start `active`. Companies disable the ones they do not use.
 | GET | `/companies/:company_id/operations/pos/:operation_id/customer_lookup` | `Companies::Operations::PosController#customer_lookup` | POS customer lookup |
 | POST | `/companies/:company_id/operations/pos/:operation_id/lock` | `Companies::Operations::PosController#lock` | Server-enforced terminal lock |
 | POST | `/companies/:company_id/operations/pos/:operation_id/unlock` | `Companies::Operations::PosController#unlock` | Password unlock |
-| GET | `/companies/:company_id/operations/booking/:operation_id` | `Companies::Operations::BookingController#show` | Booking console (Events/Facilities) |
-| POST | `/companies/:company_id/operations/booking/:operation_id/reservations` | `Companies::Operations::BookingController#create_reservation` | Create a reservation Event + facility link |
+| GET | `/companies/:company_id/operations/booking/:operation_id` | `Companies::Operations::BookingController#show` | Booking console (Events/Facilities, real counts, caps, server `now`) |
+| GET | `/companies/:company_id/operations/booking/:operation_id/customers` | `Companies::Operations::BookingController#customers` | Customer typeahead (Meilisearch, ≤10) |
+| POST | `/companies/:company_id/operations/booking/:operation_id/reservations` | `Companies::Operations::BookingController#create_reservation` | Create a conflict-checked reservation Event + facility/host/customer links |
+| POST | `/companies/:company_id/operations/booking/:operation_id/reservations/:reservation_id/extend` | `Companies::Operations::BookingController#extend_reservation` | +30 minutes with next-booking conflict check |
+| POST | `/companies/:company_id/operations/booking/:operation_id/reservations/:reservation_id/end` | `Companies::Operations::BookingController#finish_reservation` | End & release (in-progress ends now; stock holds released) |
+| POST | `/companies/:company_id/operations/booking/:operation_id/reservations/:reservation_id/cancel` | `Companies::Operations::BookingController#cancel_reservation` | Cancel a booking and free its time |
 | GET | `/companies/:company_id/operations/inventory/:operation_id` | `Companies::Operations::InventoryController#show` | Placeholder |
 | GET | `/companies/:company_id/operations/reception/:operation_id` | `Companies::Operations::ReceptionController#show` | Reception console (Events/Customers/Facilities) |
 | POST | `/companies/:company_id/operations/reception/:operation_id/check_in` | `Companies::Operations::ReceptionController#check_in` | Walk-in Customer + Event (+ host/room links) |
@@ -192,7 +196,7 @@ preserved when the form is saved. Raw metadata is never exposed in the UI.
 | Operation config details / edit | `Companies_OperationConfigs_ShowController` / `Companies_OperationConfigs_EditController` | `Companies::OperationConfigsController#show/edit/update` |
 | POS | `Companies_Operations_Pos_ShowController` (`companies--operations--pos--show`) | `Companies::Operations::PosController#show` |
 | Reception | `Companies_Operations_Reception_ShowController` (`companies--operations--reception--show`) | `Companies::Operations::ReceptionController#show/check_in/advance/create_parcel/notify_parcel/pick_up_parcel/notify_host` |
-| Booking | `Companies_Operations_Booking_ShowController` (`companies--operations--booking--show`) | `Companies::Operations::BookingController#show/create_reservation` |
+| Booking | `Companies_Operations_Booking_ShowController` (`companies--operations--booking--show`) | `Companies::Operations::BookingController#show/customers/create_reservation/extend_reservation/finish_reservation/cancel_reservation` |
 | Store Manager | `Companies_Operations_StoreManager_ShowController` (`companies--operations--store-manager--show`) | `Companies::Operations::StoreManagerController#show` |
 | Placeholders | `Companies_Operations_<Type>_ShowController` | `Companies::Operations::<Type>Controller#show` |
 
@@ -219,14 +223,51 @@ Reception reuses the existing domain instead of adding visitor/parcel tables:
 
 Booking reuses the same domain for resource reservations:
 
-- **Timeline row** = `Facility` (room, pod, studio, equipment) scoped to the
-  branch.
+- **Timeline row** = `Facility` (room, storage, floor, office) scoped to the
+  branch, grouped by its real `category`. Names are never classified as
+  equipment/desks.
 - **Booking block** = `Event` for the selected day, positioned by `start_at` /
-  `end_at` and linked to its spaces through `EventFacilityAppointment`.
-- **Status** = `active` (in progress or inside its time window), `completed`,
-  `upcoming`; cancelled events are excluded.
-- **Current-time needle** is rendered client-side over the 08:00–18:00 grid and
-  refreshes every minute.
+  `end_at` and linked to its spaces through `EventFacilityAppointment`. The
+  day query is an overlap query (`start_at < day_end AND end_at > day_start`),
+  so a booking that starts the previous day is still visible.
+- **Day window** is fixed at 08:00–18:00 and labelled as such. Bookings that
+  overlap the window are clipped into blocks; bookings entirely outside it are
+  shown as clickable time tags on their facility row.
+- **Status** = `upcoming`, `in_progress`, `done`; cancelled Events are excluded
+  from the payload. `Booking::Status` derives the state from workflow status
+  and the server-supplied `now`, so the KPI strip and the needle agree.
+- **Spaces in use** = facilities whose linked non-completed booking is in
+  progress at `now`. Category cards and "Spaces by type" are built from those
+  facility categories; a category with no facilities never appears.
+- **Conflict safety** = `Booking::ConflictChecker` refuses any overlapping
+  active booking of the same facility inside a reservation transaction that
+  locks the facility row first. Back-to-back windows are allowed. Cancelled
+  and completed bookings have released the space.
+- **Host / customer** = optional `Employee` / `Customer` records linked
+  through `EmployeeEventAppointment` / `CustomerEventAppointment`; the form
+  never accepts free-text names.
+- **Extend / end / cancel** update the same selected Event. End & release sets
+  the Event to `completed`, ends an in-progress Event at `now`, and releases
+  stock holds through `Events::AfterSaveService`.
+- **Caps** = bookings 200, facilities 100, hosts 100. The payload carries
+  `{ capped, limit }`; lists are labelled, KPI counts stay full-data counts.
+- **Run sheet** = browser print of the selected day only (branch, date, one line
+  per non-cancelled booking in time order).
+
+`Booking::ConsoleService` builds the read payload; `Booking::ReservationService`,
+`Booking::ExtendService`, `Booking::FinishService`, `Booking::CancelService`, and
+`Booking::CustomerSearchService` own the writes/lookup. The Stimulus controller
+only renders the payload, keeps a typed form draft in state, and posts actions.
+
+### 7.1 Booking — deliberately not in this pass
+
+- Weekly recurrence.
+- Deposits or payments at booking time.
+- Real branch opening hours (08:00–18:00 is an explicit stand-in).
+- A health signal behind a "live engine" pill.
+- Drag-to-reschedule.
+- Automatic no-show release.
+- Room List / Desk Zones as separate screens.
 
 `Reception::ConsoleService` builds the read payload;
 `Reception::CheckInService`, `Reception::AdvanceService` and

@@ -82,6 +82,13 @@ Every write response carries `warnings[]`:
 HTML flows append the count to the flash notice. Real validation failures
 stay `422 { errors: [...] }` (`docs/API_ERROR_FORMAT.md`).
 
+**Booking-console exception.** Reservations created or extended from the
+Booking operation are intentionally stricter: `Booking::ConflictChecker`
+refuses an overlap with another non-cancelled, non-completed booking of the
+same facility and returns `422 { errors: ["Facility … is already booked …"] }`.
+Cancelled and completed bookings have released the space. The Events CRUD
+surfaces keep the warn-but-allow contract above.
+
 ### Holds lifecycle (`Events::AfterSaveService`)
 
 One transaction-safe entry point; the controller passes the pre-save
@@ -153,6 +160,11 @@ planning rows only, no holds, no orders.
 | `spec/services/events/after_save_service_spec.rb` | hold opt-in/out, strict raise vs warn, update reconciliation, release on completed/cancelled, order bridge trigger |
 | `spec/services/events/create_order_service_spec.rb` | snapshots, walk-in fallback, idempotency, flag-off, zero-lines |
 | `spec/services/events/search_query_service_spec.rb` | shared dynamic-search contract |
+| `spec/services/booking/console_service_spec.rb` | day overlap, statuses, facility categories, caps, full counts, next-five |
+| `spec/services/booking/reservation_service_spec.rb` | conflict refusal, back-to-back, cancelled/completed release, host/customer links |
+| `spec/services/booking/lifecycle_services_spec.rb` | extend/end/cancel, conflict message, end-at-now |
+| `spec/services/booking/customer_search_service_spec.rb` | blank query, Meilisearch mapping, limit |
+| `spec/features/companies/operations/booking_spec.rb` | console chrome, KPIs, outside tags, selection, conflict, host/customer, quick room, extend/end/cancel, run sheet, caps |
 | `spec/services/seed/retail_init_event_spec.rb` | categories + configs + grants on fresh retail company |
 | `spec/requests/companies/{events,calendars}_controller_spec.rb` | search contract, JSON create/update + warnings, board range + scoping |
 | `spec/features/companies/{events,event_configs,calendars}/*_spec.rb` | index/new/show/edit E2E, config CRUD, board views + click-to-create modal |

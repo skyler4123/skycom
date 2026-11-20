@@ -45,15 +45,14 @@ dynamic properties, location appointments, and access policies.
 | Console | What it is for | Verdict | Why |
 |---|---|---|---|
 | [POS](02-pos.md) | Taking money at the counter | 🟢 | Tax/currency from config, services, server prices, discounts, void, receipt slip, real lock, persisted tabs; one company-wide tax rate |
-| [Booking](03-booking.md) | Reserving rooms and spaces | 🔴 | No double-booking check, dead inspector, invented floor map |
+| [Booking](03-booking.md) | Reserving rooms and spaces | 🟢 | Conflict-safe locking, click-to-inspect, real host/customer, extend/end/cancel, real category occupancy, run sheet |
 | [Reception](04-reception.md) | Front desk, visitors, parcels | 🔴 | Four dead tabs, badge printing only toasts, fake "connected" systems |
 | [Inventory](05-inventory.md) | Warehouse stock command screen | 🔴 | BOM panel is hardcoded zeros, invented zone occupancy, fake dock data |
 | [Store Manager](06-store-manager.md) | Retail floor command screen | 🔴 | Six dead tabs, invented shift, fabricated register names, UTC hourly chart |
 
-All five need work before a paying customer sees them. The single most urgent
-fixes are: POS tax and service sales, Booking conflict detection, and removing
-the fabricated panels from Inventory and Store Manager. The dead tabs are the
-cheapest visible win.
+POS and Booking are shippable. The remaining urgent work is POS service sales,
+Reception badge/tab honesty, and removing the fabricated panels from Inventory
+and Store Manager. The dead tabs are the cheapest visible win.
 
 [Operations landing and configuration](01-operations-landing.md) is the control
 room for all five; it is 🟠 with one table defect.
@@ -166,12 +165,13 @@ Never demo a control or panel marked 🔴, 🗑️, ⛔, or 🔢 in the page doc
 ## 7. Cross-cutting decisions for the BA
 
 **APP-D1 — Which console ships first?**
-- A. POS. Highest revenue impact; two fixes unlock it (tax, services). Effort M.
-- B. Booking. Conflict detection is the only blocker for a real front desk. Effort M.
+- A. POS. Highest revenue impact; service sales remain. Effort M.
+- B. Booking. **Shipped** — conflict-safe reservations, real inspector and desk
+  actions are in place. Effort M.
 - C. Reception. Most visible to visitors, but badge printing and pre-registration
   are larger. Effort M–L.
-- *Recommendation:* A, then B. POS and Booking are the two consoles a customer
-  will judge in the first week.
+- *Recommendation:* A, then C. Booking is already the front-desk-safe console;
+  POS is the next revenue blocker.
 
 **APP-D2 — Credits or subscriptions?**
 - A. Keep prepaid credits. Effort S.
@@ -180,8 +180,8 @@ Never demo a control or panel marked 🔴, 🗑️, ⛔, or 🔢 in the page doc
 
 **APP-D3 — Which industry to sell to first?**
 - A. Retail. POS and Store Manager are purpose-built for it. Effort S.
-- B. Office/coworking. Booking and Reception fit, but the floor map and badge
-  printing must be real. Effort M.
+- B. Office/coworking. Booking now fits; Reception badge printing and its dead
+  tabs must become real. Effort M.
 - C. Hospitality. Reception branding already leans this way, but the consoles are
   not hotel-specific. Effort M–L.
 - *Recommendation:* A. The retail path needs the least new domain work.

@@ -1,30 +1,62 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Booking — full-screen resource reservation console for the branch-scoped
-// Booking operation. The timeline rows are real Facilities (rooms, pods,
-// studios, equipment) and the blocks are real Events for the selected day,
-// linked through EventFacilityAppointment.
+// Booking operation. The timeline rows are real Facilities and the blocks are
+// real Events for the selected day, linked through EventFacilityAppointment.
 //
 // Serves Stimulus: Companies_Operations_Booking_ShowController
-// Depends on BE: Companies::Operations::BookingController#show/create_reservation
+// Depends on BE: Companies::Operations::BookingController
+//   #show #customers #create_reservation
+//   #extend_reservation #finish_reservation #cancel_reservation
 // Endpoints: Helpers.booking_company_operation_path
+//            Helpers.booking_customers_company_operation_path
 //            Helpers.booking_reservations_company_operation_path
+//            Helpers.booking_reservation_extend_company_operation_path
+//            Helpers.booking_reservation_end_company_operation_path
+//            Helpers.booking_reservation_cancel_company_operation_path
 // Docs: docs/OPERATIONS.md, docs/EVENTS.md
 export default class Companies_Operations_Booking_ShowController extends Controller {
   /** @type {any | null} */ operation = null
   /** @type {any | null} */ appointment = null
+  /** @type {any | null} */ company = null
+  /** @type {any} */ reference = {}
   /** @type {any[]} */ resources = []
   /** @type {any[]} */ bookings = []
   /** @type {any[]} */ upcoming = []
   /** @type {any} */ counts = {}
-  /** @type {any} */ reference = {}
+  /** @type {any} */ caps = {}
   /** @type {any} */ timeline = { start_hour: 8, end_hour: 18 }
   /** @type {string | null} */ companyId = null
   /** @type {string | null} */ operationId = null
   /** @type {string | null} */ branchId = null
   /** @type {string | null} */ selectedDate = null
   /** @type {string} */ activeFilter = "all"
+  /** @type {string | null} */ selectedBookingId = null
+  /** @type {string | null} */ selectedResourceId = null
   /** @type {number | null} */ needleTimer = null
+  /** @type {number | null} */ customerSearchTimer = null
+  /** @type {number} */ customerSearchToken = 0
+  /** @type {string} */ reservationError = ""
+  /** @type {string} */ extendNotice = ""
+  /** @type {string} */ quickRoomNotice = ""
+  /** @type {any | null} */ cancelState = null
+  /** @type {boolean} */ actionPending = false
+  /** @type {boolean} */ formSubmitting = false
+  /** @type {string | null} */ serverNow = null
+  /** @type {number} */ loadedAt = Date.now()
+  /** @type {any[]} */ customerResults = []
+  /** @type {string} */ customerSearchError = ""
+  /** @type {boolean} */ customerSearching = false
+  /** @type {any} */ formState = {
+    title: "",
+    facilityId: "",
+    hostId: "",
+    customerId: "",
+    customerName: "",
+    customerQuery: "",
+    start: "",
+    end: ""
+  }
 
   async connect() {
     const pathParts = window.location.pathname.split("/")
@@ -44,6 +76,7 @@ export default class Companies_Operations_Booking_ShowController extends Control
 
   disconnect() {
     if (this.needleTimer) window.clearInterval(this.needleTimer)
+    if (this.customerSearchTimer) window.clearTimeout(this.customerSearchTimer)
   }
 
   // --- Data -----------------------------------------------------------------------
@@ -56,8 +89,10 @@ export default class Companies_Operations_Booking_ShowController extends Control
     const response = await fetchJson(Helpers.booking_company_operation_path(this.companyId, this.operationId, params))
     this.operation = response.operation
     this.appointment = response.appointment
+    this.company = response.company || null
     this.reference = response.reference || {}
     this.hydrateBooking(response.booking || {})
+    this.caps = { ...(response.booking?.caps || {}), ...(response.reference?.caps || {}) }
     return response
   }
 
@@ -68,6 +103,8 @@ export default class Companies_Operations_Booking_ShowController extends Control
     this.counts = booking.counts || {}
     this.timeline = booking.timeline || { start_hour: 8, end_hour: 18 }
     this.selectedDate = booking.date || this.selectedDate
+    this.serverNow = booking.now || null
+    this.loadedAt = Date.now()
   }
 
   // --- Time helpers ---------------------------------------------------------------
@@ -76,149 +113,171 @@ export default class Companies_Operations_Booking_ShowController extends Control
     return this.appointment?.location || {}
   }
 
+  get timelineStartHour() { return this.timeline.start_hour ?? 8 }
+  get timelineEndHour() { return this.timeline.end_hour ?? 18 }
+
+  currentNow() {
+    const base = this.serverNow ? new Date(this.serverNow).getTime() : Date.now()
+    return new Date(base + (Date.now() - this.loadedAt))
+  }
+
   time(value, format = "h:mm A") {
     return Helpers.locationTime(value, format, this.location)
   }
 
-  minutesOfDay(value) {
-    const label = this.time(value, "HH:mm")
-    if (label === "—") return null
-    const [hours, minutes] = label.split(":").map(Number)
-    return hours * 60 + minutes
-  }
-
-  get timelineStartHour() { return this.timeline.start_hour ?? 8 }
-  get timelineEndHour() { return this.timeline.end_hour ?? 18 }
-  get timelineSpan() { return Math.max(1, this.timelineEndHour - this.timelineStartHour) }
-
-  percentForTime(value) {
-    if (!value) return 0
-    const minutes = this.minutesOfDay(value)
-    if (minutes === null) return 0
-    const start = this.timelineStartHour * 60
-    return this.clampPercent(((minutes - start) / (this.timelineSpan * 60)) * 100)
-  }
-
-  durationPercent(booking) {
-    if (!booking.start_at || !booking.end_at) return 0
-    const start = new Date(booking.start_at)
-    const end = new Date(booking.end_at)
-    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0
-    const minutes = (end - start) / 60000
-    return this.clampPercent((minutes / (this.timelineSpan * 60)) * 100)
-  }
-
-  nowPercent() {
-    const minutes = this.minutesOfDay(new Date().toISOString())
-    if (minutes === null) return 0
-    const start = this.timelineStartHour * 60
-    return this.clampPercent(((minutes - start) / (this.timelineSpan * 60)) * 100)
-  }
-
-  clampPercent(value) {
-    return Math.max(0, Math.min(100, value))
-  }
-
-  get isToday() {
-    if (!this.selectedDate) return true
-    return this.selectedDate === this.todayIso()
-  }
-
-  todayIso() {
-    return Helpers.localToday(this.location)
-  }
-
-  isoDate(date) {
-    const month = String(date.getMonth() + 1).padStart(2, "0")
-    const day = String(date.getDate()).padStart(2, "0")
-    return `${date.getFullYear()}-${month}-${day}`
+  dateLabelFor(value) {
+    return Helpers.dateOnly(value, "dddd, MMM D, YYYY", this.location)
   }
 
   get dateLabel() {
-    return Helpers.dateOnly(this.selectedDate || this.todayIso(), "dddd, MMM D, YYYY", this.location)
+    return this.dateLabelFor(this.selectedDate || this.todayIso())
+  }
+
+  todayIso() {
+    if (this.serverNow) return Helpers.locationTime(this.serverNow, "YYYY-MM-DD", this.location)
+    return Helpers.localToday(this.location)
+  }
+
+  get isToday() {
+    return (this.selectedDate || this.todayIso()) === this.todayIso()
+  }
+
+  windowBounds() {
+    const date = this.selectedDate || this.todayIso()
+    const [year, month, day] = String(date).split("-").map(Number)
+    const offsetHours = Helpers.timezoneOffsetHours(this.location) ?? 0
+    const start = Date.UTC(year, month - 1, day, this.timelineStartHour, 0, 0) - (offsetHours * 3600 * 1000)
+    const end = Date.UTC(year, month - 1, day, this.timelineEndHour, 0, 0) - (offsetHours * 3600 * 1000)
+    return { start, end }
+  }
+
+  windowSegment(booking) {
+    if (!booking.start_at || !booking.end_at) return null
+    const start = new Date(booking.start_at).getTime()
+    const end = new Date(booking.end_at).getTime()
+    if (Number.isNaN(start) || Number.isNaN(end)) return null
+
+    const bounds = this.windowBounds()
+    const clippedStart = Math.max(start, bounds.start)
+    const clippedEnd = Math.min(end, bounds.end)
+    if (clippedEnd <= clippedStart) return null
+
+    return {
+      left: ((clippedStart - bounds.start) / (bounds.end - bounds.start)) * 100,
+      width: ((clippedEnd - clippedStart) / (bounds.end - bounds.start)) * 100
+    }
+  }
+
+  get showNowNeedle() {
+    if (!this.isToday) return false
+    const now = this.currentNow().getTime()
+    const bounds = this.windowBounds()
+    return now >= bounds.start && now < bounds.end
+  }
+
+  nowPercent() {
+    const bounds = this.windowBounds()
+    return this.clampPercent(((this.currentNow().getTime() - bounds.start) / (bounds.end - bounds.start)) * 100)
   }
 
   get nowLabel() {
-    return this.time(new Date().toISOString())
+    return this.time(this.currentNow().toISOString())
+  }
+
+  get windowLabel() {
+    return `${String(this.timelineStartHour).padStart(2, "0")}:00–${String(this.timelineEndHour).padStart(2, "0")}:00`
   }
 
   startNeedleTimer() {
     if (this.needleTimer) window.clearInterval(this.needleTimer)
     this.needleTimer = window.setInterval(() => {
+      if (!this.isToday) return
       const needle = this.element.querySelector("[data-booking-now-needle]")
-      if (needle) needle.style.left = `calc(14rem + ((100% - 14rem) * ${this.nowPercent() / 100}))`
-      const label = this.element.querySelector("[data-booking-now-label]")
-      if (label) label.textContent = this.nowLabel
+      if (this.showNowNeedle && needle) {
+        needle.style.left = `calc(14rem + ((100% - 14rem) * ${this.nowPercent() / 100}))`
+        const label = this.element.querySelector("[data-booking-now-label]")
+        if (label) label.textContent = this.nowLabel
+      } else if (this.showNowNeedle !== Boolean(needle)) {
+        this.refreshTimeline()
+      }
     }, 60000)
   }
 
   // --- Derived data ---------------------------------------------------------------
 
   get branchName() {
-    return this.appointment?.location?.name || this.appointment?.branch?.name || this.operation?.branch?.name || translate("Branch not resolved")
+    return this.appointment?.location?.name || ""
+  }
+
+  get companyName() {
+    return this.company?.name || ""
   }
 
   get userName() {
-    return this.element.dataset.userName || (typeof window.currentUser === "function" ? window.currentUser()?.name : window.currentUser?.name) || translate("Front Desk")
+    const user = typeof window.currentUser === "function" ? window.currentUser() : window.currentUser
+    return this.element.dataset.userName || Helpers.currentEmployee()?.name || user?.name || ""
   }
 
   get userRole() {
-    return this.element.dataset.userRole || translate("Front Office & Operations")
+    return this.element.dataset.userRole || Helpers.currentEmployee()?.category?.name || ""
   }
 
-  get totalBookings() { return this.counts.total_bookings_today ?? this.bookings.length }
-  get pendingCheckins() { return this.counts.pending_checkin ?? this.upcoming.length }
-  get resourcesTotal() { return this.counts.resources_total ?? this.resources.length }
-  get resourcesInUse() { return this.counts.resources_in_use ?? this.resources.filter((resource) => resource.status === "busy").length }
-  get roomUtilization() { return this.counts.room_utilization ?? (this.resourcesTotal === 0 ? 0 : Math.round((this.resourcesInUse / this.resourcesTotal) * 100)) }
-  get equipmentDeployed() { return this.counts.equipment_deployed ?? 0 }
-  get equipmentTotal() { return this.counts.equipment_total ?? 0 }
-  get hotDeskOccupied() { return this.counts.hot_desk_occupied ?? 0 }
-  get hotDeskTotal() { return this.counts.hot_desk_total ?? 0 }
-  get hotDeskPercent() { return this.hotDeskTotal === 0 ? 0 : Math.round((this.hotDeskOccupied / this.hotDeskTotal) * 100) }
-
-  resourceGroup(resource) {
-    const category = String(resource.category || "").trim()
-    if (category && category !== "Facilities") return category
-
-    const name = String(resource.name || "").toLowerCase()
-    if (/pod|booth|focus/.test(name)) return translate("Focus Pods")
-    if (/studio|lab\b|hall|event|theatre|theater|auditorium/.test(name)) return translate("Event Spaces")
-    if (/equipment|camera|microphone|mic\b|projector|screen|beamer|vr\b|polycom|av\b/.test(name)) return translate("Equipment Units")
-    return translate("Meeting Rooms")
-  }
+  get totalBookings() { return this.counts.total_bookings ?? this.bookings.length }
+  get upcomingCount() { return this.counts.upcoming ?? 0 }
+  get inProgressCount() { return this.counts.in_progress ?? 0 }
+  get doneCount() { return this.counts.done ?? 0 }
+  get spacesTotal() { return this.counts.spaces_total ?? this.resources.length }
+  get spacesInUse() { return this.counts.spaces_in_use ?? this.resources.filter((resource) => resource.in_use).length }
+  get utilization() { return this.counts.utilization ?? (this.spacesTotal === 0 ? 0 : Math.round((this.spacesInUse / this.spacesTotal) * 100)) }
 
   get categories() {
+    const fromCounts = this.counts.categories || []
+    if (fromCounts.length > 0) return fromCounts
     const seen = new Map()
     this.resources.forEach((resource) => {
-      const group = this.resourceGroup(resource)
-      seen.set(group, (seen.get(group) || 0) + 1)
+      const name = resource.category || translate("Other spaces")
+      seen.set(name, (seen.get(name) || 0) + 1)
     })
-    return Array.from(seen.entries()).map(([name, count]) => ({ name, count }))
+    return Array.from(seen.entries()).map(([name, total]) => ({ name, total, in_use: 0, free: total }))
   }
 
   get filteredResources() {
     if (this.activeFilter === "all") return this.resources
-    return this.resources.filter((resource) => this.resourceGroup(resource) === this.activeFilter)
+    return this.resources.filter((resource) => (resource.category || translate("Other spaces")) === this.activeFilter)
   }
 
-  get featuredBooking() {
-    return this.bookings.find((booking) => booking.status === "active") || this.bookings[0] || null
+  get bookingsKpiLabel() {
+    return this.isToday ? translate("Bookings today") : translate("Bookings on this day")
   }
 
-  get featuredResource() {
-    const booking = this.featuredBooking
+  get selectedBooking() {
+    return this.bookings.find((booking) => String(booking.id) === String(this.selectedBookingId)) || null
+  }
+
+  get selectedFacility() {
+    const booking = this.selectedBooking
     if (!booking) return null
-    return this.resources.find((resource) => booking.resource_ids.includes(resource.id)) || null
-  }
-
-  get unassignedBookings() {
-    return this.bookings.filter((booking) => !booking.resource_ids || booking.resource_ids.length === 0)
+    return (booking.facilities || []).find((facility) => String(facility.id) === String(this.selectedResourceId)) ||
+      (booking.facilities || [])[0] ||
+      null
   }
 
   bookingsFor(resourceId) {
-    if (resourceId === "unassigned") return this.unassignedBookings
-    return this.bookings.filter((booking) => booking.resource_ids.includes(resourceId))
+    if (resourceId === "unassigned") {
+      return this.bookings.filter((booking) => !booking.resource_ids || booking.resource_ids.length === 0)
+    }
+    return this.bookings.filter((booking) => (booking.resource_ids || []).includes(resourceId))
+  }
+
+  visibleOnTimeline(booking) {
+    if (booking.status === "cancelled") return false
+    if (booking.status !== "done") return true
+    const start = new Date(booking.start_at).getTime()
+    return !Number.isNaN(start) && start <= this.currentNow().getTime()
+  }
+
+  visibleBookingsFor(resourceId) {
+    return this.bookingsFor(resourceId).filter((booking) => this.visibleOnTimeline(booking))
   }
 
   // --- Rendering ------------------------------------------------------------------
@@ -230,32 +289,36 @@ export default class Companies_Operations_Booking_ShowController extends Control
   contentHTML() {
     return `
       <div class="bg-background text-foreground min-h-screen flex flex-col">
-        ${this.renderHeader()}
-        <main class="flex-1 pt-20 w-full">
-          <div class="w-full px-4 lg:px-6 py-4 flex flex-col gap-4">
-            ${this.renderHeadline()}
-            ${this.renderKpis()}
-            ${this.renderActionBar()}
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-              <section class="lg:col-span-8 flex flex-col gap-4 min-w-0">
-                ${this.renderControls()}
-                ${this.renderTimeline()}
-                ${this.renderFloorMap()}
-              </section>
-              <aside class="lg:col-span-4 flex flex-col gap-4 min-w-0">
-                ${this.renderInspector()}
-                ${this.renderReservationForm()}
-                ${this.renderUpcoming()}
-              </aside>
+        <div class="print:hidden flex flex-col min-h-screen">
+          ${this.renderHeader()}
+          <main class="flex-1 pt-20 w-full">
+            <div class="w-full px-4 lg:px-6 py-4 flex flex-col gap-4">
+              ${this.renderHeadline()}
+              ${this.renderKpis()}
+              ${this.renderActionBar()}
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+                <section class="lg:col-span-8 flex flex-col gap-4 min-w-0">
+                  ${this.renderControls()}
+                  <div data-booking-timeline>${this.renderTimeline()}</div>
+                  ${this.renderSpacesByType()}
+                </section>
+                <aside class="lg:col-span-4 flex flex-col gap-4 min-w-0">
+                  <div data-booking-inspector>${this.renderInspector()}</div>
+                  <div id="quickReservationDrawer" data-booking-reservation-card>${this.renderReservationForm()}</div>
+                  <div data-booking-upcoming>${this.renderUpcoming()}</div>
+                </aside>
+              </div>
             </div>
-          </div>
-        </main>
-        ${this.renderFooter()}
+          </main>
+          ${this.renderFooter()}
+        </div>
+        ${this.renderRunSheet()}
       </div>
     `
   }
 
   renderHeader() {
+    const currentHref = `${window.location.pathname}${window.location.search}`
     return `
       <header class="fixed top-0 left-0 right-0 z-40 bg-card/95 backdrop-blur border-b border-line shadow-sm">
         <div class="h-20 w-full px-4 lg:px-6 flex items-center justify-between gap-4">
@@ -270,38 +333,34 @@ export default class Companies_Operations_Booking_ShowController extends Control
               </div>
             </div>
             <div class="h-6 w-px bg-line hidden xl:block"></div>
-            <div class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted">
-              <span class="material-symbols-outlined text-[16px] text-primary">business</span>
-              <span class="text-[13px] font-semibold text-foreground">${this.escape(this.branchName)}</span>
-              <span class="material-symbols-outlined text-[16px] text-muted-foreground">expand_more</span>
-            </div>
+            ${this.branchName ? `
+              <div class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted">
+                <span class="material-symbols-outlined text-[16px] text-primary">business</span>
+                <span class="text-[13px] font-semibold text-foreground">${this.escape(this.branchName)}</span>
+              </div>
+            ` : ""}
             <div class="hidden 2xl:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground">
               <span class="material-symbols-outlined text-[16px]">calendar_today</span>
-              <span class="text-[13px] font-semibold text-foreground">${translate("Today")}, ${this.escape(this.dateLabel)}</span>
+              <span class="text-[13px] font-semibold text-foreground">${this.escape(this.dateLabel)}</span>
             </div>
           </div>
           <nav class="hidden lg:flex items-center gap-1 px-1 py-1 rounded-xl bg-muted">
-            <a class="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold" href="#">${translate("Bookings & Calendar")}</a>
-            <a class="px-3 py-2 rounded-lg text-muted-foreground text-[13px] font-semibold hover:text-foreground" href="#">${translate("Resource Directory")}</a>
-            <a class="px-3 py-2 rounded-lg text-muted-foreground text-[13px] font-semibold hover:text-foreground" href="#">${translate("Room Management")}</a>
-            <a class="px-3 py-2 rounded-lg text-muted-foreground text-[13px] font-semibold hover:text-foreground" href="#">${translate("Analytics & Usage")}</a>
+            <a class="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold" href="${this.escape(currentHref)}">${translate("Bookings")}</a>
           </nav>
-          <div class="flex items-center gap-3">
-            <div class="hidden md:inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-success/10 text-success">
-              <span class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></span>
-              <span class="text-[10px] font-semibold uppercase tracking-wide">${translate("Live Scheduling Engine")}</span>
-            </div>
-            <div class="h-6 w-px bg-line hidden sm:block"></div>
-            <div class="hidden sm:flex items-center gap-2">
-              <div class="flex flex-col items-end text-right">
-                <span class="text-[12px] font-semibold text-foreground leading-none">${this.escape(this.userName)}</span>
-                <span class="text-[10px] text-muted-foreground leading-none mt-1">${this.escape(this.userRole)}</span>
-              </div>
-              <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-                <span class="material-symbols-outlined text-[18px]">person</span>
+          ${this.userName ? `
+            <div class="flex items-center gap-3">
+              <div class="h-6 w-px bg-line hidden sm:block"></div>
+              <div class="hidden sm:flex items-center gap-2">
+                <div class="flex flex-col items-end text-right">
+                  <span class="text-[12px] font-semibold text-foreground leading-none">${this.escape(this.userName)}</span>
+                  ${this.userRole ? `<span class="text-[10px] text-muted-foreground leading-none mt-1">${this.escape(this.userRole)}</span>` : ""}
+                </div>
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+                  <span class="material-symbols-outlined text-[18px]">person</span>
+                </div>
               </div>
             </div>
-          </div>
+          ` : ""}
         </div>
       </header>
     `
@@ -311,19 +370,16 @@ export default class Companies_Operations_Booking_ShowController extends Control
     return `
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
         <div class="flex flex-col">
-          <div class="flex items-center gap-2">
-            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20 text-[11px] font-semibold">
-              <span class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></span>
-              ${translate("Live Scheduling Engine")}
-            </span>
-            <span class="text-[11px] text-muted-foreground truncate">· ${this.escape(this.branchName)} · ${this.escape(this.dateLabel)}</span>
+          <div class="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+            ${this.branchName ? `<span>${this.escape(this.branchName)}</span><span>·</span>` : ""}
+            <span>${this.escape(this.dateLabel)}</span>
           </div>
           <h1 class="text-2xl font-bold text-foreground tracking-tight mt-1">${translate("Booking Operations Console")}</h1>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-[12px] font-semibold">
             <span class="material-symbols-outlined text-[17px] text-primary">event_available</span>
-            ${this.totalBookings} ${translate("bookings")} · ${this.resourcesInUse} ${translate("spaces in use")}
+            ${this.totalBookings} ${translate("bookings")} · ${this.spacesInUse} ${translate("spaces in use now")}
           </span>
         </div>
       </div>
@@ -332,39 +388,33 @@ export default class Companies_Operations_Booking_ShowController extends Control
 
   renderKpis() {
     return `
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        ${this.renderKpiCard({
-          label: translate("Total Bookings Today"),
+      <div class="grid gap-4" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+        <div data-booking-kpi="bookings">${this.renderKpiCard({
+          label: this.bookingsKpiLabel,
           value: this.totalBookings,
-          unit: translate("Confirmed"),
-          footer: `<span class="w-2 h-2 rounded-full bg-warning inline-block"></span> ${this.pendingCheckins} ${translate("pending check-in")}`,
+          unit: translate("bookings"),
+          footer: `<span class="w-2 h-2 rounded-full bg-warning inline-block"></span> ${this.upcomingCount} ${translate("upcoming")} · ${this.inProgressCount} ${translate("in progress")} · ${this.doneCount} ${translate("done")}`,
           icon: "calendar_month",
           tone: "primary"
-        })}
-        ${this.renderKpiCard({
-          label: translate("Room Utilization"),
-          value: `${this.roomUtilization}%`,
-          unit: translate("Active"),
-          footer: `${this.resourcesInUse} ${translate("of")} ${this.resourcesTotal} ${translate("spaces in use")}`,
+        })}</div>
+        <div data-booking-kpi="spaces">${this.renderKpiCard({
+          label: translate("Spaces in use"),
+          value: `${this.spacesInUse}<span class="text-2xl text-muted-foreground">/${this.spacesTotal}</span>`,
+          unit: `${this.utilization}%`,
+          footer: `${this.spacesInUse} ${translate("of")} ${this.spacesTotal} ${translate("spaces in use")}`,
           icon: "meeting_room",
           tone: "success"
-        })}
-        ${this.renderKpiCard({
-          label: translate("Equipment Deployed"),
-          value: this.equipmentDeployed,
-          unit: translate("Devices"),
-          footer: `${this.equipmentTotal} ${translate("equipment resources tracked")}`,
-          icon: "devices_other",
-          tone: "warning"
-        })}
-        ${this.renderKpiCard({
-          label: translate("Hot Desk Occupancy"),
-          value: `${this.hotDeskOccupied}<span class="text-2xl text-muted-foreground">/${this.hotDeskTotal}</span>`,
-          unit: `${this.hotDeskPercent}% ${translate("full")}`,
-          footer: `${Math.max(0, this.hotDeskTotal - this.hotDeskOccupied)} ${translate("open agile bays available")}`,
-          icon: "desk",
-          tone: "info"
-        })}
+        })}</div>
+        ${this.categories.map((category) => `
+          <div data-booking-category-kpi="${this.escape(category.name)}">${this.renderKpiCard({
+            label: category.name,
+            value: `${category.in_use}<span class="text-2xl text-muted-foreground">/${category.total}</span>`,
+            unit: `${category.total === 0 ? 0 : Math.round((category.in_use / category.total) * 100)}%`,
+            footer: `${category.free} ${translate("free")}`,
+            icon: "space_dashboard",
+            tone: "info"
+          })}</div>
+        `).join("")}
       </div>
     `
   }
@@ -382,7 +432,7 @@ export default class Companies_Operations_Booking_ShowController extends Control
       <div class="relative overflow-hidden rounded-xl bg-card border border-line shadow-sm p-4 flex items-center justify-between gap-3 group hover:shadow-md transition-all">
         <div class="absolute left-0 top-0 bottom-0 w-1 ${palette.bar}"></div>
         <div class="flex flex-col pl-1 min-w-0">
-          <span class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">${label}</span>
+          <span class="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider truncate">${this.escape(label)}</span>
           <div class="flex items-baseline gap-1.5 mt-1">
             <span class="text-3xl font-extrabold tracking-tight text-foreground">${value}</span>
             <span class="text-[12px] font-semibold text-muted-foreground">${unit}</span>
@@ -398,33 +448,29 @@ export default class Companies_Operations_Booking_ShowController extends Control
 
   renderActionBar() {
     return `
-      <div class="flex flex-wrap items-center justify-between gap-3 bg-card border border-line px-4 py-3 rounded-xl shadow-sm">
+      <div data-booking-action-bar class="flex flex-wrap items-center justify-between gap-3 bg-card border border-line px-4 py-3 rounded-xl shadow-sm">
         <div class="flex items-center gap-3 flex-wrap">
-          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-[13px] font-semibold">
-            <span class="material-symbols-outlined text-[18px] text-primary">corporate_fare</span>
-            <span>${this.escape(this.branchName)}</span>
-          </div>
-          <div class="h-4 w-px bg-line/60"></div>
-          <div class="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
-            <span class="w-2 h-2 rounded-full bg-success"></span>
-            <span>${translate("Synced with live Event reservations")}</span>
+          ${this.branchName ? `
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-[13px] font-semibold">
+              <span class="material-symbols-outlined text-[18px] text-primary">corporate_fare</span>
+              <span>${this.escape(this.branchName)}</span>
+            </div>
+            <div class="h-4 w-px bg-line/60"></div>
+          ` : ""}
+          <div class="flex flex-col">
+            <button type="button" data-action="click->${this.identifier}#quickRoom"
+              class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-muted hover:bg-line text-foreground text-[13px] font-semibold transition-colors">
+              <span class="material-symbols-outlined text-[18px]">bolt</span>
+              <span>${translate("15-Min Quick Room")}</span>
+            </button>
+            ${this.quickRoomNotice ? `<span class="text-[10px] font-semibold text-warning mt-1">${this.escape(this.quickRoomNotice)}</span>` : ""}
           </div>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
-          <button type="button" data-action="click->${this.identifier}#quickRoom"
-            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-muted hover:bg-line text-foreground text-[13px] font-semibold transition-colors">
-            <span class="material-symbols-outlined text-[18px]">bolt</span>
-            <span>${translate("15-Min Quick Room")}</span>
-          </button>
-          <button type="button" data-action="click->${this.identifier}#scrollToReservation"
-            class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-muted hover:bg-line text-foreground text-[13px] font-semibold transition-colors">
-            <span class="material-symbols-outlined text-[18px]">no_meeting_room</span>
-            <span>${translate("Release Unused")}</span>
-          </button>
-          <button type="button" data-action="click->${this.identifier}#scrollToReservation"
+          <button type="button" data-action="click->${this.identifier}#printRunSheet"
             class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-muted hover:bg-line text-foreground text-[13px] font-semibold transition-colors">
             <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-            <span>${translate("Daily Run Sheet")}</span>
+            <span>${translate("Daily run sheet")}</span>
           </button>
           <button id="btnOpenNewReservation" type="button" data-action="click->${this.identifier}#scrollToReservation"
             class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold shadow-sm hover:brightness-110 transition-all">
@@ -440,23 +486,18 @@ export default class Companies_Operations_Booking_ShowController extends Control
     return `
       <div class="bg-card rounded-xl border border-line p-4 shadow-sm flex flex-col gap-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div class="inline-flex p-1 bg-muted rounded-xl" role="tablist">
-            <button type="button" class="px-3.5 py-1.5 rounded-lg bg-card text-primary text-[13px] font-semibold shadow-sm flex items-center gap-1.5">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold">
               <span class="material-symbols-outlined text-[16px]">view_timeline</span>
-              <span>${translate("Day Timeline Grid")}</span>
-            </button>
-            <button type="button" class="px-3.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground text-[13px] font-semibold flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[16px]">meeting_room</span>
-              <span>${translate("Room List")}</span>
-            </button>
-            <button type="button" class="px-3.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground text-[13px] font-semibold flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[16px]">grid_view</span>
-              <span>${translate("Desk Zones")}</span>
-            </button>
+              <span>${translate("Day")}</span>
+            </span>
+            <span class="text-[11px] font-semibold text-muted-foreground" ${tooltip(translate("Branch opening hours are not configured yet. The grid shows a fixed day window."))}>
+              ${translate("Day window")} ${this.windowLabel}
+            </span>
           </div>
           <div class="flex items-center gap-1">
             <button type="button" data-action="click->${this.identifier}#previousDay"
-              class="p-1.5 rounded-lg hover:bg-muted text-muted-foreground" title="${translate("Previous day")}">
+              class="p-1.5 rounded-lg hover:bg-muted text-muted-foreground" title="${translate("Previous day")}" aria-label="${translate("Previous day")}">
               <span class="material-symbols-outlined text-[18px]">chevron_left</span>
             </button>
             <div class="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-muted text-foreground text-[13px] font-semibold">
@@ -464,7 +505,7 @@ export default class Companies_Operations_Booking_ShowController extends Control
               <span>${this.escape(this.dateLabel)}</span>
             </div>
             <button type="button" data-action="click->${this.identifier}#nextDay"
-              class="p-1.5 rounded-lg hover:bg-muted text-muted-foreground" title="${translate("Next day")}">
+              class="p-1.5 rounded-lg hover:bg-muted text-muted-foreground" title="${translate("Next day")}" aria-label="${translate("Next day")}">
               <span class="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>
             <button type="button" data-action="click->${this.identifier}#today"
@@ -474,8 +515,8 @@ export default class Companies_Operations_Booking_ShowController extends Control
           </div>
         </div>
         <div class="flex items-center gap-2 overflow-x-auto pb-0.5">
-          ${this.renderFilterChip("all", `${translate("All Resources")} (${this.resources.length})`)}
-          ${this.categories.map((category) => this.renderFilterChip(category.name, `${this.escape(category.name)} (${category.count})`)).join("")}
+          ${this.renderFilterChip("all", `${translate("All spaces")} (${this.spacesTotal})`)}
+          ${this.categories.map((category) => this.renderFilterChip(category.name, `${this.escape(category.name)} (${category.total})`)).join("")}
         </div>
       </div>
     `
@@ -499,24 +540,26 @@ export default class Companies_Operations_Booking_ShowController extends Control
       <div class="bg-card rounded-xl border border-line shadow-sm overflow-hidden flex flex-col">
         <div class="border-b border-line bg-muted/70 flex items-stretch">
           <div class="w-56 shrink-0 p-2 px-4 border-r border-line flex items-center justify-between">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">${translate("Resource / Space")}</span>
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">${translate("Space")}</span>
             <span class="material-symbols-outlined text-[16px] text-muted-foreground">tune</span>
           </div>
-          <div class="flex-1 grid text-center py-2 text-[11px] font-semibold text-muted-foreground select-none" style="grid-template-columns: repeat(${this.timelineSpan}, minmax(0, 1fr));">
+          <div class="flex-1 grid text-center py-2 text-[11px] font-semibold text-muted-foreground select-none" style="grid-template-columns: repeat(${this.timelineEndHour - this.timelineStartHour}, minmax(0, 1fr));">
             ${this.renderHourMarkers()}
           </div>
         </div>
         <div class="relative divide-y divide-line bg-card">
-          ${this.isToday ? this.renderNowNeedle() : ""}
+          ${this.showNowNeedle ? this.renderNowNeedle() : ""}
           ${this.filteredResources.length === 0 ? this.renderEmptyResources() : this.filteredResources.map((resource) => this.renderTimelineRow(resource)).join("")}
           ${this.renderUnassignedRow()}
         </div>
       </div>
+      ${this.renderCapsNotice()}
     `
   }
 
   renderHourMarkers() {
-    return Array.from({ length: this.timelineSpan }, (_, index) => {
+    const span = this.timelineEndHour - this.timelineStartHour
+    return Array.from({ length: span }, (_, index) => {
       const hour = this.timelineStartHour + index
       return `<div>${String(hour).padStart(2, "0")}:00</div>`
     }).join("")
@@ -536,13 +579,15 @@ export default class Companies_Operations_Booking_ShowController extends Control
   }
 
   renderUnassignedRow() {
-    if (this.activeFilter !== "all" || this.unassignedBookings.length === 0) return ""
+    if (this.activeFilter !== "all") return ""
+    const bookings = this.visibleBookingsFor("unassigned")
+    if (bookings.length === 0) return ""
     return this.renderTimelineRow({
       id: "unassigned",
       name: translate("Unassigned bookings"),
       category: translate("Unassigned"),
       capacity: null,
-      status: "available"
+      in_use: false
     })
   }
 
@@ -555,28 +600,52 @@ export default class Companies_Operations_Booking_ShowController extends Control
   }
 
   renderTimelineRow(resource) {
-    const resourceBookings = this.bookingsFor(resource.id)
-    const statusDot = resource.status === "busy" ? "bg-success" : "bg-line"
+    const bookings = this.visibleBookingsFor(resource.id)
+    const blocks = bookings.map((booking) => this.renderBookingBlock(booking, resource.id)).join("")
+    const outside = bookings.filter((booking) => !this.windowSegment(booking))
+    const statusDot = resource.in_use ? "bg-success" : "bg-line"
     const capacity = resource.capacity ? `${resource.capacity} ${translate("Pax")}` : null
-    const detail = [capacity, this.resourceGroup(resource)].filter(Boolean).join(" • ")
+    const detail = [capacity, resource.category].filter(Boolean).join(" • ")
 
     return `
-      <div class="flex items-stretch hover:bg-muted/40 transition-colors group">
+      <div data-booking-row="${this.escape(resource.id)}" class="flex items-stretch hover:bg-muted/40 transition-colors group">
         <div class="w-56 shrink-0 p-3 px-4 border-r border-line flex flex-col justify-center">
           <div class="flex items-center gap-1.5 min-w-0">
             <span class="text-[15px] font-semibold text-foreground tracking-tight truncate">${this.escape(resource.name)}</span>
             <span class="w-2 h-2 rounded-full ${statusDot} shrink-0"></span>
           </div>
           <div class="flex items-center gap-2 mt-0.5 text-muted-foreground text-[11px] font-semibold truncate">
-            ${detail ? `<span>${this.escape(detail)}</span>` : `<span>${translate("Resource")}</span>`}
+            ${detail ? `<span class="truncate">${this.escape(detail)}</span>` : `<span>${translate("Space")}</span>`}
           </div>
+          ${outside.length > 0 ? this.renderOutsideTags(outside, resource.id) : ""}
         </div>
         <div class="flex-1 relative h-24 p-1">
-          <div class="absolute inset-0 grid pointer-events-none opacity-40" style="grid-template-columns: repeat(${this.timelineSpan}, minmax(0, 1fr));">
-            ${Array.from({ length: this.timelineSpan }, () => `<div class="border-r border-dashed border-line"></div>`).join("")}
+          <div class="absolute inset-0 grid pointer-events-none opacity-40" style="grid-template-columns: repeat(${this.timelineEndHour - this.timelineStartHour}, minmax(0, 1fr));">
+            ${Array.from({ length: this.timelineEndHour - this.timelineStartHour }, () => `<div class="border-r border-dashed border-line"></div>`).join("")}
           </div>
-          ${resourceBookings.length === 0 ? this.renderAvailableBand() : resourceBookings.map((booking) => this.renderBookingBlock(booking)).join("")}
+          ${blocks || (outside.length === 0 ? this.renderAvailableBand() : "")}
         </div>
+      </div>
+    `
+  }
+
+  renderOutsideTags(bookings, resourceId) {
+    const sorted = [...bookings].sort((a, b) => new Date(a.start_at) - new Date(b.start_at))
+    const label = sorted.length === 1
+      ? `${sorted.length} ${translate("booking outside this window")}`
+      : `${sorted.length} ${translate("bookings outside this window")}`
+
+    return `
+      <div class="mt-1 flex flex-wrap items-center gap-1 text-[10px] font-semibold text-warning">
+        <span>${label}</span>
+        ${sorted.map((booking) => `
+          <button type="button" data-booking-outside-tag data-booking-id="${this.escape(booking.id)}" data-resource-id="${this.escape(resourceId)}"
+            data-action="click->${this.identifier}#selectBooking"
+            data-selected="${String(this.selectedBookingId) === String(booking.id) && String(this.selectedResourceId) === String(resourceId)}"
+            class="rounded-full border border-warning/40 bg-warning/10 px-1.5 py-0.5 hover:bg-warning/20 transition-colors ${String(this.selectedBookingId) === String(booking.id) && String(this.selectedResourceId) === String(resourceId) ? "ring-2 ring-primary" : ""}">
+            ${this.escape(this.time(booking.start_at))}
+          </button>
+        `).join("")}
       </div>
     `
   }
@@ -592,22 +661,26 @@ export default class Companies_Operations_Booking_ShowController extends Control
     `
   }
 
-  renderBookingBlock(booking) {
-    const left = this.percentForTime(booking.start_at)
-    const width = Math.max(2, this.durationPercent(booking))
+  renderBookingBlock(booking, resourceId) {
+    const segment = this.windowSegment(booking)
+    if (!segment) return ""
     const tone = this.bookingTone(booking.status)
     const statusLabel = this.bookingStatusLabel(booking.status)
+    const selected = String(this.selectedBookingId) === String(booking.id) && String(this.selectedResourceId) === String(resourceId)
+    const narrow = segment.width < 18
 
     return `
-      <div data-booking-block data-booking-id="${this.escape(booking.id)}"
-        class="absolute top-1.5 bottom-1.5 z-10 cursor-pointer rounded-lg p-2 border ${tone} transition-all hover:shadow-md overflow-hidden"
-        style="left: ${left}%; width: ${width}%;"
+      <div data-booking-block data-booking-id="${this.escape(booking.id)}" data-resource-id="${this.escape(resourceId)}"
+        data-selected="${selected}"
+        data-action="click->${this.identifier}#selectBooking"
+        class="absolute top-1.5 bottom-1.5 z-10 cursor-pointer rounded-lg p-2 border ${tone} ${selected ? "ring-2 ring-primary" : ""} transition-all hover:shadow-md overflow-hidden"
+        style="left: ${segment.left}%; width: ${Math.max(1.5, segment.width)}%;"
         title="${this.escape(booking.title)} · ${this.escape(this.time(booking.start_at))} - ${this.escape(this.time(booking.end_at))}">
         <div class="flex items-center justify-between gap-1 leading-none">
           <span class="text-[11px] font-bold tracking-wide truncate">${this.escape(booking.title)}</span>
-          ${statusLabel ? `<span class="px-1.5 py-0.5 rounded-full text-[9px] uppercase font-bold shrink-0 ${this.bookingBadgeTone(booking.status)}">${statusLabel}</span>` : ""}
+          ${!narrow && statusLabel ? `<span class="px-1.5 py-0.5 rounded-full text-[9px] uppercase font-bold shrink-0 ${this.bookingBadgeTone(booking.status)}">${statusLabel}</span>` : ""}
         </div>
-        <div class="text-[11px] truncate mt-1 opacity-90">${this.escape(booking.organizer)} • ${booking.attendees} ${translate("Att.")}</div>
+        ${narrow ? "" : `<div class="text-[11px] truncate mt-1 opacity-90">${this.escape(booking.host?.name || translate("No host"))} • ${booking.attendees} ${translate("Att.")}</div>`}
         <div class="text-[10px] truncate mt-1 opacity-75">${this.escape(this.time(booking.start_at))} - ${this.escape(this.time(booking.end_at))}</div>
       </div>
     `
@@ -615,18 +688,17 @@ export default class Companies_Operations_Booking_ShowController extends Control
 
   bookingTone(status) {
     const tones = {
-      active: "bg-primary text-primary-foreground border-primary",
-      completed: "bg-muted text-muted-foreground border-line opacity-80",
-      upcoming: "bg-card text-foreground border-line",
-      cancelled: "bg-muted text-muted-foreground border-line opacity-60"
+      in_progress: "bg-primary text-primary-foreground border-primary",
+      done: "bg-muted text-muted-foreground border-line opacity-80",
+      upcoming: "bg-card text-foreground border-line"
     }
     return tones[status] || tones.upcoming
   }
 
   bookingBadgeTone(status) {
     const tones = {
-      active: "bg-success text-success-foreground",
-      completed: "bg-line text-muted-foreground",
+      in_progress: "bg-success text-success-foreground",
+      done: "bg-line text-muted-foreground",
       upcoming: "bg-primary/10 text-primary",
       cancelled: "bg-danger/10 text-danger"
     }
@@ -635,223 +707,283 @@ export default class Companies_Operations_Booking_ShowController extends Control
 
   bookingStatusLabel(status) {
     const labels = {
-      active: translate("Active"),
-      completed: translate("Done"),
-      upcoming: translate("Confirmed"),
+      upcoming: translate("Upcoming"),
+      in_progress: translate("In progress"),
+      done: translate("Done"),
       cancelled: translate("Cancelled")
     }
     return labels[status] || ""
   }
 
-  renderFloorMap() {
+  renderCapsNotice() {
+    const lines = []
+    if (this.caps?.bookings?.capped) {
+      lines.push(`${translate("Showing the first")} ${this.caps.bookings.limit} ${translate("bookings for this day.")}`)
+    }
+    if (this.caps?.resources?.capped) {
+      lines.push(`${translate("Showing the first")} ${this.caps.resources.limit} ${translate("spaces for this branch.")}`)
+    }
+    if (lines.length === 0) return ""
+    return `<p class="text-[11px] font-semibold text-muted-foreground mt-1">${lines.map((line) => this.escape(line)).join(" ")}</p>`
+  }
+
+  renderSpacesByType() {
     return `
-      <div class="bg-card rounded-xl border border-line p-4 shadow-sm flex flex-col gap-4">
+      <div class="bg-card rounded-xl border border-line p-4 shadow-sm flex flex-col gap-3">
         <div class="flex items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[24px] text-primary">map</span>
-            <div>
-              <span class="text-[16px] font-bold text-foreground tracking-tight">${translate("Floor 4 Agile Zoning & Hot Desking")}</span>
-              <p class="text-[12px] text-muted-foreground mt-0.5">${translate("Live occupancy derived from today's facility bookings")}</p>
-            </div>
-          </div>
-          <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-success/10 text-success">${translate("Zone Live Map")}</span>
+          <span class="text-[16px] font-bold text-foreground tracking-tight">${translate("Spaces by type")}</span>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          ${this.renderZoneCard(translate("Zone A (East Wing)"), translate("Open collaborative benching and shared desks."), this.hotDeskOccupied, this.hotDeskTotal, "primary")}
-          ${this.renderZoneCard(translate("Zone B (Quiet Hub)"), translate("Individual focus desks with privacy screens."), Math.max(0, this.hotDeskTotal - this.hotDeskOccupied), this.hotDeskTotal, "success")}
-          <div class="p-4 rounded-xl bg-muted flex flex-col justify-between">
-            <span class="text-[13px] font-bold text-foreground">${translate("Micro-Pods & Booths")}</span>
-            <div class="grid grid-cols-4 gap-2 my-2">
-              ${this.resources.slice(0, 8).map((resource, index) => `
-                <div class="h-8 rounded ${resource.status === "busy" ? "bg-primary text-primary-foreground" : "bg-success/15 text-success"} text-[10px] flex items-center justify-center font-bold truncate px-1" title="${this.escape(resource.name)}">
-                  ${this.escape(resource.code || `P-${String(index + 1).padStart(2, "0")}`)}
-                </div>
-              `).join("") || `<span class="col-span-4 text-[11px] text-muted-foreground">${translate("No pods configured")}</span>`}
-            </div>
-            <div class="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
-              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-primary inline-block"></span> ${translate("Occupied")}</span>
-              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-success/40 inline-block"></span> ${translate("Free")}</span>
-            </div>
-          </div>
-        </div>
+        ${this.categories.length === 0 ? `
+          <p class="text-[12px] text-muted-foreground">${translate("No facilities are configured for this branch yet.")}</p>
+        ` : this.categories.map((category) => this.renderSpacesByTypeRow(category)).join("")}
       </div>
     `
   }
 
-  renderZoneCard(title, description, occupied, total, tone) {
-    const percent = total === 0 ? 0 : Math.round((occupied / total) * 100)
-    const bar = tone === "primary" ? "bg-primary" : "bg-success"
+  renderSpacesByTypeRow(category) {
+    const percent = category.total === 0 ? 0 : Math.round((category.in_use / category.total) * 100)
     return `
-      <div class="p-4 rounded-xl bg-muted flex flex-col justify-between">
-        <div class="flex items-center justify-between gap-2">
-          <span class="text-[13px] font-bold text-foreground">${title}</span>
-          <span class="px-2 py-0.5 rounded-full ${percent >= 80 ? "bg-danger/10 text-danger" : "bg-success/10 text-success"} text-[11px] font-bold">${percent}% ${translate("Full")}</span>
+      <div data-booking-spaces-by-type="${this.escape(category.name)}" class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between gap-3 text-[12px]">
+          <span class="font-semibold text-foreground truncate">${this.escape(category.name)}</span>
+          <span class="font-semibold text-muted-foreground whitespace-nowrap">${category.in_use} ${translate("in use")} · ${category.free} ${translate("free")}</span>
         </div>
-        <p class="text-[12px] text-muted-foreground mt-2">${description}</p>
-        <div class="w-full bg-line h-2 rounded-full overflow-hidden mt-3">
-          <div class="${bar} h-full rounded-full" style="width: ${percent}%"></div>
-        </div>
-        <div class="flex items-center justify-between mt-3 text-[11px] font-semibold">
-          <span class="text-muted-foreground">${Math.max(0, total - occupied)} ${translate("Open")}</span>
-          <button type="button" data-action="click->${this.identifier}#scrollToReservation" class="text-primary hover:underline">${translate("Claim Seat")} →</button>
+        <div class="w-full bg-line h-1.5 rounded-full overflow-hidden">
+          <div class="bg-primary h-full rounded-full" style="width: ${percent}%"></div>
         </div>
       </div>
     `
   }
 
   renderInspector() {
-    const booking = this.featuredBooking
-    const resource = this.featuredResource
+    const booking = this.selectedBooking
     if (!booking) {
       return `
         <div class="bg-card rounded-xl border border-line p-4 shadow-sm">
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[16px] text-primary">visibility</span>
-              ${translate("Selected Room Inspector")}
+              ${translate("Selected booking")}
             </span>
-            <span class="px-2.5 py-0.5 rounded-full bg-muted text-muted-foreground text-[11px] font-bold">${translate("Idle")}</span>
           </div>
-          <p class="text-[13px] text-muted-foreground mt-3">${translate("Select a booking block to inspect the reservation.")}</p>
+          <p class="text-[13px] font-semibold text-foreground mt-3">${translate("Select a booking")}</p>
+          <p class="text-[12px] text-muted-foreground mt-1">${translate("or lock a room with the form.")}</p>
         </div>
       `
     }
 
-    const statusLabel = booking.status === "active" ? translate("In Session") : this.bookingStatusLabel(booking.status)
+    const facility = this.selectedFacility
+    const status = booking.status
+    const active = status === "upcoming" || status === "in_progress"
+    const confirm = this.cancelState && String(this.cancelState.id) === String(booking.id) && this.cancelState.context === "inspector"
+
     return `
       <div class="bg-card rounded-xl border border-line p-4 shadow-sm flex flex-col gap-4">
         <div class="flex items-center justify-between">
           <span class="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[16px] text-primary">visibility</span>
-            ${translate("Selected Room Inspector")}
+            ${translate("Selected booking")}
           </span>
-          <span class="px-2.5 py-0.5 rounded-full bg-success/10 text-success text-[11px] font-bold">${statusLabel}</span>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${this.bookingBadgeTone(status)}">${this.bookingStatusLabel(status)}</span>
         </div>
-        <div class="flex flex-col gap-2">
-          <div class="relative w-full h-36 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
-            <span class="material-symbols-outlined text-[64px] text-muted-foreground/40">meeting_room</span>
-            <div class="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent"></div>
-            <div class="absolute bottom-2 left-3 text-primary-foreground">
-              <span class="text-[20px] font-bold leading-tight block">${this.escape(resource?.name || translate("Unassigned room"))}</span>
-              <span class="text-[11px] opacity-90">${this.escape(this.branchName)}</span>
-            </div>
+
+        <div class="flex items-center gap-3 rounded-lg bg-muted p-3">
+          <div class="w-10 h-10 rounded-lg bg-card border border-line flex items-center justify-center text-primary shrink-0">
+            <span class="material-symbols-outlined text-[22px]">meeting_room</span>
           </div>
-          <div class="pt-1">
-            <span class="text-[16px] font-bold text-foreground block">${this.escape(booking.title)}</span>
-            <span class="text-[12px] text-muted-foreground">${translate("Scheduled:")} ${this.escape(this.time(booking.start_at))} – ${this.escape(this.time(booking.end_at))}</span>
+          <div class="min-w-0">
+            <span class="text-[15px] font-bold text-foreground truncate block">${this.escape(facility?.name || translate("No space linked"))}</span>
+            <span class="text-[11px] font-semibold text-muted-foreground truncate block">
+              ${this.escape(facility?.category || "—")}${facility?.capacity ? ` · ${this.escape(facility.capacity)} ${translate("Pax")}` : ""}
+            </span>
           </div>
         </div>
-        <div class="bg-muted rounded-lg p-2 flex flex-col gap-2">
-          <div class="flex items-center gap-2">
-            <div class="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-[16px]">
-              ${this.escape(this.initialsFor(booking.organizer))}
-            </div>
-            <div class="flex flex-col">
-              <span class="text-[13px] font-semibold text-foreground leading-tight">${this.escape(booking.organizer)}</span>
-              <span class="text-[12px] text-muted-foreground leading-tight">${translate("Organiser")}</span>
-            </div>
+
+        <div class="flex flex-col gap-1">
+          <span class="text-[16px] font-bold text-foreground block">${this.escape(booking.title)}</span>
+          <span class="text-[12px] text-muted-foreground">${this.escape(this.time(booking.start_at))} – ${this.escape(this.time(booking.end_at))}</span>
+        </div>
+
+        <div class="bg-muted rounded-lg p-3 flex flex-col gap-2 text-[12px]">
+          <div class="flex items-center justify-between gap-3">
+            <span class="font-semibold text-muted-foreground">${translate("Host")}</span>
+            <span class="font-semibold text-foreground truncate">${this.escape(booking.host?.name || translate("No host"))}</span>
           </div>
-          ${booking.customer ? `
-            <div class="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
-              <span class="material-symbols-outlined text-[14px]">apartment</span>
-              ${translate("Client:")} <strong class="text-foreground">${this.escape(booking.customer)}</strong>
-            </div>
-          ` : ""}
-          <div class="grid grid-cols-2 gap-2 pt-2 border-t border-line text-[11px] font-semibold">
+          <div class="flex items-center justify-between gap-3">
+            <span class="font-semibold text-muted-foreground">${translate("Customer")}</span>
+            <span class="font-semibold text-foreground truncate">${this.escape(booking.customer?.name || translate("No customer"))}</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-2 border-t border-line">
             <div>
               <span class="text-muted-foreground block">${translate("Attendees")}</span>
-              <span class="text-foreground">${booking.attendees}</span>
+              <span class="text-foreground font-semibold">${booking.attendees}</span>
             </div>
             <div>
               <span class="text-muted-foreground block">${translate("Reference")}</span>
-              <span class="text-primary truncate block">${this.escape(booking.code || booking.id)}</span>
+              <span class="text-primary font-semibold truncate block">${this.escape(booking.code || "—")}</span>
             </div>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button" data-action="click->${this.identifier}#extendBooking"
-            class="px-3 py-2 rounded-lg bg-muted hover:bg-line text-foreground text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors">
-            <span class="material-symbols-outlined text-[16px] text-primary">more_time</span>
-            ${translate("Extend +30m")}
-          </button>
-          <button type="button" data-action="click->${this.identifier}#endBooking"
-            class="px-3 py-2 rounded-lg bg-danger/10 hover:bg-danger hover:text-danger-foreground text-danger text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors">
-            <span class="material-symbols-outlined text-[16px]">stop_circle</span>
-            ${translate("End & Release")}
-          </button>
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button" data-action="click->${this.identifier}#checkInBooking"
-            class="px-3 py-2 rounded-lg bg-success text-success-foreground text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-sm">
-            <span class="material-symbols-outlined text-[16px]">how_to_reg</span>
-            ${translate("Check-In Room")}
-          </button>
-          <button type="button" data-action="click->${this.identifier}#ringOrganizer"
-            class="px-3 py-2 rounded-lg bg-muted hover:bg-line text-muted-foreground text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors">
-            <span class="material-symbols-outlined text-[16px]">call</span>
-            ${translate("Ring Organizer")}
-          </button>
-        </div>
+
+        ${confirm ? `
+          <div data-booking-cancel-confirm class="rounded-lg border border-danger/30 bg-danger/10 p-3 flex flex-col gap-2">
+            <span class="text-[12px] font-semibold text-danger">${translate("Cancel this booking?")}</span>
+            <div class="flex items-center gap-2">
+              <button type="button" data-action="click->${this.identifier}#keepBooking"
+                class="px-3 py-1.5 rounded-lg bg-muted text-foreground text-[11px] font-semibold">${translate("Keep")}</button>
+              <button type="button" data-action="click->${this.identifier}#confirmCancel"
+                class="px-3 py-1.5 rounded-lg bg-danger text-danger-foreground text-[11px] font-semibold">${translate("Cancel booking")}</button>
+            </div>
+          </div>
+        ` : ""}
+
+        ${active && !confirm ? `
+          <div class="flex flex-col gap-2">
+            <div class="grid grid-cols-2 gap-2">
+              <div class="flex flex-col">
+                <button type="button" data-action="click->${this.identifier}#extendBooking"
+                  class="px-3 py-2 rounded-lg bg-muted hover:bg-line text-foreground text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors">
+                  <span class="material-symbols-outlined text-[16px] text-primary">more_time</span>
+                  ${translate("Extend +30m")}
+                </button>
+                ${this.extendNotice ? `<span class="text-[10px] font-semibold text-danger mt-1 text-center">${this.escape(this.extendNotice)}</span>` : ""}
+              </div>
+              <button type="button" data-action="click->${this.identifier}#endBooking"
+                class="px-3 py-2 rounded-lg bg-danger/10 hover:bg-danger hover:text-danger-foreground text-danger text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors">
+                <span class="material-symbols-outlined text-[16px]">stop_circle</span>
+                ${translate("End & release")}
+              </button>
+            </div>
+            <button type="button" data-action="click->${this.identifier}#requestCancel" data-booking-id="${this.escape(booking.id)}" data-context="inspector"
+              class="text-[11px] font-semibold text-muted-foreground hover:text-danger text-left">
+              ${translate("Cancel booking")}
+            </button>
+          </div>
+          <p class="text-[11px] font-semibold text-muted-foreground">${translate("Guest check-in is in Reception.")}</p>
+        ` : ""}
       </div>
     `
   }
 
   renderReservationForm() {
-    const facilities = this.reference.facilities?.length ? this.reference.facilities : this.resources
-    const options = facilities.map((facility) => {
-      const capacity = facility.capacity ? ` (${facility.capacity}p)` : ""
-      return `<option value="${this.escape(facility.id)}">${this.escape(facility.name)}${capacity}</option>`
-    }).join("")
+    const facilities = this.reference.facilities || []
+    const hosts = this.reference.hosts || []
+    const disabled = facilities.length === 0
+    const action = Helpers.booking_reservations_company_operation_path(
+      this.companyId,
+      this.operationId,
+      this.branchId ? { branch_id: this.branchId } : {}
+    )
+
+    const html = `
+      ${facilities.length === 0 ? `<p class="text-[12px] text-danger font-semibold">${translate("No spaces are configured for this branch. Add a Facility to start booking.")}</p>` : ""}
+      <div>
+        <label class="text-[11px] font-semibold text-muted-foreground block mb-1">${translate("Meeting / event name")}</label>
+        <input name="booking[title]" value="${this.escape(this.formState.title)}" class="w-full px-3 py-2 rounded-lg bg-muted text-foreground text-[13px] border border-line focus:outline-none focus:ring-2 focus:ring-primary" placeholder="${translate("e.g. Q4 Regional Strategy Workshop")}" required type="text" />
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[11px] font-semibold text-muted-foreground block mb-1">${translate("Space")}</label>
+          <select name="booking[facility_id]" ${disabled ? "disabled" : ""} class="w-full px-3 py-2 rounded-lg bg-muted text-foreground text-[11px] font-semibold border border-line focus:outline-none focus:ring-2 focus:ring-primary" required>
+            <option value="">${translate("Select a space")}</option>
+            ${facilities.map((facility) => `
+              <option value="${this.escape(facility.id)}" ${String(this.formState.facilityId) === String(facility.id) ? "selected" : ""}>
+                ${this.escape(facility.name)}${facility.category ? ` — ${this.escape(facility.category)}` : ""}
+              </option>
+            `).join("")}
+          </select>
+          ${this.caps?.facilities?.capped ? `<p class="text-[10px] font-semibold text-muted-foreground mt-1">${translate("Showing the first")} ${this.caps.facilities.limit}.</p>` : ""}
+        </div>
+        <div>
+          <label class="text-[11px] font-semibold text-muted-foreground block mb-1">${translate("Host")}</label>
+          <select name="booking[host_id]" class="w-full px-3 py-2 rounded-lg bg-muted text-foreground text-[11px] font-semibold border border-line focus:outline-none focus:ring-2 focus:ring-primary">
+            <option value="">${translate("No host")}</option>
+            ${hosts.map((host) => `
+              <option value="${this.escape(host.id)}" ${String(this.formState.hostId) === String(host.id) ? "selected" : ""}>
+                ${this.escape(host.name)}${host.role ? ` — ${this.escape(host.role)}` : ""}
+              </option>
+            `).join("")}
+          </select>
+          ${this.caps?.hosts?.capped ? `<p class="text-[10px] font-semibold text-muted-foreground mt-1">${translate("Showing the first")} ${this.caps.hosts.limit}.</p>` : ""}
+        </div>
+      </div>
+      <div>
+        <label class="text-[11px] font-semibold text-muted-foreground block mb-1">${translate("Customer")}</label>
+        <div data-booking-customer-field>${this.renderCustomerField()}</div>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="text-[11px] font-semibold text-muted-foreground block mb-1">${translate("Start")}</label>
+          <input name="booking[start_time]" value="${this.escape(this.formState.start)}" class="w-full px-3 py-2 rounded-lg bg-muted text-foreground text-[11px] font-semibold border border-line focus:outline-none focus:ring-2 focus:ring-primary" required type="time" />
+        </div>
+        <div>
+          <label class="text-[11px] font-semibold text-muted-foreground block mb-1">${translate("End")}</label>
+          <input name="booking[end_time]" value="${this.escape(this.formState.end)}" class="w-full px-3 py-2 rounded-lg bg-muted text-foreground text-[11px] font-semibold border border-line focus:outline-none focus:ring-2 focus:ring-primary" required type="time" />
+        </div>
+      </div>
+      <p data-booking-form-error class="text-[11px] font-semibold text-danger min-h-[1rem]">${this.escape(this.reservationError)}</p>
+      <button class="w-full py-2.5 rounded-lg bg-primary hover:brightness-110 text-primary-foreground text-[13px] font-semibold transition-all shadow-sm mt-1 flex items-center justify-center gap-1.5 disabled:opacity-50" type="submit" ${disabled ? "disabled" : ""}>
+        <span class="material-symbols-outlined text-[18px]">verified</span>
+        <span>${translate("Confirm & Lock Booking")}</span>
+      </button>
+    `
 
     return `
-      <div id="quickReservationDrawer" class="bg-card rounded-xl border border-line p-4 shadow-sm flex flex-col gap-4">
+      <div class="bg-card rounded-xl border border-line p-4 shadow-sm flex flex-col gap-4">
         <div class="flex items-center justify-between border-b border-line pb-2">
           <span class="text-[16px] font-bold text-foreground flex items-center gap-2">
             <span class="material-symbols-outlined text-primary text-[22px]">add_alarm</span>
-            ${translate("Instant Reservation")}
+            ${translate("Instant reservation")}
           </span>
-          <span class="text-[11px] font-semibold text-muted-foreground">${translate("Instant Lock")}</span>
         </div>
-        <form class="flex flex-col gap-3" data-action="submit->${this.identifier}#handleReservationSubmit">
-          <div>
-            <label class="text-[11px] font-semibold text-muted-foreground block mb-1">${translate("Meeting / Event Name")}</label>
-            <input name="booking[title]" class="w-full px-3 py-2 rounded-lg bg-muted text-foreground text-[13px] border border-line focus:outline-none focus:ring-2 focus:ring-primary" placeholder="${translate("e.g. Q4 Regional Strategy Workshop")}" required type="text" />
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-[11px] font-semibold text-muted-foreground block mb-1">${translate("Select Space")}</label>
-              <select name="booking[facility_id]" class="w-full px-3 py-2 rounded-lg bg-muted text-foreground text-[11px] font-semibold border border-line focus:outline-none focus:ring-2 focus:ring-primary">
-                ${options || `<option value="">${translate("No facilities")}</option>`}
-              </select>
-            </div>
-            <div>
-              <label class="text-[11px] font-semibold text-muted-foreground block mb-1">${translate("Host / Dept")}</label>
-              <input name="booking[host]" class="w-full px-3 py-2 rounded-lg bg-muted text-foreground text-[13px] border border-line focus:outline-none focus:ring-2 focus:ring-primary" type="text" value="${this.escape(this.userName)}" />
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-[11px] font-semibold text-muted-foreground block mb-1">${translate("Start Time")}</label>
-              <input name="booking[start_time]" class="w-full px-3 py-2 rounded-lg bg-muted text-foreground text-[11px] font-semibold border border-line focus:outline-none focus:ring-2 focus:ring-primary" type="time" value="10:30" />
-            </div>
-            <div>
-              <label class="text-[11px] font-semibold text-muted-foreground block mb-1">${translate("End Time")}</label>
-              <input name="booking[end_time]" class="w-full px-3 py-2 rounded-lg bg-muted text-foreground text-[11px] font-semibold border border-line focus:outline-none focus:ring-2 focus:ring-primary" type="time" value="11:30" />
-            </div>
-          </div>
-          <div class="flex items-center justify-between p-2 rounded-lg bg-muted mt-1">
-            <div class="flex flex-col">
-              <span class="text-[11px] font-semibold text-foreground">${translate("10-Min No-Show Release")}</span>
-              <span class="text-[11px] text-muted-foreground">${translate("Auto-releases room if not checked in")}</span>
-            </div>
-            <input checked class="w-4 h-4 text-primary rounded focus:ring-primary" type="checkbox" />
-          </div>
-          <button class="w-full py-2.5 rounded-lg bg-primary hover:brightness-110 text-primary-foreground text-[13px] font-semibold transition-all shadow-sm mt-1 flex items-center justify-center gap-1.5" type="submit">
-            <span class="material-symbols-outlined text-[18px]">verified</span>
-            <span>${translate("Confirm & Lock Booking")}</span>
-          </button>
-        </form>
+        ${Helpers.form({
+          action: action,
+          method: "POST",
+          attributes: `novalidate data-booking-reservation-form data-action="submit->${this.identifier}#handleReservationSubmit input->${this.identifier}#syncReservationForm input->${this.identifier}#scheduleCustomerSearch change->${this.identifier}#syncReservationForm"`,
+          html: html
+        })}
       </div>
+    `
+  }
+
+  renderCustomerField() {
+    if (this.formState.customerId) {
+      return `
+        <input type="hidden" name="booking[customer_id]" value="${this.escape(this.formState.customerId)}" />
+        <div class="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-muted border border-line">
+          <span class="text-[12px] font-semibold text-foreground truncate">${this.escape(this.formState.customerName || translate("No customer"))}</span>
+          <button type="button" data-action="click->${this.identifier}#clearCustomer" class="text-muted-foreground hover:text-danger" title="${translate("Clear customer")}" aria-label="${translate("Clear customer")}">
+            <span class="material-symbols-outlined text-[16px]">close</span>
+          </button>
+        </div>
+      `
+    }
+
+    return `
+      <input type="hidden" name="booking[customer_id]" value="" />
+      <input name="booking[customer_query]" value="${this.escape(this.formState.customerQuery)}" data-action="keydown.enter->${this.identifier}#handleCustomerKeydown"
+        class="w-full px-3 py-2 rounded-lg bg-muted text-foreground text-[12px] border border-line focus:outline-none focus:ring-2 focus:ring-primary"
+        placeholder="${translate("No customer")}" autocomplete="off" type="text" />
+      <div data-booking-customer-results class="mt-1 flex flex-col gap-1">${this.renderCustomerResults()}</div>
+    `
+  }
+
+  renderCustomerResults() {
+    const showEmpty = this.formState.customerQuery.length >= 2 && !this.customerSearching && this.customerResults.length === 0 && !this.customerSearchError
+    return `
+      ${this.formState.customerQuery.length === 0 ? `<span class="text-[10px] font-semibold text-muted-foreground">${translate("Type to search customers.")}</span>` : ""}
+      ${this.customerSearchError ? `<span class="text-[10px] font-semibold text-danger">${this.escape(this.customerSearchError)}</span>` : ""}
+      ${this.customerSearching ? `<span class="text-[10px] font-semibold text-muted-foreground">${translate("Searching customers…")}</span>` : ""}
+      ${this.formState.customerQuery.length > 0 && this.formState.customerQuery.length < 2 ? `<span class="text-[10px] font-semibold text-muted-foreground">${translate("Type at least 2 characters.")}</span>` : ""}
+      ${showEmpty ? `<span class="text-[10px] font-semibold text-muted-foreground">${translate("No customers found.")}</span>` : ""}
+      ${this.customerResults.map((customer) => `
+        <button type="button" data-booking-customer-result data-customer-id="${this.escape(customer.id)}" data-customer-name="${this.escape(customer.name)}"
+          data-action="click->${this.identifier}#selectCustomer"
+          class="text-left px-2 py-1.5 rounded-lg bg-card border border-line hover:bg-muted">
+          <span class="block text-[12px] font-semibold text-foreground truncate">${this.escape(customer.name)}</span>
+          <span class="block text-[10px] text-muted-foreground truncate">${this.escape([ customer.code, customer.email ].filter(Boolean).join(" · "))}</span>
+        </button>
+      `).join("")}
     `
   }
 
@@ -859,31 +991,37 @@ export default class Companies_Operations_Booking_ShowController extends Control
     return `
       <div class="bg-card rounded-xl border border-line p-4 shadow-sm flex flex-col gap-4">
         <div class="flex items-center justify-between">
-          <span class="text-[16px] font-bold text-foreground">${translate("Upcoming Check-Ins")}</span>
-          <span class="text-[11px] font-semibold text-success">${this.pendingCheckins} ${translate("Pending")}</span>
+          <span class="text-[16px] font-bold text-foreground">${translate("Upcoming check-ins")}</span>
+          <span class="text-[11px] font-semibold text-muted-foreground">${this.upcomingCount} ${translate("upcoming")}</span>
         </div>
         <div class="flex flex-col gap-2">
-          ${this.upcoming.length === 0 ? `<p class="text-[12px] text-muted-foreground">${translate("No pending check-ins for this day.")}</p>` : this.upcoming.map((booking) => this.renderUpcomingItem(booking)).join("")}
+          ${this.upcoming.length === 0 ? `<p class="text-[12px] text-muted-foreground">${translate("No upcoming bookings for this day.")}</p>` : this.upcoming.map((booking) => this.renderUpcomingItem(booking)).join("")}
         </div>
       </div>
     `
   }
 
   renderUpcomingItem(booking) {
+    const confirm = this.cancelState && String(this.cancelState.id) === String(booking.id) && this.cancelState.context === "upcoming"
     return `
-      <div class="p-2.5 rounded-lg bg-muted flex items-center justify-between gap-2">
-        <div class="flex flex-col min-w-0 pr-2">
-          <span class="text-[13px] font-semibold text-foreground truncate">${this.escape(booking.title)}</span>
-          <span class="text-[11px] text-muted-foreground truncate">${this.escape(booking.resource_name || translate("Unassigned room"))} • ${translate("Starts")} ${this.escape(this.time(booking.start_at))}</span>
+      <div data-booking-upcoming-item="${this.escape(booking.id)}" class="p-2.5 rounded-lg bg-muted flex flex-col gap-2">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex flex-col min-w-0 pr-2">
+            <span class="text-[13px] font-semibold text-foreground truncate">${this.escape(booking.title)}</span>
+            <span class="text-[11px] text-muted-foreground truncate">${this.escape(booking.facility_name || translate("No space linked"))} • ${translate("Starts")} ${this.escape(this.time(booking.start_at))}</span>
+          </div>
+          <button type="button" data-action="click->${this.identifier}#requestCancel" data-booking-id="${this.escape(booking.id)}" data-context="upcoming"
+            class="text-[11px] font-semibold text-danger hover:underline shrink-0">${translate("Cancel")}</button>
         </div>
-        <div class="flex items-center gap-1 shrink-0">
-          <button type="button" data-action="click->${this.identifier}#checkInBooking" class="p-1 rounded bg-success text-success-foreground hover:brightness-110 transition-colors" title="${translate("Check In Now")}">
-            <span class="material-symbols-outlined text-[16px]">check</span>
-          </button>
-          <button type="button" data-action="click->${this.identifier}#endBooking" class="p-1 rounded bg-danger/10 text-danger hover:bg-danger hover:text-danger-foreground transition-colors" title="${translate("Release Room")}">
-            <span class="material-symbols-outlined text-[16px]">close</span>
-          </button>
-        </div>
+        ${confirm ? `
+          <div data-booking-cancel-confirm class="flex items-center justify-between gap-2 border-t border-line pt-2">
+            <span class="text-[11px] font-semibold text-danger">${translate("Cancel this booking?")}</span>
+            <div class="flex items-center gap-1">
+              <button type="button" data-action="click->${this.identifier}#keepBooking" class="px-2 py-1 rounded bg-muted text-foreground text-[10px] font-semibold">${translate("Keep")}</button>
+              <button type="button" data-action="click->${this.identifier}#confirmCancel" class="px-2 py-1 rounded bg-danger text-danger-foreground text-[10px] font-semibold">${translate("Cancel booking")}</button>
+            </div>
+          </div>
+        ` : ""}
       </div>
     `
   }
@@ -892,17 +1030,49 @@ export default class Companies_Operations_Booking_ShowController extends Control
     return `
       <footer class="w-full bg-muted border-t border-line mt-4">
         <div class="w-full px-4 lg:px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-3">
-          <div class="flex items-center gap-2 text-muted-foreground text-[13px] font-semibold">
-            <span>${translate("Skycom ERP Booking & Reservations")}</span>
-            <span class="text-line">•</span>
-            <span>${translate("Reception Console")} v4.8</span>
-          </div>
-          <div class="flex items-center gap-4 text-muted-foreground text-[11px] font-semibold">
-            <span>${translate("Tenant:")} ${this.escape(this.operation?.company?.name || translate("Skycom Enterprise Corp"))}</span>
-            <span class="text-muted-foreground/80">© 2026 ${translate("Skycom Systems. All rights reserved.")}</span>
-          </div>
+          <span class="text-muted-foreground text-[13px] font-semibold">${translate("Skycom ERP · Booking")}</span>
+          ${this.companyName ? `<span class="text-muted-foreground text-[12px] font-semibold">${this.escape(this.companyName)}</span>` : ""}
         </div>
       </footer>
+    `
+  }
+
+  renderRunSheet() {
+    const bookings = [...this.bookings].sort((a, b) => new Date(a.start_at) - new Date(b.start_at))
+    return `
+      <div id="booking-run-sheet" data-booking-run-sheet class="hidden print:block text-foreground p-6">
+        <div class="mb-4">
+          <h1 class="text-xl font-bold">${this.escape(this.branchName)}</h1>
+          <p class="text-sm">${this.escape(this.dateLabel)}</p>
+        </div>
+        ${bookings.length === 0 ? `<p class="text-sm font-semibold">${translate("No bookings")}</p>` : `
+          <table class="w-full text-left text-[11px] border-collapse">
+            <thead>
+              <tr class="border-b border-line">
+                <th class="py-1 pr-2 font-bold">${translate("Time")}</th>
+                <th class="py-1 pr-2 font-bold">${translate("Space")}</th>
+                <th class="py-1 pr-2 font-bold">${translate("Meeting / event name")}</th>
+                <th class="py-1 pr-2 font-bold">${translate("Host")}</th>
+                <th class="py-1 pr-2 font-bold">${translate("Customer")}</th>
+                <th class="py-1 font-bold">${translate("Status")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${bookings.map((booking) => `
+                <tr class="border-b border-line align-top">
+                  <td class="py-1 pr-2 whitespace-nowrap">${this.escape(this.time(booking.start_at))} – ${this.escape(this.time(booking.end_at))}</td>
+                  <td class="py-1 pr-2">${this.escape((booking.facilities || []).map((facility) => facility.name).join(", ") || translate("No space linked"))}</td>
+                  <td class="py-1 pr-2 font-semibold">${this.escape(booking.title)}</td>
+                  <td class="py-1 pr-2">${this.escape(booking.host?.name || translate("No host"))}</td>
+                  <td class="py-1 pr-2">${this.escape(booking.customer?.name || translate("No customer"))}</td>
+                  <td class="py-1">${this.escape(this.bookingStatusLabel(booking.status))}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+          ${this.caps?.bookings?.capped ? `<p class="text-[11px] mt-3">${translate("Showing the first")} ${this.caps.bookings.limit} ${translate("bookings for this day.")}</p>` : ""}
+        `}
+      </div>
     `
   }
 
@@ -923,85 +1093,402 @@ export default class Companies_Operations_Booking_ShowController extends Control
 
   async today() {
     this.selectedDate = null
+    this.clearSelection()
     await this.reloadConsole()
   }
 
   async shiftDay(offset) {
     const base = new Date(`${this.selectedDate || this.todayIso()}T12:00:00`)
     base.setDate(base.getDate() + offset)
-    this.selectedDate = this.isoDate(base)
+    this.selectedDate = this.localIsoDate(base)
+    this.clearSelection()
     await this.reloadConsole()
+  }
+
+  localIsoDate(date) {
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const day = String(date.getDate()).padStart(2, "0")
+    return `${date.getFullYear()}-${month}-${day}`
   }
 
   async reloadConsole() {
     try {
       await this.loadConsole()
+      if (this.selectedBookingId && !this.bookings.some((booking) => String(booking.id) === String(this.selectedBookingId))) {
+        this.clearSelection()
+      }
       this.renderContent()
     } catch (error) {
       toast({ type: "error", message: error.errors?.join(", ") || error.message })
     }
   }
 
+  clearSelection() {
+    this.selectedBookingId = null
+    this.selectedResourceId = null
+    this.extendNotice = ""
+    this.cancelState = null
+  }
+
+  selectBooking(event) {
+    this.selectedBookingId = event.currentTarget.dataset.bookingId
+    this.selectedResourceId = event.currentTarget.dataset.resourceId
+    this.extendNotice = ""
+    this.cancelState = null
+    this.refreshTimeline()
+    this.refreshInspector()
+    this.refreshUpcoming()
+  }
+
+  refreshTimeline() {
+    const target = this.element.querySelector("[data-booking-timeline]")
+    if (target) target.innerHTML = this.renderTimeline()
+  }
+
+  refreshInspector() {
+    const target = this.element.querySelector("[data-booking-inspector]")
+    if (target) target.innerHTML = this.renderInspector()
+  }
+
+  refreshUpcoming() {
+    const target = this.element.querySelector("[data-booking-upcoming]")
+    if (target) target.innerHTML = this.renderUpcoming()
+  }
+
+  refreshReservationForm() {
+    const target = this.element.querySelector("[data-booking-reservation-card]")
+    if (target) target.innerHTML = this.renderReservationForm()
+  }
+
+  refreshActionBar() {
+    const target = this.element.querySelector("[data-booking-action-bar]")
+    if (target) target.innerHTML = this.renderActionBar()
+  }
+
   scrollToReservation() {
-    document.getElementById("quickReservationDrawer")?.scrollIntoView({ behavior: "smooth", block: "center" })
-    document.getElementById("quickReservationDrawer")?.querySelector("input")?.focus()
+    const drawer = document.getElementById("quickReservationDrawer")
+    drawer?.scrollIntoView({ behavior: "smooth", block: "center" })
+    drawer?.querySelector('input[name="booking[title]"]')?.focus()
+  }
+
+  syncReservationForm(event) {
+    const form = this.element.querySelector("[data-booking-reservation-form]")
+    if (!form) return
+    const data = new FormData(form)
+    this.formState.title = data.get("booking[title]") || ""
+    this.formState.facilityId = data.get("booking[facility_id]") || ""
+    this.formState.hostId = data.get("booking[host_id]") || ""
+    this.formState.customerId = data.get("booking[customer_id]") || ""
+    this.formState.customerQuery = data.get("booking[customer_query]") || ""
+    this.formState.start = data.get("booking[start_time]") || ""
+    this.formState.end = data.get("booking[end_time]") || ""
+
+    const name = event?.target?.name
+    if (["booking[facility_id]", "booking[start_time]", "booking[end_time]"].includes(name) && this.reservationError) {
+      this.setReservationError("")
+    }
+  }
+
+  handleCustomerKeydown(event) {
+    if (event.key !== "Enter") return
+    event.preventDefault()
+    this.searchCustomers()
+  }
+
+  scheduleCustomerSearch(event) {
+    if (event?.target?.name !== "booking[customer_query]") return
+    const query = event.target.value || ""
+    this.formState.customerQuery = query
+    if (this.customerSearchTimer) window.clearTimeout(this.customerSearchTimer)
+    if (query.trim().length < 2) {
+      this.customerResults = []
+      this.customerSearchError = ""
+      this.customerSearching = false
+      this.refreshCustomerResults()
+      return
+    }
+
+    this.customerSearchTimer = window.setTimeout(() => this.searchCustomers(), 250)
+  }
+
+  async searchCustomers() {
+    const query = this.formState.customerQuery.trim()
+    if (query.length < 2) return
+    const token = ++this.customerSearchToken
+    this.customerSearching = true
+    this.customerSearchError = ""
+    this.refreshCustomerResults()
+
+    try {
+      const params = { q: query }
+      if (this.branchId) params.branch_id = this.branchId
+      const response = await fetchJson(Helpers.booking_customers_company_operation_path(this.companyId, this.operationId, params))
+      if (token !== this.customerSearchToken) return
+      this.customerResults = response.customers || []
+    } catch (error) {
+      if (token !== this.customerSearchToken) return
+      this.customerResults = []
+      this.customerSearchError = error.errors?.join(", ") || error.message || translate("Failed to search customers.")
+    } finally {
+      if (token === this.customerSearchToken) {
+        this.customerSearching = false
+        this.refreshCustomerResults()
+      }
+    }
+  }
+
+  refreshCustomerResults() {
+    const target = this.element.querySelector("[data-booking-customer-results]")
+    if (target) target.innerHTML = this.renderCustomerResults()
+  }
+
+  refreshCustomerField() {
+    const target = this.element.querySelector("[data-booking-customer-field]")
+    if (target) target.innerHTML = this.renderCustomerField()
+  }
+
+  selectCustomer(event) {
+    this.formState.customerId = event.currentTarget.dataset.customerId
+    this.formState.customerName = event.currentTarget.dataset.customerName
+    this.formState.customerQuery = ""
+    this.customerResults = []
+    this.customerSearchError = ""
+    this.refreshCustomerField()
+  }
+
+  clearCustomer() {
+    this.formState.customerId = ""
+    this.formState.customerName = ""
+    this.formState.customerQuery = ""
+    this.customerResults = []
+    this.customerSearchError = ""
+    this.refreshCustomerField()
+  }
+
+  setReservationError(message) {
+    this.reservationError = message || ""
+    const target = this.element.querySelector("[data-booking-form-error]")
+    if (target) target.textContent = this.reservationError
   }
 
   async handleReservationSubmit(event) {
     event.preventDefault()
+    if (this.formSubmitting) return
+
     const form = event.target
     const data = new FormData(form)
-    const payload = {
-      booking: {
-        title: data.get("booking[title]"),
-        facility_id: data.get("booking[facility_id]"),
-        host: data.get("booking[host]"),
-        start_time: data.get("booking[start_time]"),
-        end_time: data.get("booking[end_time]"),
-        date: this.selectedDate
-      }
+    const title = (data.get("booking[title]") || "").trim()
+    const facilityId = data.get("booking[facility_id]") || ""
+    const start = data.get("booking[start_time]") || ""
+    const end = data.get("booking[end_time]") || ""
+
+    if (!title) {
+      toast({ type: "error", message: translate("Meeting / event name is required.") })
+      form.querySelector('input[name="booking[title]"]')?.focus()
+      return
+    }
+    if (!facilityId) {
+      toast({ type: "error", message: translate("Select a space for this reservation.") })
+      form.querySelector('select[name="booking[facility_id]"]')?.focus()
+      return
+    }
+    if (!start || !end) {
+      this.setReservationError(translate("Start and end times are required."))
+      form.querySelector('input[name="booking[start_time]"]')?.focus()
+      return
+    }
+    if (end <= start) {
+      this.setReservationError(translate("End time must be after start time."))
+      form.querySelector('input[name="booking[end_time]"]')?.focus()
+      return
     }
 
+    this.formSubmitting = true
+    this.setReservationError("")
     try {
       const params = this.branchId ? { branch_id: this.branchId } : {}
-      const response = await fetchJson(Helpers.booking_reservations_company_operation_path(this.companyId, this.operationId, params), {
-        method: "POST",
-        body: payload
-      })
-      toast({ type: "success", message: response.message || translate("Reservation confirmed.") })
-      form.reset()
+      const response = await fetchJson(
+        Helpers.booking_reservations_company_operation_path(this.companyId, this.operationId, params),
+        {
+          method: "POST",
+          body: {
+            booking: {
+              title,
+              facility_id: facilityId,
+              host_id: data.get("booking[host_id]") || null,
+              customer_id: data.get("booking[customer_id]") || null,
+              start_time: start,
+              end_time: end,
+              date: this.selectedDate
+            }
+          }
+        }
+      )
+      this.selectedBookingId = response.event?.id || null
+      this.selectedResourceId = facilityId
+      this.resetReservationForm()
       await this.reloadConsole()
+      toast({ type: "success", message: response.message })
     } catch (error) {
-      toast({ type: "error", message: error.errors?.join(", ") || error.message || translate("Failed to create the reservation.") })
+      this.setReservationError(error.errors?.join(", ") || error.message || translate("Failed to create the reservation."))
+    } finally {
+      this.formSubmitting = false
     }
   }
 
-  quickRoom() {
+  resetReservationForm() {
+    this.formState = {
+      title: "",
+      facilityId: "",
+      hostId: "",
+      customerId: "",
+      customerName: "",
+      customerQuery: "",
+      start: "",
+      end: ""
+    }
+    this.customerResults = []
+    this.customerSearchError = ""
+    this.customerSearching = false
+    this.reservationError = ""
+    this.extendNotice = ""
+    this.quickRoomNotice = ""
+    this.cancelState = null
+  }
+
+  async quickRoom() {
+    if (!this.isToday) {
+      this.selectedDate = null
+      this.clearSelection()
+      await this.reloadConsole()
+    }
+
+    const now = this.currentNow()
+    const label = Helpers.locationTime(now, "HH:mm", this.location)
+    const [hours, minutes] = label.split(":").map(Number)
+    const nowMinutes = (hours * 60) + minutes
+    const windowStart = this.timelineStartHour * 60
+    const windowEnd = this.timelineEndHour * 60
+    const outside = nowMinutes < windowStart || nowMinutes >= windowEnd
+    const startMinutes = outside ? windowStart : (Math.floor(nowMinutes / 15) * 15) + 15
+    const endMinutes = startMinutes + 15
+
+    this.formState.start = this.clockValue(startMinutes)
+    this.formState.end = this.clockValue(endMinutes)
+    this.formState.facilityId = ""
+    this.formState.hostId = ""
+    this.formState.customerId = ""
+    this.formState.customerName = ""
+    this.formState.customerQuery = ""
+    this.customerResults = []
+    this.customerSearchError = ""
+    this.reservationError = ""
+    this.quickRoomNotice = outside
+      ? `${translate("Starts at")} ${this.clockValue(windowStart)} — ${translate("outside the day window the grid shows")}`
+      : ""
+
+    this.renderContent()
     this.scrollToReservation()
   }
 
-  extendBooking() {
-    toast({ type: "info", message: translate("Extend the booking from the Events module.") })
+  clockValue(minutes) {
+    const normalized = ((minutes % (24 * 60)) + (24 * 60)) % (24 * 60)
+    return `${String(Math.floor(normalized / 60)).padStart(2, "0")}:${String(normalized % 60).padStart(2, "0")}`
   }
 
-  endBooking() {
-    toast({ type: "info", message: translate("Release the booking from the Events module.") })
+  async extendBooking() {
+    if (!this.selectedBookingId || this.actionPending) return
+    this.actionPending = true
+    this.extendNotice = ""
+    try {
+      const response = await fetchJson(
+        Helpers.booking_reservation_extend_company_operation_path(
+          this.companyId, this.operationId, this.selectedBookingId, this.branchId ? { branch_id: this.branchId } : {}
+        ),
+        { method: "POST", body: {} }
+      )
+      await this.reloadConsole()
+      toast({ type: "success", message: response.message })
+    } catch (error) {
+      this.extendNotice = error.errors?.[0] || error.message || translate("Failed to extend the booking.")
+      this.refreshInspector()
+    } finally {
+      this.actionPending = false
+    }
   }
 
-  checkInBooking() {
-    toast({ type: "info", message: translate("Check-in is managed from the Reception console.") })
+  async endBooking() {
+    if (!this.selectedBookingId || this.actionPending) return
+    this.actionPending = true
+    try {
+      const response = await fetchJson(
+        Helpers.booking_reservation_end_company_operation_path(
+          this.companyId, this.operationId, this.selectedBookingId, this.branchId ? { branch_id: this.branchId } : {}
+        ),
+        { method: "POST", body: {} }
+      )
+      this.extendNotice = ""
+      await this.reloadConsole()
+      toast({ type: "success", message: response.message })
+    } catch (error) {
+      toast({ type: "error", message: error.errors?.join(", ") || error.message })
+    } finally {
+      this.actionPending = false
+    }
   }
 
-  ringOrganizer() {
-    toast({ type: "info", message: translate("Call the organiser from the employee directory.") })
+  requestCancel(event) {
+    this.cancelState = {
+      id: event.currentTarget.dataset.bookingId,
+      context: event.currentTarget.dataset.context || "inspector"
+    }
+    this.refreshInspector()
+    this.refreshUpcoming()
+  }
+
+  keepBooking() {
+    this.cancelState = null
+    this.refreshInspector()
+    this.refreshUpcoming()
+  }
+
+  async confirmCancel() {
+    if (!this.cancelState || this.actionPending) return
+    this.actionPending = true
+    const id = this.cancelState.id
+    try {
+      const response = await fetchJson(
+        Helpers.booking_reservation_cancel_company_operation_path(
+          this.companyId, this.operationId, id, this.branchId ? { branch_id: this.branchId } : {}
+        ),
+        { method: "POST", body: {} }
+      )
+      if (String(this.selectedBookingId) === String(id)) this.clearSelection()
+      this.cancelState = null
+      await this.reloadConsole()
+      toast({ type: "success", message: response.message })
+    } catch (error) {
+      toast({ type: "error", message: error.errors?.join(", ") || error.message })
+    } finally {
+      this.actionPending = false
+    }
+  }
+
+  printRunSheet() {
+    if (!this.element.querySelector("[data-booking-run-sheet]")) return
+    const style = document.createElement("style")
+    style.textContent = "@page { size: letter portrait; margin: 12mm; }"
+    document.head.appendChild(style)
+    const cleanup = () => style.remove()
+    window.addEventListener("afterprint", cleanup, { once: true })
+    window.print()
+    window.setTimeout(cleanup, 2000)
   }
 
   // --- Utilities ------------------------------------------------------------------
 
-  initialsFor(name) {
-    const parts = String(name || "").trim().split(/\s+/).filter(Boolean)
-    if (parts.length === 0) return "?"
-    return parts.slice(0, 2).map((part) => part[0].toUpperCase()).join("")
+  clampPercent(value) {
+    return Math.max(0, Math.min(100, value))
   }
 
   escape(value) {
