@@ -6,7 +6,7 @@ RSpec.feature "Mobile Inventory", type: :feature, js: true do
   let(:company) { create(:company, business_type: :retail) }
   let(:user) { company.user }
   let(:branch) { create(:branch, company: company, name: "Central Distribution Hub", code: "WH-01") }
-  let(:warehouse) { Seed::WarehouseService.create(company: company, branch: branch, name: "WH-01 Central") }
+  let(:warehouse) { Seed::WarehouseService.create(company: company, branch: branch, name: "WH-01 Central", code: "WH-01") }
   let(:operation_record) do
     create(:operation, company: company, operation_type: :inventory, name: "Inventory Command")
   end
@@ -33,15 +33,20 @@ RSpec.feature "Mobile Inventory", type: :feature, js: true do
     sign_in(user)
   end
 
-  scenario "loads the live stock console in the mobile shell" do
+  scenario "loads the one-page console in the mobile shell" do
     visit inventory_path
 
-    expect(page).to have_content("Stock Ledger & Granular Bin Registry", wait: 10)
+    expect(page).to have_content("Stock ledger", wait: 10)
     expect(page).to have_content("Micro-Controller PCB v2.4")
     expect(page).to have_content("SKU-ELEC-9021")
-    expect(page).to have_content("Active Freight Docks")
-    expect(page).to have_content("Zone Capacity Map")
-    expect(page).to have_content("Audit & RFID Integrity")
+    expect(page).to have_content("Recent inbound")
+    expect(page).to have_content("Recent outbound")
+    expect(page).to have_content("Cycle counts are not available yet.")
+    expect(page).to have_content("No recent receipts.")
+    expect(page).to have_content("No recent dispatches.")
+    expect(page).to have_no_content("Active Freight Docks")
+    expect(page).to have_no_content("Zone Capacity Map")
+    expect(page).to have_no_content("Audit & RFID Integrity")
   end
 
   scenario "opens inventory from the mobile operations list" do
@@ -50,14 +55,14 @@ RSpec.feature "Mobile Inventory", type: :feature, js: true do
     click_link "Open Inventory"
 
     expect(page).to have_current_path(inventory_path, wait: 10)
-    expect(page).to have_content("Stock Ledger & Granular Bin Registry", wait: 10)
+    expect(page).to have_content("Stock ledger", wait: 10)
   end
 
-  scenario "stacks the ledger above the dock panels on a phone in portrait" do
+  scenario "stacks the ledger above the side panels on a phone in portrait" do
     page.driver.browser.manage.window.resize_to(390, 844)
     visit inventory_path
 
-    expect(page).to have_content("Stock Ledger & Granular Bin Registry", wait: 10)
+    expect(page).to have_content("Stock ledger", wait: 10)
     main = find("[data-inventory-main-column]")
     side = find("[data-inventory-side-column]")
 
@@ -66,11 +71,11 @@ RSpec.feature "Mobile Inventory", type: :feature, js: true do
     page.driver.browser.manage.window.resize_to(1400, 900)
   end
 
-  scenario "stacks the ledger above the dock panels on a phone in landscape" do
+  scenario "stacks the ledger above the side panels on a phone in landscape" do
     page.driver.browser.manage.window.resize_to(844, 390)
     visit inventory_path
 
-    expect(page).to have_content("Stock Ledger & Granular Bin Registry", wait: 10)
+    expect(page).to have_content("Stock ledger", wait: 10)
     main = find("[data-inventory-main-column]")
     side = find("[data-inventory-side-column]")
 
@@ -79,11 +84,11 @@ RSpec.feature "Mobile Inventory", type: :feature, js: true do
     page.driver.browser.manage.window.resize_to(1400, 900)
   end
 
-  scenario "stacks the ledger above the dock panels on a tablet in portrait" do
+  scenario "stacks the ledger above the side panels on a tablet in portrait" do
     page.driver.browser.manage.window.resize_to(768, 1024)
     visit inventory_path
 
-    expect(page).to have_content("Stock Ledger & Granular Bin Registry", wait: 10)
+    expect(page).to have_content("Stock ledger", wait: 10)
     main = find("[data-inventory-main-column]")
     side = find("[data-inventory-side-column]")
 
@@ -92,11 +97,11 @@ RSpec.feature "Mobile Inventory", type: :feature, js: true do
     page.driver.browser.manage.window.resize_to(1400, 900)
   end
 
-  scenario "shows the ledger beside the dock panels on a landscape tablet" do
+  scenario "shows the ledger beside the side panels on a landscape tablet" do
     page.driver.browser.manage.window.resize_to(1280, 800)
     visit inventory_path
 
-    expect(page).to have_content("Stock Ledger & Granular Bin Registry", wait: 10)
+    expect(page).to have_content("Stock ledger", wait: 10)
     main = find("[data-inventory-main-column]")
     side = find("[data-inventory-side-column]")
 

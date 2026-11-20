@@ -203,7 +203,7 @@ same screen. Errors use `{ errors: [...] }` (plural array) per
 | POS | Shell-First page mounted by `Companies_Operations_Pos_ShowController`; the controller hydrates products, services, categories, payment methods, cart, receipt and customer lookup from the existing web JSON endpoint |
 | Booking | Shell-First page mounted by `Companies_Operations_Booking_ShowController`; the controller hydrates the real facility timeline, outside-window tags, KPIs, category cards, inspector, host/customer reservation form, upcoming check-ins and caps from the existing web JSON endpoint; it posts conflict-checked reservations, customer search, extend/end/cancel and prints the day run sheet |
 | Reception | Shell-First page mounted by `Companies_Operations_Reception_ShowController`; the controller hydrates guest-linked visits, pre-registrations, hosts, facility rooms, parcels, non-visit appointments and the scheduled shift from the existing web JSON endpoint, and posts walk-in/pre-register/advance/parcel/notify actions |
-| Inventory | Shell-First page mounted by `Companies_Operations_Inventory_ShowController`; the controller hydrates vital stock metrics, the granular stock ledger, inbound/outbound freight docks, zone capacity and audit state from the existing web JSON endpoint |
+| Inventory | Shell-First page mounted by `Companies_Operations_Inventory_ShowController`; the controller hydrates the four warehouse KPIs (stock rows, low/out, recent inbound units, recent outbound units), the warehouse-searched stock ledger with disjoint All/Low/Out/In-stock tabs and an honest row cap, the recent receipt and dispatch record lists, and the cycle-count gap from the existing web JSON endpoint; rows open the stock-row screen |
 | Payroll unlock | signed-in user's password; success sets a five-minute server-side unlock for the current company |
 | Payroll | month, status/step, period start/end/days, disbursement date, month options, worked hours, present days, overtime minutes, salary/allowance/overtime/deductions/net amounts, currency, tax percent; only after password confirmation |
 | New request | employee/branch, defaults, business types, group managers listed from `EmployeeGroup#manager` (owner fallback), errors and submitted values after a failed POST |
@@ -333,11 +333,14 @@ the Operations list links with the appointment's `warehouse_id`; without it the
 resolver falls back to a warehouse under the employee's branch. The shared
 inventory controller hydrates from
 `/companies/:company_id/operations/inventory/:operation_id.json` and renders
-stock metrics, the granular stock ledger, inbound/outbound freight docks, zone
-capacity and audit state. The layout is width-driven for both orientations:
-phone and tablet portrait stack the ledger/BOM column above the docks/zone/audit
-column; landscape tablet at `lg` places the two columns side by side. Tables
-scroll horizontally inside their cards instead of widening the page.
+four KPIs, the searchable stock ledger (name/code/location search, disjoint
+availability tabs, capped-list footer), the recent receipt and dispatch record
+lists, and the cycle-count note. Export CSV downloads
+`/companies/:company_id/operations/inventory/:operation_id/ledger` for the
+current tab + search. The layout is width-driven for both orientations: phone
+and tablet portrait stack the ledger column above the recent/cycle-count column;
+landscape tablet at `lg` places the two columns side by side. Tables scroll
+horizontally inside their cards instead of widening the page.
 
 ---
 
