@@ -255,6 +255,7 @@ Rails.application.routes.draw do
           get "inventory/:operation_id", to: "operations/inventory#show", as: :inventory
           get "reception/:operation_id", to: "operations/reception#show", as: :reception
           post "reception/:operation_id/check_in", to: "operations/reception#check_in", as: :reception_check_in
+          post "reception/:operation_id/pre_register", to: "operations/reception#pre_register", as: :reception_pre_register
           post "reception/:operation_id/advance", to: "operations/reception#advance", as: :reception_advance
           post "reception/:operation_id/parcels", to: "operations/reception#create_parcel", as: :reception_parcels
           post "reception/:operation_id/parcels/:parcel_id/notify", to: "operations/reception#notify_parcel", as: :reception_parcel_notify

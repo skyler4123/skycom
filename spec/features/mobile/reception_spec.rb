@@ -7,7 +7,7 @@ RSpec.feature "Mobile Reception", type: :feature, js: true do
   let(:user) { company.user }
   let(:branch) { create(:branch, company: company, name: "Downtown Branch") }
   let!(:operation_record) do
-    create(:operation, company: company, branch: branch, name: "Front Desk", operation_type: :reception)
+    create(:operation, company: company, branch: branch, name: "Reception Desk", operation_type: :reception)
   end
   let(:event_category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "events") }
   let(:host) { create(:employee, company: company, branch: branch, name: "Eleanor Vance") }
@@ -18,11 +18,12 @@ RSpec.feature "Mobile Reception", type: :feature, js: true do
 
   before { sign_in(user) }
 
-  def create_visit(customer_name:, status:, start_at:, facility: nil, code:)
+  def create_visit(customer_name:, status:, start_at:, facility: nil, code:, metadata: {})
     customer = create(:customer, company: company, name: customer_name, description: "Vanguard Global Capital")
     event = create(:event, company: company, branch: branch, category: event_category,
-      name: "Visit · #{customer_name}", code: code, start_at: start_at,
-      end_at: start_at + 1.hour, workflow_status: status)
+      name: "Visit · #{customer_name} · #{SecureRandom.hex(2)}", code: code, start_at: start_at,
+      end_at: start_at + 1.hour, workflow_status: status,
+      metadata: { "reception_kind" => "visit", "visitor_company" => "Vanguard Global Capital" }.merge(metadata))
     CustomerEventAppointment.create!(company: company, event: event, customer: customer)
     EmployeeEventAppointment.create!(company: company, event: event, employee: host)
     EventFacilityAppointment.create!(company: company, event: event, facility: facility) if facility
@@ -35,10 +36,12 @@ RSpec.feature "Mobile Reception", type: :feature, js: true do
 
     visit reception_path
 
-    expect(page).to have_content("Reception Operations Console", wait: 10)
+    expect(page).to have_content("Skycom Reception", wait: 10)
     expect(page).to have_content("Arthur Pendelton")
     expect(page).to have_content("Vanguard Global Capital")
-    expect(page).to have_button("Quick Walk-In Check-In")
+    expect(page).to have_button("Walk-in check-in")
+    expect(page).to have_button("Pre-register")
+    expect(page).to have_button("Log delivery")
   end
 
   scenario "opens reception from the mobile operations list" do
@@ -47,7 +50,7 @@ RSpec.feature "Mobile Reception", type: :feature, js: true do
     click_link "Open Reception"
 
     expect(page).to have_current_path(reception_path, wait: 10)
-    expect(page).to have_content("Reception Operations Console", wait: 10)
+    expect(page).to have_content("Skycom Reception", wait: 10)
   end
 
   scenario "stacks the coordination panels under the queue in portrait" do
@@ -57,8 +60,8 @@ RSpec.feature "Mobile Reception", type: :feature, js: true do
     page.driver.browser.manage.window.resize_to(768, 1024)
     visit reception_path
 
-    expect(page).to have_content("Reception Operations Console", wait: 10)
-    queue = find("section", text: /Active Lobby Queue/i)
+    expect(page).to have_content("Skycom Reception", wait: 10)
+    queue = find("section[aria-label='Reception queue']")
     panels = find("aside")
 
     expect(panels.native.rect.y).to be > queue.native.rect.y
@@ -73,8 +76,8 @@ RSpec.feature "Mobile Reception", type: :feature, js: true do
     page.driver.browser.manage.window.resize_to(1280, 800)
     visit reception_path
 
-    expect(page).to have_content("Reception Operations Console", wait: 10)
-    queue = find("section", text: /Active Lobby Queue/i)
+    expect(page).to have_content("Skycom Reception", wait: 10)
+    queue = find("section[aria-label='Reception queue']")
     panels = find("aside")
 
     expect(panels.native.rect.x).to be > queue.native.rect.x
@@ -89,9 +92,9 @@ RSpec.feature "Mobile Reception", type: :feature, js: true do
     page.driver.browser.manage.window.resize_to(390, 844)
     visit reception_path
 
-    expect(page).to have_content("Reception Operations Console", wait: 10)
+    expect(page).to have_content("Skycom Reception", wait: 10)
     expect(page).to have_content("Arthur Pendelton")
-    expect(page).to have_button("Quick Walk-In Check-In")
+    expect(page).to have_button("Walk-in check-in")
   ensure
     page.driver.browser.manage.window.resize_to(1400, 900)
   end
@@ -99,22 +102,55 @@ RSpec.feature "Mobile Reception", type: :feature, js: true do
   scenario "checks in a walk-in guest from the mobile console" do
     host
     visit reception_path
-    expect(page).to have_content("Reception Operations Console", wait: 10)
+    expect(page).to have_content("Skycom Reception", wait: 10)
 
-    click_button "Quick Walk-In Check-In"
+    click_button "Walk-in check-in"
     find('input[name="visitor[name]"]').set("Jessica Tan")
     find('input[name="visitor[company]"]').set("Deloitte Consulting")
-    find('select[name="visitor[host_id]"]').find("option[value='#{host.id}']").select_option
-    click_button "Check-In & Print Badge"
+    click_button "Check in to lobby"
 
     expect(page).to have_content("Walk-in check-in complete for Jessica Tan", wait: 5)
     expect(page).to have_content("Jessica Tan")
+    expect(page).to have_content("No host")
 
     expect(Customer.find_by(company: company, name: "Jessica Tan")).to be_present
     expect(
       Event.where(company: company).order(:created_at).to_a
         .find { |event| event.name.start_with?("Walk-in · Jessica Tan") }
     ).to be_present
+  end
+
+  scenario "pre-registers a visitor from the mobile console" do
+    host
+    visit reception_path
+    expect(page).to have_content("Skycom Reception", wait: 10)
+
+    click_button "Pre-register"
+    find('input[name="pre_registration[name]"]').set("Tomorrow Guest")
+    find('input[name="pre_registration[company]"]').set("Acme")
+    page.execute_script(
+      "document.querySelector('input[name=\"pre_registration[date]\"]').value = arguments[0]",
+      (Date.current + 1).iso8601
+    )
+    find('input[name="pre_registration[start_time]"]').set("09:30")
+    click_button "Save pre-registration"
+
+    expect(page).to have_content("Pre-registration saved for Tomorrow Guest", wait: 5)
+    expect(Event.where(company: company).where("metadata ->> 'visitor_kind' = ?", "Pre-registered")).to exist
+  end
+
+  scenario "prints a badge from the mobile console without claiming a printer" do
+    create_visit(customer_name: "Arthur Pendelton", status: :confirmed,
+      start_at: 10.minutes.ago, facility: room, code: "VIS-ARTHUR")
+
+    visit reception_path
+    expect(page).to have_content("Arthur Pendelton", wait: 10)
+    page.execute_script("window.__receptionPrintCalls = 0; window.print = () => { window.__receptionPrintCalls += 1 }")
+    find("button[title='Print visitor badge']").click
+
+    expect(page.evaluate_script("window.__receptionPrintCalls")).to eq(1)
+    expect(page.evaluate_script("document.getElementById('reception-badge-print').textContent")).to include("Arthur Pendelton")
+    expect(page).not_to have_content("sent to the printer")
   end
 
   scenario "does not show Open Reception for non-reception operations" do

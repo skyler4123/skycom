@@ -13,7 +13,7 @@ RSpec.describe Reception::CheckInService do
     result = described_class.call(
       company: company,
       appointment: appointment,
-      params: { name: "Jessica Tan", company: "Deloitte Consulting", host_id: host.id }
+      params: { name: "Jessica Tan", company: "Deloitte Consulting", host_id: host.id, vip: "1" }
     )
 
     expect(result[:success]).to be true
@@ -24,8 +24,26 @@ RSpec.describe Reception::CheckInService do
     expect(event.branch).to eq(branch)
     expect(event.metadata["reception_kind"]).to eq("visit")
     expect(event.metadata["visitor_company"]).to eq("Deloitte Consulting")
+    expect(event.metadata["vip"]).to be(true)
+    expect(event.metadata["lobby_entered_at"]).to be_present
+    expect(event.metadata).not_to have_key("notify_host")
+    expect(event.metadata).not_to have_key("auto_print")
     expect(event.customer_event_appointments.first.customer.name).to eq("Jessica Tan")
     expect(event.employee_event_appointments.first.employee).to eq(host)
+  end
+
+  it "creates a lobby visit without a host or room" do
+    result = described_class.call(
+      company: company,
+      appointment: appointment,
+      params: { name: "No Host Guest", company: "Acme" }
+    )
+
+    expect(result[:success]).to be true
+    event = result[:event]
+    expect(event.employee_event_appointments).to be_empty
+    expect(event.event_facility_appointments).to be_empty
+    expect(event.metadata["vip"]).to be(false)
   end
 
   it "reuses an existing Customer with the same name" do

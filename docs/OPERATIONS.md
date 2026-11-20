@@ -134,13 +134,14 @@ All appointments start `active`. Companies disable the ones they do not use.
 | POST | `/companies/:company_id/operations/booking/:operation_id/reservations/:reservation_id/end` | `Companies::Operations::BookingController#finish_reservation` | End & release (in-progress ends now; stock holds released) |
 | POST | `/companies/:company_id/operations/booking/:operation_id/reservations/:reservation_id/cancel` | `Companies::Operations::BookingController#cancel_reservation` | Cancel a booking and free its time |
 | GET | `/companies/:company_id/operations/inventory/:operation_id` | `Companies::Operations::InventoryController#show` | Placeholder |
-| GET | `/companies/:company_id/operations/reception/:operation_id` | `Companies::Operations::ReceptionController#show` | Reception console (Events/Customers/Facilities) |
-| POST | `/companies/:company_id/operations/reception/:operation_id/check_in` | `Companies::Operations::ReceptionController#check_in` | Walk-in Customer + Event (+ host/room links) |
-| POST | `/companies/:company_id/operations/reception/:operation_id/advance` | `Companies::Operations::ReceptionController#advance` | Check in / check out / re-open a visit Event |
+| GET | `/companies/:company_id/operations/reception/:operation_id` | `Companies::Operations::ReceptionController#show` | Reception console (guest-linked visits, parcels, rooms, appointments, shift) |
+| POST | `/companies/:company_id/operations/reception/:operation_id/check_in` | `Companies::Operations::ReceptionController#check_in` | Walk-in Customer + lobby visit (+ optional host/room/VIP) |
+| POST | `/companies/:company_id/operations/reception/:operation_id/pre_register` | `Companies::Operations::ReceptionController#pre_register` | Expected visit Event from a branch-local date/time |
+| POST | `/companies/:company_id/operations/reception/:operation_id/advance` | `Companies::Operations::ReceptionController#advance` | Arrive / mark inside / check out / reopen |
 | POST | `/companies/:company_id/operations/reception/:operation_id/parcels` | `Companies::Operations::ReceptionController#create_parcel` | Log a held parcel Event |
-| POST | `/companies/:company_id/operations/reception/:operation_id/parcels/:parcel_id/notify` | `Companies::Operations::ReceptionController#notify_parcel` | Stamp the parcel's notified_at metadata |
+| POST | `/companies/:company_id/operations/reception/:operation_id/parcels/:parcel_id/notify` | `Companies::Operations::ReceptionController#notify_parcel` | Direct notification to the recipient + `notified_at` |
 | POST | `/companies/:company_id/operations/reception/:operation_id/parcels/:parcel_id/pick_up` | `Companies::Operations::ReceptionController#pick_up_parcel` | Complete the parcel Event |
-| POST | `/companies/:company_id/operations/reception/:operation_id/notify_host` | `Companies::Operations::ReceptionController#notify_host` | Stamp the visit's host_notified_at metadata |
+| POST | `/companies/:company_id/operations/reception/:operation_id/notify_host` | `Companies::Operations::ReceptionController#notify_host` | Direct notification to the host + `host_notified_at` |
 | GET | `/mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | Mobile/tablet Shell-First mount point |
 | GET | `/companies/:company_id/operations/store_manager/:operation_id` | `Companies::Operations::StoreManagerController#show` | Store Manager console (Orders/Stocks/Employees) |
 
@@ -195,7 +196,7 @@ preserved when the form is saved. Raw metadata is never exposed in the UI.
 | Operation Configs | `Companies_OperationConfigs_IndexController` (`companies--operation-configs--index`) | `Companies::OperationConfigsController#index` |
 | Operation config details / edit | `Companies_OperationConfigs_ShowController` / `Companies_OperationConfigs_EditController` | `Companies::OperationConfigsController#show/edit/update` |
 | POS | `Companies_Operations_Pos_ShowController` (`companies--operations--pos--show`) | `Companies::Operations::PosController#show` |
-| Reception | `Companies_Operations_Reception_ShowController` (`companies--operations--reception--show`) | `Companies::Operations::ReceptionController#show/check_in/advance/create_parcel/notify_parcel/pick_up_parcel/notify_host` |
+| Reception | `Companies_Operations_Reception_ShowController` (`companies--operations--reception--show`) | `Companies::Operations::ReceptionController#show/check_in/pre_register/advance/create_parcel/notify_parcel/pick_up_parcel/notify_host` |
 | Booking | `Companies_Operations_Booking_ShowController` (`companies--operations--booking--show`) | `Companies::Operations::BookingController#show/customers/create_reservation/extend_reservation/finish_reservation/cancel_reservation` |
 | Store Manager | `Companies_Operations_StoreManager_ShowController` (`companies--operations--store-manager--show`) | `Companies::Operations::StoreManagerController#show` |
 | Placeholders | `Companies_Operations_<Type>_ShowController` | `Companies::Operations::<Type>Controller#show` |
@@ -211,15 +212,56 @@ controller formats with `Helpers.locationTime(value, format, appointment.locatio
 
 Reception reuses the existing domain instead of adding visitor/parcel tables:
 
-- **Visit** = `Event` (branch-scoped). `pending` → upcoming, `confirmed` → lobby,
-  `in_progress` → inside, `completed` → departed.
+- **Visit** = `Event` (branch-scoped) with
+  `metadata["reception_kind"] = "visit"` **and** a linked Customer. A booking
+  with no guest is never a visit. `pending/draft` → expected, `confirmed` →
+  lobby, `in_progress` → inside, `completed` → departed, `cancelled` hidden.
 - **Visitor** = `Customer` linked through `CustomerEventAppointment`.
 - **Host** = `Employee` linked through `EmployeeEventAppointment`.
-- **Room** = `Facility` linked through `EventFacilityAppointment`; room
-  availability is derived from the current/next linked Event.
+- **Room** = `Facility` linked through `EventFacilityAppointment`. Rooms are the
+  branch/global facilities whose category looks room-like (fallback: all
+  facilities). Readiness is derived from the current/next facility Event.
+- **Pre-registration** = `Reception::PreRegisterService` creates a `pending`
+  visit from branch-local date/time input. Room overlap is allowed; this page
+  does not run the Booking conflict checker.
 - **Parcel** = `Event` with `metadata["reception_kind"] = "parcel"`,
   `workflow_status: received`, and the recipient employee linked through
   `EmployeeEventAppointment`. Completed parcels disappear from the console.
+- **Appointment** = today's Event with a facility link, excluding visit/parcel
+  kinds. It appears in the side panel and never moves a visitor count.
+- **Shift** = this employee's `ScheduledShift` for the branch whose
+  `expected_start_at <= now <= expected_end_at`; nil hides the pill.
+- **Timers** = lobby wait from `lobby_entered_at` (legacy fallback
+  `checked_in_at`, then start); inside time from `inside_at` (legacy fallback
+  `checked_in_at`). Average wait is the mean of lobby waits.
+- **Notifications** = `Reception::NotifyHostService` and
+  `ParcelService#notify` create one direct notification
+  (`notifications.recipient_employee_id`) per click and stamp
+  `host_notified_at` / `notified_at`. No tag broadcast is sent.
+- **Print** = browser print of one visit. The screen is `print:hidden`; the
+  hidden print root contains only company, Visitor, name, visitor company, host,
+  room, branch, time and code.
+- **Caps** = visits/parcels/appointments first 200. Counts stay full-data
+  counts; lists label the cap. Rooms load all room-like facilities and preview 8.
+
+The console payload is `{ visits, parcels, rooms, appointments, counts, shift,
+generated_at }`; the controller also ships `company` and `reference`
+(`hosts`, `facilities`). The Stimulus controller polls every 20 seconds and
+updates only live regions, preserving open forms, typed values, the queue
+filter and header search.
+
+`Reception::ConsoleService` builds the read payload;
+`Reception::GuestResolver`, `Reception::CheckInService`,
+`Reception::PreRegisterService`, `Reception::AdvanceService`,
+`Reception::NotifyHostService`, `Reception::ParcelService` and
+`Reception::ShiftService` own the writes/derived state. The Stimulus controller
+only renders the payload and posts the write actions.
+
+The mobile/tablet route mounts the same Stimulus controller from a Shell-First
+`<div>` built by `shell_html` (`Mobile::Companies::Operations::ReceptionController`;
+see `docs/MOBILE.md` §2 for why the mobile layout needs it); the responsive
+Tailwind layout handles phone portrait, tablet portrait and tablet landscape.
+The mobile Operations list adds an **Open Reception** action next to **Open POS**.
 
 Booking reuses the same domain for resource reservations:
 
@@ -268,17 +310,6 @@ only renders the payload, keeps a typed form draft in state, and posts actions.
 - Drag-to-reschedule.
 - Automatic no-show release.
 - Room List / Desk Zones as separate screens.
-
-`Reception::ConsoleService` builds the read payload;
-`Reception::CheckInService`, `Reception::AdvanceService` and
-`Reception::ParcelService` own the writes. The Stimulus controller only renders
-the payload and posts the write actions.
-
-The mobile/tablet route mounts the same Stimulus controller from a Shell-First
-`<div>` built by `shell_html` (`Mobile::Companies::Operations::ReceptionController`;
-see `docs/MOBILE.md` §2 for why the mobile layout needs it); the responsive
-Tailwind layout handles phone portrait, tablet portrait and tablet landscape.
-The mobile Operations list adds an **Open Reception** action next to **Open POS**.
 
 Store Manager reuses Orders, Stocks and Employees for the branch command screen:
 

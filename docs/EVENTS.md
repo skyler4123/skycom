@@ -132,9 +132,15 @@ Sidebar group `calendar` ("Calendar/Schedule"): Calendar, Events, Event Configs.
 The Reception operation (`Companies::Operations::ReceptionController`) projects
 Events into a front-desk queue rather than adding a visitor table:
 
-- `pending` → upcoming, `confirmed` → lobby, `in_progress` → inside,
+- A visit is an Event with `metadata["reception_kind"] = "visit"` **and** a
+  linked Customer (CustomerEventAppointment). Events without a guest are never
+  counted as visitors, even if they are facility bookings.
+- `pending/draft` → expected, `confirmed` → lobby, `in_progress` → inside,
   `completed` → departed, `cancelled` → hidden.
 - Visitor = linked Customer, host = linked Employee, room = linked Facility.
+- Pre-registration creates a `pending` visit through
+  `Reception::PreRegisterService`; overlap is allowed and does not use the
+  Booking conflict checker.
 - Parcels are Events flagged `metadata["reception_kind"] = "parcel"` with
   `workflow_status: received`; completing the Event removes them from the
   console. See `docs/OPERATIONS.md` §7.

@@ -23,6 +23,30 @@ RSpec.describe Notifications::CreateService do
       throttle_key: "stock:1", throttle_window: 1.hour)
     expect(res[:success]).to be(false)
   end
+
+  it "creates a direct notification without a tag" do
+    employee = create(:employee, company: company, business_type: :full_time)
+    res = described_class.call(company: company, name: "Guest arrived", recipient_employee: employee)
+
+    expect(res[:success]).to be(true)
+    expect(res[:notification].recipient_employee).to eq(employee)
+    expect(res[:notification].notification_tags).to be_empty
+  end
+
+  it "rejects a recipient from another company" do
+    foreign_employee = create(:employee, company: create(:company), business_type: :full_time)
+    res = described_class.call(company: company, name: "x", recipient_employee: foreign_employee)
+
+    expect(res[:success]).to be(false)
+    expect(res[:errors]).to contain_exactly("Unknown recipient")
+  end
+
+  it "requires a tag or a recipient" do
+    res = described_class.call(company: company, name: "x")
+
+    expect(res[:success]).to be(false)
+    expect(res[:errors]).to contain_exactly("At least one tag or recipient is required")
+  end
 end
 
 RSpec.describe Notifications::UnreadQuery do
@@ -39,6 +63,13 @@ RSpec.describe Notifications::UnreadQuery do
     Notifications::CreateService.call(company: company, name: "a", tag_ids: [ tag.id ])
     Notifications::CreateService.call(company: company, name: "b", tag_ids: [ other_tag.id ])
     expect(described_class.new(company: company, employee: employee).count).to eq(1)
+  end
+
+  it "counts a directly addressed notification even without a tag subscription" do
+    direct = create(:employee, company: company, business_type: :full_time)
+    Notifications::CreateService.call(company: company, name: "Guest arrived", recipient_employee: direct)
+
+    expect(described_class.new(company: company, employee: direct).count).to eq(1)
   end
 
   it "new hire sees zero unread" do

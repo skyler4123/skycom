@@ -1,6 +1,6 @@
 # Skycom — application overview
 
-> **Last audited:** 2026-11-19 · **Audit scope:** sidebar navigation, routes,
+> **Last audited:** 2026-11-20 · **Audit scope:** sidebar navigation, routes,
 > module docs, operation consoles (audited separately), TODO roadmap, mobile
 > feature matrix. Module status is based on routes, controllers, and module docs —
 > not a page-by-page UI audit.
@@ -46,13 +46,13 @@ dynamic properties, location appointments, and access policies.
 |---|---|---|---|
 | [POS](02-pos.md) | Taking money at the counter | 🟢 | Tax/currency from config, services, server prices, discounts, void, receipt slip, real lock, persisted tabs; one company-wide tax rate |
 | [Booking](03-booking.md) | Reserving rooms and spaces | 🟢 | Conflict-safe locking, click-to-inspect, real host/customer, extend/end/cancel, real category occupancy, run sheet |
-| [Reception](04-reception.md) | Front desk, visitors, parcels | 🔴 | Four dead tabs, badge printing only toasts, fake "connected" systems |
+| [Reception](04-reception.md) | Front desk, visitors, parcels | 🟢 | Guest-linked visits only, pre-registration, browser badge print, direct notifications, real shift/timers/polling |
 | [Inventory](05-inventory.md) | Warehouse stock command screen | 🔴 | BOM panel is hardcoded zeros, invented zone occupancy, fake dock data |
 | [Store Manager](06-store-manager.md) | Retail floor command screen | 🔴 | Six dead tabs, invented shift, fabricated register names, UTC hourly chart |
 
-POS and Booking are shippable. The remaining urgent work is POS service sales,
-Reception badge/tab honesty, and removing the fabricated panels from Inventory
-and Store Manager. The dead tabs are the cheapest visible win.
+POS, Booking and Reception are shippable. The remaining urgent work is POS
+service sales and removing the fabricated panels from Inventory and Store
+Manager. The dead tabs are the cheapest visible win.
 
 [Operations landing and configuration](01-operations-landing.md) is the control
 room for all five; it is 🟠 with one table defect.
@@ -168,10 +168,10 @@ Never demo a control or panel marked 🔴, 🗑️, ⛔, or 🔢 in the page doc
 - A. POS. Highest revenue impact; service sales remain. Effort M.
 - B. Booking. **Shipped** — conflict-safe reservations, real inspector and desk
   actions are in place. Effort M.
-- C. Reception. Most visible to visitors, but badge printing and pre-registration
-  are larger. Effort M–L.
-- *Recommendation:* A, then C. Booking is already the front-desk-safe console;
-  POS is the next revenue blocker.
+- C. Reception. **Shipped** — guest-linked visits, pre-registration, browser
+  badge print, direct notifications, shift/timers/search/polling. Effort M.
+- *Recommendation:* A. Booking and Reception are already front-desk-safe; POS is
+  the next revenue blocker.
 
 **APP-D2 — Credits or subscriptions?**
 - A. Keep prepaid credits. Effort S.
@@ -180,10 +180,10 @@ Never demo a control or panel marked 🔴, 🗑️, ⛔, or 🔢 in the page doc
 
 **APP-D3 — Which industry to sell to first?**
 - A. Retail. POS and Store Manager are purpose-built for it. Effort S.
-- B. Office/coworking. Booking now fits; Reception badge printing and its dead
-  tabs must become real. Effort M.
-- C. Hospitality. Reception branding already leans this way, but the consoles are
-  not hotel-specific. Effort M–L.
+- B. Office/coworking. Booking and Reception now fit: reception has real
+  pre-registration, badge print and host notifications. Effort S.
+- C. Hospitality. Reception now uses neutral front-desk copy, not hotel-specific
+  branding; the consoles are purpose-based. Effort M–L.
 - *Recommendation:* A. The retail path needs the least new domain work.
 
 **APP-D4 — Payroll: calculate or store?**

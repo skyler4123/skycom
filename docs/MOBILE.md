@@ -202,7 +202,7 @@ same screen. Errors use `{ errors: [...] }` (plural array) per
 | Operations | every accessible operation appointment for the company: Operation name/code/type, branch or warehouse location, operation workflow status, appointment workflow status; POS operations expose an **Open POS** action, Booking operations expose **Open Booking**, Reception operations expose **Open Reception**, Store Manager operations expose **Open Store Manager**, and warehouse Inventory operations expose **Open Inventory** |
 | POS | Shell-First page mounted by `Companies_Operations_Pos_ShowController`; the controller hydrates products, services, categories, payment methods, cart, receipt and customer lookup from the existing web JSON endpoint |
 | Booking | Shell-First page mounted by `Companies_Operations_Booking_ShowController`; the controller hydrates the real facility timeline, outside-window tags, KPIs, category cards, inspector, host/customer reservation form, upcoming check-ins and caps from the existing web JSON endpoint; it posts conflict-checked reservations, customer search, extend/end/cancel and prints the day run sheet |
-| Reception | Shell-First page mounted by `Companies_Operations_Reception_ShowController`; the controller hydrates today's visit Events, customers, hosts, facility rooms, parcels and next appointments from the existing web JSON endpoint, and posts walk-in/check-out/parcel actions |
+| Reception | Shell-First page mounted by `Companies_Operations_Reception_ShowController`; the controller hydrates guest-linked visits, pre-registrations, hosts, facility rooms, parcels, non-visit appointments and the scheduled shift from the existing web JSON endpoint, and posts walk-in/pre-register/advance/parcel/notify actions |
 | Inventory | Shell-First page mounted by `Companies_Operations_Inventory_ShowController`; the controller hydrates vital stock metrics, the granular stock ledger, inbound/outbound freight docks, zone capacity and audit state from the existing web JSON endpoint |
 | Payroll unlock | signed-in user's password; success sets a five-minute server-side unlock for the current company |
 | Payroll | month, status/step, period start/end/days, disbursement date, month options, worked hours, present days, overtime minutes, salary/allowance/overtime/deductions/net amounts, currency, tax percent; only after password confirmation |
@@ -306,10 +306,12 @@ uses the same Shell-First contract:
 `data-controller="companies--operations--reception--show darkmode"` plus the
 company, operation and employee identifiers. The shared reception controller
 hydrates from `/companies/:company_id/operations/reception/:operation_id.json`
-and posts walk-in, check-in/check-out, parcel and host-notification actions. The
-layout is width-driven for both orientations: phone portrait stacks the queue and
-coordination panels; tablet portrait keeps a single column; landscape tablet at
-`xl` puts the queue beside the rooms/deliveries/speed-dial panels.
+and posts walk-in, pre-register, arrive/mark-inside/check-out/reopen, parcel,
+parcel-notify and host-notify actions. It prints one visit badge in the browser
+(the same print root as web). The layout is width-driven for both orientations:
+phone portrait stacks the queue and coordination panels; tablet portrait keeps a
+single column; landscape tablet at `xl` puts the queue beside the
+rooms/appointments/parcels panels.
 
 **Store Manager** — `GET /mobile/companies/:company_id/operations/store_manager/:operation_id`
 uses the same Shell-First contract:
@@ -417,7 +419,8 @@ request feature spec sets them through the DOM with `set_native_field`.
   receipt printing, or offline mode. The POS page's Orders link still points at
   the web Orders page.
 - Mobile/tablet Reception reuses the web reception console; there is no native
-  visitor/parcel workflow, offline queue, or badge-printer integration.
+  visitor/parcel workflow, offline queue, or label-printer integration. Badge
+  print is the browser print of one visit.
 - Mobile/tablet Store Manager reuses the web store manager console; there is no
   native register/cash-drawer or footfall sensor integration, and the footfall
   panel reports that the sensor is not connected.

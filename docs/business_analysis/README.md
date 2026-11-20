@@ -89,7 +89,7 @@
 | [01-operations-landing](01-operations-landing.md) | Operations list, activation, config, roles | 🟠 | 30 | 8 | 2026-11-19 |
 | [02-pos](02-pos.md) | POS console (point of sale) | 🔴 | 29 | 10 | 2026-11-19 |
 | [03-booking](03-booking.md) | Booking console (facilities and reservations) | 🟢 | 26 | 0 | 2026-11-20 |
-| [04-reception](04-reception.md) | Reception console (visitors, parcels, rooms) | 🔴 | 45 | 11 | 2026-11-19 |
+| [04-reception](04-reception.md) | Reception console (visitors, parcels, rooms) | 🟢 | 44 | 0 | 2026-11-20 |
 | [05-inventory](05-inventory.md) | Inventory console (warehouse) | 🔴 | 29 | 10 | 2026-11-19 |
 | [06-store-manager](06-store-manager.md) | Store Manager console | 🔴 | 28 | 11 | 2026-11-19 |
 | [07-dashboard](07-dashboard.md) | Company dashboard | 🟠 | 29 | 7 | 2026-11-19 |
@@ -181,3 +181,4 @@ These docs are only useful if they are true. The rules:
 | 2026-11-19 | Analytics | Page and config audit (13 controls, 6 decisions) |
 | 2026-11-19 | App overview | Module map, commercial model, cross-cutting decisions |
 | 2026-11-20 | Booking | Shippable pass: conflict-safe reservations, click inspector, real host/customer, extend/end/cancel, run sheet, caps; 🟢 26 controls |
+| 2026-11-20 | Reception | Shippable pass: one page, guest-linked visits, pre-registration, browser badge print, direct notifications, real shift/timers/search/polling; 🟢 44 controls |

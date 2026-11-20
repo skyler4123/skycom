@@ -3,16 +3,38 @@
 # Reception::AdvanceService — moves a reception visit through its physical
 # states while keeping the Event workflow status as the source of truth:
 #
-#   confirmed (waiting in lobby) → in_progress (inside) → completed (departed)
-#   completed → confirmed (re-open at reception)
+#   pending/draft (expected) → confirmed (lobby) → in_progress (inside)
+#   in_progress → completed (departed)
+#   completed → in_progress (re-open inside)
 #
-# The console renders those states as Lobby / Inside / Departed.
+# The console renders those states as Expected / Lobby / Inside / Departed.
 # Docs: docs/OPERATIONS.md, docs/EVENTS.md
 class Reception::AdvanceService
   ACTIONS = {
-    "check_in" => { from: %w[confirmed], to: :in_progress, message: "checked in and is now inside the building" },
-    "check_out" => { from: %w[confirmed in_progress], to: :completed, message: "checked out. Access privileges revoked" },
-    "reopen" => { from: %w[completed], to: :confirmed, message: "was re-opened in the lobby queue" }
+    "arrive" => {
+      from: %w[pending draft],
+      to: :confirmed,
+      stamp: "lobby_entered_at",
+      message: "has arrived and is waiting in the lobby"
+    },
+    "mark_inside" => {
+      from: %w[confirmed],
+      to: :in_progress,
+      stamp: "inside_at",
+      message: "is now inside the building"
+    },
+    "check_out" => {
+      from: %w[in_progress],
+      to: :completed,
+      stamp: "checked_out_at",
+      message: "has checked out"
+    },
+    "reopen" => {
+      from: %w[completed],
+      to: :in_progress,
+      stamp: "inside_at",
+      message: "was re-opened inside the building"
+    }
   }.freeze
 
   def self.call(company:, appointment:, params:, now: Time.current)
@@ -29,17 +51,15 @@ class Reception::AdvanceService
   def call
     event = company.events.find_by(id: params[:event_id], branch_id: appointment.branch_id)
     return failure([ "Visit not found." ]) unless event
-    return failure([ "This is not a reception visit." ]) if event.metadata&.dig("reception_kind") == "parcel"
+    return failure([ "This is not a reception visit." ]) unless reception_visit?(event)
 
-    action = params[:transition].to_s
-    transition = ACTIONS[action]
+    transition = ACTIONS[params[:transition].to_s]
     return failure([ "Unknown reception action." ]) unless transition
     return failure([ "This visit cannot be updated from its current state." ]) unless transition[:from].include?(event.workflow_status)
 
     metadata = (event.metadata || {}).dup
-    metadata["checked_in_at"] = now.iso8601 if action == "check_in"
-    metadata["checked_out_at"] = now.iso8601 if action == "check_out"
-    metadata.delete("checked_out_at") if action == "reopen"
+    metadata[transition[:stamp]] = now.iso8601
+    metadata.delete("checked_out_at") if params[:transition].to_s == "reopen"
 
     event.update!(workflow_status: transition[:to], metadata: metadata)
 
@@ -55,6 +75,11 @@ class Reception::AdvanceService
   private
 
   attr_reader :company, :appointment, :params, :now
+
+  def reception_visit?(event)
+    event.metadata&.dig("reception_kind") == "visit" &&
+      event.customer_event_appointments.exists?
+  end
 
   def visit_name(event)
     event.customer_event_appointments.first&.customer&.name.presence || event.name

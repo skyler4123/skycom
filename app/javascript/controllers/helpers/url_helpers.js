@@ -202,6 +202,7 @@ export const booking_reservation_cancel_company_operation_path = (companyId, ope
 export const inventory_company_operation_path = (companyId, operationId, params = {}) => operationPath("inventory", companyId, operationId, params)
 export const reception_company_operation_path = (companyId, operationId, params = {}) => operationPath("reception", companyId, operationId, params)
 export const reception_check_in_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/check_in`
+export const reception_pre_register_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/pre_register`
 export const reception_advance_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/advance`
 export const reception_parcels_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/parcels`
 export const reception_parcel_notify_company_operation_path = (companyId, operationId, parcelId) => `${reception_parcels_company_operation_path(companyId, operationId)}/${parcelId}/notify`

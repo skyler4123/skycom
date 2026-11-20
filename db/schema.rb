@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_17_000091) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_20_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -5643,12 +5643,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000091) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "recipient_employee_id"
     t.index ["business_type"], name: "index_notifications_on_business_type"
     t.index ["company_id", "created_at"], name: "index_notifications_on_company_id_and_created_at"
+    t.index ["company_id", "recipient_employee_id"], name: "index_notifications_on_company_id_and_recipient_employee_id"
     t.index ["company_id"], name: "index_notifications_on_company_id"
     t.index ["discarded_at"], name: "index_notifications_on_discarded_at"
     t.index ["external_id"], name: "index_notifications_on_external_id"
     t.index ["lifecycle_status"], name: "index_notifications_on_lifecycle_status"
+    t.index ["recipient_employee_id"], name: "index_notifications_on_recipient_employee_id"
     t.index ["subject_type", "subject_id"], name: "index_notifications_on_subject_type_and_subject_id"
     t.index ["workflow_status"], name: "index_notifications_on_workflow_status"
   end
@@ -10902,6 +10905,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000091) do
   add_foreign_key "notification_tag_appointments", "notifications"
   add_foreign_key "notification_tags", "companies"
   add_foreign_key "notifications", "companies"
+  add_foreign_key "notifications", "employees", column: "recipient_employee_id"
   add_foreign_key "operation_warehouse_appointments", "companies"
   add_foreign_key "operation_warehouse_appointments", "operations"
   add_foreign_key "operation_warehouse_appointments", "warehouses"

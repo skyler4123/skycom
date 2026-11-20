@@ -6,6 +6,10 @@ class Companies::Operations::ReceptionPolicy < Companies::Operations::BasePolicy
     show?
   end
 
+  def pre_register?
+    show?
+  end
+
   def advance?
     show?
   end

@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 # == Purpose:
-# Lazy unread computation for one employee: subscribed-tag join minus
-# individually-read rows minus the mark-all-read shortcut.
+# Lazy unread computation for one employee: visible notifications (subscribed
+# tags plus direct recipient rows) minus individually-read rows minus the
+# mark-all-read shortcut.
 #
-# Unread = subscribed AND created_at > last_read_all_at AND id NOT IN reads.
+# Unread = visible AND created_at > last_read_all_at AND id NOT IN reads.
 module Notifications
   class UnreadQuery
     def initialize(company:, employee:)
@@ -13,16 +14,9 @@ module Notifications
     end
 
     def scope
-      tag_ids = @employee.subscribed_notification_tag_ids
-      return Notification.none if tag_ids.empty?
-
-      Notification
-        .joins(:notification_tag_appointments)
-        .where(company: @company)
-        .where(notification_tag_appointments: { notification_tag_id: tag_ids })
+      Notification.subscribed_for(@employee, @company)
         .where("notifications.created_at > ?", last_read_all_at)
         .where.not(id: read_ids)
-        .distinct
     end
 
     def count
