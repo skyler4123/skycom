@@ -34,7 +34,7 @@ class Purchase < ApplicationRecord
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
-  enum :business_type, { office_supply: 0, equipment: 1, service: 2 }
+  enum :business_type, { office_supply: 0, equipment: 1, service: 2, stock_reorder: 3 }
 
   # --- Associations ---
   belongs_to :company

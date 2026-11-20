@@ -200,6 +200,22 @@ export const booking_reservation_extend_company_operation_path = (companyId, ope
 export const booking_reservation_end_company_operation_path = (companyId, operationId, reservationId, params = {}) => bookingReservationActionPath(companyId, operationId, reservationId, "end", params)
 export const booking_reservation_cancel_company_operation_path = (companyId, operationId, reservationId, params = {}) => bookingReservationActionPath(companyId, operationId, reservationId, "cancel", params)
 export const inventory_company_operation_path = (companyId, operationId, params = {}) => operationPath("inventory", companyId, operationId, params)
+const inventoryActionPath = (companyId, operationId, action, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `/companies/${companyId}/operations/inventory/${operationId}/${action}${query ? `?${query}` : ""}`
+}
+export const inventory_ledger_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "ledger", params)
+export const inventory_export_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "export", params)
+export const inventory_receipts_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "receipts", params)
+export const inventory_receipt_post_company_operation_path = (companyId, operationId, receiptId, params = {}) => inventoryActionPath(companyId, operationId, `receipts/${encodeURIComponent(receiptId)}/post`, params)
+export const inventory_transfers_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "transfers", params)
+export const inventory_transfer_receive_company_operation_path = (companyId, operationId, transferId, params = {}) => inventoryActionPath(companyId, operationId, `transfers/${encodeURIComponent(transferId)}/receive`, params)
+export const inventory_exports_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "exports", params)
+export const inventory_adjustments_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "adjustments", params)
+export const inventory_reorder_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "reorder", params)
+export const inventory_counts_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "counts", params)
+export const inventory_count_company_operation_path = (companyId, operationId, countId, params = {}) => inventoryActionPath(companyId, operationId, `counts/${encodeURIComponent(countId)}`, params)
+export const inventory_count_submit_company_operation_path = (companyId, operationId, countId, params = {}) => inventoryActionPath(companyId, operationId, `counts/${encodeURIComponent(countId)}/submit`, params)
 export const reception_company_operation_path = (companyId, operationId, params = {}) => operationPath("reception", companyId, operationId, params)
 export const reception_check_in_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/check_in`
 export const reception_pre_register_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/pre_register`

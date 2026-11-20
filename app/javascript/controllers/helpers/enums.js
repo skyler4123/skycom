@@ -1681,6 +1681,10 @@ const ENUMS = {
       {
         "name": "Service",
         "value": "service"
+      },
+      {
+        "name": "Stock reorder",
+        "value": "stock_reorder"
       }
     ],
     "currencies": [

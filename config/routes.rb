@@ -253,6 +253,19 @@ Rails.application.routes.draw do
           post "booking/:operation_id/reservations/:reservation_id/end", to: "operations/booking#finish_reservation", as: :booking_reservation_end
           post "booking/:operation_id/reservations/:reservation_id/cancel", to: "operations/booking#cancel_reservation", as: :booking_reservation_cancel
           get "inventory/:operation_id", to: "operations/inventory#show", as: :inventory
+          get "inventory/:operation_id/ledger", to: "operations/inventory#ledger", as: :inventory_ledger
+          get "inventory/:operation_id/export", to: "operations/inventory#export", as: :inventory_export
+          post "inventory/:operation_id/receipts", to: "operations/inventory#create_receipt", as: :inventory_receipts
+          post "inventory/:operation_id/receipts/:receipt_id/post", to: "operations/inventory#post_receipt", as: :inventory_receipt_post
+          post "inventory/:operation_id/transfers", to: "operations/inventory#create_transfer", as: :inventory_transfers
+          post "inventory/:operation_id/transfers/:transfer_id/receive", to: "operations/inventory#receive_transfer", as: :inventory_transfer_receive
+          post "inventory/:operation_id/exports", to: "operations/inventory#create_export", as: :inventory_exports
+          post "inventory/:operation_id/adjustments", to: "operations/inventory#create_adjustment", as: :inventory_adjustments
+          post "inventory/:operation_id/reorder", to: "operations/inventory#create_reorder", as: :inventory_reorder
+          post "inventory/:operation_id/counts", to: "operations/inventory#start_count", as: :inventory_counts
+          get "inventory/:operation_id/counts/:count_id", to: "operations/inventory#show_count", as: :inventory_count
+          patch "inventory/:operation_id/counts/:count_id", to: "operations/inventory#update_count", as: :inventory_count_update
+          post "inventory/:operation_id/counts/:count_id/submit", to: "operations/inventory#submit_count", as: :inventory_count_submit
           get "reception/:operation_id", to: "operations/reception#show", as: :reception
           post "reception/:operation_id/check_in", to: "operations/reception#check_in", as: :reception_check_in
           post "reception/:operation_id/pre_register", to: "operations/reception#pre_register", as: :reception_pre_register

@@ -90,7 +90,7 @@
 | [02-pos](02-pos.md) | POS console (point of sale) | 🔴 | 29 | 10 | 2026-11-19 |
 | [03-booking](03-booking.md) | Booking console (facilities and reservations) | 🟢 | 26 | 0 | 2026-11-20 |
 | [04-reception](04-reception.md) | Reception console (visitors, parcels, rooms) | 🟢 | 44 | 0 | 2026-11-20 |
-| [05-inventory](05-inventory.md) | Inventory console (warehouse) | 🔴 | 29 | 10 | 2026-11-19 |
+| [05-inventory](05-inventory.md) | Inventory console (warehouse) | 🟢 | 38 | 0 | 2026-11-20 |
 | [06-store-manager](06-store-manager.md) | Store Manager console | 🔴 | 28 | 11 | 2026-11-19 |
 | [07-dashboard](07-dashboard.md) | Company dashboard | 🟠 | 29 | 7 | 2026-11-19 |
 | [08-analytics](08-analytics.md) | Analytics | 🟠 | 13 | 6 | 2026-11-19 |
@@ -181,4 +181,5 @@ These docs are only useful if they are true. The rules:
 | 2026-11-19 | Analytics | Page and config audit (13 controls, 6 decisions) |
 | 2026-11-19 | App overview | Module map, commercial model, cross-cutting decisions |
 | 2026-11-20 | Booking | Shippable pass: conflict-safe reservations, click inspector, real host/customer, extend/end/cancel, run sheet, caps; 🟢 26 controls |
+| 2026-11-20 | Inventory | Shippable pass: stripped BOM/zones/docks/RFID, server ledger search/pagination/CSV, receive/transfer/export/adjust/reorder/count drawers, real reorder points; 🟢 38 controls |
 | 2026-11-20 | Reception | Shippable pass: one page, guest-linked visits, pre-registration, browser badge print, direct notifications, real shift/timers/search/polling; 🟢 44 controls |

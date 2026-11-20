@@ -47,7 +47,7 @@ dynamic properties, location appointments, and access policies.
 | [POS](02-pos.md) | Taking money at the counter | 🟢 | Tax/currency from config, services, server prices, discounts, void, receipt slip, real lock, persisted tabs; one company-wide tax rate |
 | [Booking](03-booking.md) | Reserving rooms and spaces | 🟢 | Conflict-safe locking, click-to-inspect, real host/customer, extend/end/cancel, real category occupancy, run sheet |
 | [Reception](04-reception.md) | Front desk, visitors, parcels | 🟢 | Guest-linked visits only, pre-registration, browser badge print, direct notifications, real shift/timers/polling |
-| [Inventory](05-inventory.md) | Warehouse stock command screen | 🔴 | BOM panel is hardcoded zeros, invented zone occupancy, fake dock data |
+| [Inventory](05-inventory.md) | Warehouse stock command screen | 🟢 | Four real KPIs, server-paged ledger, receive/transfer/export/adjust/reorder/count loops |
 | [Store Manager](06-store-manager.md) | Retail floor command screen | 🔴 | Six dead tabs, invented shift, fabricated register names, UTC hourly chart |
 
 POS, Booking and Reception are shippable. The remaining urgent work is POS

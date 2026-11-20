@@ -406,6 +406,11 @@ CREDIT_USAGE_RATES = {
 # below this value. Products do not carry a per-SKU reorder point yet.
 LOW_STOCK_THRESHOLD = 10
 
+# Allowed reasons on a manual stock adjustment (Inventory console Adjust
+# drawer). Stored verbatim on stock_adjustments.reason; the note lives on
+# stock_adjustments.description. docs/business_analysis/05-inventory.md.
+STOCK_ADJUSTMENT_REASONS = [ "Count correction", "Damage", "Found", "Other" ].freeze
+
 # =============================================================================
 # Company Support Tickets (B2B — company → Skycom)
 # Ticket-level: used by CompanyTicket::FileAttachmentConcern (CompanyTicket).

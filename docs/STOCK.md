@@ -198,6 +198,36 @@ Stock documents themselves keep polymorphic `appoint_from/to/for/by` links
 (operator identity, purchase anchor, transfer legs) — only their *lines* and
 order/purchase lines are atomic (see `docs/RESOURCES.md` §4).
 
+### 4.7 Cycle counts (Inventory console)
+
+`StockCount` is the session header (warehouse, counter, `count_type`, `status`
+`draft/in_progress/completed/cancelled`, `started_at`/`completed_at`).
+`StockCountLine` snapshots `expected_quantity` per stock row at start and stores
+the counter's `counted_quantity` plus `variance_quantity = counted - expected`.
+
+- One open session per warehouse: `Inventory::CountService#start` locks the
+  warehouse row, checks `StockCount.open_counts`, and creates the lines; the model
+  also validates the single-open rule.
+- Save progress writes counted values and recomputes the stored variance. Clearing
+  a counted value resets the variance to 0.
+- Submit posts one `StockAdjustment` per line whose counted target differs from
+  the **current** `stock.quantity` (not only the start snapshot), with reason
+  `Count`. Rows whose target is below `stock.pending` are skipped with a named
+  error; the rest post. The session completes and stores the counter name and
+  failed lines in `metadata`.
+- A zero-variance submit is still a completed count. The Inventory card reads the
+  latest completed session and the open session's counted-row progress.
+
+### 4.8 Reorder bridge (Inventory console)
+
+`ReorderRule` holds the per-product/warehouse `min_quantity`, `max_quantity`,
+`safety_stock`, and `lead_time_days`. The Inventory row threshold is
+`min_quantity + safety_stock` when an active rule exists, otherwise
+`LOW_STOCK_THRESHOLD`. `Inventory::ReorderService` creates/reuses one open
+`Purchase` per product + warehouse with a real `PurchaseItem` line and
+`business_type: stock_reorder`; it never creates a second open purchase. Approval
+and goods receipt stay on the purchase screens and the existing purchase bridge.
+
 ---
 
 ## 5. Tenets (Immutable)
@@ -247,6 +277,10 @@ order/purchase lines are atomic (see `docs/RESOURCES.md` §4).
 | `app/models/stock.rb` | SKU row (`quantity`/`pending`), `available_counter`, the three wrappers, `sync_available_counter` |
 | `app/models/stock_transaction.rb` | Ledger row + the single quantity mutator (`recalibrate_stock_metrics`) |
 | `app/models/stock_pending.rb` | Owner-less hold record (`quantity`, holding/released `workflow_status`, `released_at`) |
+| `app/models/stock_count.rb` / `stock_count_line.rb` | Cycle-count session + counted/expected/variance line |
+| `app/models/reorder_rule.rb` | Per-product/warehouse min/max/safety/lead-time rule |
+| `app/services/inventory/count_service.rb` | Start/save/submit cycle counts (adjustments against current on hand) |
+| `app/services/inventory/reorder_service.rb` | Low row → real purchase draft (one open per product/warehouse) |
 | `app/services/stock_pendings/{hold,release}_service.rb` | Hold/release services (one ledger row per transition, FIFO scope release) |
 | `app/controllers/companies/stock_pendings_controller.rb` | Hold dashboards (index/new/show/edit + release/cancel members) |
 | `app/models/stock_{import,export,transfer,adjustment}.rb` | Movement documents |

@@ -96,7 +96,7 @@ items** across 16 active groups plus 3 coming-soon groups.
 | 9 | Booking | `GET /mobile/companies/:company_id/operations/booking/:operation_id` | `Mobile::Companies::Operations::BookingController#show` | `Operation`, `BranchOperationAppointment`, `Event`, `Facility`, `Employee`, `Customer` | Conflict-checked instant reservation, customer search, extend/end/cancel via the web booking endpoints | Shell-First; reuses web booking Stimulus controller; real host/customer, outside-window tags, run sheet; responsive tablet portrait/landscape; no offline mode |
 | 10 | Reception | `GET /mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | `Operation`, `BranchOperationAppointment`, `Event`, `Customer`, `Facility`, `ScheduledShift` | Walk-in, pre-register, arrive/mark-inside/check-out/reopen, parcel, parcel-notify, host-notify and browser badge-print actions via the web reception endpoints | Shell-First; reuses web reception Stimulus controller; responsive phone/tablet; no offline mode or label-printer integration |
 | 11 | Store Manager | `GET /mobile/companies/:company_id/operations/store_manager/:operation_id` | `Mobile::Companies::Operations::StoreManagerController#show` | `Operation`, `BranchOperationAppointment`, `Order`, `Stock`, `Employee` | — | Shell-First; reuses web store manager Stimulus controller; responsive phone/tablet portrait and landscape; footfall sensor not modelled |
-| 12 | Inventory | `GET /mobile/companies/:company_id/operations/inventory/:operation_id` | `Mobile::Companies::Operations::InventoryController#show` | `Operation`, `OperationWarehouseAppointment`, `Warehouse`, `Stock`, `StockImport`, `StockExport` | — | Shell-First; reuses web inventory Stimulus controller; responsive phone/tablet portrait and landscape; BOM/audit domains not modelled |
+| 12 | Inventory | `GET /mobile/companies/:company_id/operations/inventory/:operation_id` | `Mobile::Companies::Operations::InventoryController#show` | `Operation`, `OperationWarehouseAppointment`, `Warehouse`, `Stock`, `StockImport`, `StockExport`, `StockTransfer`, `StockCount`, `Purchase` | Receive, transfer/export, adjust, reorder and cycle-count actions via the web inventory endpoints | Shell-First; reuses web inventory Stimulus controller; responsive phone/tablet portrait and landscape; 50-row ledger pages and a 1,000-ID search cap |
 | 13 | New request | `GET/POST /mobile/companies/:company_id/attendance_requests` | `Mobile::Companies::AttendanceRequestsController#new/create` | `Employee` (group managers), `AttendanceRequest` | Create request | No attachments |
 
 `GET /mobile/home` remains the signed-in no-employee fallback and renders
@@ -274,7 +274,7 @@ status.
 
 | Web item | Mobile | Reason / next |
 |---|---|---|
-| Inventory operation console | 🟡 | Read-only stock ledger, freight docks, zone capacity and audit state from the Inventory operation |
+| Inventory operation console | 🟢 | Warehouse KPIs, 50-row server-paged ledger with search/filter/CSV, receive, transfer/export, adjust, reorder and cycle count — all finishing in-console |
 | Warehouses | ⛔ | ERP |
 | Stocks | ⛔ | ERP |
 | Stock Transfers | ⛔ | ERP |

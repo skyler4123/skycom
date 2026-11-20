@@ -8,7 +8,8 @@ FactoryBot.define do
       Seed::StockExportService.new(
         company: company,
         product: product,
-        branch: nil
+        branch: nil,
+        discarded_at: nil
       ).tap do |record|
         if record.category.nil? && record.company.present?
           record.category = Seed::CategoryService.find_or_create_for(
@@ -21,5 +22,7 @@ FactoryBot.define do
         end
       end
     end
+
+    after(:build) { |record| record.discarded_at = nil }
   end
 end

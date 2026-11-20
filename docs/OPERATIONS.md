@@ -133,7 +133,20 @@ All appointments start `active`. Companies disable the ones they do not use.
 | POST | `/companies/:company_id/operations/booking/:operation_id/reservations/:reservation_id/extend` | `Companies::Operations::BookingController#extend_reservation` | +30 minutes with next-booking conflict check |
 | POST | `/companies/:company_id/operations/booking/:operation_id/reservations/:reservation_id/end` | `Companies::Operations::BookingController#finish_reservation` | End & release (in-progress ends now; stock holds released) |
 | POST | `/companies/:company_id/operations/booking/:operation_id/reservations/:reservation_id/cancel` | `Companies::Operations::BookingController#cancel_reservation` | Cancel a booking and free its time |
-| GET | `/companies/:company_id/operations/inventory/:operation_id` | `Companies::Operations::InventoryController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/inventory/:operation_id` | `Companies::Operations::InventoryController#show` | Inventory console (warehouse ledger, KPIs, inbound/outbound, counts) |
+| GET | `/companies/:company_id/operations/inventory/:operation_id/ledger` | `Companies::Operations::InventoryController#ledger` | Server-paged ledger search/filter (50 rows) |
+| GET | `/companies/:company_id/operations/inventory/:operation_id/export` | `Companies::Operations::InventoryController#export` | CSV of the current ledger search + filter |
+| POST | `/companies/:company_id/operations/inventory/:operation_id/receipts` | `Companies::Operations::InventoryController#create_receipt` | Receive into the warehouse |
+| POST | `/companies/:company_id/operations/inventory/:operation_id/receipts/:receipt_id/post` | `Companies::Operations::InventoryController#post_receipt` | Resume an open import |
+| POST | `/companies/:company_id/operations/inventory/:operation_id/transfers` | `Companies::Operations::InventoryController#create_transfer` | Create + initiate a transfer |
+| POST | `/companies/:company_id/operations/inventory/:operation_id/transfers/:transfer_id/receive` | `Companies::Operations::InventoryController#receive_transfer` | Destination marks in-transit goods received |
+| POST | `/companies/:company_id/operations/inventory/:operation_id/exports` | `Companies::Operations::InventoryController#create_export` | Export goods out of the company |
+| POST | `/companies/:company_id/operations/inventory/:operation_id/adjustments` | `Companies::Operations::InventoryController#create_adjustment` | Set a new on hand with a reason |
+| POST | `/companies/:company_id/operations/inventory/:operation_id/reorder` | `Companies::Operations::InventoryController#create_reorder` | Create/reuse a purchase draft |
+| POST | `/companies/:company_id/operations/inventory/:operation_id/counts` | `Companies::Operations::InventoryController#start_count` | Start a cycle count |
+| GET | `/companies/:company_id/operations/inventory/:operation_id/counts/:count_id` | `Companies::Operations::InventoryController#show_count` | Load an open count with lines |
+| PATCH | `/companies/:company_id/operations/inventory/:operation_id/counts/:count_id` | `Companies::Operations::InventoryController#update_count` | Save counted progress |
+| POST | `/companies/:company_id/operations/inventory/:operation_id/counts/:count_id/submit` | `Companies::Operations::InventoryController#submit_count` | Post variances and complete the count |
 | GET | `/companies/:company_id/operations/reception/:operation_id` | `Companies::Operations::ReceptionController#show` | Reception console (guest-linked visits, parcels, rooms, appointments, shift) |
 | POST | `/companies/:company_id/operations/reception/:operation_id/check_in` | `Companies::Operations::ReceptionController#check_in` | Walk-in Customer + lobby visit (+ optional host/room/VIP) |
 | POST | `/companies/:company_id/operations/reception/:operation_id/pre_register` | `Companies::Operations::ReceptionController#pre_register` | Expected visit Event from a branch-local date/time |
@@ -198,6 +211,7 @@ preserved when the form is saved. Raw metadata is never exposed in the UI.
 | POS | `Companies_Operations_Pos_ShowController` (`companies--operations--pos--show`) | `Companies::Operations::PosController#show` |
 | Reception | `Companies_Operations_Reception_ShowController` (`companies--operations--reception--show`) | `Companies::Operations::ReceptionController#show/check_in/pre_register/advance/create_parcel/notify_parcel/pick_up_parcel/notify_host` |
 | Booking | `Companies_Operations_Booking_ShowController` (`companies--operations--booking--show`) | `Companies::Operations::BookingController#show/customers/create_reservation/extend_reservation/finish_reservation/cancel_reservation` |
+| Inventory | `Companies_Operations_Inventory_ShowController` (`companies--operations--inventory--show`) | `Companies::Operations::InventoryController#show/ledger/export/create_receipt/post_receipt/create_transfer/receive_transfer/create_export/create_adjustment/create_reorder/start_count/show_count/update_count/submit_count` |
 | Store Manager | `Companies_Operations_StoreManager_ShowController` (`companies--operations--store-manager--show`) | `Companies::Operations::StoreManagerController#show` |
 | Placeholders | `Companies_Operations_<Type>_ShowController` | `Companies::Operations::<Type>Controller#show` |
 
@@ -310,6 +324,46 @@ only renders the payload, keeps a typed form draft in state, and posts actions.
 - Drag-to-reschedule.
 - Automatic no-show release.
 - Room List / Desk Zones as separate screens.
+
+### 7.2 Inventory — one warehouse, four loops
+
+The Inventory console is warehouse-scoped. `Inventory::ConsoleService` builds the
+read payload (four KPI cards, first ledger page, inbound/outbound stacks, open and
+last cycle count, supplier/warehouse reference data); `Inventory::LedgerQueryService`
+owns server search, the reorder-point threshold expression, full filter counts and
+50-row pages. Exact stock codes are resolved in the DB; other text search uses
+Meilisearch with a `company + warehouse` filter.
+
+Every write finishes in the console:
+
+- **Receive** = `Inventory::ReceiveService` creates a `StockImport` + one line and
+  executes it through `StockMovementService::Imports::CreateService` (one `add`
+  ledger row). An open import can be resumed and posted.
+- **Transfer** = `Inventory::TransferService` creates the document and calls
+  `StockMovementService::Transfers::InitiateService` (source available drops via a
+  hold). The destination console shows the incoming transfer and calls
+  `StockMovementService::Transfers::ReceiveService`, which moves the units and
+  resolves/creates the destination stock row.
+- **Export** = `Inventory::ExportService` creates a one-shot `StockExport`; source
+  on hand drops and nothing arrives elsewhere.
+- **Adjust** = `Inventory::AdjustmentService` converts a target new on hand into a
+  delta `StockAdjustment` (increase/decrease) with the chosen reason. It blocks a
+  target below `stock.pending`.
+- **Reorder** = `Inventory::ReorderService` creates/reuses a real `Purchase` +
+  `PurchaseItem` line with `business_type: stock_reorder`. One open purchase per
+  product per warehouse; the row action then links to that purchase.
+- **Count** = `Inventory::CountService` starts a `StockCount` for the warehouse
+  (snapshotting every stock row's expected quantity under a warehouse row lock),
+  saves counted progress, and submits one adjustment per line whose counted value
+  differs from the **current** on hand. Rows below reserved are skipped with a
+  named error and the rest post. Zero-variance submit still completes a count.
+
+Reorder points come from `ReorderRule` (`min_quantity + safety_stock`) per product
+per warehouse, falling back to `LOW_STOCK_THRESHOLD`. The ledger footnote says so.
+
+*Deliberately not in this pass:* BOM/work orders, RFID, dock doors/gates/bays,
+pallets/cartons/weight, zone capacity, cloud-sync health, fulfillment-node role,
+and the six sibling tabs. The Store Manager tab cleanup remains separate.
 
 Store Manager reuses Orders, Stocks and Employees for the branch command screen:
 

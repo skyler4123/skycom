@@ -1,10 +1,10 @@
 # Inventory
 
-> **Last audited:** 2026-11-19 · **Audit scope:** frontend controller, console
-> service, backend controller, feature and service specs. No live browser run.
-> **Ship readiness:** 🔴 not shippable — a BOM panel built on hardcoded zeros, an
-> invented zone-occupancy model, a hardcoded 84% fallback, and dock data derived
-> from record IDs.
+> **Last audited:** 2026-11-20 · **Audit scope:** console service, write services,
+> web + mobile Stimulus controller, feature/request/model specs.
+> **Ship readiness:** 🟢 shippable — every number and control is backed by a
+> record; the four warehouse loops (receive, transfer/export, adjust, count)
+> finish inside the console.
 > **Who this is for:** the warehouse manager or stock controller.
 > **Mobile:** same console, mounted through the Hotwire shell.
 > **Read first:** [README](README.md) · **Related:** [00-app-overview](00-app-overview.md),
@@ -14,15 +14,28 @@
 
 ## 1. What this page is for
 
-The Inventory console is the warehouse command screen: the stock ledger for the
-warehouse, what is low or out, what freight is at the dock, how full the zones
-are, and whether an audit has been done.
+The Inventory console is the command screen for **one warehouse**: the true stock
+ledger, the four KPI cards, open inbound/outbound records, the last cycle count,
+and the drawers that finish the work.
 
-"Done" means the controller can see stock truth for one warehouse and jump to the
-screen that changes it.
+A warehouse manager can:
 
-The page is read-only by design. Receiving, transfers, and adjustments happen in
-the stock screens; this console is the overview that tells you which one to open.
+1. See true on-hand, reserved, and available stock.
+2. Receive goods and watch on hand rise.
+3. Send goods out (transfer to another warehouse, or export out of the company)
+   and watch the source drop.
+4. Correct a quantity with a reason.
+5. Turn a low row into a real purchase draft.
+6. Run a cycle count and post the variance.
+7. Leave with no number, label, or button that is not backed by a record.
+
+Receiving, transferring, exporting, adjusting, reordering, and counting all
+finish on this page. Purchasing after the draft, and approval/receipt of the
+purchase, stay on the purchase screens.
+
+**Out of this workflow (not built, not shown):** BOM and work orders, RFID,
+dock doors/gates/bays, pallets, cartons, kilograms, zone percent-full, cloud
+sync, fulfillment-node role, density, and the six sibling tabs.
 
 ---
 
@@ -30,349 +43,293 @@ the stock screens; this console is the overview that tells you which one to open
 
 **The person:** a warehouse manager, stock controller, or receiving supervisor.
 
-**Their goal:** know what is on hand, what is short, and what is arriving or
-leaving today.
-
-**What they can do here today:**
-
-- Read the stock ledger for one warehouse: on hand, allocated, available, min
-  safe, status.
-- Filter by low / critical / in stock, and search by SKU, name, or bin.
-- Export the ledger as CSV.
-- Jump to a stock row to adjust or transfer.
-- Open the receiving and transfer forms.
-- See recent inbound and outbound records.
-- See the audit empty state.
-
-**What they must do elsewhere:**
-
-- Receive, transfer, or adjust stock — the stock screens.
-- Create a purchase order — the purchase screens.
-- Run or schedule a cycle count — nothing exists.
-- See batch, lot, or expiry — not modelled.
+**Their goal:** know what is on hand, what is short, what is arriving or leaving,
+and finish the next stock job without navigating away.
 
 **Access:** the Inventory operation must be active at the warehouse and the role
-must be allowed by the operation.
+must be allowed by the operation. All write actions run behind the same
+Operation-read gate (`Companies::Operations::InventoryPolicy`).
 
 ---
 
 ## 3. The screen, in words
 
-**Header:** Skycom mark, company, warehouse name and code, a "Cloud Sync Active"
-pill, dark mode, and the user. Below it, seven tabs shared with Store Manager
-(Store Overview … BOM & Procurement), with **Inventory & Stock Ledger** active.
+**Header:** Skycom mark, company, warehouse name and code, the signed-in person
+and role, and the platform dark-mode toggle. No cloud pill, no tabs.
 
-**Context bar:** warehouse name with a "Primary Fulfillment Node" pill, tenant,
-"Sync: Real-time", two telemetry pills (Stock Row Utilization, Freight Gates),
-and four quick actions: Receive Inbound, Outbound Transfer, Scan RFID, Audit
-Cycle Count.
+**Context row:** `{Warehouse name} · {code} · Last refreshed {warehouse-local
+time}`. Buttons: **Receive**, **Transfer out**, **Count** (or **Continue
+count** while a session is open).
 
-**KPI strip (five cards):** Total SKUs Active, Stock Criticality, Inbound Gate
-Intake, Outbound Freight, BOM Line Shortage.
+**KPI strip — four cards, all from this warehouse**
 
-**Main column:** the stock ledger (Export CSV, Density, Refresh, search, four
-status tabs, an eight-column table, a footer count, and a link to the stock
-ledger), then the BOM Line Shortage Analyzer.
+| Card | Shows | Never shows |
+|---|---|---|
+| Stock rows | Count of stock rows, and total units on hand | “SKUs”, zones, utilization % |
+| Needs attention | Rows at or below their reorder point, and how many are at zero available | A decorative progress bar |
+| Inbound open | Imports not yet completed, plus units still to receive | Gates, pallets, RFID % |
+| Outbound open | Transfers and exports not yet completed, plus units | Cartons, kg, bay numbers |
 
-**Side column:** Active Freight Docks (inbound and outbound cards), Zone Capacity
-Map (bars plus a global utilization donut and Re-optimize), and Audit & RFID
-Integrity.
+**Left — Stock ledger.** Title `Stock`, subtitle `On hand, reserved, and
+available for {warehouse}`. Search (name, code, location), filters
+**All · Low · Out · In stock** with full counts, **Export**, **Refresh**.
+Columns: Item · Location · On hand · Reserved · Available · Reorder at · Status ·
+Action. Status is only `In stock`, `Low`, or `Out`. Row actions: **Adjust**, and
+**Reorder** only when Low or Out (or **Open purchase {code}** when one is already
+open). Footer: `Showing {from}–{to} of {total}` with **Previous** / **Next**.
+
+The location is the stock location text, or `No location`. The warehouse name is
+never used as a fake bin.
+
+**Right — three stacks**
+
+1. **Inbound** — open imports and incoming transfers, newest first. Each card:
+   reference, supplier (or `No supplier`) / source warehouse, date, units, status
+   (`Draft` / `Receiving` / `In transit` / `Received`). Open imports can be
+   resumed; incoming transfers have **Mark received**. A short `Received` list
+   keeps the last five completed records. Empty: `Nothing waiting to receive.`
+2. **Outbound** — open transfers and exports. Each card: reference, destination
+   or reference note, units, kind (`Transfer` / `Export`), status. Empty:
+   `Nothing waiting to leave.` A short `Completed` list keeps the last five.
+3. **Last count** — date, who counted, rows counted, net variance, failed-line
+   count, and **Start count** / **Continue count**. Before any count:
+   `No count recorded · {N} rows in this warehouse.` and **Start count**
+   (disabled with a reason when there are no rows). While a session is open:
+   `Count in progress · {n} of {m} entered`.
+
+No BOM analyzer, zone map, donut, or Re-optimize.
+
+**Drawers / sheet**
+
+- **Receive** — supplier (optional), item search, quantity, location (optional),
+  note. Primary **Post receipt**. Posting creates a `StockImport` and an `add`
+  ledger row; on hand rises. An existing open import resumes the same drawer.
+- **Transfer out** — two modes. *Another warehouse*: item, quantity, destination
+  (required), note; primary **Transfer**. *Leaving the company*: item, quantity,
+  reference (required), note; primary **Export**. The transfer uses the domain’s
+  two-phase flow: source available drops immediately (hold); the destination
+  marks it received and only then does destination on hand rise.
+- **Adjust** — item and current on hand read-only, reserved shown, new on hand
+  required, reason required (`Count correction`, `Damage`, `Found`, `Other`),
+  note. Primary **Post adjustment**. On hand becomes the new number; reserved is
+  untouched; a value below reserved is blocked with
+  `On hand cannot be less than the {n} reserved.`
+- **Reorder** — short-by amount, supplier (product default or picker), quantity
+  defaulting to the shortfall. Primary **Create purchase**. Creates a real
+  `Purchase` + `PurchaseItem` line (`business_type: stock_reorder`) and reuses
+  the open purchase on a second press.
+- **Count sheet** — full-screen. Item, location, expected on hand, counted input,
+  live variance. Filter to Low or one location. **Save progress**, **Submit
+  count**, Close. Saving survives refresh. Submit posts one adjustment per line
+  whose counted number differs from the current on hand, reason `Count`; rows
+  below reserved are skipped with a named error and the rest post. A zero-variance
+  submit still records a count. One open count per warehouse.
+
+After a write, the drawer closes, the KPI strip, side stack, and current ledger
+page/filter reload, and one server message states what changed.
 
 **States**
 
-- *No stock rows:* "No stock rows match this view."
-- *No inbound:* "No inbound shipments are docked."
-- *No outbound:* "No outbound dispatches are scheduled."
-- *No zones:* "No warehouse zones are configured."
-- *No audit:* an honest "No audit recorded" with the line count.
-- *Load failure:* a full-screen red "Failed to load the inventory console."
-- *Responsive:* the side column stacks; the table scrolls horizontally.
+- *No stock rows:* `No stock rows match this view.`
+- *Exact code not found:* `Code not found: {q}` (single-token query).
+- *No inbound:* `Nothing waiting to receive.`
+- *No outbound:* `Nothing waiting to leave.`
+- *No count:* `No count recorded · {N} rows in this warehouse.`
+- *Load failure:* a full-screen red “Failed to load the inventory console.” with
+  the server detail.
+- *Responsive:* main and side stack below `lg`; the table scrolls inside its card.
 
 ---
 
 ## 4. Control inventory
 
-29 interactive controls.
+38 interactive controls.
 
-| ID | Area | Control | What it does today | Status | If shipped as-is |
-|---|---|---|---|---|---|
-| INV-01 | Top bar | Skycom logo | Returns to the Operations list | ✅ | — |
-| INV-02 | Tabs | Store Overview | Toast: "… is coming soon." | 🗑️ | Six of seven tabs are promises |
-| INV-03 | Tabs | Counter & POS Terminals | Toast: "… is coming soon." | 🗑️ | Same |
-| INV-04 | Tabs | Orders & Fulfillment | Toast: "… is coming soon." | 🗑️ | Same |
-| INV-05 | Tabs | Store Replenishment | Toast: "… is coming soon." | 🗑️ | Same |
-| INV-06 | Tabs | Warehouse Transfers | Toast: "… is coming soon." | 🗑️ | Same |
-| INV-07 | Tabs | BOM & Procurement | Toast: "… is coming soon." | 🗑️ | Same |
-| INV-08 | Tabs | Inventory & Stock Ledger | Active tab; does nothing | ✅ | — |
-| INV-09 | Top bar | Dark-mode toggle | Switches theme | ✅ | — |
-| INV-10 | Context bar | Receive Inbound | Opens the stock-import form | ✅ | Leaves the console |
-| INV-11 | Context bar | Outbound Transfer | Opens the stock-transfer form | ✅ | Leaves the console |
-| INV-12 | Context bar | Scan RFID | Focuses the search box; shows a toast | 🟡 | No RFID reader exists |
-| INV-13 | Context bar | Audit Cycle Count | Opens the stock list | 🟡 | No count flow exists |
-| INV-14 | Ledger | Export CSV | Downloads the stock list | ✅ | Exports all stocks, not the filtered view |
-| INV-15 | Ledger | Density | Toast: "Density controls are not connected yet." | 🗑️ | Decorative |
-| INV-16 | Ledger | Refresh | Reloads the payload | ✅ | — |
-| INV-17 | Ledger | Stock search | Filters loaded rows by name, code, bin, status | ✅ | Only the 200 loaded rows |
-| INV-18 | Ledger | All tab | Shows all loaded rows | ✅ | — |
-| INV-19 | Ledger | Low Stock tab | Filters low, critical, and reorder rows | ✅ | Count is global; rows are capped |
-| INV-20 | Ledger | Critical tab | Filters zero-available rows | ✅ | — |
-| INV-21 | Ledger | In Stock tab | Filters healthy rows | ✅ | — |
-| INV-22 | Row | PO Reorder | Opens the stock row | ✅ | Creates no purchase order |
-| INV-23 | Row | Transfer | Opens the stock row | ✅ | Starts no transfer |
-| INV-24 | Row | Adjust balance (pencil) | Opens the stock row | ✅ | — |
-| INV-25 | Footer | Open stock ledger | Opens the stock list | ✅ | — |
-| INV-26 | BOM | Auto-Generate Bulk POs | Toast: "No BOM shortages to order for this warehouse." | 🗑️ | Always says the same, because the data is fake |
-| INV-27 | Zones | Re-optimize | Toast: "Zone re-optimization is not connected yet." | 🗑️ | Decorative |
-| INV-28 | Audit | View Full Audit Log | Opens the stock list | ✅ | There is no audit log |
-| INV-29 | Audit | Schedule Count | Opens the stock list | 🟡 | Schedules nothing |
+| ID | Area | Control | What it does | Status |
+|---|---|---|---|---|
+| INV-01 | Header | Skycom logo | Returns to the Operations list | ✅ |
+| INV-02 | Header | Dark-mode toggle | Switches theme | ✅ |
+| INV-03 | Context | Receive | Opens the Receive drawer | ✅ |
+| INV-04 | Context | Transfer out | Opens the Transfer/Export drawer | ✅ |
+| INV-05 | Context | Count | Starts a session or continues the open one | ✅ |
+| INV-06 | Ledger | Export | Downloads the current search + filter as CSV | ✅ |
+| INV-07 | Ledger | Refresh | Reloads the console from the server | ✅ |
+| INV-08 | Ledger | Search | Server-side name/code/location search (Meilisearch, exact code via DB) | ✅ |
+| INV-09–12 | Ledger | All / Low / Out / In stock | Server-side filters with full counts | ✅ |
+| INV-13–14 | Ledger | Previous / Next | 50-row pages | ✅ |
+| INV-15 | Row | Adjust | Opens the Adjust drawer | ✅ |
+| INV-16 | Row | Reorder | Opens the Reorder drawer on Low/Out rows | ✅ |
+| INV-17 | Row | Open purchase | Navigates to the existing open purchase | ✅ |
+| INV-18 | Inbound | Open | Resumes an open import in the Receive drawer | ✅ |
+| INV-19 | Inbound | Mark received | Receives an incoming transfer at this warehouse | ✅ |
+| INV-20 | Last count | Start count | Creates a cycle count session | ✅ |
+| INV-21 | Last count | Continue count | Loads the open session | ✅ |
+| INV-22 | Receive | Item search | Scoped server-side stock search | ✅ |
+| INV-23 | Receive | Quantity | Required whole number > 0 | ✅ |
+| INV-24 | Receive | Supplier | Optional company supplier | ✅ |
+| INV-25 | Receive | Location | Optional put-away location; saves on the stock row | ✅ |
+| INV-26 | Receive | Note | Optional receipt note | ✅ |
+| INV-27 | Receive | Post / Cancel | Posts the receipt or closes with no write | ✅ |
+| INV-28 | Transfer | Mode switch | Another warehouse / Leaving the company | ✅ |
+| INV-29 | Transfer | Destination | Required other warehouse (transfer mode) | ✅ |
+| INV-30 | Transfer | Reference | Required reference note (export mode) | ✅ |
+| INV-31 | Transfer | Primary / Cancel | Transfers, exports, or closes with no write | ✅ |
+| INV-32 | Adjust | New on hand + reason + note | Required target and reason | ✅ |
+| INV-33 | Adjust | Post / Cancel | Posts the adjustment or closes | ✅ |
+| INV-34 | Reorder | Supplier + quantity | Default supplier or picker; editable quantity | ✅ |
+| INV-35 | Reorder | Create purchase / Cancel | Creates/reuses the purchase or closes | ✅ |
+| INV-36 | Count sheet | Low / location filters | Filters the loaded count lines | ✅ |
+| INV-37 | Count sheet | Save progress | Persists counted values and variance | ✅ |
+| INV-38 | Count sheet | Submit count / Close | Posts variances or closes (session stays open) | ✅ |
 
-**Count by status:** ✅ 17 · 🟡 3 · 🗑️ 9 · ⛔ 0. Fabricated figures are in §5.
+**Count by status:** ✅ 38 · 🟡 0 · 🗑️ 0 · ⛔ 0.
 
 ---
 
 ## 5. Numbers on screen
 
-| Claim on screen | What it appears to mean | Where it actually comes from | Verdict |
-|---|---|---|---|
-| Total SKUs Active | Distinct products in the warehouse | Count of stock rows scoped to the warehouse | ✅ stock rows, not distinct products |
-| "Across N facility zones" | Warehouse zones | Number of **warehouses** for the branch | 🟡 warehouses are not zones |
-| Stock Criticality | SKUs at or below the threshold | Stock rows where quantity − pending ≤ 10 | ✅ |
-| Zero-Stock Outages | SKUs with nothing available | Stock rows where quantity − pending ≤ 0 | ✅ |
-| Inbound Gate Intake | Shipments arriving | The four most recent stock imports | ✅ count of recent records, not today's |
-| Inbound Units / Docked | Units arriving | Sum of import quantities; count in received/in-progress/confirmed | ✅ |
-| Outbound Freight | Dispatches | The four most recent stock exports | ✅ |
-| Outbound Cartons | Boxes shipped | Sum of export quantities ÷ 5 | 🔢 no carton data exists |
-| "N kg" on an outbound card | Shipment weight | The export **quantity** rendered as kilograms | 🔢 units are presented as weight |
-| "N pallets" on an inbound card | Pallets received | Import quantity ÷ 10 | 🔢 no pallet data exists |
-| "Gate 3" / "Bay 5" | A real dock door | `record.id` bytes modulo 8, plus 1 | 🔢 invented dock numbers |
-| "QC RFID Gate Scan N% offloaded" | RFID read progress | Workflow status mapped to 15/35/65/100 | 🔢 no RFID scan exists |
-| "Stock Row Utilization N%" | How full the warehouse is | Average of the invented zone occupancies; **84** when there are no zones | 🔢 |
-| Zone name "Zone A: Main" | A real zone | Warehouses listed with letters by position | 🔢 no zone model exists |
-| Zone "N% Full" | Zone occupancy | `stock rows × 5`, clamped between 5 and 98 | 🔢 invented formula |
-| BOM Line Shortage | Work orders short of parts | Hardcoded `0` | 🔢 there is no BOM model; this claims "no shortages" |
-| "Missing Vital Parts" | Missing components | Hardcoded `0` | 🔢 same |
-| "No BOM shortages right now." | Production is clear | Always displayed | 🔢 |
-| Min Safe | Reorder threshold per product | Global constant 10 for every product | 🟡 |
-| "Showing N of M line items" | Coverage of the ledger | M is capped at 200; there is no pagination | 🟡 |
-| "Cycle verified against <warehouse>" | Audit coverage | Static footer text | 🔢 |
-| "No audit recorded" | No audit exists | `available: false` with the real line count | 💤 honest gap |
-| "Cloud Sync Active" / "Sync: Real-time" / "RFID Live Mode" | Live integrations | Static text | 🔢 |
-| "Primary Fulfillment Node" | This warehouse's role | Static pill on every warehouse | 🔢 |
-| KPI progress bars | Progress toward a target | Arbitrary formulas (94%, count × 10, count × 20) | 🔢 no target exists |
+| Claim on screen | Source |
+|---|---|
+| Stock rows | `stocks` rows for the warehouse, not discarded |
+| Units on hand | `SUM(stocks.quantity)` for the warehouse |
+| Needs attention | Rows where `quantity - pending <= reorder point` |
+| At zero available | Rows where `quantity - pending <= 0` |
+| Inbound open / units | `stock_imports` with workflow status not received/completed/cancelled/failed; units from `quantity` or line sum |
+| Outbound open / units | same for source `stock_transfers` (draft/pending/initiated) and `stock_exports` (draft/pending/confirmed/in_progress) |
+| On hand | `stocks.quantity` |
+| Reserved | `stocks.pending` |
+| Available | `stocks.quantity - stocks.pending`, clamped at 0 on screen |
+| Reorder at | `reorder_rules.min_quantity + safety_stock` when an active rule exists; otherwise `LOW_STOCK_THRESHOLD` (10) |
+| Status | Out when available ≤ 0; Low when available ≤ reorder point; otherwise In stock |
+| Tab counts | full warehouse counts from the same threshold expression as the rows |
+| Showing from–to of total | server pagination (`count`, `from`, `to`) |
+| Inbound/outbound card units | document `quantity` or its line sum |
+| Last count rows/variance | `stock_count_lines` counted rows and summed stored variance |
+| Last refreshed | server `generated_at`, rendered in the warehouse timezone |
+| Document codes | the persisted `StockImport` / `StockExport` / `StockTransfer` / `StockCount` / `Purchase` records |
+| `Purchase {code} drafted` / `Open purchase {code}` | the open `Purchase` for this product + warehouse |
+
+No fabricated number remains. A zero is a true count; a missing count is `nil` +
+an empty state.
 
 ---
 
-## 6. Gaps by user job
+## 6. Gaps closed (from the previous audit)
 
-### G1 — "Which parts are short for production?"
-The BOM panel is a mock. The KPI reports 0 work orders, the panel always says
-"no shortages", and the button always refuses. Nothing reads a bill of materials
-because none is modelled.
-
-- Smallest real version: remove the BOM card and KPI (S).
-- Better: mark it as "not connected" like the audit card (S).
-- Full version: BOM model and shortage calculation (L).
-
-### G2 — "How full is the warehouse?"
-Zones are warehouses with invented letters, and occupancy is a formula on the
-stock-row count. The global figure averages those inventions and returns 84 when
-there is nothing to average.
-
-- Smallest real version: remove the zone map and global utilization (S).
-- Better: show stock rows per warehouse as a bar chart, labelled as rows (M).
-- Full version: real zones with capacity and bin assignment (L).
-
-### G3 — "Which dock is this truck at?"
-Gate and bay numbers are derived from the record ID. Two shipments can share a
-gate; the number means nothing.
-
-- Smallest real version: remove gate/bay labels (S).
-- Full version: dock doors as a real resource (M).
-
-### G4 — "How much does this shipment weigh?"
-The outbound card prints the export **quantity** followed by "kg". A shipment of
-12 units is shown as 12 kg.
-
-- Smallest real version: remove the kg label (S).
-- Full version: capture weight on the export (M).
-
-### G5 — "How many pallets and cartons?"
-Both are quantity divided by a constant, with a minimum of one.
-
-- Smallest real version: remove both (S).
-- Full version: record packaging on the shipment (M).
-
-### G6 — "I scanned an RFID tag."
-There is no RFID reader. "RFID Live Mode" and "QC RFID Gate Scan" are labels on
-a search field and a workflow percentage.
-
-- Smallest real version: remove the RFID claims (S).
-- Full version: barcode/RFID integration (L).
-
-### G7 — "Let me receive stock from here."
-Every write sends the user to another screen. There is no receiving, transfer,
-adjustment, or count in the console.
-
-- Smallest real version: accept the navigation and label the buttons "Open
-  receiving" (S).
-- Better: a receive drawer that captures quantity and supplier (M).
-
-### G8 — "I have more than 200 stock rows."
-The ledger stops at 200 with no pagination, and the search only covers the loaded
-rows. Low-stock counts are global, so the tab count can exceed the rows shown.
-
-- Smallest real version: show the cap (S).
-- Better: server-side pagination and search (M).
-
-### G9 — "This product needs a different minimum."
-Min safe is a single global constant of 10 for every product in every company.
-
-- Smallest real version: accept the global threshold and label it (S).
-- Full version: per-product reorder point (M).
-
-### G10 — "Which shelf is it on?"
-"Bin Location" is a free-text property on the stock row, falling back to the
-warehouse name. There is no bin model, no zone, and no shelf capacity.
-
-- Smallest real version: label it "Location" (S).
-- Full version: bins and locations (L).
-
-### G11 — "Schedule a cycle count."
-The button opens the stock list. There is no audit record, no count sheet, no
-variance approval.
-
-- Smallest real version: remove the button (S).
-- Full version: audit domain with count and variance (L).
-
-### G12 — "Export exactly what I filtered."
-Export downloads all stocks, ignoring the tab and search.
-
-- Smallest real version: export the filtered set (S).
+| Previous gap | Resolution |
+|---|---|
+| G1 BOM panel / hardcoded zeros | Removed; no BOM domain, no KPI, no panel |
+| G2 Invented zones / 84% fallback | Removed; no zone or utilization payload |
+| G3 Gate/bay numbers from record IDs | Removed; cards carry reference, party, date, units, status |
+| G4 Export quantity shown as kg | Removed; units only |
+| G5 Pallets/cartons from division | Removed |
+| G6 RFID labels and fake scan progress | Removed; search is the only finder |
+| G7 Writes only navigate away | Receive/transfer/export/adjust/reorder/count finish in the console |
+| G8 200-row cap / local search | Server search + 50-row pages + full counts |
+| G9 Global 10 threshold unlabeled | Labeled footnote; per-item `ReorderRule` overrides |
+| G10 Warehouse name used as bin | Location is the stock location text or `No location` |
+| G11 Schedule Count opened the stock list | Real `StockCount` session with save/submit/variance |
+| G12 Export ignored the filter | CSV of the current search + filter |
+| Audit card was decorative | `Last count` with real completed/open session data |
+| No purchase from reorder | `ReorderService` creates/reuses a real purchase draft |
 
 ---
 
-## 7. Decisions for the BA
+## 7. Decisions implemented
 
-**INV-D1 — The BOM panel: remove, label, or build?**
-- A. Remove the KPI and the panel. Effort S.
-- B. Keep the panel but render "Not connected" like the audit card. Effort S.
-- C. Build BOM and shortage analysis. Effort L.
-- *Recommendation:* B if manufacturing customers are in the target market, A
-  otherwise. Never ship a hardcoded "0 shortages".
-
-**INV-D2 — Zone capacity: remove or replace?**
-- A. Remove the zone map and global utilization. Effort S.
-- B. Replace with stock rows per warehouse, honestly labelled. Effort M.
-- C. Build zones, bins, and capacity. Effort L.
-- *Recommendation:* B. It answers the real question without inventing a model.
-
-**INV-D3 — Dock identity: remove or model?**
-- A. Remove gate and bay numbers. Effort S.
-- B. Model dock doors and assign shipments. Effort M.
-- *Recommendation:* A. Dock scheduling is a niche need; the shipment status is the
-  useful part.
-
-**INV-D4 — Packaging and weight: capture or drop?**
-- A. Drop pallets, cartons, and kg. Effort S.
-- B. Capture weight and package count on imports and exports. Effort M.
-- *Recommendation:* A for v1. Wrong units are worse than absent ones.
-
-**INV-D5 — Should the console gain a receive action?**
-- A. Keep navigation only. Effort S.
-- B. Add a receive drawer. Effort M.
-- *Recommendation:* B if warehouse staff work from a tablet at the dock; A if they
-  use the desktop receiving screen.
-
-**INV-D6 — Ledger pagination?**
-- A. Show the 200 cap honestly. Effort S.
-- B. Server-side pagination and search. Effort M.
-- *Recommendation:* B for warehouses above a few hundred rows.
-
-**INV-D7 — Per-product reorder point?**
-- A. Keep the global 10. Effort S.
-- B. Add a reorder point per product/warehouse. Effort M.
-- *Recommendation:* B. A global threshold guarantees false alerts in a real
-  warehouse.
-
-**INV-D8 — Cycle counts: in scope?**
-- A. Remove Schedule Count. Effort S.
-- B. Build audit sessions with count and variance. Effort L.
-- *Recommendation:* B is the strongest differentiator on this page, but it is a
-  project of its own. Do A now, B when a customer asks.
-
-**INV-D9 — Remove the six dead tabs here too?**
-- A. Remove them from both Inventory and Store Manager. Effort S.
-- B. Keep them as a roadmap hint. Effort S. Risk: two consoles look unfinished.
-- *Recommendation:* A, with the decisions recorded in `06-store-manager.md` (SM-D1).
-
-**INV-D10 — Static operational claims?**
-- A. Remove "Cloud Sync Active", "Sync: Real-time", "Primary Fulfillment Node",
-  and "Cycle verified against…". Effort S.
-- B. Replace them with a real last-synced time and a real node role. Effort M.
-- *Recommendation:* A now. The page already has a real "Refreshed at" pattern to
-  copy later if a health signal is built.
+- **BOM:** removed (the grocery workflow does not build).
+- **Zones/utilization:** removed; no capacity model exists.
+- **Docks:** removed; shipment status is the useful part.
+- **Packaging/weight:** removed; wrong units are worse than absent ones.
+- **Receive:** in-console drawer backed by `StockImport`.
+- **Ledger:** server pagination + Meilisearch; exact code lookup stays in the DB.
+- **Reorder point:** per-product/warehouse `ReorderRule`, company default 10.
+- **Cycle counts:** built on `StockCount`/`StockCountLine`, warehouse-locked to one
+  open session, adjustments through `StockAdjustment`.
+- **Tabs:** removed from Inventory. Store Manager cleanup remains separate.
+- **Static operational claims:** removed (`Cloud Sync`, `Sync: Real-time`,
+  `Primary Fulfillment Node`, `Cycle verified`).
 
 ---
 
-## 8. Safe demo path
+## 8. Safe demo path / proof
 
-1. Open **Operations** → **Inventory** for a warehouse with stock seeded.
-2. Show the KPI strip: SKUs, criticality, inbound, outbound.
-3. Filter **Low Stock**, search a SKU, open a row.
-4. Show the inbound and outbound dock cards as **record lists**, not as live
-   dock telemetry.
-5. Show the audit card: "No audit recorded — N line items ready for the first
-   count."
+Run this on Grocery VN / Branch 1 Warehouse and stop if any step leaves the
+console or shows a number you cannot point at in the database.
 
-**Do not demo:**
+1. Open the page. Four KPIs. No BOM, percent-full, gate, or `coming soon`.
+2. Search a known SKU past the first page. It appears with on hand, reserved,
+   available.
+3. Receive 10 of it. On hand is +10. Inbound shows the receipt as Received.
+4. Transfer 4 to another warehouse. Source available is −4 and the outbound card
+   says In transit. On the destination console, Mark received; source on hand is
+   −4 and destination is +4.
+5. Adjust one damaged unit with reason Damage. On hand is −1. Reason is stored.
+6. Set a row to Out/ Low, press Reorder, create the purchase. A draft exists.
+   Pressing the action again opens that purchase instead of creating another.
+7. Start a count, change one quantity, submit. Last count shows the counter’s
+   name and the variance. The ledger matches.
+8. Export Low. The file matches the Low filter only.
 
-- The BOM panel or its KPI — it always reports zero.
-- The zone capacity map, the donut, or Re-optimize.
-- Gate and bay numbers, pallet or carton counts, or the kg weight.
-- "RFID Live Mode", "Scan RFID", "QC RFID Gate Scan".
-- The six header tabs other than Inventory.
-- The density button, "Schedule Count", or "View Full Audit Log".
-- Export as "your filtered list" — it exports everything.
+The same proof is encoded in `spec/features/companies/operations/inventory_spec.rb`,
+the service specs under `spec/services/inventory/`, and the request spec
+`spec/requests/companies/operations/inventory_spec.rb`.
 
 ---
 
 ## 9. Engineering appendix
 
-**Route:** `GET /companies/:company_id/operations/inventory/:operation_id`
-(HTML + `.json`), optional `warehouse_id`.
+**Routes**
 
-**Backend:** `Companies::Operations::InventoryController#show` (payload only);
-`Inventory::ConsoleService`.
+```
+GET    /companies/:company_id/operations/inventory/:operation_id
+GET    /companies/:company_id/operations/inventory/:operation_id/ledger
+GET    /companies/:company_id/operations/inventory/:operation_id/export
+POST   /companies/:company_id/operations/inventory/:operation_id/receipts
+POST   /companies/:company_id/operations/inventory/:operation_id/receipts/:receipt_id/post
+POST   /companies/:company_id/operations/inventory/:operation_id/transfers
+POST   /companies/:company_id/operations/inventory/:operation_id/transfers/:transfer_id/receive
+POST   /companies/:company_id/operations/inventory/:operation_id/exports
+POST   /companies/:company_id/operations/inventory/:operation_id/adjustments
+POST   /companies/:company_id/operations/inventory/:operation_id/reorder
+POST   /companies/:company_id/operations/inventory/:operation_id/counts
+GET    /companies/:company_id/operations/inventory/:operation_id/counts/:count_id
+PATCH  /companies/:company_id/operations/inventory/:operation_id/counts/:count_id
+POST   /companies/:company_id/operations/inventory/:operation_id/counts/:count_id/submit
+```
+
+**Backend:** `Companies::Operations::InventoryController` (thin shell),
+`Inventory::ConsoleService`, `Inventory::LedgerQueryService`,
+`Inventory::LedgerCsvService`, `Inventory::ReceiveService`,
+`Inventory::TransferService`, `Inventory::ExportService`,
+`Inventory::AdjustmentService`, `Inventory::ReorderService`,
+`Inventory::CountService`.
 
 **Frontend:** `app/javascript/controllers/companies/operations/inventory/show_controller.js`
-(`Companies_Operations_Inventory_ShowController`).
+(`Companies_Operations_Inventory_ShowController`), shared by web and the mobile
+Hotwire shell.
 
-**Payload:** `{ location, currency, metrics, stocks, low_stock_count, docks,
-zones, global_utilization, audit, generated_at }`.
+**Payload:** `{ location, currency, generated_at, metrics, stocks, pagination,
+counts, search_capped, reorder_default, reorder_rules_present, adjustment_reasons,
+inbound, outbound, open_count, last_count, reference }`.
 
-**Known code-level issues behind §5 and §6:**
+**Source tables:** `stocks`, `reorder_rules`, `stock_imports`, `stock_exports`,
+`stock_transfers`, `stock_adjustments`, `stock_transactions`, `stock_counts`,
+`stock_count_lines`, `purchases`, `purchase_items`, `purchase_purchase_item_appointments`,
+`suppliers`, `warehouses`.
 
-- `metrics_payload` sets `bom_shortage_work_orders: 0` and
-  `bom_missing_parts: 0` unconditionally.
-- `zones_payload` maps warehouses to `"Zone #{letter}: #{warehouse.name}"` and
-  computes `occupancy = [stock_count * 5, 5].max.clamp(5, 98)`.
-- `global_utilization` returns `84` when there are no zones.
-- `inbound_dock_payload` computes `pallets = [quantity / 10, 1].max` and
-  `gate = "Gate #{id.bytes.sum % 8 + 1}"`; `outbound_dock_payload` does the same
-  for cartons and `weight = quantity`.
-- `dock_progress` maps workflow statuses to 15/35/65/100.
-- `audit_payload` honestly returns `available: false`.
-- `stocks_payload` is capped at `STOCK_LIMIT = 200`; `low_stock_count` is a
-  separate global count.
-- `bin_location` falls back to the warehouse name when the property is blank.
-- The KPI progress bars use arbitrary formulas in the frontend.
+**Known limits:** text search is capped at 1,000 Meilisearch IDs per query (the
+payload and UI flag it); the count sheet loads every stock row for the warehouse;
+one open count per warehouse is enforced by a warehouse row lock plus a model
+validation; an abandoned open count is completed with a zero-variance submit.
 
-**Source tables:** `stocks`, `stock_imports`, `stock_exports`, `warehouses`,
-`products`, `branches`. There is no BOM, zone, bin, dock, or audit table.
-
-**Proof:** `spec/features/companies/operations/inventory_spec.rb`,
+**Proof:**
+`spec/features/companies/operations/inventory_spec.rb`,
+`spec/features/mobile/inventory_spec.rb`,
+`spec/services/inventory/console_service_spec.rb`,
+`spec/services/inventory/ledger_query_service_spec.rb`,
+`spec/services/inventory/write_services_spec.rb`,
+`spec/models/stock_count_spec.rb`,
+`spec/models/stock_count_line_spec.rb`,
 `spec/requests/companies/operations/inventory_spec.rb`,
-`spec/services/inventory/console_service_spec.rb`.
-
-**Not covered by tests:** BOM zeros, zone occupancy, utilization fallback, gate
-numbers, packaging conversions, and the audit empty state beyond its shape.
+`spec/requests/mobile/inventory_controller_spec.rb`.

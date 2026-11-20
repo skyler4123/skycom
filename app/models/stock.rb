@@ -15,7 +15,7 @@
 class Stock < ApplicationRecord
   # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
   # settings block runs at include time. See the hook docs in the concern.
-  def self.ms_extra_filterable_columns = %w[quantity pending] # rubocop:disable Layout/ClassStructure
+  def self.ms_extra_filterable_columns = %w[quantity pending warehouse_id] # rubocop:disable Layout/ClassStructure
 
   include CategoryConcern
   include PropertyMappingConcern

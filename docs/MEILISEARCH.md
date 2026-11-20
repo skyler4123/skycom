@@ -125,12 +125,16 @@ The concern merges a model-declared hook into `indexed_attributes` + `filterable
 
 ```ruby
 # app/models/stock.rb
-def self.ms_extra_filterable_columns = %w[quantity pending]  # MUST precede `include DynamicSearchConcern`
+def self.ms_extra_filterable_columns = %w[quantity pending warehouse_id]  # MUST precede `include DynamicSearchConcern`
 
 include CategoryConcern
 include PropertyMappingConcern
 include DynamicSearchConcern
 ```
+
+`warehouse_id` was added for the Inventory console's warehouse-scoped ledger search;
+after deploying the change, reindex stocks once (`bin/rails meilisearch:reindex[Stock]`)
+so the filterable attribute exists on the live index.
 
 The meilisearch settings block runs at **include time**, so the class method must be defined
 **above** the `include` line (a later `def self.` is silently ignored — hence the
