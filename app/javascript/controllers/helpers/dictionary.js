@@ -2983,5 +2983,14 @@ export const dictionary = () => {
     "Shipped": { vi: "Đã gửi hàng" },
     "Initiated": { vi: "Đã khởi tạo" },
     "Paid": { vi: "Đã thanh toán" },
+    "Recent movements": { vi: "Biến động gần đây" },
+    "No movements recorded for this stock row.": { vi: "Chưa có biến động nào cho dòng tồn kho này." },
+    "Document": { vi: "Chứng từ" },
+    "Price": { vi: "Giá" },
+    "Export": { vi: "Xuất kho" },
+    "Adjustment": { vi: "Điều chỉnh" },
+    "Hold": { vi: "Giữ hàng" },
+    "Release": { vi: "Giải phóng" },
+    "Failed to load the stock row.": { vi: "Không thể tải dòng tồn kho." },
   }
 }

@@ -431,6 +431,7 @@ export const new_company_workflow_path = (companyId) => `/companies/${companyId}
 export const company_workflow_path = (companyId, workflowId) => `/companies/${companyId}/workflows/${workflowId}`
 export const edit_company_workflow_path = (companyId, workflowId) => `/companies/${companyId}/workflows/${workflowId}/edit`
 export const company_stocks_path = (companyId) => `/companies/${companyId}/stocks`
+export const company_stock_path = (companyId, stockId) => `/companies/${companyId}/stocks/${stockId}`
 export const company_stock_transfers_path = (companyId) => `/companies/${companyId}/stock_transfers`
 export const company_stock_imports_path = (companyId) => `/companies/${companyId}/stock_imports`
 export const company_stock_exports_path = (companyId) => `/companies/${companyId}/stock_exports`

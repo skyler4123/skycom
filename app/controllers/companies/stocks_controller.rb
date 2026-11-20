@@ -3,11 +3,18 @@
 # Stocks dashboard API (Shell-First). index supports the same TableConfig-driven
 # dynamic search/filter as Products (?q= / ?filters[key]= → Meilisearch via
 # Stocks::SearchQueryService; plain DB path otherwise). quantity/pending are
-# filterable metrics (Stock.ms_extra_filterable_columns).
-# Serves Stimulus: Companies_Stocks_IndexController (index JSON incl. q/filters passthrough)
+# filterable metrics (Stock.ms_extra_filterable_columns). show is the stock-row
+# screen: one row's quantities, location, price and its recent ledger entries.
+# Serves Stimulus: Companies_Stocks_IndexController (index JSON incl. q/filters passthrough),
+#                  Companies_Stocks_ShowController (show JSON)
 # Endpoints: GET /companies/:company_id/stocks(.json) — see config/routes.rb
-# Docs: docs/DYNAMIC_TABLE.md §2.5, docs/MEILISEARCH.md
+#            GET /companies/:company_id/stocks/:id(.json)
+# Docs: docs/DYNAMIC_TABLE.md §2.5, docs/MEILISEARCH.md, docs/STOCK.md
 class Companies::StocksController < Companies::ApplicationController
+  # Movements shown on one stock-row screen. The row identity is the stock's
+  # (company, warehouse, product) triple because StockTransaction has no stock_id.
+  STOCK_LEDGER_LIMIT = 20
+
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -29,7 +36,45 @@ class Companies::StocksController < Companies::ApplicationController
     end
   end
 
+  def show
+    stock = current_company.stocks.includes(:product, :warehouse, :branch).find(params[:id])
+
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: { stock: format_stock_row(stock), ledger: stock_ledger(stock) } }
+    end
+  end
+
   private
+
+  def format_stock_row(stock)
+    Stocks::RowPresenter.call(stock, company: current_company).merge(
+      product_name: stock.product&.name,
+      warehouse_name: stock.warehouse&.name,
+      warehouse_code: stock.warehouse&.code,
+      branch_name: stock.branch&.name,
+      updated_at: stock.updated_at.iso8601
+    )
+  end
+
+  def stock_ledger(stock)
+    StockTransaction
+      .where(company_id: current_company.id, warehouse_id: stock.warehouse_id, product_id: stock.product_id)
+      .order(created_at: :desc, id: :desc)
+      .limit(STOCK_LEDGER_LIMIT)
+      .includes(:appoint_for)
+      .map do |transaction|
+        {
+          id: transaction.id,
+          direction: transaction.direction,
+          transaction_type: transaction.transaction_type,
+          transaction_type_label: transaction.transaction_type.to_s.humanize,
+          quantity: transaction.quantity.to_i,
+          document_code: transaction.appoint_for.try(:code),
+          occurred_at: transaction.created_at.iso8601
+        }
+      end
+  end
 
   def format_stock(stock)
     stock.as_json(only: [
