@@ -133,7 +133,9 @@ All appointments start `active`. Companies disable the ones they do not use.
 | POST | `/companies/:company_id/operations/booking/:operation_id/reservations/:reservation_id/extend` | `Companies::Operations::BookingController#extend_reservation` | +30 minutes with next-booking conflict check |
 | POST | `/companies/:company_id/operations/booking/:operation_id/reservations/:reservation_id/end` | `Companies::Operations::BookingController#finish_reservation` | End & release (in-progress ends now; stock holds released) |
 | POST | `/companies/:company_id/operations/booking/:operation_id/reservations/:reservation_id/cancel` | `Companies::Operations::BookingController#cancel_reservation` | Cancel a booking and free its time |
-| GET | `/companies/:company_id/operations/inventory/:operation_id` | `Companies::Operations::InventoryController#show` | Placeholder |
+| GET | `/companies/:company_id/operations/inventory/:operation_id` | `Companies::Operations::InventoryController#show` | Inventory console (four real KPIs, warehouse-searched ledger, recent receipts/dispatches, cycle-count gap) |
+| GET | `/companies/:company_id/operations/inventory/:operation_id/ledger` | `Companies::Operations::InventoryController#ledger` | Filtered ledger CSV (tab + search; warehouse code in the filename) |
+| GET | `/companies/:company_id/stocks/:id` | `Companies::StocksController#show` | Stock row screen (quantities, location, price, recent movements) |
 | GET | `/companies/:company_id/operations/reception/:operation_id` | `Companies::Operations::ReceptionController#show` | Reception console (guest-linked visits, parcels, rooms, appointments, shift) |
 | POST | `/companies/:company_id/operations/reception/:operation_id/check_in` | `Companies::Operations::ReceptionController#check_in` | Walk-in Customer + lobby visit (+ optional host/room/VIP) |
 | POST | `/companies/:company_id/operations/reception/:operation_id/pre_register` | `Companies::Operations::ReceptionController#pre_register` | Expected visit Event from a branch-local date/time |
@@ -331,6 +333,29 @@ Store Manager reuses Orders, Stocks and Employees for the branch command screen:
 `StoreManager::ConsoleService` builds the read payload; the Stimulus controller
 only renders it. The web route is built first; mobile parity is out of scope for
 this pass.
+
+Inventory is the warehouse-level read console (one page, no tabs, no writes):
+
+- **Stock rows** = `stocks` rows for the resolved warehouse (`discarded_at` nil).
+- **Low or out** = rows where `quantity - pending` is at or below
+  `LOW_STOCK_THRESHOLD`; `out` is the subset at or below 0.
+- **Recent inbound / outbound** = the newest `StockImport` / `StockExport` rows
+  for the warehouse, capped at `Inventory::ConsoleService::RECENT_LIMIT`; the KPI
+  units are the plain `sum(quantity)` of those same records (no carton, pallet,
+  or weight conversion).
+- **Ledger buckets** are disjoint: `out <= 0 < low <= 10 < in_stock`. The SQL is
+  owned by the `Stock` scopes (`out_of_stock`, `low_stock`, `in_stock`,
+  `low_or_out`) and labels by `STOCK_AVAILABILITY_LABELS`.
+- **Search** is Meilisearch over `name`, `code`, and `property_string_1`, filtered
+  by company + warehouse (`warehouse_id` is in `Stock.ms_extra_filterable_columns`;
+  reindex once after the change). `matching_strategy: "all"` keeps codes precise.
+- **Ledger cap** is `Inventory::LedgerScope::LEDGER_LIMIT` (200); tab counts and
+  search cover the whole warehouse, and the footer says when the list is capped.
+- **Cycle counts** are not modelled; the card reports `available: false` with the
+  real row count. `ReorderRule`, `StockCount`, and `StorageLocation` tables exist
+  but nothing writes them yet — do not read them from this console.
+- **CSV export** reuses the ledger scope and is not gated by
+  `EXPORT_ENABLED_RESOURCES` (docs/EXPORT.md).
 
 The Operations pages use **full-page show + edit** pages, never modals. The two list
 pages link the row name to the show page and the edit icon to the edit page. Both

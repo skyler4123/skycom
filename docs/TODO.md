@@ -67,6 +67,33 @@ Skycom only stores and displays the result; it never applies rates or formulas.
 
 ---
 
+## Inventory console — deliberately deferred (feature backlog)
+
+The Inventory console was made shippable on 2026-11-20 by removing fabricated
+metrics and wiring the real ledger. These are the pieces that were deliberately
+NOT built; each is a product decision, not a cleanup
+(see `docs/business_analysis/05-inventory.md` §10).
+
+- [ ] **Per-product reorder point** — `reorder_rules` (product × warehouse
+  min/max, safety stock, lead time) exists but has no writer or reader. Wire it
+  into the ledger status and the low/out buckets instead of the global
+  `LOW_STOCK_THRESHOLD`.
+- [ ] **Cycle counts** — `stock_counts` / `stock_count_lines` exist; no screen,
+  service, or route creates a count or approves a variance. The console card is
+  honest text until this exists.
+- [ ] **Bins / storage locations** — `storage_locations` exists but `stocks` has
+  no location column; `Location` is the row's first text property. Add real bin
+  assignment before promising a shelf.
+- [ ] **Ledger pagination** — the list stops at 200 and says so; search and tab
+  counts already cover the warehouse.
+- [ ] **Dock doors, packaging, weight** — no model; shipment cards show units.
+- [ ] **BOM and shortages** — no model; the panel was removed rather than faked.
+- [ ] **RFID / barcode** — no reader; nothing on the page claims one.
+- [ ] **Receive inside the console** — the console navigates to the receipt form
+  by design.
+
+---
+
 ## Operations — new operation_type backfill (out of scope for the operations refactor)
 
 Adding a value to `Operation.operation_type` / `OPERATION_TYPES` is not enough for existing
