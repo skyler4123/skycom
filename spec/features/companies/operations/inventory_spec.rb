@@ -73,6 +73,19 @@ RSpec.feature "Companies::Operations::Inventory", type: :feature, js: true do
     expect(find('[data-kpi="recent_outbound"]')).to have_content("2")
     expect(find('[data-kpi="recent_outbound"]')).to have_content("52 units")
 
+    inbound_card = find('[data-operation-block="recent-inbound"]')
+    expect(inbound_card).to have_content("IMP-TEST-002")
+    expect(inbound_card).to have_content("Received")
+    expect(inbound_card).to have_content("30 units")
+    expect(inbound_card).to have_no_content("Gate")
+    expect(inbound_card).to have_no_content("%")
+
+    outbound_card = find('[data-operation-block="recent-outbound"]')
+    expect(outbound_card).to have_content("EXP-TEST-002")
+    expect(outbound_card).to have_content("Shipped")
+    expect(outbound_card).to have_content("40 units")
+    expect(outbound_card).to have_no_content("kg")
+
     expect(page).to have_content("WH-01 Central")
     expect(page).to have_content("WH-01")
     expect(page).to have_content("BR-01 Central Hub")
