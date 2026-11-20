@@ -27,6 +27,15 @@ Every index page can optionally show an **Export** button (header, visible only 
 - `Helpers.exportEnabled(resource)` / `Helpers.downloadCSV(records, columns, filename)`.
 - Button renders in the layout header only on index pages (`/companies/:id/:resource`) when enabled.
 
+## Operation consoles (Inventory ledger)
+Operation consoles export their own filtered view instead of using the index pipeline:
+
+- `GET /companies/:company_id/operations/inventory/:operation_id/ledger` (`Companies::Operations::InventoryController#ledger`) — CSV, `send_data`.
+- It reuses `Inventory::LedgerScope` so the file contains exactly the rows the current tab + search show (all matching rows, not the capped screen page).
+- The attachment filename includes the warehouse code and the selected bucket: `inventory-<warehouse-code>-<bucket>-<location-date>.csv`.
+- It is **not** gated by `EXPORT_ENABLED_RESOURCES` (that toggle governs index pages), but it honors `EXPORT_MAX_RECORDS` and returns `{ errors: [...] }` with `:unprocessable_content` above it.
+- Proof: `spec/requests/companies/operations/inventory_spec.rb` (filtered bucket, cap, oversized refusal).
+
 ## File reference
 - `config/initializers/constants.rb` — `EXPORT_ENABLED_RESOURCES`, `EXPORT_MAX_RECORDS`
 - `app/controllers/companies/application_controller.rb` — guard

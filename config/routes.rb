@@ -253,6 +253,7 @@ Rails.application.routes.draw do
           post "booking/:operation_id/reservations/:reservation_id/end", to: "operations/booking#finish_reservation", as: :booking_reservation_end
           post "booking/:operation_id/reservations/:reservation_id/cancel", to: "operations/booking#cancel_reservation", as: :booking_reservation_cancel
           get "inventory/:operation_id", to: "operations/inventory#show", as: :inventory
+          get "inventory/:operation_id/ledger", to: "operations/inventory#ledger", as: :inventory_ledger
           get "reception/:operation_id", to: "operations/reception#show", as: :reception
           post "reception/:operation_id/check_in", to: "operations/reception#check_in", as: :reception_check_in
           post "reception/:operation_id/pre_register", to: "operations/reception#pre_register", as: :reception_pre_register
