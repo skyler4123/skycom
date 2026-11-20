@@ -34,6 +34,16 @@ Each `Stock` row tracks one SKU in one warehouse (`warehouse_id` unique per
   movement leaves Redis briefly ahead until the next `save!` heals it via
   delta. Small, self-healing window — never the reverse direction.
 
+**Two availability readers, on purpose.** `Stock#available_count` is the Redis
+hot-path figure floored at 0 (what the checkout may sell).
+`Stock#available_quantity` is the unclamped DB figure (`quantity - pending`)
+that the Inventory ledger and the stock-row screen show — a row with 3 on hand
+and 5 reserved reads `available: -2` and status `out`. The ledger buckets are
+disjoint: `out <= 0 < low <= LOW_STOCK_THRESHOLD (10) < in_stock`, defined once
+by the `Stock` scopes (`out_of_stock`, `low_stock`, `in_stock`, `low_or_out`)
+and `Stock#availability_status`, with display labels in
+`STOCK_AVAILABILITY_LABELS`.
+
 ---
 
 ## 2. The Single Write Path

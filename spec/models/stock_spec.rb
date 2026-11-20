@@ -62,6 +62,46 @@ RSpec.describe Stock, type: :model do
     end
   end
 
+  describe "availability buckets" do
+    let(:company) { create(:company) }
+    let(:warehouse) { create(:warehouse, company: company) }
+    let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "stocks") }
+
+    def stock_with(quantity:, pending:)
+      product = create(:product, company: company)
+      Stock.create!(company: company, warehouse: warehouse, product: product, category: category,
+        property_mapping: category.default_property_mapping, name: "Row", code: "SKU-#{SecureRandom.hex(3)}",
+        quantity: quantity, pending: pending)
+    end
+
+    it "reports the unclamped on-hand minus reserved figure" do
+      expect(stock_with(quantity: 3, pending: 5).available_quantity).to eq(-2)
+    end
+
+    it "maps the boundary values to disjoint statuses" do
+      expect(stock_with(quantity: 0, pending: 0).availability_status).to eq("out")
+      expect(stock_with(quantity: 3, pending: 5).availability_status).to eq("out")
+      expect(stock_with(quantity: 1, pending: 0).availability_status).to eq("low")
+      expect(stock_with(quantity: 10, pending: 0).availability_status).to eq("low")
+      expect(stock_with(quantity: 11, pending: 0).availability_status).to eq("in_stock")
+    end
+
+    it "keeps the SQL buckets disjoint and exhaustive" do
+      out = stock_with(quantity: 0, pending: 0)
+      low = stock_with(quantity: 10, pending: 0)
+      healthy = stock_with(quantity: 11, pending: 0)
+
+      expect(Stock.out_of_stock).to contain_exactly(out)
+      expect(Stock.low_stock).to contain_exactly(low)
+      expect(Stock.in_stock).to contain_exactly(healthy)
+      expect(Stock.low_or_out).to contain_exactly(out, low)
+    end
+
+    it "exposes the status labels from one constant" do
+      expect(STOCK_AVAILABILITY_LABELS).to eq("out" => "Out", "low" => "Low", "in_stock" => "In stock")
+    end
+  end
+
   describe "category taxonomy" do
     let(:company) { create(:company) }
     let(:product) { create(:product, company: company) }

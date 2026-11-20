@@ -403,8 +403,17 @@ CREDIT_USAGE_RATES = {
 
 # Dashboard/analytics low-stock alert threshold. Stock is per warehouse; the
 # count is warehouse SKU rows whose available quantity (quantity - pending) is
-# below this value. Products do not carry a per-SKU reorder point yet.
+# at or below this value. Products do not carry a per-SKU reorder point yet.
 LOW_STOCK_THRESHOLD = 10
+
+# Availability buckets for the stock ledger and stock-row screens
+# (docs/STOCK.md). Disjoint by construction:
+# out <= 0 < low <= LOW_STOCK_THRESHOLD < in_stock.
+STOCK_AVAILABILITY_LABELS = {
+  "out" => "Out",
+  "low" => "Low",
+  "in_stock" => "In stock"
+}.freeze
 
 # =============================================================================
 # Company Support Tickets (B2B — company → Skycom)

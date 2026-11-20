@@ -15,7 +15,7 @@
 class Stock < ApplicationRecord
   # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
   # settings block runs at include time. See the hook docs in the concern.
-  def self.ms_extra_filterable_columns = %w[quantity pending] # rubocop:disable Layout/ClassStructure
+  def self.ms_extra_filterable_columns = %w[quantity pending warehouse_id] # rubocop:disable Layout/ClassStructure
 
   include CategoryConcern
   include PropertyMappingConcern
@@ -60,6 +60,12 @@ class Stock < ApplicationRecord
   has_many :pick_tasks, dependent: :destroy
   has_many :landed_cost_allocations, dependent: :destroy
   has_many :service_visit_parts, dependent: :nullify
+  # --- Scopes ---
+  # Disjoint availability buckets (docs/STOCK.md): out <= 0 < low <= threshold < in_stock.
+  scope :out_of_stock, -> { where("quantity - pending <= 0") }
+  scope :low_stock, -> { where("quantity - pending BETWEEN 1 AND ?", LOW_STOCK_THRESHOLD) }
+  scope :in_stock, -> { where("quantity - pending > ?", LOW_STOCK_THRESHOLD) }
+  scope :low_or_out, -> { where("quantity - pending <= ?", LOW_STOCK_THRESHOLD) }
   # --- Validations ---
   validates :quantity, :pending, presence: true, numericality: { only_integer: true }
   validates :warehouse_id, uniqueness: { scope: :product_id, message: "already holds a tracking SKU row mapping for this layout" }
@@ -93,6 +99,20 @@ class Stock < ApplicationRecord
     qty = qty.to_i
     available_counter.increment(by: qty)
     self.class.where(id: id).update_all([ "pending = GREATEST(pending - ?, 0)", qty ])
+  end
+
+  # Physical minus reserved (the DB figure the stock ledger shows). Distinct
+  # from #available_count, the Redis hot counter, which is floored at 0.
+  def available_quantity
+    quantity.to_i - pending.to_i
+  end
+
+  # "out" | "low" | "in_stock" — the same buckets as the scopes above.
+  def availability_status
+    return "out" if available_quantity <= 0
+    return "low" if available_quantity <= LOW_STOCK_THRESHOLD
+
+    "in_stock"
   end
 
   private

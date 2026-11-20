@@ -120,12 +120,13 @@ How it works:
 ### 2.1 Per-model extra filterable columns (`ms_extra_filterable_columns`)
 
 Some models have plain metric columns (not `property_*` slots) that should be range-filterable —
-`Stock#quantity`/`Stock#pending`, and `quantity` on `StockTransfer`/`StockImport`/`StockExport`.
+`Stock#quantity`/`Stock#pending` (plus `warehouse_id`, so the Inventory ledger can search one
+warehouse), and `quantity` on `StockTransfer`/`StockImport`/`StockExport`.
 The concern merges a model-declared hook into `indexed_attributes` + `filterable_attributes`:
 
 ```ruby
 # app/models/stock.rb
-def self.ms_extra_filterable_columns = %w[quantity pending]  # MUST precede `include DynamicSearchConcern`
+def self.ms_extra_filterable_columns = %w[quantity pending warehouse_id]  # MUST precede `include DynamicSearchConcern`
 
 include CategoryConcern
 include PropertyMappingConcern
@@ -345,7 +346,7 @@ To opt a model **out** of searchable: do not include the concern (or add `meilis
 | `app/services/products/search_query_service.rb` | Products subclass — TableConfig-driven search/filter query translation |
 | `app/services/customers/search_query_service.rb` | Customers subclass (proof of the 3-line rollout) |
 | `app/services/{branches,brands,departments,employees,facilities,invoices,orders,services,warehouses}/search_query_service.rb` | Remaining 9 subclasses — all dynamic-table index pages wired (2026-09-07/08) |
-| `app/services/{stocks,stock_transfers,stock_imports,stock_exports}/search_query_service.rb` | Stock-family subclasses (2026-09-09) — `quantity`/`pending` metrics filterable via `ms_extra_filterable_columns` |
+| `app/services/{stocks,stock_transfers,stock_imports,stock_exports}/search_query_service.rb` | Stock-family subclasses (2026-09-09) — `quantity`/`pending` metrics filterable via `ms_extra_filterable_columns`; `Stock` also makes `warehouse_id` filterable for the Inventory console ledger (2026-11-20) |
 | `app/services/dynamic_search/base_query_service.rb` | Generic search/filter core (whitelist + filter-string building); pages subclass it — rollout: `docs/DYNAMIC_TABLE.md` §8 |
 | `spec/support/shared_examples/dynamic_search_service.rb` | Shared behavioral contract for every subclass |
 | `spec/support/shared_examples/dynamic_search_index_controller.rb` | Shared request-level contract for every wired index controller |
