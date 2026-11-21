@@ -148,7 +148,7 @@ version as the library.
 
 | File | Purpose |
 |---|---|
-| `android/app/src/main/AndroidManifest.xml` | `INTERNET` permission, application class, Material theme, `SignInActivity` as the launcher, orientation/keyboard handling, predictive back. |
+| `android/app/src/main/AndroidManifest.xml` | `INTERNET` + `ACCESS_FINE_LOCATION` + `ACCESS_COARSE_LOCATION` permissions, application class, Material theme, `SignInActivity` as the launcher, orientation/keyboard handling, predictive back. |
 | `android/app/src/debug/AndroidManifest.xml` | Adds `android:usesCleartextTraffic="true"` **for debug builds only**, so the app can talk to `http://10.88.0.2:3000`. Release builds do not get this. |
 
 ### 3.3 Kotlin
