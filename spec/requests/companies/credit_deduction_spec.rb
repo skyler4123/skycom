@@ -93,6 +93,29 @@ RSpec.describe "Credit deduction via page tokens", type: :request do
       expect(company.credit_usage_delta).to eq(0)
     end
 
+    it "charges once for each of two page loads (two tabs)" do
+      wallet.add_to!(balance: :main, amount: 100)
+      first_token = page_token
+      second_token = page_token
+
+      get_json(token: first_token)
+      get_json(token: second_token)
+
+      expect(wallet.reload.main_credit_balance).to eq(96)
+      expect(company.credit_usage_delta).to eq(4)
+    end
+
+    it "does not charge a suspended company" do
+      wallet.add_to!(balance: :main, amount: 100)
+      company.reload.sync_credit_status!(total_credit_balance: 0)
+
+      get "/companies/#{company.id}/dashboards"
+
+      expect(response).to have_http_status(:found)
+      expect(wallet.reload.main_credit_balance).to eq(100)
+      expect(company.credit_usage_delta).to eq(0)
+    end
+
     it "deducts from the promo balance before the main balance" do
       wallet.add_to!(balance: :promo, amount: 5)
       wallet.add_to!(balance: :main, amount: 100)
