@@ -258,7 +258,7 @@ the background-job boundary.
 | Column | Purpose | Deduct order |
 |--------|---------|--------------|
 | `main_credit_balance` | Purchased credits (top-ups land here) | 2nd |
-| `promo_credit_balance` | Promotional credits (incl. the 1,000-credit signup bonus) | **1st** |
+| `promo_credit_balance` | Promotional credits (incl. the 1,000,000-credit signup bonus) | **1st** |
 
 Both balances may be negative. There is no debt column; a negative total derives
 `workflow_status: suspend`.
@@ -509,7 +509,7 @@ expect(invoice.transactions.sum(:price_cents)).to be >= invoice.price_cents
 This example traces a company through a full credit cycle — from consuming actions through top-up.
 
 ```
-Day 1:  Company active, wallet promo_balance 1,000, main_balance 0
+Day 1:  Company active, wallet promo_balance 1,000,000, main_balance 0
         (SIGNUP_PROMO_CREDITS)
 
 09:00   Dashboard visit
