@@ -44,4 +44,23 @@ RSpec.describe "Mobile::Companies::HomeController", type: :request do
       expect(json["today_logs"].first["branch_name"]).to be_present
     end
   end
+
+  it "marks geofence_required when the employee's branch has a config" do
+    branch = create(:branch, company: company)
+    employee.update!(branch: branch)
+    create(:attendance_config, company: company, branch: branch)
+
+    get mobile_company_home_path(company, format: :json)
+
+    expect(JSON.parse(response.body)["geofence_required"]).to be(true)
+  end
+
+  it "does not require a geofence when the branch has no config" do
+    branch = create(:branch, company: company)
+    employee.update!(branch: branch)
+
+    get mobile_company_home_path(company, format: :json)
+
+    expect(JSON.parse(response.body)["geofence_required"]).to be(false)
+  end
 end
