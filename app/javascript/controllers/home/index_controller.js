@@ -151,7 +151,7 @@ export default class Home_IndexController extends Controller {
     this.setLive("credits", this.live.credits.toFixed(1))
     this.setLive("pool", Math.floor(this.live.pool).toLocaleString("en-US"))
     this.setLive("burn", `${this.live.credits.toFixed(1)} cr today`)
-    this.setLive("pool2", `Master Balance: ${Math.floor(this.live.pool).toLocaleString("en-US")} / ${POOL_CAP.toLocaleString("en-US")} cr remaining`)
+    this.setLive("pool2", `Business balance: ${Math.floor(this.live.pool).toLocaleString("en-US")} / ${POOL_CAP.toLocaleString("en-US")} cr remaining`)
   }
 
   setLive(name, text) {

@@ -58,17 +58,17 @@ Rules:
 | 1 | Header | — | `#header-guest` (visible) + `#header-signedin` (`hidden`, §9) |
 | 2 | Hero | — | Trust tag (`$0 Base Fee` → `/sign_up`), H1 (single on page), CTA cluster, tick row |
 | 3 | Demo console | `#interactive-preview` | Tenant tabs, 3 metric cards, chart + ledger grid (§4) |
-| 4 | Vertical solutions | `#solutions` | Retail / Dental / Hotel / Restaurant cards + industry pills + schema strip |
-| 5 | Multi-tenant core | — | 3 cards (switcher, credit pool, provisioning) |
-| 6 | Operational pillars | `#platform` | 6 cards (POS, inventory, HR/payroll, attendance, calendar, billing) |
-| 7 | Pricing transparency | `#pricing` | Free-tier card, bait CTA → `/sign_up` |
-| 8 | Enterprise scaling | — | 6 cards (platform, schemas, sprawl, RBAC, API, SLA) |
-| 9 | Stats + testimonials | — | 4 counters, 4 quotes |
+| 4 | Vertical solutions | `#solutions` | Retail / Dental / Hotel / Restaurant cards + industry pills + custom-field callout |
+| 5 | Multi-tenant core | — | 3 cards (switcher, per-business credits, provisioning) |
+| 6 | Operational pillars | `#platform` | 6 cards (POS, inventory, HR/attendance, GPS attendance, calendar, invoicing) |
+| 7 | Pricing transparency | `#pricing` | Free starter tier card (no monthly base fee, no per-seat fee), CTA → `/sign_up` |
+| 8 | Enterprise scaling | — | 6 cards (workspaces, dynamic fields, one login, ABAC, imports, Android) |
+| 9 | Stats + operator scenarios | — | 4 platform facts, 4 anonymous operator scenarios (no named quotes) |
 | 10 | Final CTA | — | GET form → `/sign_up?email=` |
 | 11 | Footer | — | 5 columns + bottom bar, `© 2025 Skycom Technologies Inc.` |
 
 Header nav links: Solutions → `#solutions`, Pricing → `#pricing`,
-Docs → `#platform`. Sections carrying anchors use `scroll-mt-*` for the
+Platform → `#platform`. Sections carrying anchors use `scroll-mt-*` for the
 sticky header offset.
 
 ---
@@ -76,7 +76,9 @@ sticky header offset.
 ## 4. Live Demo Console
 
 The console is a **mockup with live-feeling numbers** — explicitly demo data,
-not account data. Same ApexCharts pattern as
+not account data, and it must ship a visible **“Demo preview · Sample data”**
+label so no visitor mistakes the numbers or ledger rows for account data.
+Same ApexCharts pattern as
 `companies/dashboards/index_controller.js` (`import ApexCharts from
 "apexcharts"`, `new ApexCharts(container, options)`, `chart.render()`).
 
@@ -162,6 +164,21 @@ end
   JS-only buttons — except in-page actions (tenant tabs, chart), which carry
   no SEO weight.
 
+### 8.1 Content claims contract (mandatory)
+
+The homepage is marketing, not a roadmap. Every claim must map to a shipped
+route, service, model, or operation console.
+
+| Rule | Why |
+|------|-----|
+| **No certification/compliance claims** without documented evidence (SOC 2, HIPAA, GDPR, SLA, encrypted backups). | TODO #78/#82/#84/#97 leave these unbuilt; a claim is a legal risk. |
+| **No feature claims from `docs/TODO.md` items marked ❌ or 🟡.** Check the item before writing the copy. | The 100-item gap audit is the source of truth. |
+| **No hardcoded prices or credit rates.** Read from `CREDIT_RATES` / `SIGNUP_PROMO_CREDITS` or omit the number. | The page previously quoted `$0.012/credit`, contradicting the constants by ~1,200×. |
+| **No paid top-up claims while the routes are placeholders.** | `Companies::TopUpsController` uses mock gateways; the flow is not live. |
+| **Demo numbers must be visibly labeled.** | `docs/HOMEPAGE.md` §4: the console is a mockup, not account data. |
+| **No dead `href="#"` links.** Point at a real anchor or remove the link. | Dead links imply pages that do not exist. |
+| **Compliance copy changes need a matching code/doc change first.** | The page follows the product, not the other way around. |
+
 ---
 
 ## 9. Header Swap Mechanics
@@ -196,11 +213,11 @@ container and break `position: sticky`).
 
 | Spec | Coverage |
 |------|----------|
-| `spec/features/homepage_spec.rb` | Static header links + `href`s, swap to signed-in header, avatar, sign-out, dashboard nav, company page flows (owner reveal + manager-employee gating; flash pushes the header down, header stays pinned on scroll), live-tick (Capybara-waited, never `sleep`), tenant switch |
+| `spec/features/homepage_spec.rb` | Static header links + `href`s, swap to signed-in header, avatar, sign-out, dashboard nav, company page flows (owner reveal + manager-employee gating; flash pushes the header down, header stays pinned on scroll), live-tick (Capybara-waited, never `sleep`), tenant switch, visible demo label |
 | `spec/features/authentication_spec.rb` | Signup/signin submit via pages, email prefill, signed-in redirects away |
 | `spec/features/sign_in_flash_spec.rb` / `sign_up_flash_spec.rb` | Success flashes, failure stays on auth page with alert, session persists across reload |
 | `spec/features/global_session_cache_spec.rb` / `omniauth_spec.rb` | Session lifecycle + Google OAuth, starting at `/sign_in` |
-| `spec/requests/home_spec.rb` | `private` + `max-age=3600` + `Vary: Cookie` on clean GET, static-markup anchors, non-cacheable flash response (POSTs use the forgery-disable wrapper — CSRF is on in test env) |
+| `spec/requests/home_spec.rb` | `private` + `max-age=3600` + `Vary: Cookie` on clean GET, static-markup anchors, no unbuilt certification/API claims, non-cacheable flash response (POSTs use the forgery-disable wrapper — CSRF is on in test env) |
 | `spec/requests/companies_controller_spec.rb` | `GET /companies/new` shell for owners/new accounts, redirect + JSON 403 for company members, redirect for guests; `POST /companies` guard blocks members (no self-promotion) |
 
 House patterns this page depends on: `bundle exec parallel_rspec -n 14`

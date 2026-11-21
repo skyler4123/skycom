@@ -29,6 +29,14 @@ RSpec.describe "Homepage caching and auth pages", type: :request do
       expect(response.body).to include("Claim Free Starter Credits")
     end
 
+    it "does not advertise unbuilt certification or public API claims" do
+      get root_path
+
+      [ "SOC 2", "SOC2", "HIPAA", "GDPR", "99.99%", "REST/GraphQL", "$0.012" ].each do |claim|
+        expect(response.body).not_to include(claim)
+      end
+    end
+
     it "ships a hidden admin link for admins (revealed client-side by role)" do
       get root_path
 
