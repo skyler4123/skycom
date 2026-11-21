@@ -29,7 +29,7 @@ module Companies::CreditDeductionConcern
 
   def mint_credit_page_token
     return unless current_company && current_employee
-    return unless credit_page_rule&.fetch(:charge_on) == :first_json
+    return unless credit_page_rule&.dig(:charge_on) == :first_json
 
     @credit_page_token = CompanyCreditDeduction::PageTokenService.generate(
       page: credit_page_key,
