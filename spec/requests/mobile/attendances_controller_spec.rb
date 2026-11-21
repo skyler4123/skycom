@@ -5,7 +5,8 @@ require "rails_helper"
 RSpec.describe "Mobile::Companies::AttendancesController", type: :request do
   let(:company) { create(:company) }
   let(:user) { company.user }
-  let!(:employee) { company.employees.find_by(user: user) }
+  let(:branch) { create(:branch, company: company) }
+  let!(:employee) { company.employees.find_by(user: user).tap { |record| record.update!(branch: branch) } }
 
   around do |example|
     original = ActionController::Base.allow_forgery_protection
@@ -58,5 +59,55 @@ RSpec.describe "Mobile::Companies::AttendancesController", type: :request do
     }.not_to change(AttendanceLog, :count)
 
     expect(response).to have_http_status(:not_found)
+  end
+
+  it "stores the submitted GPS coordinates and accuracy" do
+    create(:attendance_config, company: company, branch: branch)
+    post mobile_company_attendances_path(company), params: {
+      attendance: { latitude: 10.773, longitude: 106.694, accuracy: 12 }
+    }
+
+    log = AttendanceLog.last
+    expect(log.latitude).to be_within(0.000001).of(10.773)
+    expect(log.longitude).to be_within(0.000001).of(106.694)
+    expect(log.gps_accuracy_meters).to eq(12)
+    expect(log.geofence_distance_meters).to eq(0)
+    expect(response).to redirect_to(mobile_company_home_path(company))
+  end
+
+  it "rejects a check-in outside the branch radius" do
+    create(:attendance_config, company: company, branch: branch)
+    expect {
+      post mobile_company_attendances_path(company), params: {
+        attendance: { latitude: 10.8, longitude: 106.8 }
+      }
+    }.not_to change(AttendanceLog, :count)
+
+    expect(flash[:alert]).to eq("You are outside the allowed check-in area.")
+    expect(response).to redirect_to(mobile_company_home_path(company))
+  end
+
+  it "rejects a check-in without location when the branch has a config" do
+    create(:attendance_config, company: company, branch: branch)
+    expect {
+      post mobile_company_attendances_path(company)
+    }.not_to change(AttendanceLog, :count)
+
+    expect(flash[:alert]).to eq("Location is required to check in.")
+  end
+
+  it "ignores a wifi_ssid param" do
+    create(:attendance_config, company: company, branch: branch)
+    post mobile_company_attendances_path(company), params: {
+      attendance: { latitude: 10.773, longitude: 106.694, wifi_ssid: "Clinic_WiFi" }
+    }
+
+    expect(AttendanceLog.last.wifi_ssid).to be_nil
+  end
+
+  it "accepts a check-in when the branch has no config" do
+    expect {
+      post mobile_company_attendances_path(company)
+    }.to change(AttendanceLog, :count).by(1)
   end
 end

@@ -195,7 +195,7 @@ same screen. Errors use `{ errors: [...] }` (plural array) per
 | Screen | Payload |
 |---|---|
 | Sign-in | `email` (kept after a failed attempt), errors |
-| Home | employee/company/branch/code, company UTC offset, company switcher, check-in state and every check-in time, today's shift/logs, monthly attendance totals, overtime, pending requests, paid-leave balance and pending days, latest published company announcement |
+| Home | employee/company/branch/code, company UTC offset, company switcher, check-in state and every check-in time, geofence-required flag, today's shift/logs, monthly attendance totals, overtime, pending requests, paid-leave balance and pending days, latest published company announcement |
 | Notifications | every subscribed notification (name, description, severity, created_at) |
 | Profile | name/code/type/roles/category, signed-in avatar, email, phone, company, branch, departments, next shift, monthly attendance, group managers, contract renewal (`expiration_date`), Payroll entry point |
 | Attendance | month summary (worked/present/absent/overtime), daily in/out/duration/status/recorded method, prev/next month and whether next is disabled |
@@ -243,11 +243,32 @@ the page controller renders the errors inline and restores the submitted values.
 Check-in and sign-out are also native form posts, so their redirects and flashes
 are unchanged.
 
-**Check-in** — `POST /mobile/companies/:company_id/attendances` writes one
-`AttendanceLog` (`log_type: check_in`) for the employee resolved from the URL
-company. Every tap creates another check-in; the home punch card lists every
-check-in time for the company-local day, using the company's timezone offset.
-There is no checkout, break, or geofence check in this namespace yet.
+**Check-in** — `POST /mobile/companies/:company_id/attendances` captures the
+device GPS fix in the Home page's Stimulus controller and submits it as
+`attendance[latitude]`, `attendance[longitude]`, and `attendance[accuracy]`
+with the existing native form POST. The controller resolves the employee from
+the URL company and passes the coordinates to `Attendance::CheckInService`:
+
+- When the employee's branch has an `AttendanceConfig`, the fix is required and
+  the haversine distance must be within `allowed_radius_meters`; a missing fix
+  gets `"Location is required to check in."`, an out-of-range fix gets
+  `"You are outside the allowed check-in area."`. The failed request creates no
+  `AttendanceLog`.
+- When the branch has no config (or the employee has no branch), the check-in
+  still succeeds and the fix is recorded when available.
+- Mobile passes `require_scheduled_shift: false`, so an employee without a
+  scheduled shift can still clock in.
+- Successful logs store `latitude`, `longitude`, and the metadata fields
+  `gps_accuracy_meters` and `geofence_distance_meters`. Every tap creates
+  another check-in; the home punch card lists every check-in time for the
+  company-local day, using the company's timezone offset.
+
+The form warns when location is required and shows a red toast if permission is
+denied, location services are off, the fix times out, or the origin is not
+secure. Browser geolocation requires a secure origin, so dev over
+`http://10.88.0.2:3000` is refused; use `adb reverse tcp:3000 tcp:3000` with
+`-PskycomBaseUrl=http://127.0.0.1:3000` or HTTPS. There is still no checkout or
+break action in this namespace.
 
 **Attendance request** — the form posts `attendance_date`, `business_type`,
 `check_in_time`, `check_out_time`, and `reason` to
@@ -410,10 +431,14 @@ request feature spec sets them through the DOM with `set_native_field`.
 
 - Multi-employee/company switching is still first/last used; the tenant picker
   is not wired. The URL structure already supports a picker.
-- No checkout, break, geofence validation, request attachments, leave-request
-  form/history, announcement management UI, or payslip/PDF download. Payroll
-  money and seeded leave/notice data are real; the remaining items are not
-  modelled yet.
+- No checkout, break, Wi-Fi SSID, mock-location detection, request attachments,
+  leave-request form/history, announcement management UI, or payslip/PDF
+  download. Payroll money and seeded leave/notice data are real; the remaining
+  items are not modelled yet.
+- Geofence validation uses the WebView geolocation API, so it needs a secure
+  origin (HTTPS or `127.0.0.1`). A branch without an `AttendanceConfig` is not
+  geofenced; managers must configure one. A poor-accuracy fix is stored but not
+  rejected.
 - Operations is a read-only operation-appointment list with built actions for
   POS, Booking, Reception and Store Manager branch appointments and Inventory
   warehouse appointments. Other operation types, filtering, and other actions

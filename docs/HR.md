@@ -72,17 +72,31 @@ Attendance::CheckInService.new(
   branch: branch,
   latitude: 10.773,
   longitude: 106.694,
-  wifi_ssid: "Clinic_WiFi"
+  accuracy_meters: 8.0,
+  wifi_ssid: "Clinic_WiFi",
+  require_scheduled_shift: true,
+  enforce_geofence: true
 ).call
 ```
 
 Returns `Result.success(scheduled_shift)` or `Result.failure("error message")`.
 
 Steps:
-1. Load branch's `AttendanceConfig` → validate GPS distance or WiFi SSID
-2. Find today's `ScheduledShift` for the employee
-3. Create `AttendanceLog` (immutable audit)
-4. Update `ScheduledShift.status` → `:active`
+1. Load the branch's `AttendanceConfig` (when `enforce_geofence` is true) and
+   validate the GPS distance or a matching WiFi SSID. Missing coordinates fail
+   with `"Location is required to check in."`; a point outside
+   `allowed_radius_meters` fails with `"You are outside the allowed check-in area."`.
+2. Find today's `ScheduledShift` for the employee. When
+   `require_scheduled_shift: false` (mobile check-in), a shift is optional.
+3. Create `AttendanceLog` (immutable audit) with `latitude`, `longitude`,
+   `wifi_ssid`, and the metadata fields `gps_accuracy_meters` and
+   `geofence_distance_meters`.
+4. Update the shift status to `:active` when a shift was found.
+
+`Attendance::CheckInSimulatorJob` uses the defaults
+(`require_scheduled_shift: true`, `enforce_geofence: true`); the mobile
+check-in passes `require_scheduled_shift: false` so employees without a
+scheduled shift can still clock in.
 
 ### Attendance::CheckOutService
 
