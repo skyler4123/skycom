@@ -323,6 +323,16 @@ class CacheKeyService
     "companies:#{company_id}:credit_usage"
   end
 
+  # Pattern: company:<company_id>:credit_page:<token_digest>
+  # Purpose: atomic one-time claim marker for a page-load deduction token.
+  # Store: Rails.global_cache (Kredis)
+  # TTL: CREDIT_PAGE_TOKEN_TTL (1 hour)
+  # Written by: Company#claim_credit_page_token!
+  # Cleared by: Company#release_credit_page_token! when a charge fails; TTL otherwise
+  def self.company_credit_page_token(company_id, token_digest)
+    "company:#{company_id}:credit_page:#{token_digest}"
+  end
+
   class << self
     private
 

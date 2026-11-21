@@ -120,7 +120,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - `bundle exec parallel_rspec -n 14 [paths]` - Run tests (parallel, 14 workers). See `docs/PARALLEL_TESTS.md`.
 
 ## Pre-Commit Checklist
-- **Credit deduction is controller-only** — never call `CompanyCreditDeduction::*`, `CompanyWallet#deduct_from!`, or `Company#record_credit_usage!` from a background job, import, seed, or migration. Background jobs are free-credit and may still process suspended companies. See `docs/CREDIT_DEDUCTION.md`.
+- **Credit deduction goes through the service** — call `CompanyCreditDeduction::DeductionService` from controllers, models, jobs, or mailers; never call `CompanyWallet#deduct_from!` directly. Suspended companies are skipped unless the caller passes `allow_suspended: true`. Page prices live in `CREDIT_DEDUCTION_RATES`; the HTML shell is free today and the first matching JSON request charges once. See `docs/CREDIT_DEDUCTION.md`.
 - **Update** `docs/MODEL_CALLBACKS.md` if model/concern callbacks were added or modified
 - **Constants** — All app-wide constants must be in `config/initializers/constants.rb`, never hardcoded inline. See `docs/CONSTANTS.md`.
 - **Environment variables** — Declare every env-backed value once in `config/initializers/constants.rb` with `ENV[...].presence || Rails.application.credentials.dig(:key) || default`; consumers use only the constant. Run `bin/check_env`. See `docs/ENVIRONMENT.md`.

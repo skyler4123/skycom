@@ -190,6 +190,28 @@ RSpec.describe Company, type: :model do
     end
   end
 
+  describe "credit page tokens" do
+    let(:company) { create(:company) }
+    let(:employee) { company.employees.find_by!(user: company.user) }
+    let(:token) do
+      CompanyCreditDeduction::PageTokenService.generate(
+        page: "companies/dashboards#index", company: company, employee: employee
+      )
+    end
+
+    it "claims a page token only once" do
+      expect(company.claim_credit_page_token!(token)).to be(true)
+      expect(company.claim_credit_page_token!(token)).to be(false)
+    end
+
+    it "releases a claim so a retry can claim it again" do
+      company.claim_credit_page_token!(token)
+      company.release_credit_page_token!(token)
+
+      expect(company.claim_credit_page_token!(token)).to be(true)
+    end
+  end
+
   describe "credit usage counter (Kredis)" do
     let(:company) { create(:company) }
 

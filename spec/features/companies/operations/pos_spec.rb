@@ -80,6 +80,15 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(page).not_to have_content(/Tab \d/)
   end
 
+  scenario "charges 3 credits once per page load" do
+    original_promo = company.company_wallet.reload.promo_credit_balance
+
+    visit pos_path
+    expect(page).to have_content(/Products Gallery/i, wait: 10)
+
+    expect(company.company_wallet.reload.promo_credit_balance).to eq(original_promo - 3)
+  end
+
   scenario "toggles dark mode from the POS header" do
     visit pos_path
     expect(page).to have_selector("[data-darkmode-target='trigger'] svg", visible: :all, wait: 10)

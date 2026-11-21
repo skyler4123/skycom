@@ -1,160 +1,132 @@
 # Skycom Credit Deduction System
 
-> **Status**: Live. Credit deduction is controlled at the **controller action level** via an `after_action` filter, and the deduction logic lives in a dedicated service class hierarchy (`CompanyCreditDeduction::*`).
+> **Status**: Live. All credit OUT flows through
+> `CompanyCreditDeduction::DeductionService`, callable from controllers, models,
+> jobs, and mailers. Page prices live in `CREDIT_DEDUCTION_RATES` keyed by
+> `controller#action`.
 >
-> **Hard boundary**: deduction is **controller-only**. Background jobs, imports,
-> seeds, and migrations are **free-credit** — they may grant credits and drain
-> usage counters, but they must never call `CompanyCreditDeduction::*`,
-> `CompanyWallet#deduct_from!`, or `Company#record_credit_usage!`.
+> **Suspended-company rule**: a deduction skips a suspended company by default.
+> A caller that must charge while suspended passes `allow_suspended: true`
+> explicitly. Page deductions always use the default.
 
 ---
 
 ## 1. Overview
 
-Every credit-consuming action (dashboard access, order creation, customer creation, ...) must leave a trail: the wallet balance moves and usage is metered. This document defines **how** those deductions are wired and executed.
+Every credit-consuming action must leave a trail: the wallet balance moves and
+usage is metered. This document defines how charges are triggered, priced, and
+executed.
 
-### The Two Rules
+### The Entry Point
 
-1. **Never deduct inline in a controller action.** The demo pattern (`credit_warning = deduct_dashboard_credits` — a private controller method that mutates the wallet inside the action body) is deprecated: it couples business logic to the controller, duplicates the deduct/meter/rescue code in every action, and is not scalable.
-2. **Deduction is a filter concern; the logic belongs to a service class.** Each controller *declares* which `CompanyCreditDeduction::*` service runs for which action. The `after_action` filter executes the service after a successful JSON response.
+```ruby
+CompanyCreditDeduction::DeductionService.call(
+  company: company,
+  amount: 3,
+  action_type: "access_pos_console",
+  description: "POS console access",
+  source: nil,
+  allow_suspended: false,
+  external_id: nil
+)
+```
 
-### Deduction Boundary — Controllers Only
+| Argument | Required | Meaning |
+|---|---|---|
+| `company` | ✅ | Wallet owner |
+| `amount` | ✅ | Positive integer credits |
+| `action_type` | ✅ | Must exist in `CREDIT_DEDUCTION_ACTION_TYPES` |
+| `description` | optional | Audit text; defaults to the humanized action type |
+| `source` | optional | Domain record written to wallet/usage logs; defaults to company |
+| `allow_suspended` | optional | `false` skips a suspended company |
+| `external_id` | optional | Retry key; a repeated key does not charge twice |
 
-Background jobs are **free-credit**. A suspended company is still processed by
-company-wide jobs (usage sync, promo campaigns), and those runs must never move
-credits out of the wallet.
+The service returns `true` when it charged, `false` when it skipped.
 
-| Path | May deduct? | May grant credits? | May meter usage? |
-|------|-------------|--------------------|------------------|
-| Controller action via `deduct_company_credits_for` | ✅ | ✅ | ✅ |
-| `CompanyUsageSyncJob` | ❌ | ❌ | ❌ — it only drains the counter |
-| Promo campaign job / top-up completion | ❌ | ✅ | ❌ |
-| Data migration job | ❌ | ❌ | ❌ |
-| Order finalization job | ❌ | ❌ | ❌ |
-| Seed data | ❌ | ✅ (demo top-ups) | ✅ (demo usage only) |
+### One Write Path
 
-When a feature exists in both a controller and a background job (data migration,
-order finalization, bulk updates), **the deduction belongs to the controller
-entry point only**. Do not move it into a shared domain service that the job
-also calls. The mechanical guard is
-`spec/services/credit_deduction_boundary_spec.rb`, which scans `app/jobs`,
-`app/services/company_migrations`, and `app/services/seed` for deduction calls.
+| Path | May deduct? | How |
+|---|---|---|
+| Controller page load | ✅ | `Companies::CreditDeductionConcern` → service |
+| Controller action (API) | ✅ | Service directly, or `charge_on: :every_request` rule |
+| Model | ✅ | Service directly |
+| Background job | ✅ | Service directly; suspended skipped unless opted in |
+| Mailer | ✅ | Service directly; suspended skipped unless opted in |
+| Seed | ❌ | Seeds may meter demo usage, never deduct |
 
-### Why a Service Subclass per Place/Action?
-
-The same **action type** can have different deduction rules in different places:
-
-| Place | Action type | Cost | Guard |
-|-------|-------------|------|-------|
-| `DashboardsController#index` | `access_dashboard` | 2 | JSON only |
-| Future: `DashboardController#export` | `access_dashboard` | 5 (heavier operation) | JSON only |
-| Future: `OrdersController#create` | `create_order` | 10 | Feature enabled |
-
-Because rules differ per place even for the same action type, each (controller, action) pair gets its **own subclass** of the epic `CompanyCreditDeduction::BaseService`. The subclass controls cost, description, and guards; the base class owns the deduction core (priority order + metering).
+`deduct_from!` is the wallet primitive behind the service. Nothing outside
+`CompanyCreditDeduction::*` calls it directly
+(`spec/services/credit_deduction_boundary_spec.rb` enforces this).
 
 ---
 
-## 2. The after_action Filter (Controller Layer)
+## 2. Page Pricing
 
-**File**: `app/controllers/concerns/companies/credit_deduction_concern.rb`
-
-Included in `Companies::ApplicationController`, so every company-scoped controller inherits a single `after_action :run_credit_deduction`.
-
-### Declarative DSL
+**File**: `config/initializers/constants.rb`
 
 ```ruby
-class Companies::DashboardsController < Companies::ApplicationController
-  # Map one or more actions to their dedicated service.
-  deduct_company_credits_for :index, with: CompanyCreditDeduction::Companies::Dashboards::IndexService
-end
+CREDIT_DEDUCTION_RATES = {
+  "companies/dashboards#index" => {
+    cost: 2, action_type: "access_dashboard",
+    description: "Dashboard access", charge_on: :first_json
+  }.freeze,
+  "companies/analytics#index" => {
+    cost: 2, action_type: "access_analytics",
+    description: "Analytics access", charge_on: :first_json
+  }.freeze,
+  "companies/operations/pos#show" => {
+    cost: 3, action_type: "access_pos_console",
+    description: "POS console access", charge_on: :first_json
+  }.freeze
+  # booking, inventory, reception, store_manager
+}.freeze
 ```
 
-### Filter Behavior
+| `charge_on` | Behavior |
+|---|---|
+| `:first_json` | HTML shell free; first successful matching JSON charges once; later JSON free |
+| `:html` | Successful HTML page request charges; JSON free (available for later) |
+| `:every_request` | Every successful JSON request charges (available for API pricing) |
+| `:none` | Never charge |
 
-| Rule | Detail |
-|------|--------|
-| **Runs after the action** | `after_action` — the response is already rendered |
-| **JSON only** | HTML shell requests never deduct |
-| **Successful responses only** | `response.successful?` — 4xx/5xx never deduct. A suspended company's JSON request is 403, so it never deducts. |
-| **Delegates entirely** | Calls `ServiceClass.call(company: current_company)` — the controller holds no deduct logic |
-| **Never breaks the request** | Any error inside the deduction is rescued and logged as `[CompanyCreditDeduction]` — the page always renders |
+Current prices:
 
-### Deprecated Demo Pattern (Do NOT Use)
+| Page | Cost |
+|---|---:|
+| Dashboard index | 2 |
+| Analytics index | 2 |
+| POS console | 3 |
+| Booking console | 3 |
+| Inventory console | 3 |
+| Reception console | 3 |
+| Store Manager console | 3 |
 
-```ruby
-# ❌ FORBIDDEN — inline deduction in the action body
-def index
-  credit_warning = deduct_dashboard_credits   # private controller method mutating the wallet
-  render json: { ..., credit_warning: credit_warning }
-end
-```
-
-Removed in the after_action refactor. The warning-surfacing responsibility moved out of the deduction path entirely — balance display is a separate concern (see §5).
+Mobile operation shells use the same rule: the concern drops the `mobile/`
+prefix before lookup, and the web JSON endpoint consumes the mobile shell's
+token.
 
 ---
 
-## 3. The CompanyCreditDeduction Service Hierarchy (Service Layer)
+## 3. Page-Load Flow (`:first_json`)
 
-```
-app/services/company_credit_deduction/
-├── base_service.rb                                 # The epic — deduction core
-└── companies/
-    └── dashboards/
-        └── index_service.rb                        # CompanyCreditDeduction::Companies::Dashboards::IndexService
-```
+1. A successful `GET` HTML request for a priced page mints a signed page token
+   (`CompanyCreditDeduction::PageTokenService`) containing the page key, company
+   id, employee id, nonce, and a one-hour expiry.
+2. The token is rendered into `<body data-credit-page-token="…">`.
+3. `Helpers.fetchJson()` forwards it as `X-Credit-Page-Token` on same-origin
+   requests.
+4. The first successful JSON request whose `controller#action` matches the
+   token page claims the token atomically (Kredis `SET NX` via
+   `Company#claim_credit_page_token!`) and calls `DeductionService`.
+5. Later JSON requests with the same token do not charge: polling, period
+   changes, and sub-resource calls are free.
+6. A new page load mints a new token, so it charges again.
+7. A JSON request without a token is free. API pricing can opt into
+   `:every_request` later.
+8. If the deduction raises, the claim is released so a retry can charge.
 
-**Naming convention**: the constant matches the route path exactly.
-
-| URL | Service class |
-|-----|---------------|
-| `/companies/:company_id/dashboards` + `index` | `CompanyCreditDeduction::Companies::Dashboards::IndexService` |
-| `/companies/:company_id/orders` + `create` | `CompanyCreditDeduction::Companies::Orders::CreateService` (future) |
-
-> The dashboard JSON payload is cached for 5 minutes (`DASHBOARD_CACHE_EXPIRY`,
-> `docs/CACHE.md` §7), but deduction still runs **per request** through the
-> `after_action` filter. A cache hit is still a dashboard access and is billed.
-
-### 3.1 `CompanyCreditDeduction::BaseService` — The Epic
-
-One purpose: **move credits out of the wallet for one action and meter the usage.**
-
-```ruby
-class CompanyCreditDeduction::Companies::Dashboards::IndexService < CompanyCreditDeduction::BaseService
-  def action_type = "access_dashboard"   # key in CREDIT_USAGE_RATES + CompanyUsageLog
-  def description = "Dashboard access"   # human-readable audit log description
-end
-```
-
-| Method | Default | Override? | Purpose |
-|--------|---------|-----------|---------|
-| `action_type` | **required** (raises if missing) | Always | Key into `CREDIT_USAGE_RATES`; mirrored in `CompanyUsageLog.action_type` |
-| `cost` | `CREDIT_USAGE_RATES[action_type]` | Optional | Place-specific pricing (same action type, different cost) |
-| `description` | `action_type` humanized | Optional | Audit trail text |
-| `should_run?` | `company.present?` | Optional | Place-specific guards (feature gating, request format, ...) |
-
-### 3.2 The Deduction Core (inherited — never reimplement)
-
-```
-call(company:)
-  ├── should_run?  ── no ──► return
-  ├── cost = cost() ── zero ──► return
-  ├── wallet = company.company_wallet ── missing ──► return
-  ├── balance_before = wallet.total_credit_balance
-  │
-  ├── deduct promo balance first   (while it is positive)
-  ├── deduct main balance second   (absorbs the whole remainder, even below zero)
-  │
-  ├── if balance_before < 0:
-  │     Rails.logger.warn("[CompanyCreditDeduction] deduction while negative ...")
-  │     company.sync_credit_status!(total_credit_balance: balance_after)
-  │
-  └── company.record_credit_usage!(cost)   ← Kredis counter, always
-```
-
-**Never raises for an insufficient balance.** Negative balances are allowed:
-`0 - 2 = -2` is silent. If a later deduction starts while the balance is already
-negative, the service logs a warning and rechecks `workflow_status` (which derives
-`suspend` for any total ≤ 0). There is no debt column and no debt absorption.
+The concern never contains deduction math. It resolves the rule, validates the
+token, and delegates.
 
 ---
 
@@ -162,57 +134,53 @@ negative, the service logs a warning and rechecks `workflow_status` (which deriv
 
 **File**: `app/models/company_wallet.rb`
 
-The wallet stores credit balance **numbers only** (atomic-purpose pattern — no business logic). The `CompanyCreditDeduction::*` services own the priority rules.
-
-### Balances
+The wallet stores credit balance numbers only. The deduction service owns the
+priority rules.
 
 | Column | Purpose | Top-up target? | Deduct order |
 |--------|---------|----------------|--------------|
 | `main_credit_balance` | Purchased credits (top-ups land here) | ✅ Yes (`add_credits!`) | 2nd |
 | `promo_credit_balance` | Promotional credits (signup bonus, campaigns) | ❌ No | **1st** |
 
-- New companies get `SIGNUP_PROMO_CREDITS` (1,000) in the **promo** balance at
-  creation, so they start active. System-owned companies receive the same grant;
-  only their suspension exemption is special.
-- Both columns are BIGINT and may be **negative**. A negative total is allowed
-  and derives `workflow_status: suspend`.
+- New companies get `SIGNUP_PROMO_CREDITS` (**1,000,000**) in the promo balance
+  at creation. System-owned companies receive the same grant; only their
+  suspension exemption is special.
+- Existing companies are not backfilled.
+- Both columns are BIGINT and may be negative. A negative total derives
+  `workflow_status: suspend`.
 
-### Low-Level API (the only wallet mutation entry points)
+### Low-Level API
 
 ```ruby
 wallet.add_credits!(amount:, source:, description:)                    # top-up → main only
 wallet.add_to!(balance: :promo, amount:, source:, description:)        # grant promo credits
-wallet.deduct_from!(balance: :main, amount:, source:, description:)   # deduct (controller-only)
+wallet.deduct_from!(balance: :main, amount:, source:, description:,
+                    action_type:, external_id:)                         # service only
 ```
 
-- Every mutation runs inside **`with_lock`** (transaction + row-level `FOR UPDATE`) — concurrent deductions serialize on the wallet row.
-- `deduct_from!` does **not** raise on a low balance; it subtracts the full amount and may make the balance negative. `add_to!` / `add_credits!` are allowed from jobs (money IN); `deduct_from!` is controller-only (money OUT).
-- Every mutation writes a `CompanyWalletLog` audit row with `balance_type` (`main` / `promo`) + before/after snapshots, then calls `company.sync_credit_status!` so the company status follows the new total.
-- Balance keys are validated against `CompanyWallet::BALANCES` (single-file constant) — unknown keys raise `ArgumentError`.
+- Every mutation runs inside `with_lock` (transaction + `FOR UPDATE`).
+- `deduct_from!` subtracts the full amount and may make the balance negative.
+- Every mutation writes a `CompanyWalletLog` audit row with `balance_type` and
+  before/after snapshots, then calls `company.sync_credit_status!`.
+- `external_id` is an optional retry key mirrored on the wallet log.
 
-### Company Credit Status (derived)
-
-`companies.workflow_status` is derived from the usable balance:
+### Company Credit Status
 
 | Value | Meaning | Web/API/mobile | Background jobs | Set when |
 |-------|---------|----------------|-----------------|----------|
 | `active` | Normal company with usable credit | Allowed | Processed | `total > 0` |
-| `disabled` | Owner no longer uses Skycom | Not suspension-blocked (manual state) | Skipped | Manual/back-office |
-| `suspend` | No usable credit (`total <= 0`) | Web redirects to top-up; JSON/mobile return 403 | Processed (free-credit) | `total <= 0` |
+| `disabled` | Owner no longer uses Skycom | Not suspension-blocked | Skipped | Manual |
+| `suspend` | No usable credit (`total <= 0`) | Web redirects to top-up; JSON/mobile 403 | Processed; deductions skip by default | `total <= 0` |
 
-- `companies.lifecycle_status` is legacy and is not used for access control.
-- `Company#suspended?` is backed by a `ram_cache` boolean; status changes write the
-  new value locally and broadcast a `sync_cache` invalidation so every worker
-  rebuilds it (see `docs/CACHE.md` §7).
 - System companies are exempt from credit suspension.
-- Any credit movement can move a `disabled` company back to `active` (the user
-  must be able to recover by topping up).
+- Any credit movement can move a `disabled` company back to `active`.
 
 ---
 
-## 5. Warning & Balance Display (Separate Concern)
+## 5. Warning & Balance Display
 
-The deduction service **only cares about deducting**. It returns no warning message. Insufficient-balance feedback is a separate concern, handled by whichever logic owns the display — e.g. the dashboard JSON already exposes the full wallet state:
+The deduction service only deducts. Insufficient-balance feedback is separate.
+The dashboard JSON exposes wallet numbers:
 
 ```json
 {
@@ -224,166 +192,106 @@ The deduction service **only cares about deducting**. It returns no warning mess
 }
 ```
 
-The frontend decides what to surface from those numbers. Suspension itself is
-enforced by the request block (§5.2), not by a warning key. The old
-`credit_warning` JSON key was removed with the demo pattern.
+The old `credit_warning` key is gone.
 
-### 5.1 Opt-in Detail Logging (Usage Page)
+### 5.1 Opt-in Detail Logging
 
-Per-action detail rows (`CompanyUsageLog` — *why* a balance moved) are **opt-in** and hot-table safe. The Usage page (`GET /companies/:id/usage`) exposes the toggle:
+Per-action detail rows (`CompanyUsageLog`) are opt-in. The Usage page
+(`GET /companies/:id/usage`) exposes the toggle:
 
 | Control | Endpoint | Effect |
 |---------|----------|--------|
-| **Enable Logging** button | `POST .../usage/enable_logging` | `wallet.enable_usage_logging!` — opens a 5-minute recording window |
-| **Stop Logging** button | `POST .../usage/disable_logging` | `wallet.disable_usage_logging!` — closes the window immediately |
+| **Enable Logging** | `POST .../usage/enable_logging` | Opens a 5-minute recording window |
+| **Stop Logging** | `POST .../usage/disable_logging` | Closes it immediately |
 
-While active, the page shows a table of that window's log rows; when off (the default), the table renders as an empty layout.
+`CompanyUsageLog.action_type` accepts `CREDIT_DEDUCTION_ACTION_TYPES` keys plus
+`top_up` / `deduction`.
 
 ---
 
 ## 5.2 Suspended Company — Request Blocking
 
-A suspended company cannot use the business surface:
-
 | Request | Result |
 |---------|--------|
 | Web HTML (company pages) | `302` → `new_company_top_up_path` |
-| Web JSON (company pages) | `403` + `{ errors: ["Your company is suspended. Please top up to continue."] }` |
-| Mobile company pages | `403` with a mobile-layout notice (top-up is web-only) |
-| Top-Up / Billing / Usage | Allowed — recovery and inspection pages |
+| Web JSON (company pages) | `403` + `{ errors: [...] }` |
+| Mobile company pages | `403` with a mobile-layout notice |
+| Top-Up / Billing / Usage | Allowed |
 | Sign-in / root / client cache / webhooks | Allowed |
 
-Implementation:
-- `Companies::SuspendedCompanyConcern` is included **after**
-  `Companies::Authorizable` in `Companies::ApplicationController`.
-- `Mobile::Companies::SuspendedCompanyConcern` does the same for mobile company
-  pages.
-- `Companies::TopUpsController`, `Companies::BillingController`, and
-  `Companies::UsageController` skip the filter.
-- `Companies::TopUpsPolicy#new?` is `true` for any employee so a redirected
-  employee never loops on authorization; payment initiation stays
-  permission-gated.
+`Companies::SuspendedCompanyConcern` and
+`Mobile::Companies::SuspendedCompanyConcern` enforce this. The deduction
+service has a second guard: `allow_suspended` defaults to `false`.
 
-### Shortfall guard (safety net)
+### Shortfall guard
 
-The controller block is the primary prevention. The deduction service also has a
-last-line guard: if a deduction reaches it while the pre-deduction balance is
-negative, it logs `[CompanyCreditDeduction] deduction while negative ...` and
-rechecks `workflow_status`. The first overdraw (`0 → -2`) is silent; a later
-deduction while already negative logs.
+The first overdraw (`0 → -2`) is silent. A later deduction that starts while
+the balance is already negative logs
+`[CompanyCreditDeduction] deduction while negative ...` and rechecks
+`workflow_status`.
 
 ---
 
-## 6. Adding a New Deduction Point (Step by Step)
+## 6. Adding a Deduction Point
 
-**1. Add the action cost** (if the action type is new):
+### 6.1 A new page
 
-```ruby
-# config/initializers/constants.rb
-CREDIT_USAGE_RATES = {
-  create_order: 10,
-  access_dashboard: 2,
-  create_customer: 7,
-  create_export: 5          # new action type
-}.freeze
-```
+1. Add the `controller#action` key to `CREDIT_DEDUCTION_RATES` with `cost`,
+   `action_type`, `description`, and `charge_on: :first_json`.
+2. Add the action type to `CREDIT_DEDUCTION_ACTION_TYPES` if it is not already
+   derived from the rules (the constant is derived from `CREDIT_DEDUCTION_RATES`
+   plus `top_up` / `deduction`; non-page actions are appended).
+3. No controller code is needed. The concern picks up the rule.
+4. Add request coverage: HTML free; first JSON charges once; later JSON free.
 
-**2. Create the dedicated service subclass** (path matches the route):
+For a new Operation type, add the rule for
+`"companies/operations/<type>#show"`. The rates spec fails until every
+`OPERATION_TYPES` key has one.
 
-```ruby
-# app/services/company_credit_deduction/companies/dashboards/export_service.rb
-module CompanyCreditDeduction
-  module Companies
-    module Dashboards
-      class ExportService < CompanyCreditDeduction::BaseService
-        def action_type = "create_export"
-        def description = "Dashboard export"
-
-        # Optional place-specific guard:
-        # def should_run? = @company.feature_enabled?("analytics_dashboard")
-      end
-    end
-  end
-end
-```
-
-**3. Declare it in the controller** — one line, no other controller changes:
+### 6.2 A job, model, or mailer charge
 
 ```ruby
-class Companies::DashboardsController < Companies::ApplicationController
-  deduct_company_credits_for :export, with: CompanyCreditDeduction::Companies::Dashboards::ExportService
-end
+CompanyCreditDeduction::DeductionService.call(
+  company: company,
+  amount: 1,
+  action_type: "send_email",
+  description: "Email sent",
+  source: email_record,
+  allow_suspended: false,
+  external_id: "email-#{email_record.id}"
+)
 ```
 
-Do **not** call the service from a background job, import, seed, or migration.
-If the same action also runs in a job, deduct only at the controller entry point
-(see “Deduction Boundary — Controllers Only” above).
-
-**4. Specs** (TDD — write first):
-
-```ruby
-# spec/services/company_credit_deduction/companies/dashboards/export_service_spec.rb
-# + request-level coverage in spec/requests/companies/credit_deduction_spec.rb
-```
+Add a stable action type and pass an `external_id` when the work can retry.
 
 ---
 
-## 7. Testing — Wallet Seeding Requirement
+## 7. Testing
 
-New companies start with `SIGNUP_PROMO_CREDITS` (1,000) in the promo balance.
-Credit-focused tests should use the `:without_signup_promo` company factory trait
-or the `seed_random_wallet!` helper so exact balance assertions stay
-deterministic. The trait is not a shortcut for the state machine: it gives a
-known zero baseline, and the wallet/service specs must still exercise every
-transition.
+- Page costs: `spec/services/company_credit_deduction/deduction_rates_spec.rb`
+- Service contract: `spec/services/company_credit_deduction/deduction_service_spec.rb`
+- Token signing: `spec/services/company_credit_deduction/page_token_service_spec.rb`
+- Page flows: `spec/requests/companies/credit_deduction_spec.rb`,
+  `spec/requests/companies/credit_deduction_pages_spec.rb`
+- Feature proof: dashboard, analytics, and operation feature specs
+- E2E chain: `spec/features/companies/credit_deduction_e2e_spec.rb`
 
-### Required state transitions
+New companies start with `SIGNUP_PROMO_CREDITS` in promo. Use the
+`:without_signup_promo` factory trait or `seed_random_wallet!` when a test needs
+a known baseline.
+
+### State transitions
 
 | State transition | Expected status | Covered by |
 |---|---|---|
-| Signup init (promo 1,000) | `active` | `company_credit_status_spec` |
+| Signup init (promo 1,000,000) | `active` | `company_credit_status_spec` |
 | `0` | `suspend` | `company_credit_status_spec`, `company_wallet_spec` |
-| `0` → positive (`SIGNUP_PROMO_CREDITS`) | `active` | `company_credit_status_spec` |
-| positive → `0` (deduction reaches zero) | `suspend` | `company_credit_status_spec`, `company_wallet_spec` |
-| positive → negative (overdraw) | `suspend` | `company_credit_status_spec`, `company_wallet_spec`, `base_service_spec` |
-| negative → positive (top-up/grant) | `active` | `company_credit_status_spec`, `company_wallet_spec` |
+| `0` → positive | `active` | `company_credit_status_spec` |
+| positive → `0` | `suspend` | `company_credit_status_spec`, `company_wallet_spec` |
+| positive → negative | `suspend` | `company_credit_status_spec`, `company_wallet_spec` |
+| negative → positive | `active` | `company_credit_status_spec`, `company_wallet_spec` |
 | `disabled` → positive | `active` | `company_credit_status_spec` |
 | System company at `0` or negative | stays `active` | `company_credit_status_spec` |
-
-### Reusable Helper
-
-**File**: `spec/support/credit_wallet_helper.rb:1`
-
-```ruby
-# Clears the signup promo, then seeds promo-first priority.
-snapshot = seed_random_wallet!(company) # => { promo_start: 200..500, main_start: 200..500 }
-# or custom ranges:
-snapshot = seed_random_wallet!(company, promo_range: 300..600, main_range: 300..600)
-
-visit company_dashboards_path(company)
-expect(company.company_wallet.reload.promo_credit_balance).to eq(snapshot[:promo_start] - 2)
-expect(company.company_wallet.reload.main_credit_balance).to eq(snapshot[:main_start])
-expect(company.credit_usage_delta).to eq(CREDIT_USAGE_RATES[:access_dashboard])
-```
-
-For specs that need a zero wallet without the signup bonus:
-`create(:company, :without_signup_promo)`. The trait clears both balances and
-sets the company to `suspend`; any subsequent `add_to!`/`add_credits!` returns it
-to `active`.
-
-Auto-loaded via `spec/rails_helper.rb:26` (`Rails.root.glob('spec/support/**/*.rb')`), so no per-file `require` needed — works for `type: :feature` (js), `:request`, and `:job`.
-
-### The Full E2E Chain (Redis → DB)
-
-This is the canonical pattern proven in `spec/features/companies/credit_deduction_e2e_spec.rb:1`:
-
-```
-visit (trigger after_action deduct → Kredis INCR) → assert credit_usage_delta
-  → CompanyUsageSyncJob.perform_now (drain counter → DB)
-  → assert CompanyDailyUsage h<HH> / CompanyMonthlyUsage d<DD> / total_credits
-```
-
-See `docs/ATOMIC_PURPOSE.md` § Hot Path Rule for the `kredis_counter :credit_usage` + `CompanyUsageSyncJob` drain details.
 
 ---
 
@@ -391,33 +299,30 @@ See `docs/ATOMIC_PURPOSE.md` § Hot Path Rule for the `kredis_counter :credit_us
 
 | File | Purpose |
 |------|---------|
-| `app/controllers/concerns/companies/credit_deduction_concern.rb` | `after_action :run_credit_deduction` + `deduct_company_credits_for` DSL |
-| `app/controllers/companies/application_controller.rb` | Includes the concern for all company controllers |
-| `app/services/company_credit_deduction/base_service.rb` | Epic service: priority deduction + metering, subclass contract |
-| `app/services/company_credit_deduction/companies/dashboards/index_service.rb` | Dashboard-access deduction (reference implementation) |
-| `app/models/company_wallet.rb` | Two-balance wallet: `add_to!` / `deduct_from!` / `add_credits!`; status sync |
-| `app/models/company_wallet_log.rb` | Audit log with `balance_type` enum (`main` / `promo`) |
-| `app/models/company.rb` | `COMPANY_WORKFLOW_STATUS`, `suspended?`, `sync_credit_status!`, signup promo, suspension cache |
-| `app/controllers/concerns/companies/suspended_company_concern.rb` | Web HTML redirect / JSON 403 |
-| `app/controllers/concerns/mobile/companies/suspended_company_concern.rb` | Mobile 403 page |
-| `config/initializers/constants.rb` | `CREDIT_USAGE_RATES`, `COMPANY_WORKFLOW_STATUS`, `SIGNUP_PROMO_CREDITS` |
-| `db/migrate/20261031000001_remove_debt_from_company_wallets.rb` | Drops the debt column and discards old debt log rows |
-| `spec/support/credit_wallet_helper.rb` | **Reusable `seed_random_wallet!` helper (clears signup promo + randomized seeding)** |
-| `spec/services/credit_deduction_boundary_spec.rb` | Mechanical guard: jobs/imports never call deduction |
-| `spec/services/company_credit_deduction/base_service_spec.rb` | Priority/deduction/metering coverage |
-| `spec/services/company_credit_deduction/companies/dashboards/index_service_spec.rb` | Dashboard service contract |
-| `spec/requests/companies/credit_deduction_spec.rb` | after_action filter behavior (JSON-only, rescue, payload) |
-| `app/controllers/companies/usage_controller.rb` | Usage page: wallet/daily/monthly JSON + opt-in `enable_logging` / `disable_logging` endpoints + window log feed |
-| `spec/features/companies/usages/show_spec.rb` | Usage-page toggle E2E (empty default layout → record → stop clears) |
-| `spec/features/companies/dashboards/index_spec.rb` | End-to-end dashboard deduction scenarios |
-| `spec/features/companies/credit_deduction_e2e_spec.rb` | **E2E js:true — Kredis delta → SyncJob → Daily/Monthly DB** |
+| `app/services/company_credit_deduction/deduction_service.rb` | Public, layer-agnostic deduction API + suspended guard + retry key |
+| `app/services/company_credit_deduction/base_service.rb` | Deduction core: priority, logs, metering, status sync |
+| `app/services/company_credit_deduction/page_token_service.rb` | Signed one-time page tokens |
+| `app/controllers/concerns/companies/credit_deduction_concern.rb` | Page rule lookup, token mint/claim, `charge_on` switch |
+| `app/controllers/mobile/companies/base_controller.rb` | Includes the concern for mobile shells |
+| `app/models/company.rb` | `claim_credit_page_token!`, `release_credit_page_token!`, signup promo, status sync |
+| `app/models/company_wallet.rb` | Wallet primitives + audit logs |
+| `app/models/company_usage_log.rb` | Opt-in per-action detail log |
+| `app/services/cache_key_service.rb` | `company_credit_page_token` Kredis key |
+| `app/services/dashboards/overview_service.rb` | Dashboard `access_cost` from the page rule |
+| `app/views/layouts/application.html.erb` | `data-credit-page-token` |
+| `app/views/layouts/mobile.html.erb` | `data-credit-page-token` |
+| `app/javascript/controllers/helpers/ui_helpers.js` | Forwards `X-Credit-Page-Token` |
+| `config/initializers/constants.rb` | `CREDIT_DEDUCTION_RATES`, `CREDIT_DEDUCTION_ACTION_TYPES`, `CREDIT_PAGE_TOKEN_TTL`, `SIGNUP_PROMO_CREDITS` |
+| `spec/services/credit_deduction_boundary_spec.rb` | Mechanical guard: only deduction services call `deduct_from!` |
 
 ---
 
 ## 9. See Also
 
-- `docs/ATOMIC_PURPOSE.md` — the credit chain (`CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`) and the atomic-purpose pattern; the wallet's per-balance entry points are called by `CompanyCreditDeduction::*` services
-- `docs/CONSTANTS.md` — constant conventions (`CREDIT_USAGE_RATES` is the single source of action costs)
+- `docs/ATOMIC_PURPOSE.md` — credit chain and atomic-purpose pattern
+- `docs/CONSTANTS.md` — constant conventions
+- `docs/MONEY_FLOW.md` — money lifecycle
+- `docs/OPERATION_PAGES.md` — Operation page contract
 
 ---
 

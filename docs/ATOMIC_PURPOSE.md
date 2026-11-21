@@ -43,15 +43,16 @@ Rules:
 - **Wallet atomicity.** Every mutation runs inside `with_lock` (transaction +
   row-level `FOR UPDATE`) so concurrent deductions serialize on the wallet row
   and can never overdraw — Rails' own locking, no manual version bookkeeping.
-- **Usage deduction flows through `CompanyCreditDeduction::*` services** (see `docs/CREDIT_DEDUCTION.md`).
-  The chain above handles money IN; the `CompanyCreditDeduction::BaseService`
-  hierarchy handles credit OUT (deduct promo → main, allowing a negative main
-  balance), triggered by an `after_action` filter at the controller action level
-  — never inline in actions.
-- **Deduction is controller-only.** Background jobs, imports, seeds, and
-  migrations are free-credit. They may grant credits (money IN) and drain usage
-  counters, but they must never deduct or record usage. Suspended companies may
-  still be processed by those jobs; that must remain free.
+- **Usage deduction flows through `CompanyCreditDeduction::DeductionService`** (see `docs/CREDIT_DEDUCTION.md`).
+  The chain above handles money IN; the service handles credit OUT (deduct
+  promo → main, allowing a negative main balance). Page prices live in
+  `CREDIT_DEDUCTION_RATES`; the controller concern charges the first matching
+  JSON request and never deducts inline. Jobs, models, and mailers may call the
+  service directly.
+- **Suspended companies are skipped by default.** The service returns without
+  charging when `company.suspended?`, unless the caller passes
+  `allow_suspended: true`. Background jobs may still process suspended
+  companies; their default deduction is free.
 
 ## The Hot Path Rule (usage tracking)
 
@@ -101,8 +102,8 @@ Reads: today = DB total + Redis delta; past = DB only
 
 | Task | What to do |
 |------|------------|
-| New credit cost action | Add key to `CREDIT_USAGE_RATES` (e.g. `create_export: 5`) |
-| New deduction point | Create a `CompanyCreditDeduction::*` service subclass + declare it via `deduct_company_credits_for` (see `docs/CREDIT_DEDUCTION.md` §6) |
+| New credit cost action | Add a page rule to `CREDIT_DEDUCTION_RATES` (or call `DeductionService` with an explicit amount) |
+| New deduction point | Add a page rule to `CREDIT_DEDUCTION_RATES`, or call `CompanyCreditDeduction::DeductionService` with an explicit amount (see `docs/CREDIT_DEDUCTION.md` §6) |
 | New purchase tier | Add `{ money_cents => credits }` entry to `CREDIT_RATES[country]` |
 | New money flow | Place the model in the chain with ONE purpose; wire it through the model above it |
 | New usage metric | Add a Kredis counter key + a persisted usage model with store_accessor helpers |

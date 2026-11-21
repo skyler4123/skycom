@@ -393,6 +393,7 @@ Two key families:
 | `company_storage_statistics(id)` | `company:<id>:storage_statistics` | `sync_cache` | 1 hour | TTL only — uploads/deletes intentionally do not bust it |
 | `stock_available(id)` | `stock:<id>:available` | Kredis | none | never delete — data-bearing counter |
 | `company_credit_usage(id)` | `companies:<id>:credit_usage` | Kredis | none | never delete — data-bearing delta counter |
+| `company_credit_page_token(id, token_digest)` | `company:<id>:credit_page:<digest>` | Kredis | 1 hour | write on first JSON claim; release on deduction failure |
 
 Notes:
 

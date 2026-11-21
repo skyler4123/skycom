@@ -42,8 +42,10 @@ constants: they always live in `config/initializers/constants.rb`.
 | Array configs | `ALLOWED_TABLE_ALIGNS`, `PROPERTY_MAPPING_SUPPORTED_KEYS` |
 | Enum mappings | `TIMEZONES`, `CURRENCIE_CODES`, `LIFECYCLE_STATUS`, `WORKFLOW_STATUS`, `COMPANY_WORKFLOW_STATUS` |
 | Credit purchase tiers | `CREDIT_RATES` — per-country `{ money_cents => credits }` map |
-| Credit action costs | `CREDIT_USAGE_RATES` — global per-action credit cost (not country-based) |
-| Signup credit grant | `SIGNUP_PROMO_CREDITS` — promo credits granted to every new company, including system-owned companies |
+| Credit page costs | `CREDIT_DEDUCTION_RATES` — `controller#action` → `{ cost:, action_type:, description:, charge_on: }` |
+| Credit action types | `CREDIT_DEDUCTION_ACTION_TYPES` — valid `CompanyUsageLog.action_type` values |
+| Page token TTL | `CREDIT_PAGE_TOKEN_TTL` — lifetime of the signed page-load token |
+| Signup credit grant | `SIGNUP_PROMO_CREDITS` — 1,000,000 promo credits for every new company, including system-owned companies |
 | Environment-backed config | `MEILISEARCH_HOST`, `AWS_ACCESS_KEY_ID` — see `docs/ENVIRONMENT.md` |
 
 ## What Stays Local

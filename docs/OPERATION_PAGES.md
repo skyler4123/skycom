@@ -37,6 +37,7 @@ A new Operation page is not done until **all** of these are true:
 - [ ] Console service with a real-data payload.
 - [ ] Web Stimulus controller.
 - [ ] Mobile route, mobile policy, mobile shell, mobile Operations list link.
+- [ ] `CREDIT_DEDUCTION_RATES["companies/operations/<type>#show"]` entry (3 credits by default; see `docs/CREDIT_DEDUCTION.md`).
 - [ ] Translations for every new string.
 - [ ] Exhaustive feature tests for web and mobile, including four viewport sizes.
 - [ ] Docs and BE↔FE headers updated.

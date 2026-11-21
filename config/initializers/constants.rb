@@ -239,8 +239,8 @@ EXAM_SUBMIT_GRACE_SECONDS = 30
 #            to active.
 # suspend  — no usable credit (main + promo <= 0). Web, JSON, and mobile requests
 #            are blocked and sent to the top-up flow. Still processed by
-#            company-wide background jobs (usage sync, promo grants) because
-#            those jobs are free-credit.
+#            company-wide background jobs (usage sync, promo grants); a job's
+#            deduction skips the suspended company unless it opts in.
 #
 # companies.lifecycle_status is legacy and is NOT used for access control.
 COMPANY_WORKFLOW_STATUS = {

@@ -224,32 +224,40 @@ WEBSOCKET.publish_event(:top_up_completed)   → frontend redirects to Usage/Bil
 
 ### 5.2 Deduction (credits out)
 
-**Files**: `app/controllers/concerns/companies/credit_deduction_concern.rb`, `app/services/company_credit_deduction/*`
+**Files**: `app/services/company_credit_deduction/*`, `app/controllers/concerns/companies/credit_deduction_concern.rb`
 
-Every consuming action (dashboard access, order creation, customer creation, ...) declares its deduction via an `after_action` filter — **never inline in the action**:
+Every deduction goes through one service, callable from controllers, models,
+jobs, and mailers:
 
 ```ruby
-class Companies::DashboardsController < Companies::ApplicationController
-  deduct_company_credits_for :index, with: CompanyCreditDeduction::Companies::Dashboards::IndexService
-end
+CompanyCreditDeduction::DeductionService.call(
+  company: company,
+  amount: 3,
+  action_type: "access_pos_console",
+  description: "POS console access",
+  allow_suspended: false
+)
 ```
 
-The service drains the wallet in priority order:
+Page prices live in `CREDIT_DEDUCTION_RATES` keyed by `controller#action`. The
+HTML shell is free by default; `charge_on: :first_json` mints a signed page
+token and the first matching JSON request charges once. Later JSON requests are
+free. `charge_on: :html` and `:every_request` are available for later.
 
 ```
-CompanyCreditDeduction::BaseService#call
-  ├── should_run? ── no ──► return
-  ├── cost = CREDIT_USAGE_RATES[action_type] ── zero ──► return
-  ├── wallet = company.company_wallet ── missing ──► return
+CompanyCreditDeduction::DeductionService#call
+  ├── suspended and not allow_suspended? ──► return false
+  ├── amount invalid or external_id already charged ──► return false
+  ├── wallet = company.company_wallet ── missing ──► return false
   ├── deduct promo balance first     (while positive)
   ├── deduct main balance second     (absorbs the remainder, even below zero)
   ├── if the pre-deduction balance was negative: log + recheck workflow_status
-  └── company.record_credit_usage!(cost)   ← Kredis counter, always
+  └── company.record_credit_usage!(amount)   ← Kredis counter, always
 ```
 
-Deduction is **controller-only**; background jobs are free-credit and never call
-this service. See `docs/CREDIT_DEDUCTION.md` for the full service hierarchy and
-the background-job boundary.
+Suspended companies are skipped for job/mailer charges unless the caller opts
+in. See `docs/CREDIT_DEDUCTION.md` for the full page-token flow and the
+deduction boundary.
 
 ### 5.3 The Two-Balance Wallet
 
@@ -258,7 +266,7 @@ the background-job boundary.
 | Column | Purpose | Deduct order |
 |--------|---------|--------------|
 | `main_credit_balance` | Purchased credits (top-ups land here) | 2nd |
-| `promo_credit_balance` | Promotional credits (incl. the 1,000-credit signup bonus) | **1st** |
+| `promo_credit_balance` | Promotional credits (incl. the 1,000,000-credit signup bonus) | **1st** |
 
 Both balances may be negative. There is no debt column; a negative total derives
 `workflow_status: suspend`.
@@ -268,7 +276,7 @@ Low-level mutation entry points:
 ```ruby
 wallet.add_credits!(amount:, source:, description:)                   # top-up → main only (jobs allowed)
 wallet.add_to!(balance: :promo, amount:, source:, description:)       # grant promo credits (jobs allowed)
-wallet.deduct_from!(balance: :main, amount:, source:, description:)   # controller-only deduction
+wallet.deduct_from!(balance: :main, amount:, source:, description:, action_type:, external_id:) # service-only deduction
 ```
 
 - Every mutation runs inside `with_lock` (transaction + row-level `FOR UPDATE`) — concurrent deductions serialize on the wallet row.
@@ -509,16 +517,17 @@ expect(invoice.transactions.sum(:price_cents)).to be >= invoice.price_cents
 This example traces a company through a full credit cycle — from consuming actions through top-up.
 
 ```
-Day 1:  Company active, wallet promo_balance 1,000, main_balance 0
+Day 1:  Company active, wallet promo_balance 1,000,000, main_balance 0
         (SIGNUP_PROMO_CREDITS)
 
 09:00   Dashboard visit
-        → Dashboards#index JSON
-        → after_action CompanyCreditDeduction::Dashboards::IndexService (access_dashboard, 2)
+        → HTML shell mints page token (no charge)
+        → first Dashboards#index JSON claims it
+        → DeductionService (access_dashboard, 2)
         → promo -2, main unchanged, record_credit_usage!(2)
 
 09:05   Customer creation
-        → (future) Customers#create → CreateService (create_customer, 7)
+        → (future) DeductionService (create_customer, 7)
         → promo -7, main unchanged, record_credit_usage!(7)
 
 09:10   POS order paid (cash)
@@ -526,7 +535,7 @@ Day 1:  Company active, wallet promo_balance 1,000, main_balance 0
         → (future) create_order deduction (10)
         → promo -10, main unchanged, record_credit_usage!(10)
 
-Wallet now: promo 981, main 0
+Wallet now: promo 999,981, main 0
 
 Usage sync runs → CompanyDailyUsage[09:00] += 2, [09:05] += 7, [09:10] += 10 (total 19)
 
@@ -572,7 +581,7 @@ Owner recovers from the Top Up page
 | `app/controllers/companies/top_ups_controller.rb` | Top-up page + gateway initiation |
 | `app/jobs/company_usage_sync_job.rb` | Drains Kredis usage delta → Daily/Monthly usage tables |
 | `docs/DISCOUNTS.md` | Single-use discount engine — reserve at pay, consume on invoice paid (the only sanctioned Invoice-level money callback besides the derivation) |
-| `config/initializers/constants.rb` | `CREDIT_RATES`, `CREDIT_USAGE_RATES`, `GATEWAY_STRATEGIES`, `GATEWAY_STRATEGY_CLASSES` |
+| `config/initializers/constants.rb` | `CREDIT_RATES`, `CREDIT_DEDUCTION_RATES`, `GATEWAY_STRATEGIES`, `GATEWAY_STRATEGY_CLASSES` |
 
 ---
 

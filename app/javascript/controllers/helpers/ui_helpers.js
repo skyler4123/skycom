@@ -46,6 +46,11 @@ export const fetchJson = async (url, options = {}) => {
 
   if (requestUrl.origin === window.location.origin) {
     defaultHeaders["X-CSRF-Token"] = csrfToken()
+
+    const creditPageToken = document.body?.dataset?.creditPageToken
+    if (creditPageToken) {
+      defaultHeaders["X-Credit-Page-Token"] = creditPageToken
+    }
   }
 
   let requestBody = body

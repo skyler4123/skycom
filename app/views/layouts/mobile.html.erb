@@ -23,6 +23,7 @@
   </head>
   <body
   class="min-h-dvh bg-background font-sans text-foreground antialiased "
+  data-credit-page-token="<%= @credit_page_token %>"
   data-controller="websocket client-cache"
   data-user-avatar="<%= current_user&.avatar %>"
   <% if is_signed_in? && @channels.present? %>
