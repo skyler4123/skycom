@@ -336,7 +336,7 @@ module Dashboards
           .sum(:change_amount)
           .abs,
         currency: company.currency,
-        access_cost: CREDIT_USAGE_RATES[:access_dashboard]
+        access_cost: CREDIT_DEDUCTION_RATES.dig("companies/dashboards#index", :cost)
       }
     end
 

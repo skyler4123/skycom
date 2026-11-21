@@ -65,7 +65,7 @@ class CompanyWallet < ApplicationRecord
     public_send(column)
   end
 
-  def deduct_from!(balance:, amount:, source: nil, description: nil, action_type: "deduction")
+  def deduct_from!(balance:, amount:, source: nil, description: nil, action_type: "deduction", external_id: nil)
     column = balance_column!(balance)
     raise ArgumentError, "amount must be a positive integer" unless amount.is_a?(Integer) && amount.positive?
 
@@ -75,9 +75,13 @@ class CompanyWallet < ApplicationRecord
       CompanyWalletLog.create!(
         company: company, company_wallet: self, change_type: :debit,
         change_amount: -amount, balance_before: current, balance_after: public_send(column),
-        balance_type: balance, source: source, description: description
+        balance_type: balance, source: source, description: description,
+        external_id: external_id
       )
-      record_usage_log!(action_type: action_type, source: source, change_amount: -amount, description: description)
+      record_usage_log!(
+        action_type: action_type, source: source, change_amount: -amount,
+        description: description, external_id: external_id
+      )
       company.sync_credit_status!(total_credit_balance: total_credit_balance)
     end
     public_send(column)
@@ -110,13 +114,14 @@ class CompanyWallet < ApplicationRecord
     column
   end
 
-  def record_usage_log!(action_type:, source:, change_amount:, description:)
+  def record_usage_log!(action_type:, source:, change_amount:, description:, external_id: nil)
     return unless usage_logging_active?
 
     CompanyUsageLog.create!(
       company: company, company_wallet: self,
       action_type: action_type, change_amount: change_amount,
-      balance_after: total_credit_balance, source: source, description: description
+      balance_after: total_credit_balance, source: source, description: description,
+      external_id: external_id
     )
   end
 end

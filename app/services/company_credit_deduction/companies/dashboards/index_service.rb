@@ -10,6 +10,8 @@ module CompanyCreditDeduction
         def action_type = "access_dashboard"
 
         def description = "Dashboard access"
+
+        def cost = CREDIT_DEDUCTION_RATES.dig("companies/dashboards#index", :cost)
       end
     end
   end

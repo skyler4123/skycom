@@ -6,8 +6,9 @@ RSpec.describe CompanyCreditDeduction::Companies::Dashboards::IndexService do
   let(:company) { create(:company, :without_signup_promo) }
   let(:wallet) { company.company_wallet }
 
-  it "resolves the dashboard action cost from CREDIT_USAGE_RATES" do
-    expect(described_class.new(company: company).send(:cost)).to eq(CREDIT_USAGE_RATES[:access_dashboard])
+  it "resolves the dashboard action cost from CREDIT_DEDUCTION_RATES" do
+    expect(described_class.new(company: company).send(:cost))
+      .to eq(CREDIT_DEDUCTION_RATES.dig("companies/dashboards#index", :cost))
   end
 
   it "uses the access_dashboard action type for usage logs" do
@@ -19,7 +20,8 @@ RSpec.describe CompanyCreditDeduction::Companies::Dashboards::IndexService do
 
     described_class.call(company: company)
 
-    expect(wallet.reload.main_credit_balance).to eq(100 - CREDIT_USAGE_RATES[:access_dashboard])
-    expect(company.credit_usage_delta).to eq(CREDIT_USAGE_RATES[:access_dashboard])
+    cost = CREDIT_DEDUCTION_RATES.dig("companies/dashboards#index", :cost)
+    expect(wallet.reload.main_credit_balance).to eq(100 - cost)
+    expect(company.credit_usage_delta).to eq(cost)
   end
 end

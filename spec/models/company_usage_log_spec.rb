@@ -17,9 +17,9 @@ RSpec.describe CompanyUsageLog, type: :model do
   end
 
   describe "action type catalog" do
-    it "includes every CREDIT_USAGE_RATES key" do
-      CREDIT_USAGE_RATES.each_key do |key|
-        expect(described_class::VALID_ACTION_TYPES).to include(key.to_s)
+    it "includes every page deduction action type" do
+      CREDIT_DEDUCTION_ACTION_TYPES.each do |key|
+        expect(described_class::VALID_ACTION_TYPES).to include(key)
       end
     end
 

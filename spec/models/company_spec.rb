@@ -184,7 +184,7 @@ RSpec.describe Company, type: :model do
       company = create(:company)
       expect(company.company_wallet).to be_present
       expect(company.company_wallet.main_credit_balance).to eq(0)
-      expect(company.company_wallet.promo_credit_balance).to eq(SIGNUP_PROMO_CREDITS)
+      expect(company.company_wallet.promo_credit_balance).to eq(1_000_000)
       expect(company.company_wallet.walletable).to eq(company)
       expect(company.workflow_status).to eq("active")
     end
@@ -316,7 +316,7 @@ RSpec.describe Company, type: :model do
     it "still grants the signup promo when system_owned" do
       company = build_company(company_user).tap { |c| c.system_owned = true }.tap(&:save!)
 
-      expect(company.company_wallet.promo_credit_balance).to eq(SIGNUP_PROMO_CREDITS)
+      expect(company.company_wallet.promo_credit_balance).to eq(1_000_000)
       expect(company.company_wallet.main_credit_balance).to eq(0)
     end
 
