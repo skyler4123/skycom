@@ -115,6 +115,17 @@ RSpec.feature "Mobile Check In", type: :feature, js: true do
     expect(AttendanceLog.last.latitude).to be_present
   end
 
+  scenario "checks in without location when the branch has no config and permission is denied" do
+    deny_mobile_geolocation
+    sign_in(user)
+    visit mobile_company_home_path(company)
+
+    click_button "Clock In"
+
+    expect(page).to have_content("Checked in successfully")
+    expect(AttendanceLog.last.latitude).to be_nil
+  end
+
   scenario "uses the company's local day and timezone for check-ins" do
     company.update!(timezone: :plus_7)
     sign_in(user)
