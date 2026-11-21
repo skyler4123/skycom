@@ -104,8 +104,8 @@ existing guards (`unless self.class.skip_init || system_owned`):
 System companies are **exempt from credit suspension**: `Company#sync_credit_status!`
 returns early for `system_owned` companies and for companies with a `System`
 FK, so their `workflow_status` stays `active`. They start with the same
-`SIGNUP_PROMO_CREDITS` wallet grant as every other company and can still be
-topped up like a tenant; only the suspension behavior is special.
+`SIGNUP_PROMO_CREDITS` wallet grant (1,000,000) as every other company and can
+still be topped up like a tenant; only the suspension behavior is special.
 The grant applies at creation — existing system companies keep their current
 wallet until they are re-seeded or backfilled. See `docs/CREDIT_DEDUCTION.md` §4.
 
