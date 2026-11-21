@@ -98,12 +98,12 @@ RSpec.describe "Companies::Operations::BookingController", type: :request do
       expect(response).to have_http_status(:ok)
       expect(event.reload.workflow_status).to eq("completed")
       expect(event.end_at).to eq(now)
-    end
 
-    other = booking_event(name: "Other", start_time: "14:00", end_time: "15:00")
-    post_json(booking_reservation_cancel_company_operations_path(company, operation, other.id), {})
-    expect(response).to have_http_status(:ok)
-    expect(other.reload.workflow_status).to eq("cancelled")
+      other = booking_event(name: "Other", start_time: "14:00", end_time: "15:00")
+      post_json(booking_reservation_cancel_company_operations_path(company, operation, other.id), {})
+      expect(response).to have_http_status(:ok)
+      expect(other.reload.workflow_status).to eq("cancelled")
+    end
   end
 
   it "searches customers through Meilisearch" do

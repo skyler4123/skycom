@@ -20,6 +20,14 @@ RSpec.feature "Companies::Operations::Reception", type: :feature, js: true do
     page.driver.browser.manage.window.resize_to(1400, 900)
   end
 
+  around do |example|
+    if example.metadata[:fixed_clock]
+      travel_to(Time.utc(2026, 11, 20, 15, 0, 0)) { example.run }
+    else
+      example.run
+    end
+  end
+
   def create_visit(customer_name:, status:, start_at:, host_record: host, facility: nil, code: "VIS-#{SecureRandom.hex(2).upcase}", metadata: {})
     customer = create(:customer, company: company, name: customer_name,
       description: "Vanguard Global Capital")
@@ -44,7 +52,7 @@ RSpec.feature "Companies::Operations::Reception", type: :feature, js: true do
     find(%([data-reception-kpi="#{key}"] .text-3xl)).text
   end
 
-  scenario "renders one honest page with real counts and no fake terminal chrome" do
+  scenario "renders one honest page with real counts and no fake terminal chrome", :fixed_clock do
     create_visit(customer_name: "Arthur Pendelton", status: :confirmed, start_at: 10.minutes.ago,
       facility: room, metadata: { "lobby_entered_at" => 5.minutes.ago.iso8601 })
     create_visit(customer_name: "Camila Gomez", status: :confirmed, start_at: 4.minutes.ago, host_record: second_host,

@@ -37,7 +37,7 @@ RSpec.describe Purchase, type: :model do
     it { should define_enum_for(:lifecycle_status) }
     it { should define_enum_for(:workflow_status) }
     it { should define_enum_for(:currency) }
-    it { should define_enum_for(:business_type).with_values(office_supply: 0, equipment: 1, service: 2) }
+    it { should define_enum_for(:business_type).with_values(office_supply: 0, equipment: 1, service: 2, stock_reorder: 3) }
   end
 
   describe "#total_price" do
