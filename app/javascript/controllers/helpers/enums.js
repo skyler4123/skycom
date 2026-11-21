@@ -931,6 +931,38 @@ const ENUMS = {
         "value": "phone"
       }
     ],
+    "fulfillment_channels": [
+      {
+        "name": "Walk-in",
+        "value": "walk_in"
+      },
+      {
+        "name": "Click & Collect",
+        "value": "click_collect"
+      },
+      {
+        "name": "Local Delivery",
+        "value": "local_delivery"
+      },
+      {
+        "name": "Phone Hold",
+        "value": "phone_hold"
+      }
+    ],
+    "fulfillment_statuses": [
+      {
+        "name": "Unfulfilled",
+        "value": "unfulfilled"
+      },
+      {
+        "name": "Ready",
+        "value": "ready"
+      },
+      {
+        "name": "Handed over",
+        "value": "handed_over"
+      }
+    ],
     "currencies": [
       {
         "name": "Usd",

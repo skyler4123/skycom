@@ -1,9 +1,10 @@
 # Store Manager
 
-> **Last audited:** 2026-11-19 · **Audit scope:** frontend controller, console
-> service, backend controller, feature and service specs. No live browser run.
-> **Ship readiness:** 🔴 not shippable — six dead tabs and three fabricated
-> status claims are visible to an operator.
+> **Last audited:** 2026-11-21 · **Audit scope:** frontend controller, console
+> and write services, backend controller, feature, service, model and request
+> specs, including headless browser feature runs.
+> **Ship readiness:** 🟢 shippable — no fabricated status, no dead tab, no
+> toast-only workflow.
 > **Who this is for:** the store manager or shift lead on duty at one branch.
 > **Mobile:** same console, mounted through the Hotwire shell.
 > **Read first:** [README](README.md) · **Related:** [00-app-overview](00-app-overview.md),
@@ -13,19 +14,22 @@
 
 ## 1. What this page is for
 
-The Store Manager console is the branch-level command screen for a retail day.
-A manager opens it mid-shift to answer four questions at a glance: how much have
-we sold, what still has to be handed to a customer, what is nearly empty on the
-shelf, and who is working. It is also the place a manager is supposed to close
-the day from.
+The Store Manager console is the branch-level command screen for one retail day.
+A manager opens it to answer four questions at a glance: how much have we sold,
+what still has to be handed to a customer, what is nearly empty on the shelf, and
+who is working. It is also where the manager closes the shift.
 
-"Done" on this page means one of three things: an order in the queue has moved
-towards handover, a low shelf has a restock decision, or the manager has left the
-console for the specific screen that owns the detailed work.
+"Done" means one of three endings:
 
-The page is read-only. It intentionally sends the manager to the order, stock,
-attendance, and POS screens rather than duplicating their actions. That design is
-sound; the gaps below are about the console promising more than it delivers.
+1. **Handover** — an order leaves the open queue, or remains with a real
+   fulfilment state.
+2. **Shelf** — a low row has a transfer or purchase document, and pressing the
+   action again opens that same document.
+3. **Shift** — expected cash, counted cash, variance and a note are stored, and
+   the printed report matches those figures.
+
+Payment, void and warehouse counting stay on POS and Inventory. This page does
+not copy them.
 
 ---
 
@@ -35,23 +39,28 @@ sound; the gaps below are about the console promising more than it delivers.
 one branch during one shift. They are on their feet, often on a tablet, and they
 check this screen between serving customers.
 
-**Their goal:** a fast, trustworthy picture of the shift, and a short path to the
-one thing that needs attention.
+**Their goal:** a fast, trustworthy picture of the branch day, and a short path
+to the one thing that needs attention.
 
-**What they can do here today:**
+**What they can do here:**
 
-- Read today's sales, fulfilment, shelf-stock and staffing numbers.
-- Search and filter the fulfilment queue and open any listed order.
-- Jump to a low-stock row in the stock ledger.
-- Jump to the orders, stock-adjustment, and attendance screens.
-- Refresh the data on demand.
+- Read today's or a past day's sales, fulfilment, shelf-stock and staffing
+  numbers.
+- Search the whole day's fulfilment queue by order code, customer, channel or
+  status; page through it 50 rows at a time.
+- Mark a fulfilment order ready and hand it over.
+- Start a real stock transfer or purchase draft from a low shelf row and reopen
+  that document.
+- See who is actually checked in on a scheduled shift.
+- Close the shift with a cash count, variance, note and printable report.
+- Refresh on demand; the page also refreshes every 60 seconds while no sheet is
+  open.
 
 **What they must do elsewhere:**
 
-- Take a payment or open the cash drawer — POS operation.
-- Move an order through fulfilment — the order detail page.
-- Request stock from the warehouse — stock transfer or purchase screens.
-- Close the shift, count the float, or print a report — nothing exists yet.
+- Take a payment, void a sale, or open the cash drawer — POS operation.
+- Edit order lines or cancel an order — the order page / POS.
+- Receive a transfer, count stock, or adjust stock — Inventory.
 
 **Access:** the Store Manager operation must be active at the branch, and the
 employee's role must be allowed by the operation's role configuration.
@@ -61,39 +70,52 @@ employee's role must be allowed by the operation's role configuration.
 ## 3. The screen, in words
 
 **Top bar:** the Skycom mark (links back to the Operations list), the company
-name, the branch name and code, a green "Cloud Sync Active" pill, a dark-mode
-toggle, and the signed-in user's name and role.
+name, the branch name and code, a dark-mode toggle, and the signed-in user's name
+and role. No cloud-sync pill.
 
-**Second row:** seven navigation tabs — Store Overview (active), Counter & POS
-Terminals, Orders & Fulfillment, Store Replenishment, Inventory & Stock Ledger,
-Warehouse Transfers, BOM & Procurement.
+**Page heading:** **Store overview**, with the branch and selected date.
 
-**Context banner:** a green "Store Open • Fully Operational" pill, the branch
-name, the "Current Shift", and five quick actions: New Store Order, Request
-Restock, Stock Adjustment, Daily Shift Report, Float Audit.
+**Context row:** branch name, real shift chip (for example
+`Morning · 08:00–17:00 · 6 checked in`, or `No shift scheduled`), a date control
+(default today, past dates read-only), and the day actions: New Store Order,
+Show low stock, Stock Adjustment, Close shift. On a past date with a saved close,
+the only action is View close report.
 
-**KPI strip (five cards):** Gross Sales Today, Active POS Counters, Orders To
-Fulfill, Shelf Stock Alerts, Store Staff On Duty.
+**KPI strip (five cards):** Gross sales, Cashiers, To hand over, Shelf alerts,
+On duty. Every card number equals the list it summarises.
 
-**Main column:** the fulfilment queue (order tabs, search, barcode button, a
-five-column table, and a "View all orders" link), then Shelf Replenishment
-Requisitions (a six-column table of low-stock rows).
+**Main column:** the fulfilment queue (tabs, search, barcode-focus button, table,
+pagination), then Shelf replenishment (SKU, shelf stock, min, warehouse
+available, stage, floor action).
 
-**Side column:** Active Register & POS Status (one card per cashier), Footfall &
-Conversion (visitor and conversion placeholders plus an hourly bar chart), and
-the On-Duty Shift Roster with a "Manage Shift Attendance & Overtime" button.
+**Side column:** Cashiers (person, role, sales, orders), Hourly orders on the
+branch clock, On-duty roster with a real checked-in status, and one footfall line
+(`No door sensor · 4 buyers`).
 
-**Footer strip:** "Live data synced from the regional cloud", the refresh time,
-the operation code, the branch name, and a Diagnostics button.
+**Footer:** `Refreshed 5:52 AM` (or `Update failed` with the last successful
+time) and the operation code. Nothing else.
+
+**Sheets**
+
+- **Close shift** is an in-page sheet: sales by tender, order count, discounts,
+  tax, opening float, expected cash, counted cash, computed variance, still to
+  hand over (with the open order codes listed), shelf rows short, checked-in
+  staff, note, Save and close, Print.
+- **Replenishment** is an in-page sheet: quantity, source warehouse for a
+  transfer or supplier for a purchase, explicit Confirm.
 
 **States**
 
 - *Loading:* the page is blank until the JSON payload returns.
-- *Error:* a full-screen red message with the server's error text.
-- *Empty orders:* "No orders match this view."
-- *Empty shelves:* "No shelf stock is below the minimum threshold."
-- *Empty registers:* "No register activity today."
-- *Empty staff:* "No employees are assigned to this branch."
+- *Load error:* a full-screen red message with the server's error text.
+- *Refresh error:* current numbers stay; footer says `Update failed`.
+- *Empty orders:* `No orders are waiting for handover.`
+- *Empty completed:* `No orders have been handed over for this date.`
+- *Empty search:* `No orders match this search.`
+- *Empty shelves:* `No shelf stock is below the minimum threshold.`
+- *Missing past snapshot:* `No shelf snapshot was saved for this date.`
+- *Empty cashiers:* `No paid orders yet for this date.`
+- *Empty roster:* `No one is checked in right now.` / `No one was checked in on this date.`
 - *Responsive:* two columns on desktop become one on phones and tablets; wide
   tables scroll inside their card.
 
@@ -101,269 +123,135 @@ the operation code, the branch name, and a Diagnostics button.
 
 ## 4. Control inventory
 
-28 interactive controls. Non-interactive claims are listed in §5.
+35 interactive controls. Row actions are counted once per action type.
 
-| ID | Area | Control | What it does today | Status | If shipped as-is |
-|---|---|---|---|---|---|
-| SM-01 | Top bar | Skycom logo | Returns to the Operations list | ✅ | — |
-| SM-02 | Tabs | Store Overview | Already active; does nothing | ✅ | — |
-| SM-03 | Tabs | Counter & POS Terminals | Toast: "Counter & POS Terminals is coming soon." | 🗑️ | Looks like a second page that does not exist |
-| SM-04 | Tabs | Orders & Fulfillment | Toast: "… is coming soon." | 🗑️ | Same |
-| SM-05 | Tabs | Store Replenishment | Toast: "… is coming soon." | 🗑️ | Same |
-| SM-06 | Tabs | Inventory & Stock Ledger | Toast: "… is coming soon." | 🗑️ | Same |
-| SM-07 | Tabs | Warehouse Transfers | Toast: "… is coming soon." | 🗑️ | Same |
-| SM-08 | Tabs | BOM & Procurement | Toast: "… is coming soon." | 🗑️ | Same |
-| SM-09 | Top bar | Dark-mode toggle | Switches theme | ✅ | — |
-| SM-10 | Context banner | New Store Order | Opens the new-order screen | ✅ | — |
-| SM-11 | Context banner | Request Restock | Scrolls to the shelf section; creates nothing | 🟡 | Label promises a request that never happens |
-| SM-12 | Context banner | Stock Adjustment | Opens the stock-adjustment list | ✅ | Leaves the console |
-| SM-13 | Context banner | Daily Shift Report | Toast: "Daily shift report export is not connected yet." | 🗑️ | A manager cannot close the day |
-| SM-14 | Context banner | Float Audit | Toast: "Float audit is handled from the POS operation." | 🗑️ | Points at a POS flow that has no float audit either |
-| SM-15 | Fulfilment | Refresh orders | Reloads the payload and re-renders | ✅ | — |
-| SM-16 | Fulfilment | All Orders tab | Filters the loaded queue | ✅ | — |
-| SM-17 | Fulfilment | Click & Collect tab | Filters the loaded queue by channel | 🟡 | Only the 8 loaded rows are filtered |
-| SM-18 | Fulfilment | Local Delivery tab | Filters the loaded queue by channel | 🟡 | Only the 8 loaded rows are filtered |
-| SM-19 | Fulfilment | Completed tab | Filters the loaded queue by status | 🟡 | Only the 8 loaded rows are filtered |
-| SM-20 | Fulfilment | Order search | Filters loaded rows by code, customer, channel, status, assignee | 🟡 | Placeholder promises SKU scanning; SKU is not searched |
-| SM-21 | Fulfilment | Barcode scanner button | Focuses the search box and shows a toast | 🟡 | No scanner integration exists |
-| SM-22 | Fulfilment | Order code link | Opens the order detail page | ✅ | — |
-| SM-23 | Fulfilment | Row action link | Opens the order detail page (label varies by status) | ✅ | Action happens on the order page, not here |
-| SM-24 | Fulfilment | View all orders | Opens the orders list | ✅ | — |
-| SM-25 | Replenishment | Restock row action | Opens the stock row | ✅ | No request is created |
-| SM-26 | Replenishment | Open stock ledger | Opens the stock list | ✅ | — |
-| SM-27 | Staff | Manage Shift Attendance & Overtime | Opens the attendance months list | ✅ | Leaves the console |
-| SM-28 | Footer | Diagnostics | Toast: "Store manager diagnostics are not connected yet." | 🗑️ | Dead-end button in the footer |
+| ID | Area | Control | What it does | Status |
+|---|---|---|---|---|
+| SM-01 | Top bar | Skycom logo | Returns to the Operations list | ✅ |
+| SM-02 | Top bar | Dark-mode toggle | Switches theme | ✅ |
+| SM-03 | Context | Date control | Re-scopes the page; past dates read-only | ✅ |
+| SM-04 | Context | New Store Order | Opens the new-order screen | ✅ |
+| SM-05 | Context | Show low stock | Scrolls to the shelf table | ✅ |
+| SM-06 | Context | Stock Adjustment | Opens the stock-adjustment list | ✅ |
+| SM-07 | Context | Close shift | Opens the close sheet (today only) | ✅ |
+| SM-08 | Context | View close report | Opens a saved past close read-only | ✅ |
+| SM-09 | Queue | Refresh now | Reloads the console; skipped while a sheet is open | ✅ |
+| SM-10 | Queue | Open orders | Opens the orders list | ✅ |
+| SM-11 | Queue | All Orders tab | Server filter: open orders | ✅ |
+| SM-12 | Queue | Click & Collect tab | Server filter: open click-and-collect orders | ✅ |
+| SM-13 | Queue | Local Delivery tab | Server filter: open delivery orders | ✅ |
+| SM-14 | Queue | Completed tab | Server filter: handed over on that day | ✅ |
+| SM-15 | Queue | Search | Matches code, customer, channel, status on the full day set | ✅ |
+| SM-16 | Queue | Barcode-focus button | Focuses search; placeholder says `Scan or type a code` | ✅ |
+| SM-17 | Queue | View order | Opens the order detail page | ✅ |
+| SM-18 | Queue | Mark ready | Stores fulfilment status `ready` | ✅ |
+| SM-19 | Queue | Hand over | Stores `handed_over` + timestamp; requires payment | ✅ |
+| SM-20 | Queue | Previous page | Previous 50-row page | ✅ |
+| SM-21 | Queue | Next page | Next 50-row page | ✅ |
+| SM-22 | Shelf | Floor action | Request transfer, Create purchase, or open the existing document | ✅ |
+| SM-23 | Shelf | Open stock ledger | Opens the stock list | ✅ |
+| SM-24 | Roster | Manage shift attendance | Opens the attendance months list | ✅ |
+| SM-25 | Close sheet | Close | Closes the sheet without saving | ✅ |
+| SM-26 | Close sheet | Opening float | Stores the float used by expected cash | ✅ |
+| SM-27 | Close sheet | Counted cash | Stores the manager's count | ✅ |
+| SM-28 | Close sheet | Note | Stores the variance explanation | ✅ |
+| SM-29 | Close sheet | Print | Prints only the close sheet | ✅ |
+| SM-30 | Close sheet | Save and close | Upserts the stored close | ✅ |
+| SM-31 | Replenishment sheet | Close | Closes the sheet without writing | ✅ |
+| SM-32 | Replenishment sheet | Quantity | Defaults to the shortfall / source availability | ✅ |
+| SM-33 | Replenishment sheet | Supplier | Purchase only; defaults to the product supplier | ✅ |
+| SM-34 | Replenishment sheet | Cancel | Closes the sheet without writing | ✅ |
+| SM-35 | Replenishment sheet | Confirm | Creates or reuses one document | ✅ |
 
-**Count by status:** ✅ 13 · 🟡 6 · 🗑️ 9 · ⛔ 0 · 💤 0 · 🔢 0 (fabrication is in
-the claims and numbers, not the controls).
+Removed controls: the six dead tabs, Cloud Sync Active, Store Open • Fully
+Operational, Live data synced from the regional cloud, Diagnostics, Float Audit,
+Daily Shift Report, named registers and “Synced” chips.
 
 ---
 
 ## 5. Numbers on screen
 
-| Claim on screen | What it appears to mean | Where it actually comes from | Verdict |
-|---|---|---|---|
-| Gross Sales Today | Money sold today | Sum of line-item totals for today's paid/completed orders, on the branch's calendar day | 🟡 line-item totals, not invoice totals — tax and order-level adjustments are excluded |
-| +N% vs yesterday | Day-over-day change | Same calculation for yesterday; blank when yesterday had no sales | ✅ |
-| "N Lanes" (Active POS Counters) | Working POS terminals | Number of employees who recorded at least one order today | 🟡 no terminal model exists; the label describes hardware that is not tracked |
-| "N transactions processed" | Completed sales | Count of paid/completed orders today | ✅ |
-| "N Pending" (Orders To Fulfill) | Orders awaiting fulfilment | Count of today's draft, pending, confirmed and in-progress orders | ✅ |
-| "N Click & Collect" | Orders for pickup | Fulfilment-state orders whose order type is set to "in store" | 🟡 channel is inferred from a field that means something else |
-| "N Delivery" | Orders for delivery | Fulfilment-state orders whose order type is set to "online" | 🟡 same inference |
-| "Shift Sales" (register card) | Money taken during that person's shift | Today's paid/completed orders for that employee; no shift start or end is read | 🟡 labelled "shift", measured "today" |
-| "Orders Processed" (register card) | Orders handled in the shift | Count of today's orders assigned to that employee | 🟡 same |
-| "N Low" (Shelf Stock Alerts) | Products near empty | Branch stock rows where quantity minus pending is 10 or less | ✅ threshold is global, not per product |
-| "N Team" (Store Staff On Duty) | People clocked in now | Active employees assigned to the branch; no attendance or shift check | 🟡 "on duty" is assumed from assignment, not observed |
-| Current Shift | The scheduled shift | The branch-local hour bucketed at 12:00 and 17:00 into three fixed labels, ignoring scheduled shifts and branch opening hours | 🔢 fabricated; the labels ("Morning 08:00–17:00") contradict the cut-off at noon |
-| Register name ("Main Counter", "Express Kiosk", "Pickup Desk", "Floor Register") | A named POS terminal | Invented from the employee's position in the grouped list | 🔢 |
-| "Synced" on a register card | Terminal acknowledged the cloud | Static text | 🔢 |
-| Hourly Order Volume bars | Orders per hour at this branch | Orders bucketed by their **UTC** hour over a fixed 08:00–18:00 window, while the "Now" bar uses the branch clock | 🔢 wrong time base; a branch east of UTC sees an almost empty chart |
-| "Peak: 14h (6)" | Busiest hour | Maximum of the same flawed hourly series | 🔢 inherits the error above |
-| Today's Visitors / Store Conversion | People who entered, and the share who bought | No source; the panel shows "—" and "Sensor not connected" | 💤 honest gap |
-| "N buyers" | Distinct customers who bought | Distinct customer IDs among today's orders | ✅ |
-| "Cloud Sync Active" | Live connection to the cloud | Static green pill | 🔢 |
-| "Store Open • Fully Operational" | Trade status | Static text; branch opening hours are not modelled | 🔢 |
-| "Live data synced from the regional cloud." | Freshness guarantee | Static text | 🔢 |
-| "Refreshed at 9:41 AM" | When the data was built | Server timestamp of the payload | ✅ |
-| "Threshold: 10 units" | Restock warning level | Global constant of 10 for every product in every company | 🟡 |
-| "Displaying 8 of 27 today's queue entries" | How much of the queue is visible | 8 is the loaded row count; 27 is the true count — the rest cannot be reached from this page | 🟡 |
+| Claim on screen | Where it comes from | Verdict |
+|---|---|---|
+| Gross sales | Sum of paid invoice totals for the branch's calendar day (tax and order-level adjustments included) | ✅ |
+| +N% vs yesterday | Same invoice formula for the previous day; blank when yesterday had no sales | ✅ |
+| Cashiers | Distinct employees credited with at least one paid order today | ✅ |
+| N paid orders | Distinct orders with a paid invoice today; equals the sum of cashier order counts plus any uncredited note | ✅ |
+| To hand over | Fulfilment orders not handed over by the end of the selected day | ✅ |
+| Click & Collect / Local Delivery / Phone Hold | Stored `orders.fulfillment_channel`, never inferred from `business_type` | ✅ |
+| Shelf alerts | Branch stock rows at or below the product/warehouse reorder point | ✅ |
+| Min | `ReorderRule.min_quantity + safety_stock`, or 10 with `Default minimum: 10` | ✅ |
+| Warehouse available | Available units for the same product in other warehouses | ✅ |
+| Stage | The open transfer or purchase document code; otherwise `Not requested` | ✅ |
+| On duty | Employees checked in on a scheduled shift covering now, excluding approved leave | ✅ |
+| Current shift | Real scheduled shift name and hours; `No shift scheduled` when none covers now | ✅ |
+| Hourly orders | Orders bucketed on the branch clock; window is the day's first–last order; peak uses that series | ✅ |
+| N buyers | Distinct customers with a paid order on the day | ✅ |
+| Refreshed at | Server timestamp of the last successful payload | ✅ |
+| Expected cash | Opening float + cash received − change given | ✅ |
+| Counted cash | Typed by the manager and stored | ✅ |
+| Variance | Counted cash − expected cash; computed, not typed | ✅ |
+| Still to hand over / shelf rows short | Counts stored on the close at save time | ✅ |
+| No door sensor | Honest gap; the buyer count is real | 💤 |
 
 ---
 
 ## 6. Gaps by user job
 
-### G1 — "Which part of the store am I looking at?"
-Six of the seven tabs do nothing but say "coming soon". The console is one
-screen wearing a seven-tab costume. A manager learns within seconds that the
-navigation cannot be trusted.
+No open gaps for the three endings. Honest limitations:
 
-- Smallest real version: remove the six tabs and keep one clear title (S).
-- Alternative: turn each tab into an anchor that scrolls to the matching section
-  already on the page (S–M).
-- Full version: build the six sections as separate views (L, incremental).
-
-### G2 — "How did we do yesterday?"
-Every number is today. There is no date or period selector, so the page is
-useless before opening and after closing, and a manager cannot review a past
-shift from it.
-
-- Smallest real version: add a date selector and scope the payload to it (M).
-- Alternative: keep "today" and link to Analytics for history (S).
-
-### G3 — "How do I close the shift?"
-There is no shift report, no cash reconciliation, no handover note, and no
-print/export. "Daily Shift Report" and "Float Audit" are both dead ends, and the
-cash-management note sends the manager to a POS flow that has no float audit.
-
-- Smallest real version: a printable or downloadable end-of-day summary of the
-  numbers already on this page (M).
-- Full version: a shift record (open/close, counted cash, variance, notes) (L).
-
-### G4 — "Which terminal is which?"
-Register cards are grouped by cashier and named by list position. Two cashiers
-in the same order produce "Main Counter" and "Express Kiosk" — names that exist
-nowhere in the company's configuration.
-
-- Smallest real version: rename the card to "Cashier" and drop the invented
-  names and numbers (S).
-- Full version: model terminals and appoint them to branches (L).
-
-### G5 — "Who is actually on duty?"
-"On duty" means "assigned to this branch and active". Nobody has to have checked
-in, and a person on leave still appears. Scheduled shifts and attendance already
-exist in the system but are not read here.
-
-- Smallest real version: rename to "Branch staff" (S).
-- Better: join today's scheduled shifts and attendance check-ins (M).
-
-### G6 — "What should I order?"
-"Request Restock" scrolls the page. There is no requisition, no quantity, no
-approval, and no link to the purchase or transfer flows — only a link to the
-stock row.
-
-- Smallest real version: rename to "Show low stock" (S).
-- Better: link each row to the stock transfer or purchase request flow (M).
-- Full version: create a restock request from the console (L).
-
-### G7 — "How busy are we, and when?"
-The hourly chart buckets orders by UTC hour over a fixed 08:00–18:00 window. For
-a branch east of UTC, most orders fall outside the window, so the chart is
-empty, and the "Now" marker does not line up with the bars.
-
-- Smallest real version: bucket by the branch clock and derive the window from
-  the earliest and latest order of the day (S).
-
-### G8 — "How many people came in?"
-No footfall sensor exists. The panel is honest about it, but it occupies a third
-of the side column to say so.
-
-- Smallest real version: collapse it to one line, or remove the panel (S).
-- Alternative: accept manual door counts (M).
-
-### G9 — "I need the rest of the queue."
-The table loads 8 orders. The tabs, the search, and the count in the footer all
-operate on those 8 only, while the footer's total refers to all of today's
-queue. A manager can search for an order that exists and be told there are no
-matches.
-
-- Smallest real version: remove the cap and paginate, or move filters to the
-  server (M).
-- Alternative: label the cap honestly and link to the orders list (S).
-
-### G10 — "Is the data live?"
-Three separate green claims — "Cloud Sync Active", "Store Open • Fully
-Operational", "Live data synced from the regional cloud" — are static text. The
-page has no auto-refresh; a manager sees stale data until they press Refresh.
-
-- Smallest real version: remove the three claims (S).
-- Better: show only "Refreshed at…" and add auto-refresh (M).
-
-### G11 — "Something changed — tell me."
-There is no realtime signal, no unread indicator, and no sound when a new order
-or a click-and-collect handover arrives. The manager must keep pressing Refresh.
-
-- Full version: subscribe to the orders channel and update the queue (M).
-
-### G12 — "Who is this for, on mobile?"
-The same console is mounted on tablet and phone. The two-column layout stacks,
-but the target device is not stated anywhere in the page or the docs.
-
-- Smallest real version: document the intended devices (S).
+- **No door sensor.** The page says so; it does not invent visitors or
+  conversion.
+- **No shift-open flow.** The opening float is captured in the close sheet and
+  defaults to 0.
+- **Historical shelf requires a saved close.** Without a close, the page says no
+  snapshot was saved rather than showing today's stock as if it were history.
+- **Multi-currency sale aggregation** uses the company currency; currency
+  conversion is not applied here.
+- **No realtime push.** The page polls every 60 seconds.
+- **No terminal identity.** Cashier cards name people, not hardware.
 
 ---
 
 ## 7. Decisions for the BA
 
-**SM-D1 — What happens to the six dead tabs?**
-- A. Remove them; one screen, one title. Cost: loses the visual story that the
-  console will grow. Effort S.
-- B. Turn them into scroll anchors to sections that already exist. Cost: three of
-  the six have no section to scroll to. Effort S–M.
-- C. Build the six sections. Cost: six new feature areas; the largest project on
-  this page. Effort L.
-- *Recommendation:* A now, C later only where a real operator asks for it.
+All decisions from the 2026-11-19 audit are resolved:
 
-**SM-D2 — Does the console get a date selector?**
-- A. Today only, with a link to Analytics for history. Effort S.
-- B. A date selector that re-scopes all numbers. Effort M.
-- *Recommendation:* B — "how did yesterday go" is the most common manager
-  question, and the payload is already day-scoped.
-
-**SM-D3 — Is a shift report in scope for the first release?**
-- A. Cut both report and float audit from the UI until they exist. Effort S.
-- B. Ship a printable end-of-day summary of the current numbers. Effort M.
-- C. Build a shift-close record with cash count and variance. Effort L.
-- *Recommendation:* A for the first release, B immediately after; C only if a
-  pilot customer asks for cash reconciliation.
-
-**SM-D4 — Terminals: model them or drop the pretence?**
-- A. Rename to "Cashier" and remove invented names/numbers. Effort S.
-- B. Add a terminal record and appointment to branch. Effort L.
-- *Recommendation:* A. Nothing in the product needs terminal identity yet.
-
-**SM-D5 — Staff status: rename or derive from attendance?**
-- A. Rename to "Branch staff". Effort S.
-- B. Derive from scheduled shifts and attendance check-ins. Effort M.
-- *Recommendation:* B once attendance is reliable; A until then.
-
-**SM-D6 — Restock: rename, link, or build?**
-- A. Rename the button "Show low stock". Effort S.
-- B. Link each row to stock transfer / purchase. Effort M.
-- C. Create a requisition here. Effort L.
-- *Recommendation:* B — the flows exist; the console should route to them.
-
-**SM-D7 — Hourly chart: fix the time base?**
-- A. Bucket by branch clock and derive the window from the day's orders. Effort S.
-- B. Remove the chart. Effort S.
-- *Recommendation:* A. It is a real question with a cheap real answer.
-
-**SM-D8 — Footfall: keep the honest gap?**
-- A. Keep as-is. Effort S.
-- B. Collapse to one line. Effort S.
-- C. Add manual door counts. Effort M.
-- *Recommendation:* B. Honest, but it should not cost a third of the column.
-
-**SM-D9 — Queue cap: paginate or label?**
-- A. Remove the cap, paginate and filter on the server. Effort M.
-- B. Keep 8 rows, label the cap, link to the orders list. Effort S.
-- *Recommendation:* A if the console is meant for busy stores; B otherwise.
-
-**SM-D10 — Live claims: remove or wire?**
-- A. Remove the three static status claims. Effort S.
-- B. Replace with a real "refreshed at" and auto-refresh. Effort M.
-- *Recommendation:* A now, B with the realtime work.
-
-**SM-D11 — "Current Shift": remove or wire to the roster?**
-- A. Remove the label; the header already shows the branch. Effort S.
-- B. Derive it from today's scheduled shifts for the branch. Effort M.
-- C. Keep a hardcoded three-shift label, corrected to match its own cut-offs.
-  Effort S, but still not the company's real shifts.
-- *Recommendation:* B. Scheduled shifts exist; presenting an invented one next to
-  a roster that knows better undermines the page.
+| Decision | Resolution |
+|---|---|
+| SM-D1 dead tabs | Removed; one page, title **Store overview**. |
+| SM-D2 date selector | Added; past dates are read-only. |
+| SM-D3 shift report | Built as a stored shift close with print. |
+| SM-D4 terminals | No terminal model; cashier cards name people. |
+| SM-D5 staff status | Derived from scheduled shifts + attendance. |
+| SM-D6 restock | Creates a real transfer or purchase and reopens it. |
+| SM-D7 hourly chart | Branch clock; first–last order window. |
+| SM-D8 footfall | Collapsed to one honest line. |
+| SM-D9 queue cap | Removed; server-filtered 50-row pages. |
+| SM-D10 live claims | Removed; last-refreshed time + quiet polling. |
+| SM-D11 current shift | Derived from real scheduled shifts. |
 
 ---
 
 ## 8. Safe demo path
 
-Use this path when showing the console to a prospect. It touches only real data.
+1. Open **Operations** and launch **Store Manager** for a branch with paid orders
+   today (cash and QR), a scheduled shift covering now, and at least one low
+   stock row.
+2. Show the five KPI cards and point at the invoice behind Gross sales and the
+   cashier card behind Cashiers.
+3. In the fulfilment queue, page to a later order, search its code, mark it
+   ready, then hand it over. Show the count drop and the Completed tab.
+4. Scroll to **Shelf replenishment**, request a transfer or create a purchase,
+   and show the stage code; press the stage link to open the same document.
+5. Show the real shift chip, the On-duty roster, and **Manage shift
+   attendance**.
+6. Click **Close shift**, enter float and counted cash, show the variance, save,
+   print, reload and show the same variance.
+7. Switch the date to yesterday and show the saved close read-only.
 
-1. Open **Operations** and launch **Store Manager** for a branch with orders
-   seeded today.
-2. Show the five KPI cards and explain each one in business terms.
-3. In the fulfilment queue, filter by **All Orders**, search a customer name,
-   open the order.
-4. Scroll to **Shelf Replenishment Requisitions** and open a stock row.
-5. Show the **On-Duty Shift Roster** and open **Manage Shift Attendance**.
-
-**Do not demo:**
-
-- Any of the six header tabs other than **Store Overview**.
-- **Daily Shift Report**, **Float Audit**, or **Diagnostics**.
-- The **Footfall & Conversion** panel beyond saying "no sensor connected yet".
-- The register names, the "Current Shift" label, or the hourly chart.
-- The "Cloud Sync Active" and "Fully Operational" pills as if they were real.
-- A fresh company with no orders today: every KPI reads zero and the queue is
-  empty, which makes the console look broken rather than quiet.
+**Do not demo:** a door sensor, named POS hardware, cloud-sync status, BOM, dock
+doors, or a payment button on this page.
 
 ---
 
@@ -372,40 +260,49 @@ Use this path when showing the console to a prospect. It touches only real data.
 **Route:** `GET /companies/:company_id/operations/store_manager/:operation_id`
 (HTML shell + same-URL `.json`).
 
+**Additional endpoints:**
+
+- `GET  …/queue`
+- `POST …/orders/:order_id/mark_ready`
+- `POST …/orders/:order_id/hand_over`
+- `POST …/replenishments`
+- `POST …/shift_close`
+
 **Backend:** `Companies::Operations::StoreManagerController#show`, inheriting
 `Companies::Operations::BaseController` — resolves the operation, the active
 branch appointment, and the role gate before rendering.
 
-**Payload builder:** `StoreManager::ConsoleService.call(company:, appointment:)`.
+**Services:**
+
+- `StoreManager::ConsoleService` — payload orchestrator.
+- `StoreManager::SalesSummaryService` — invoice totals, tender split, cashier
+  grouping.
+- `StoreManager::QueueQueryService` — whole-day queue, search, pagination,
+  open/completed state.
+- `StoreManager::ShelfQueryService` — low stock, reorder points, open documents,
+  past snapshot.
+- `StoreManager::DutyRosterService` — real shift chip and checked-in roster.
+- `StoreManager::OrderFulfillmentService` — mark ready / hand over.
+- `StoreManager::ReplenishmentService` — transfer or purchase, reused.
+- `StoreManager::ShiftCloseService` — build/save the close and snapshots.
 
 **Frontend:** `app/javascript/controllers/companies/operations/store_manager/show_controller.js`
 (`Companies_Operations_StoreManager_ShowController`). Mobile mounts the same
 controller.
 
-**Constants:** `ORDER_LIMIT = 8`, `REPLENISHMENT_LIMIT = 8`, `STAFF_LIMIT = 8`,
-`OPEN_HOUR = 8`, `CLOSE_HOUR = 18`, `LOW_STOCK_THRESHOLD = 10`.
+**Data:**
 
-**Source tables:** `orders`, `order_product_appointments`,
-`order_service_appointments`, `order_product_group_appointments`,
-`order_service_group_appointments`, `order_subscription_plan_appointments`,
-`stocks`, `employees`, `branches`, `operations`.
+- Orders gain `fulfillment_channel`, `fulfillment_status`, `handed_over_at`, and
+  a real `code` assigned on create.
+- `shift_closes` stores one close per branch/business date with the report
+  figures, staff names and shelf snapshot.
+- Reorder points use `Stock.reorder_point_expression` shared with Inventory.
 
-**Known code-level issues behind §5:**
-
-- `registers_payload` groups today's orders by employee and calls
-  `register_name(index)` — names are positional, not stored.
-- `hourly_payload` uses `order.created_at.hour` (UTC) against a branch-local
-  `currentHour`; the server timezone is UTC and branch time is applied through
-  `LocalTime`.
-- `footfall_payload` returns `connected: false`; the panel renders em dashes.
-- `currentShift` is computed in the frontend from `Helpers.locationNow(...).hour()`
-  with thresholds at 12 and 17.
-- No cache; every load recomputes. `orders_scope` caps the query at 200 rows.
+**Constants:** `LOW_STOCK_THRESHOLD` (default 10), `QueueQueryService::PAGE_SIZE`
+(50), `SEARCH_MAX_IDS` (1,000), 60-second client refresh.
 
 **Proof:** `spec/features/companies/operations/store_manager_spec.rb`,
 `spec/features/mobile/store_manager_spec.rb`,
 `spec/requests/companies/operations/store_manager_spec.rb`,
-`spec/services/store_manager/console_service_spec.rb`.
-
-**Not covered by tests:** the six dead tabs, the hourly UTC bucketing, the
-register naming, and the static status pills.
+`spec/services/store_manager/*`, `spec/models/order_spec.rb`,
+`spec/models/shift_close_spec.rb`.

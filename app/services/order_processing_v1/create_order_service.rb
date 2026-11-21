@@ -102,6 +102,7 @@ module OrderProcessingV1
         workflow_status: :pending,
         currency: @company.currency,
         business_type: :in_store,
+        fulfillment_channel: :walk_in,
         employee: @employee,
         pos_tax_rate_bp: config.pos_tax_rate_bp.to_i,
         pos_tax_name: config.pos_tax_name.presence || "Tax",

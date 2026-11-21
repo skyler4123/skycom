@@ -125,6 +125,10 @@ Rules:
 - **Tax is a snapshot, not a live lookup.** The order snapshots the rate at
   ORDER; the invoice snapshots it again at pay. A later Tax Config change never
   rewrites an open sale or a paid receipt.
+- **Store Manager never moves money.** `StoreManager::SalesSummaryService`
+  reads paid invoice totals and completed transaction tenders for the branch day;
+  `ShiftClose` stores the cash count/variance. Payment, void and refund stay on
+  POS and the order page.
 
 ---
 

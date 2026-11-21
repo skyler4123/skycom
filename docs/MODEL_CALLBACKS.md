@@ -104,6 +104,14 @@ _No direct callbacks._ Operation appointments are created by `OperationAppointme
 
 ---
 
+### Order (`app/models/order.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :assign_code, on: :create` | 96 | `assign_code` | Assigns `ORD-XXXXXXXX` when the order has no code. The unique order code is what the Store Manager queue renders and searches; a UUIDv7 prefix is not used because UUIDv7 ids created together share their first characters. |
+
+---
+
 ### Transaction (`app/models/transaction.rb`) — B2C POS sales
 
 Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is derived from `SUM(price_cents)` of `completed` transactions only, so pending Mock QR payments never pay the invoice early. The model also carries a `status` enum (`pending/completed/failed`, DB default 0) and `store_accessor :metadata, :gateway_payload` for raw gateway responses.

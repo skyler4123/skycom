@@ -19,11 +19,9 @@ class Inventory::LedgerQueryService
   # SQL conditions are literal strings with bind placeholders so Brakeman can
   # verify them; the only interpolation is the reorder-point default constant in
   # the SELECT alias below (no user input reaches SQL).
-  LOW_STOCK_CONDITION =
-    "(stocks.quantity - stocks.pending) <= COALESCE(reorder_rules.min_quantity + reorder_rules.safety_stock, ?)".freeze
+  LOW_STOCK_CONDITION = Stock.low_stock_condition_sql.freeze
   OUT_OF_STOCK_CONDITION = "(stocks.quantity - stocks.pending) <= 0".freeze
-  IN_STOCK_CONDITION =
-    "(stocks.quantity - stocks.pending) > COALESCE(reorder_rules.min_quantity + reorder_rules.safety_stock, ?)".freeze
+  IN_STOCK_CONDITION = Stock.in_stock_condition_sql.freeze
 
   def self.call(company:, warehouse:, q: nil, filter: "all", page: 1, per_page: PAGE_SIZE)
     new(company: company, warehouse: warehouse, q: q, filter: filter, page: page, per_page: per_page).call
@@ -76,17 +74,11 @@ class Inventory::LedgerQueryService
   end
 
   def reorder_join
-    <<~SQL.squish
-      LEFT OUTER JOIN reorder_rules
-        ON reorder_rules.product_id = stocks.product_id
-        AND reorder_rules.warehouse_id = stocks.warehouse_id
-        AND reorder_rules.is_active = TRUE
-        AND reorder_rules.discarded_at IS NULL
-    SQL
+    Stock.reorder_point_join_sql
   end
 
   def reorder_point_sql
-    "COALESCE(reorder_rules.min_quantity + reorder_rules.safety_stock, #{LOW_STOCK_THRESHOLD})"
+    Stock.reorder_point_expression
   end
 
   def filtered_scope
@@ -96,11 +88,11 @@ class Inventory::LedgerQueryService
   def status_scope(base)
     case filter
     when "low"
-      base.where(LOW_STOCK_CONDITION, LOW_STOCK_THRESHOLD)
+      base.where(LOW_STOCK_CONDITION)
     when "out"
       base.where(OUT_OF_STOCK_CONDITION)
     when "in_stock"
-      base.where(IN_STOCK_CONDITION, LOW_STOCK_THRESHOLD)
+      base.where(IN_STOCK_CONDITION)
     else
       base
     end
@@ -157,9 +149,9 @@ class Inventory::LedgerQueryService
   def counts_payload
     {
       all: scope.count,
-      low: scope.where(LOW_STOCK_CONDITION, LOW_STOCK_THRESHOLD).count,
+      low: scope.where(LOW_STOCK_CONDITION).count,
       out: scope.where(OUT_OF_STOCK_CONDITION).count,
-      in_stock: scope.where(IN_STOCK_CONDITION, LOW_STOCK_THRESHOLD).count
+      in_stock: scope.where(IN_STOCK_CONDITION).count
     }
   end
 

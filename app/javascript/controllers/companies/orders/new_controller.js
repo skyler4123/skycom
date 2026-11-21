@@ -98,6 +98,10 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
       `<option value="${t.value}">${t.name === 'in_store' ? translate("In Store") : (t.name ? t.name.charAt(0).toUpperCase() + t.name.slice(1) : t.value)}</option>`
     ).join('')
 
+    const channelOptions = (ENUMS?.order?.fulfillment_channels || []).map(c =>
+      `<option value="${c.value}">${translate(c.name)}</option>`
+    ).join('')
+
     const currencyOptions = (ENUMS?.order?.currencies || []).map(c =>
       `<option value="${c.value}">${c.name?.toUpperCase() || c.value?.toUpperCase()}</option>`
     ).join('')
@@ -129,6 +133,14 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
             <select name="order[business_type]"
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
               ${typeOptions}
+            </select>
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-muted-foreground uppercase">${translate("Fulfilment channel")}</label>
+            <select name="order[fulfillment_channel]"
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
+              ${channelOptions}
             </select>
           </div>
 

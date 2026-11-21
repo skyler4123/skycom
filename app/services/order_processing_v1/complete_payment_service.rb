@@ -22,7 +22,13 @@ module OrderProcessingV1
         ActiveRecord::Base.transaction do
           @transaction.update!(status: :completed)
           @transaction.invoice.update!(workflow_status: :paid)
-          @transaction.invoice.order.update!(workflow_status: :paid)
+          order = @transaction.invoice.order
+          attributes = { workflow_status: :paid }
+          if order.fulfillment_channel_walk_in?
+            attributes[:fulfillment_status] = :handed_over
+            attributes[:handed_over_at] = Time.current
+          end
+          order.update!(attributes)
         end
       end
 

@@ -1,6 +1,6 @@
 # Skycom Meilisearch Integration
 
-> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Live consumers since 2026-09-06/07/08: ALL dynamic-table index pages (Products, Customers, Branches, Brands, Departments, Employees, Facilities, Invoices, Orders, Services, Warehouses) run dynamic search/filter (`DynamicSearch::BaseQueryService` subclasses); Stocks, StockTransfers, StockImports, StockExports joined 2026-09-09, Suppliers joined 2026-09-17 — per-page rollout recipe: `docs/DYNAMIC_TABLE.md` §8.
+> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Live consumers since 2026-09-06/07/08: ALL dynamic-table index pages (Products, Customers, Branches, Brands, Departments, Employees, Facilities, Invoices, Orders, Services, Warehouses) run dynamic search/filter (`DynamicSearch::BaseQueryService` subclasses); Stocks, StockTransfers, StockImports, StockExports joined 2026-09-09, Suppliers joined 2026-09-17; the Store Manager fulfilment queue joined 2026-11-20 (Orders + Customers search, exact codes in the DB) — per-page rollout recipe: `docs/DYNAMIC_TABLE.md` §8.
 
 ---
 

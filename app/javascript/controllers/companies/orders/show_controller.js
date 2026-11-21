@@ -70,6 +70,10 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
 
     const businessTypeLabel = o.business_type === 'in_store' ? translate("In Store")
       : o.business_type?.charAt(0).toUpperCase() + o.business_type?.slice(1) || translate("Online")
+    const channelLabel = (ENUMS?.order?.fulfillment_channels || []).find((entry) => entry.value === o.fulfillment_channel)?.name
+      || translate("Walk-in")
+    const fulfillmentLabel = (ENUMS?.order?.fulfillment_statuses || []).find((entry) => entry.value === o.fulfillment_status)?.name
+      || translate("Unfulfilled")
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-line pt-6 mt-6">
@@ -128,6 +132,26 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
               <div>
                 <p class="text-xs font-medium text-muted-foreground">${translate("Status")}</p>
                 <p class="text-sm font-semibold">${Helpers.statusBadge(o.workflow_status)}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-warning">
+                <span class="material-symbols-outlined">local_shipping</span>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Fulfilment channel")}</p>
+                <p class="text-sm font-semibold text-foreground">${Helpers.escapeHtml(translate(channelLabel))}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-warning">
+                <span class="material-symbols-outlined">package_2</span>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Fulfilment status")}</p>
+                <p class="text-sm font-semibold text-foreground">${Helpers.escapeHtml(translate(fulfillmentLabel))}</p>
               </div>
             </div>
 

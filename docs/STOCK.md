@@ -228,6 +228,13 @@ the counter's `counted_quantity` plus `variance_quantity = counted - expected`.
 `business_type: stock_reorder`; it never creates a second open purchase. Approval
 and goods receipt stay on the purchase screens and the existing purchase bridge.
 
+**Store Manager** uses the same bridge without a second write path:
+`StoreManager::ReplenishmentService` reuses an open transfer for the same
+product → destination warehouse, otherwise starts one `Inventory::TransferService`
+transfer from the supplying warehouse when it has stock, otherwise calls
+`Inventory::ReorderService` for one purchase draft. The shelf row's Min uses the
+same `Stock.reorder_point_expression` as the Inventory ledger.
+
 ---
 
 ## 5. Tenets (Immutable)

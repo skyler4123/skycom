@@ -91,7 +91,7 @@
 | [03-booking](03-booking.md) | Booking console (facilities and reservations) | 🟢 | 26 | 0 | 2026-11-20 |
 | [04-reception](04-reception.md) | Reception console (visitors, parcels, rooms) | 🟢 | 44 | 0 | 2026-11-20 |
 | [05-inventory](05-inventory.md) | Inventory console (warehouse) | 🟢 | 38 | 0 | 2026-11-20 |
-| [06-store-manager](06-store-manager.md) | Store Manager console | 🔴 | 28 | 11 | 2026-11-19 |
+| [06-store-manager](06-store-manager.md) | Store Manager console | 🟢 | 35 | 0 | 2026-11-21 |
 | [07-dashboard](07-dashboard.md) | Company dashboard | 🟠 | 29 | 7 | 2026-11-19 |
 | [08-analytics](08-analytics.md) | Analytics | 🟠 | 13 | 6 | 2026-11-19 |
 
@@ -183,3 +183,4 @@ These docs are only useful if they are true. The rules:
 | 2026-11-20 | Booking | Shippable pass: conflict-safe reservations, click inspector, real host/customer, extend/end/cancel, run sheet, caps; 🟢 26 controls |
 | 2026-11-20 | Inventory | Shippable pass: stripped BOM/zones/docks/RFID, server ledger search/pagination/CSV, receive/transfer/export/adjust/reorder/count drawers, real reorder points; 🟢 38 controls |
 | 2026-11-20 | Reception | Shippable pass: one page, guest-linked visits, pre-registration, browser badge print, direct notifications, real shift/timers/search/polling; 🟢 44 controls |
+| 2026-11-21 | Store Manager | Shippable pass: one page, invoice sales, real channel/order codes, 50-row server queue with mark ready/hand over, transfer/purchase from low rows, real shift/roster, stored close with print, date/polling; 🟢 35 controls |

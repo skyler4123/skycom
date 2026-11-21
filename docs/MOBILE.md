@@ -318,12 +318,14 @@ uses the same Shell-First contract:
 `data-controller="companies--operations--store-manager--show darkmode"` plus the
 company, operation and employee identifiers. The shared store manager controller
 hydrates from `/companies/:company_id/operations/store_manager/:operation_id.json`
-and renders today's sales KPIs, fulfillment queue, shelf alerts, registers,
-hourly order volume and the on-duty roster. The layout is width-driven for both
-orientations: phone and tablet portrait stack the fulfillment/replenishment
-column above the register/footfall/roster column; landscape tablet at `lg`
-places the two columns side by side. Tables scroll horizontally inside their
-cards instead of widening the page.
+and renders the same branch-day console as web: invoice sales KPIs, the
+server-filtered fulfilment queue with mark ready/hand over, shelf alerts with
+transfer/purchase actions, cashier cards, branch-clock hourly orders, the real
+on-duty roster, the date control and the close sheet with print. The layout is
+width-driven for both orientations: phone and tablet portrait stack the
+fulfilment/replenishment column above the cashier/hourly/roster column;
+landscape tablet at `lg` places the two columns side by side. Tables scroll
+horizontally inside their cards instead of widening the page.
 
 **Inventory** — `GET /mobile/companies/:company_id/operations/inventory/:operation_id`
 uses the same Shell-First contract:
@@ -422,9 +424,10 @@ request feature spec sets them through the DOM with `set_native_field`.
 - Mobile/tablet Reception reuses the web reception console; there is no native
   visitor/parcel workflow, offline queue, or label-printer integration. Badge
   print is the browser print of one visit.
-- Mobile/tablet Store Manager reuses the web store manager console; there is no
-  native register/cash-drawer or footfall sensor integration, and the footfall
-  panel reports that the sensor is not connected.
+- Mobile/tablet Store Manager reuses the web store manager console, including
+  mark ready/hand over, shelf transfer/purchase, the close sheet and browser
+  print; there is no native register/cash-drawer or door-sensor integration, and
+  the footfall line says the sensor is not connected.
 - Mobile copy lives in `dictionary.js` and renders through `translate()`.
   Missing entries fall back to the English key, so add the entry whenever a
   string moves or changes.

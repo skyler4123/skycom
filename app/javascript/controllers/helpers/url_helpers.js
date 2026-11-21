@@ -225,6 +225,15 @@ export const reception_parcel_notify_company_operation_path = (companyId, operat
 export const reception_parcel_pick_up_company_operation_path = (companyId, operationId, parcelId) => `${reception_parcels_company_operation_path(companyId, operationId)}/${parcelId}/pick_up`
 export const reception_notify_host_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/notify_host`
 export const store_manager_company_operation_path = (companyId, operationId, params = {}) => operationPath("store_manager", companyId, operationId, params)
+const storeManagerActionPath = (companyId, operationId, action, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `/companies/${companyId}/operations/store_manager/${operationId}/${action}${query ? `?${query}` : ""}`
+}
+export const store_manager_queue_company_operation_path = (companyId, operationId, params = {}) => storeManagerActionPath(companyId, operationId, "queue", params)
+export const store_manager_order_mark_ready_company_operation_path = (companyId, operationId, orderId) => storeManagerActionPath(companyId, operationId, `orders/${encodeURIComponent(orderId)}/mark_ready`)
+export const store_manager_order_hand_over_company_operation_path = (companyId, operationId, orderId) => storeManagerActionPath(companyId, operationId, `orders/${encodeURIComponent(orderId)}/hand_over`)
+export const store_manager_replenishments_company_operation_path = (companyId, operationId) => storeManagerActionPath(companyId, operationId, "replenishments")
+export const store_manager_shift_close_company_operation_path = (companyId, operationId) => storeManagerActionPath(companyId, operationId, "shift_close")
 
 export const order_processing_v1_checkout_path = (companyId) => `/companies/${companyId}/order_processing/v1/checkout`
 export const order_processing_v1_pay_path = (companyId) => `/companies/${companyId}/order_processing/v1/pay`

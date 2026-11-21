@@ -156,7 +156,12 @@ All appointments start `active`. Companies disable the ones they do not use.
 | POST | `/companies/:company_id/operations/reception/:operation_id/parcels/:parcel_id/pick_up` | `Companies::Operations::ReceptionController#pick_up_parcel` | Complete the parcel Event |
 | POST | `/companies/:company_id/operations/reception/:operation_id/notify_host` | `Companies::Operations::ReceptionController#notify_host` | Direct notification to the host + `host_notified_at` |
 | GET | `/mobile/companies/:company_id/operations/reception/:operation_id` | `Mobile::Companies::Operations::ReceptionController#show` | Mobile/tablet Shell-First mount point |
-| GET | `/companies/:company_id/operations/store_manager/:operation_id` | `Companies::Operations::StoreManagerController#show` | Store Manager console (Orders/Stocks/Employees) |
+| GET | `/companies/:company_id/operations/store_manager/:operation_id` | `Companies::Operations::StoreManagerController#show` | Store Manager console (invoices, queue, shelf, roster, close) |
+| GET | `/companies/:company_id/operations/store_manager/:operation_id/queue` | `Companies::Operations::StoreManagerController#queue` | Server-filtered 50-row queue page and search |
+| POST | `/companies/:company_id/operations/store_manager/:operation_id/orders/:order_id/mark_ready` | `Companies::Operations::StoreManagerController#mark_ready` | Mark a fulfilment order ready |
+| POST | `/companies/:company_id/operations/store_manager/:operation_id/orders/:order_id/hand_over` | `Companies::Operations::StoreManagerController#hand_over` | Hand over a paid fulfilment order |
+| POST | `/companies/:company_id/operations/store_manager/:operation_id/replenishments` | `Companies::Operations::StoreManagerController#create_replenishment` | Create/reuse one transfer or purchase |
+| POST | `/companies/:company_id/operations/store_manager/:operation_id/shift_close` | `Companies::Operations::StoreManagerController#save_shift_close` | Store today's close |
 
 Both index payloads are cached per company in `Rails.sync_cache` for
 `OPERATIONS_CACHE_EXPIRY` (1 day). `OperationPageCacheConcern` deletes the keys on
@@ -212,7 +217,7 @@ preserved when the form is saved. Raw metadata is never exposed in the UI.
 | Reception | `Companies_Operations_Reception_ShowController` (`companies--operations--reception--show`) | `Companies::Operations::ReceptionController#show/check_in/pre_register/advance/create_parcel/notify_parcel/pick_up_parcel/notify_host` |
 | Booking | `Companies_Operations_Booking_ShowController` (`companies--operations--booking--show`) | `Companies::Operations::BookingController#show/customers/create_reservation/extend_reservation/finish_reservation/cancel_reservation` |
 | Inventory | `Companies_Operations_Inventory_ShowController` (`companies--operations--inventory--show`) | `Companies::Operations::InventoryController#show/ledger/export/create_receipt/post_receipt/create_transfer/receive_transfer/create_export/create_adjustment/create_reorder/start_count/show_count/update_count/submit_count` |
-| Store Manager | `Companies_Operations_StoreManager_ShowController` (`companies--operations--store-manager--show`) | `Companies::Operations::StoreManagerController#show` |
+| Store Manager | `Companies_Operations_StoreManager_ShowController` (`companies--operations--store-manager--show`) | `Companies::Operations::StoreManagerController#show/queue/mark_ready/hand_over/create_replenishment/save_shift_close` |
 | Placeholders | `Companies_Operations_<Type>_ShowController` | `Companies::Operations::<Type>Controller#show` |
 
 ### 7.1 Time contract
@@ -362,31 +367,66 @@ Reorder points come from `ReorderRule` (`min_quantity + safety_stock`) per produ
 per warehouse, falling back to `LOW_STOCK_THRESHOLD`. The ledger footnote says so.
 
 *Deliberately not in this pass:* BOM/work orders, RFID, dock doors/gates/bays,
-pallets/cartons/weight, zone capacity, cloud-sync health, fulfillment-node role,
-and the six sibling tabs. The Store Manager tab cleanup remains separate.
+pallets/cartons/weight, zone capacity, cloud-sync health, fulfillment-node role.
 
-Store Manager reuses Orders, Stocks and Employees for the branch command screen:
+Store Manager reuses Orders, Invoices, Transactions, Stocks, ReorderRules,
+ScheduledShifts, AttendanceLogs/Leaves, StockTransfers and Purchases for one
+branch day:
 
-- **Sales KPIs** = today's paid/completed `Order` rows for the branch, compared
-  with the previous day.
-- **Fulfillment queue** = today's branch orders in `draft`, `pending`,
-  `confirmed` or `in_progress`; the channel chip comes from `business_type`
-  (`in_store` → Click & Collect, `online` → Local Delivery, `phone` → Phone Hold).
-- **Shelf alerts** = branch `Stock` rows where `quantity - pending` is at or
-  below `LOW_STOCK_THRESHOLD`; warehouse availability is the sum of other stock
-  rows for the same product.
-- **Registers** = today's orders grouped by the credited `Employee`, with shift
-  sales and order count.
-- **Roster** = active branch employees, with "Active POS" for employees who
-  processed orders today.
-- **Footfall** is not modelled yet; the payload reports `connected: false` and
-  the panel shows hourly order volume instead of inventing visitor counts.
+- **Sales KPIs** = paid invoice totals for the branch calendar day (tax and
+  order-level adjustments included), compared with the same formula yesterday.
+- **Cashiers** = employees credited with paid orders today; each card shows that
+  person's invoice sales and order count.
+- **Fulfilment queue** = orders created on the selected day with
+  `fulfillment_channel` in `click_collect`, `local_delivery`, `phone_hold`.
+  Open means not handed over by the end of that day (`handed_over_at`);
+  Completed means handed over before the end of that day. The queue is
+  server-filtered, searched through Meilisearch for text / exact code in the DB,
+  and paginated at 50 rows.
+- **Floor actions** = `StoreManager::OrderFulfillmentService` stores
+  `fulfillment_status: ready` or `handed_over` + `handed_over_at`. Handover
+  requires a paid invoice and never changes `workflow_status` (payment/KPI
+  semantics stay intact).
+- **Shelf alerts** = branch `Stock` rows at or below `ReorderRule`
+  (`min_quantity + safety_stock`) for that warehouse, falling back to
+  `LOW_STOCK_THRESHOLD`. Warehouse availability is the sum of other warehouses'
+  available units. `StoreManager::ReplenishmentService` creates or reuses one
+  transfer (`Inventory::TransferService`) or one purchase
+  (`Inventory::ReorderService`); the stage cell links to that document.
+- **Roster** = employees whose latest attendance log is a check-in on a
+  scheduled shift covering now, excluding approved leave. The shift chip uses
+  the real scheduled shift name/hours; `No shift scheduled` when none covers now.
+- **Hourly orders** = orders bucketed on the branch clock; the window is the
+  day's first–last order, and the peak uses the same series.
+- **Footfall** is not modelled; one line says `No door sensor` and shows the
+  real distinct-buyer count.
+- **Shift close** = `ShiftClose` stores one row per branch/business date with
+  paid-invoice sales, tender lines, cash received/change, opening float,
+  expected cash, counted cash, computed variance, the list of open handovers,
+  shelf counts, staff names, shelf snapshot and note. Print renders only the
+  sheet. Past dates read the stored row read-only when it exists.
 
-`StoreManager::ConsoleService` builds the read payload; the Stimulus controller
-only renders it. The web route is built first; mobile parity is out of scope for
-this pass.
+Endpoints:
 
-The Operations pages use **full-page show + edit** pages, never modals. The two list
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `…/store_manager/:operation_id` | HTML shell + JSON payload |
+| GET | `…/store_manager/:operation_id/queue` | Server queue/search/page |
+| POST | `…/store_manager/:operation_id/orders/:order_id/mark_ready` | Floor action |
+| POST | `…/store_manager/:operation_id/orders/:order_id/hand_over` | Floor action |
+| POST | `…/store_manager/:operation_id/replenishments` | Transfer/purchase |
+| POST | `…/store_manager/:operation_id/shift_close` | Save today's close |
+
+`StoreManager::ConsoleService` orchestrates the read services; the Stimulus
+controller renders the payload. The date control scopes sales, queue, cashiers,
+hourly bars and the saved shelf snapshot; write actions are hidden on past dates.
+The client polls every 60 seconds while no sheet is open and keeps typed sheet
+values through a refresh.
+
+Resource CRUD Operations pages use **full-page show + edit** pages, never modals.
+Console pages (POS, Booking, Reception, Inventory, Store Manager) use in-page
+sheets/drawers for their writes; those are part of the console workflow, not a
+replacement for a resource show/edit page. The two list
 pages link the row name to the show page and the edit icon to the edit page. Both
 list pages have GET filter bars:
 

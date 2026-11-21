@@ -22,6 +22,30 @@ class Stock < ApplicationRecord
   include DynamicSearchConcern
   include TagConcern # rubocop:enable Layout/ClassStructure
 
+  # One reorder-point formula for every console: the per-product/warehouse rule
+  # when present, otherwise LOW_STOCK_THRESHOLD (docs/STOCK.md).
+  def self.reorder_point_join_sql
+    <<~SQL.squish
+      LEFT OUTER JOIN reorder_rules
+        ON reorder_rules.product_id = stocks.product_id
+        AND reorder_rules.warehouse_id = stocks.warehouse_id
+        AND reorder_rules.is_active = TRUE
+        AND reorder_rules.discarded_at IS NULL
+    SQL
+  end
+
+  def self.reorder_point_expression
+    "COALESCE(reorder_rules.min_quantity + reorder_rules.safety_stock, #{LOW_STOCK_THRESHOLD})"
+  end
+
+  def self.low_stock_condition_sql
+    "(stocks.quantity - stocks.pending) <= #{reorder_point_expression}"
+  end
+
+  def self.in_stock_condition_sql
+    "(stocks.quantity - stocks.pending) > #{reorder_point_expression}"
+  end
+
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :quantity, :integer, default: 0
   attribute :pending, :integer, default: 0

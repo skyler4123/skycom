@@ -93,6 +93,7 @@ class Branch < ApplicationRecord
   has_many :stock_exports, dependent: :destroy
   has_many :stock_imports, dependent: :destroy
   has_many :stock_transfers, dependent: :destroy
+  has_many :shift_closes, dependent: :destroy
 
   # Self-referencing association for company hierarchy
   # belongs_to :parent_company, class_name: "Company", optional: true

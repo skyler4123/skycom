@@ -51,6 +51,7 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
 
     const companyId = window.location.pathname.split("/")[2]
     const businessTypes = ENUMS?.order?.business_types || []
+    const fulfillmentChannels = ENUMS?.order?.fulfillment_channels || []
     const workflowStatuses = ENUMS?.order?.workflow_statuses || []
     const currencyCodes = ENUMS?.order?.currencies || []
 
@@ -118,6 +119,14 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
             <select name="order[business_type]"
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
               ${selectOptionsHTML(businessTypes, o.business_type)}
+            </select>
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-xs font-medium text-muted-foreground">${translate("Fulfilment channel")}</label>
+            <select name="order[fulfillment_channel]"
+              class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm">
+              ${selectOptionsHTML(fulfillmentChannels, o.fulfillment_channel)}
             </select>
           </div>
 

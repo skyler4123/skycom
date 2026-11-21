@@ -275,6 +275,11 @@ Rails.application.routes.draw do
           post "reception/:operation_id/parcels/:parcel_id/pick_up", to: "operations/reception#pick_up_parcel", as: :reception_parcel_pick_up
           post "reception/:operation_id/notify_host", to: "operations/reception#notify_host", as: :reception_notify_host
           get "store_manager/:operation_id", to: "operations/store_manager#show", as: :store_manager
+          get "store_manager/:operation_id/queue", to: "operations/store_manager#queue", as: :store_manager_queue
+          post "store_manager/:operation_id/orders/:order_id/mark_ready", to: "operations/store_manager#mark_ready", as: :store_manager_order_mark_ready
+          post "store_manager/:operation_id/orders/:order_id/hand_over", to: "operations/store_manager#hand_over", as: :store_manager_order_hand_over
+          post "store_manager/:operation_id/replenishments", to: "operations/store_manager#create_replenishment", as: :store_manager_replenishments
+          post "store_manager/:operation_id/shift_close", to: "operations/store_manager#save_shift_close", as: :store_manager_shift_close
         end
       end
       resources :operation_configs, only: %i[index show edit update]

@@ -140,6 +140,7 @@ class Companies::OrdersController < Companies::ApplicationController
       :description,
       :code,
       :business_type,
+      :fulfillment_channel,
       :workflow_status,
       :currency,
       :category_id,
@@ -159,6 +160,7 @@ class Companies::OrdersController < Companies::ApplicationController
     order.as_json(only: [
       :id, :name, :description, :code,
       :lifecycle_status, :workflow_status, :business_type,
+      :fulfillment_channel, :fulfillment_status, :handed_over_at,
       :currency, :category_id, :customer_id, :employee_id,
       :created_at, :updated_at,
       *property_keys
