@@ -8,7 +8,21 @@ RSpec.feature "Mobile Check In", type: :feature, js: true do
   let(:branch) { create(:branch, company: company) }
   let!(:employee) { company.employees.find_by(user: user).tap { |record| record.update!(branch: branch) } }
 
+  before { grant_mobile_geolocation }
+
+  def geofence!
+    create(
+      :attendance_config,
+      company: company,
+      branch: branch,
+      latitude: 10.773,
+      longitude: 106.694,
+      allowed_radius_meters: 100
+    )
+  end
+
   scenario "creates attendance log and shows success notice" do
+    geofence!
     sign_in(user)
     visit mobile_company_home_path(company)
 
@@ -19,6 +33,7 @@ RSpec.feature "Mobile Check In", type: :feature, js: true do
   end
 
   scenario "records check_in log type with correct employee" do
+    geofence!
     sign_in(user)
     visit mobile_company_home_path(company)
 
@@ -33,6 +48,7 @@ RSpec.feature "Mobile Check In", type: :feature, js: true do
   end
 
   scenario "allows multiple check-ins and shows every time" do
+    geofence!
     sign_in(user)
     visit mobile_company_home_path(company)
 
@@ -48,6 +64,55 @@ RSpec.feature "Mobile Check In", type: :feature, js: true do
     expect(page).to have_content(/today's check-ins/i)
     expect(page).to have_css("[data-check-in-time]", count: 2)
     expect(AttendanceLog.where(employee: employee, log_type: :check_in).count).to eq(2)
+  end
+
+  scenario "stores the device coordinates on the attendance log" do
+    geofence!
+    sign_in(user)
+    visit mobile_company_home_path(company)
+
+    click_button "Clock In"
+
+    expect(page).to have_content("Checked in successfully")
+    log = AttendanceLog.last
+    expect(log.latitude).to be_within(0.000001).of(10.773)
+    expect(log.longitude).to be_within(0.000001).of(106.694)
+    expect(log.gps_accuracy_meters).to eq(10)
+    expect(log.geofence_distance_meters).to eq(0)
+  end
+
+  scenario "rejects a check-in outside the branch radius" do
+    geofence!
+    grant_mobile_geolocation(latitude: 10.8, longitude: 106.8)
+    sign_in(user)
+    visit mobile_company_home_path(company)
+
+    click_button "Clock In"
+
+    expect(page).to have_content("You are outside the allowed check-in area.")
+    expect(AttendanceLog.count).to eq(0)
+  end
+
+  scenario "does not submit when location permission is denied" do
+    geofence!
+    deny_mobile_geolocation
+    sign_in(user)
+    visit mobile_company_home_path(company)
+
+    click_button "Clock In"
+
+    expect(page).to have_content("Location permission is required to check in.")
+    expect(AttendanceLog.count).to eq(0)
+  end
+
+  scenario "checks in when the branch has no geofence config" do
+    sign_in(user)
+    visit mobile_company_home_path(company)
+
+    click_button "Clock In"
+
+    expect(page).to have_content("Checked in successfully")
+    expect(AttendanceLog.last.latitude).to be_present
   end
 
   scenario "uses the company's local day and timezone for check-ins" do

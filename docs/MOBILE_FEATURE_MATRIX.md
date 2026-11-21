@@ -48,7 +48,7 @@ Source files for the inventory:
 | Auth | 🟡 | Email/password sign-in, sign-out, session cookie | Forgot password, biometrics, SSO |
 | Home | 🟡 | Greeting, live clock, multi check-in state/times, today shift, monthly stats, quick actions, activity, paid-leave balance, latest company notice | No checkout/break |
 | Profile | 🟡 | Own name, code, type, roles, category, avatar, email, phone, company, branch, departments, next shift, monthly totals, group managers, contract renewal, Payroll entry point | No field editing, no dynamic profiles (avatar upload is supported) |
-| Attendance | 🟡 | Own month summary, daily rows, month navigation, check-in | No check-out, geofence, QR, request history, or PDF |
+| Attendance | 🟡 | Own month summary, daily rows, month navigation, GPS-geofenced check-in | No check-out, QR, request history, or PDF |
 | Requests | 🟡 | Create attendance request with validation, group managers listed from employee teams | No inbox, status, or attachments |
 | Payroll | 🟡 | Password gate, own status/step, period, worked hours, present days, overtime, salary/allowance/tax/net money; 5-minute unlock | No payslip/PDF |
 | Operations | 🟡 | Accessible operation appointments with Operation name/type, branch or warehouse location, resolution, statuses; POS opens the Shell-First cashier, and Booking, Reception, Store Manager and Inventory open their Shell-First consoles | Other operation types, filtering, and order history are not built |
@@ -56,7 +56,7 @@ Source files for the inventory:
 | Leave | 🟡 | Paid-leave balance and pending days on Home, seeded leave requests | No leave request form or history |
 | Schedule | 🟡 | Today/next shift read | No roster, shift list, or swap |
 | Documents and help desk | ⛔ | — | Web-only; future candidates |
-| Native shell | 🟡 | Five tabs, pull-to-refresh, edge-to-edge safe area, dark mode | No GPS, camera, biometrics, push, offline, or deep links |
+| Native shell | 🟡 | Five tabs, pull-to-refresh, edge-to-edge safe area, dark mode, WebView GPS | No camera, biometrics, push, offline, or deep links |
 
 **Headline:** 13 mobile screens (including the payroll password gate, Operations,
 the POS cashier, the Booking console, the Reception console, the Store Manager
@@ -129,10 +129,10 @@ Cross-cutting mobile behavior:
 | Biometric sign-in | — | ⛔ | No native biometric permission or library |
 | Home dashboard | — (web Dashboard is manager analytics) | ✅ | Mobile-only employee dashboard |
 | Live clock | — | ✅ | Client-side clock |
-| Check-in | ✅ manager view | ✅ | Writes one `AttendanceLog` per tap; Home lists all company-local check-ins; no geofence |
+| Check-in | ✅ manager view | ✅ | Writes one `AttendanceLog` per tap; Home lists all company-local check-ins; device GPS is captured and the branch geofence is enforced |
 | Check-out | ✅ manager view | ⛔ | `Attendance::CheckOutService` exists |
 | Break tracking | — | ⛔ | No mobile break action |
-| Geofence validation | ✅ config + service | ⛔ | Mobile bypasses `Attendance::CheckInService` |
+| Geofence validation | ✅ config + service | ✅ | Mobile sends the WebView geolocation fix through `Attendance::CheckInService`; configured branches reject missing/out-of-range fixes |
 | QR check-in | — | ⛔ | No scanner; HR roadmap item |
 | Today/next shift | ✅ shifts list | 🟡 | Read-only, one day at a time |
 | Month summary | ✅ admin | 🟡 | Own month only |
@@ -371,8 +371,11 @@ status.
 | M-09 | Announcement list and read tracking | Home shows the latest published `Document` notice; no list/read state | Announcement list + read tracking | List and read/unread state | M |
 | M-10 | Request attachments | Managers come from employee groups; no attachments | ActiveStorage + mobile upload | Optional photo/PDF proof | M |
 | M-11 | Profile field edit | Mobile profile fields are read-only (avatar upload is live) | Mobile form + permitted fields | Employee can edit allowed fields (for example phone, email) | M |
-| M-12 | GPS/geofence check-in | Mobile check-in bypasses `AttendanceConfig` and `CheckInService` | Android location permission + native/WebView geolocation | Check-in validates branch geofence or WiFi, with a clear failure state | L |
 | M-13 | Push notifications | No FCM or `POST_NOTIFICATIONS` | Firebase + native permission + backend | Push received and opens the relevant mobile page | L |
+
+> **M-12 shipped:** mobile check-in now sends the WebView GPS fix and enforces
+> the branch `AttendanceConfig` geofence. Wi-Fi SSID capture and mock-location
+> detection remain out of scope.
 
 ### P2 — polish and native
 
@@ -406,9 +409,9 @@ preferences, and dynamic employee profiles.
 | Path configuration | Asset `json/path-configuration.json`; pull-to-refresh on; off for sign-in/new | Remote `configurations/android_v1.json` URL has no server route; add it or drop it |
 | Tabs/back | Native bottom nav; HTML sticky header | No native toolbar; HTML back link on stack pages |
 | Edge-to-edge | `enableEdgeToEdge`, IME insets; HTML safe-area | Keep `env(safe-area-inset-*)` in the HTML |
-| Permissions | `INTERNET` only | Missing location, camera, biometrics, notifications |
+| Permissions | `INTERNET` + `ACCESS_FINE_LOCATION` + `ACCESS_COARSE_LOCATION` | Camera, biometrics, and notification permissions are still missing |
 | Push | None | Firebase + `POST_NOTIFICATIONS` |
-| GPS/location | None | `ACCESS_FINE_LOCATION` + runtime permission + native/WebView bridge |
+| GPS/location | WebView `navigator.geolocation`; Hotwire Native handles the runtime prompt | No native bridge, Wi-Fi SSID, or mock-location detection |
 | Camera/file upload | None | `CAMERA` as needed + file chooser + attachment model |
 | Biometrics | None | Android BiometricPrompt |
 | Offline | None | Cache strategy |
