@@ -3,8 +3,10 @@
 # EmployeeNotificationTagAppointment — Atomic purpose: atomic pairwise row
 # binding one NotificationTag to one Employee.
 #
-# Why it exists: an employee listens to notifications via shared tags (never a
-# direct employee↔notification link); this table records the subscription.
+# Why it exists: an employee listens to notifications via shared tags; this table
+# records the subscription. Directly addressed operational alerts use
+# `notifications.recipient_employee_id` instead of a per-employee copy of a
+# broadcast.
 #
 # How to use: created from the notification settings UI; read via
 # `employee.subscribed_notification_tags`.

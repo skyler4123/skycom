@@ -28,8 +28,8 @@ RSpec.describe "DynamicSearchConcern settings" do
     it "merges model-declared extra filterable metrics into the index settings" do
       filterable = Stock.meilisearch_settings.get_setting(:filterable_attributes)
       attributes = Stock.meilisearch_settings.get_setting(:attributes).keys.map(&:to_s)
-      expect(filterable).to include("quantity", "pending")
-      expect(attributes).to include("quantity", "pending")
+      expect(filterable).to include("quantity", "pending", "warehouse_id")
+      expect(attributes).to include("quantity", "pending", "warehouse_id")
     end
 
     it "keeps models without extra metrics free of them" do

@@ -34,6 +34,14 @@ through the hardened ledger callback. Requires `purchases.warehouse_id` (destina
 `purchase_items.product_id` (optional — item-less/product-less lines skip the bridge). See
 `docs/superpowers/specs/2026-09-23-stock-source-of-truth-design.md` §4.
 
+**Reorder bridge (2026-11-20)** — the Inventory console's Reorder action calls
+`Inventory::ReorderService`, which creates/reuses one open `Purchase` per product +
+warehouse with a real `PurchaseItem` line and `business_type: stock_reorder`. It uses
+the `purchases` category when the company has one so the category workflow binds and
+the draft can advance; otherwise it falls back to the product's category. A second
+press returns the existing open purchase. Approval and receipt stay on the purchase
+screens and the stock bridge above.
+
 ## 2. The Permission Model (single system — ABAC)
 
 | Rule | Detail |
@@ -218,6 +226,7 @@ ABAC permission model.
 | `app/services/seed/{retail,hospital}_enrich_service.rb` | Sample purchases across all phases (permission-aware requesters) |
 | `spec/services/workflows/advance_service_spec.rb` | State machine + ABAC authorization coverage |
 | `app/controllers/companies/purchases_controller.rb` | Purchases dashboard API (Shell-First) — dynamic search/filter index, line-item nested attributes, `POST advance` → `Workflows::AdvanceService` |
+| `app/services/inventory/reorder_service.rb` | Inventory console reorder → one open purchase per product/warehouse (`stock_reorder`) |
 | `app/controllers/companies/workflows_controller.rb` | Workflows dashboard API — full REST CRUD, nested steps, category binding (one workflow per category) |
 | `app/policies/companies/{purchases,workflows}_policy.rb` | Pundit policies (auto-derived by `Companies::Authorizable`; `advance?` = update permission) |
 | `app/services/purchases/search_query_service.rb` | Purchases index search/filter (Meilisearch via `DynamicSearch::BaseQueryService`) |

@@ -2,8 +2,10 @@
 
 # Mobile::Companies::Operations::InventoryController — Shell-First inventory
 # console for the mobile/tablet app. The response is only a mount point;
-# Companies_Operations_Inventory_ShowController hydrates the stock ledger,
-# metrics, docks, zone capacity and audit state from the web JSON endpoint.
+# Companies_Operations_Inventory_ShowController hydrates the warehouse KPIs,
+# server-paged stock ledger, inbound/outbound records and cycle-count state from
+# the web JSON endpoints and posts the in-console receive/transfer/export/adjust/
+# reorder/count actions.
 # Inventory is warehouse-scoped, so the shell resolves an
 # OperationWarehouseAppointment via warehouse_id (or the employee's branch).
 # Serves Stimulus: Companies_Operations_Inventory_ShowController (hydrate)

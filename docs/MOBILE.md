@@ -201,9 +201,9 @@ same screen. Errors use `{ errors: [...] }` (plural array) per
 | Attendance | month summary (worked/present/absent/overtime), daily in/out/duration/status/recorded method, prev/next month and whether next is disabled |
 | Operations | every accessible operation appointment for the company: Operation name/code/type, branch or warehouse location, operation workflow status, appointment workflow status; POS operations expose an **Open POS** action, Booking operations expose **Open Booking**, Reception operations expose **Open Reception**, Store Manager operations expose **Open Store Manager**, and warehouse Inventory operations expose **Open Inventory** |
 | POS | Shell-First page mounted by `Companies_Operations_Pos_ShowController`; the controller hydrates products, services, categories, payment methods, cart, receipt and customer lookup from the existing web JSON endpoint |
-| Booking | Shell-First page mounted by `Companies_Operations_Booking_ShowController`; the controller hydrates the facility timeline, booking blocks, KPIs, inspector and reservation form from the existing web JSON endpoint, and posts instant reservations |
-| Reception | Shell-First page mounted by `Companies_Operations_Reception_ShowController`; the controller hydrates today's visit Events, customers, hosts, facility rooms, parcels and next appointments from the existing web JSON endpoint, and posts walk-in/check-out/parcel actions |
-| Inventory | Shell-First page mounted by `Companies_Operations_Inventory_ShowController`; the controller hydrates vital stock metrics, the granular stock ledger, inbound/outbound freight docks, zone capacity and audit state from the existing web JSON endpoint |
+| Booking | Shell-First page mounted by `Companies_Operations_Booking_ShowController`; the controller hydrates the real facility timeline, outside-window tags, KPIs, category cards, inspector, host/customer reservation form, upcoming check-ins and caps from the existing web JSON endpoint; it posts conflict-checked reservations, customer search, extend/end/cancel and prints the day run sheet |
+| Reception | Shell-First page mounted by `Companies_Operations_Reception_ShowController`; the controller hydrates guest-linked visits, pre-registrations, hosts, facility rooms, parcels, non-visit appointments and the scheduled shift from the existing web JSON endpoint, and posts walk-in/pre-register/advance/parcel/notify actions |
+| Inventory | Shell-First page mounted by `Companies_Operations_Inventory_ShowController`; the controller hydrates the four warehouse KPIs, the server-paged stock ledger, inbound/outbound records, the open/last cycle count and supplier/warehouse reference data from the existing web JSON endpoints, and finishes receive, transfer/export, adjust, reorder and count actions in-console |
 | Payroll unlock | signed-in user's password; success sets a five-minute server-side unlock for the current company |
 | Payroll | month, status/step, period start/end/days, disbursement date, month options, worked hours, present days, overtime minutes, salary/allowance/overtime/deductions/net amounts, currency, tax percent; only after password confirmation |
 | New request | employee/branch, defaults, business types, group managers listed from `EmployeeGroup#manager` (owner fallback), errors and submitted values after a failed POST |
@@ -281,10 +281,14 @@ is Shell-First: the response contains only a mount `<div>` with
 `data-controller="companies--operations--pos--show darkmode"` plus the company
 and operation ids. The shared POS Stimulus controller fetches the web JSON
 endpoint (`/companies/:company_id/operations/pos/:operation_id.json`) and renders
-the catalog, cart, payment and receipt. The Operations card links with the
-chosen appointment's `branch_id`; without it the resolver falls back to the
-employee's branch. Tablet layout is width-driven: below `lg` the order panel
-stacks under the catalog, at `lg` and above they sit side by side.
+the catalog, cart, payment and receipt. The same controller now sells services,
+uses the company currency/tax snapshot, applies discount codes, voids a pending
+order, prints the receipt slip, and supports the server-enforced terminal lock.
+The Operations card links with the chosen appointment's `branch_id`; without it
+the resolver falls back to the employee's branch. Tablet layout is width-driven:
+below `lg` the order panel stacks under the catalog, at `lg` and above they sit
+side by side. Limits: no offline queue, order history, thermal printer, or
+price override.
 
 **Booking** — `GET /mobile/companies/:company_id/operations/booking/:operation_id`
 uses the same Shell-First contract:
@@ -302,22 +306,26 @@ uses the same Shell-First contract:
 `data-controller="companies--operations--reception--show darkmode"` plus the
 company, operation and employee identifiers. The shared reception controller
 hydrates from `/companies/:company_id/operations/reception/:operation_id.json`
-and posts walk-in, check-in/check-out, parcel and host-notification actions. The
-layout is width-driven for both orientations: phone portrait stacks the queue and
-coordination panels; tablet portrait keeps a single column; landscape tablet at
-`xl` puts the queue beside the rooms/deliveries/speed-dial panels.
+and posts walk-in, pre-register, arrive/mark-inside/check-out/reopen, parcel,
+parcel-notify and host-notify actions. It prints one visit badge in the browser
+(the same print root as web). The layout is width-driven for both orientations:
+phone portrait stacks the queue and coordination panels; tablet portrait keeps a
+single column; landscape tablet at `xl` puts the queue beside the
+rooms/appointments/parcels panels.
 
 **Store Manager** — `GET /mobile/companies/:company_id/operations/store_manager/:operation_id`
 uses the same Shell-First contract:
 `data-controller="companies--operations--store-manager--show darkmode"` plus the
 company, operation and employee identifiers. The shared store manager controller
 hydrates from `/companies/:company_id/operations/store_manager/:operation_id.json`
-and renders today's sales KPIs, fulfillment queue, shelf alerts, registers,
-hourly order volume and the on-duty roster. The layout is width-driven for both
-orientations: phone and tablet portrait stack the fulfillment/replenishment
-column above the register/footfall/roster column; landscape tablet at `lg`
-places the two columns side by side. Tables scroll horizontally inside their
-cards instead of widening the page.
+and renders the same branch-day console as web: invoice sales KPIs, the
+server-filtered fulfilment queue with mark ready/hand over, shelf alerts with
+transfer/purchase actions, cashier cards, branch-clock hourly orders, the real
+on-duty roster, the date control and the close sheet with print. The layout is
+width-driven for both orientations: phone and tablet portrait stack the
+fulfilment/replenishment column above the cashier/hourly/roster column;
+landscape tablet at `lg` places the two columns side by side. Tables scroll
+horizontally inside their cards instead of widening the page.
 
 **Inventory** — `GET /mobile/companies/:company_id/operations/inventory/:operation_id`
 uses the same Shell-First contract:
@@ -327,11 +335,12 @@ the Operations list links with the appointment's `warehouse_id`; without it the
 resolver falls back to a warehouse under the employee's branch. The shared
 inventory controller hydrates from
 `/companies/:company_id/operations/inventory/:operation_id.json` and renders
-stock metrics, the granular stock ledger, inbound/outbound freight docks, zone
-capacity and audit state. The layout is width-driven for both orientations:
-phone and tablet portrait stack the ledger/BOM column above the docks/zone/audit
-column; landscape tablet at `lg` places the two columns side by side. Tables
-scroll horizontally inside their cards instead of widening the page.
+the four KPI cards, the server-paged stock ledger, inbound/outbound records and
+the cycle-count card. The same controller posts the receive/transfer/export/
+adjust/reorder/count actions. The layout is width-driven for both orientations:
+phone and tablet portrait stack the ledger column above the side stacks;
+landscape tablet at `lg` places the two columns side by side. Tables scroll
+horizontally inside their cards instead of widening the page.
 
 ---
 
@@ -413,10 +422,12 @@ request feature spec sets them through the DOM with `set_native_field`.
   receipt printing, or offline mode. The POS page's Orders link still points at
   the web Orders page.
 - Mobile/tablet Reception reuses the web reception console; there is no native
-  visitor/parcel workflow, offline queue, or badge-printer integration.
-- Mobile/tablet Store Manager reuses the web store manager console; there is no
-  native register/cash-drawer or footfall sensor integration, and the footfall
-  panel reports that the sensor is not connected.
+  visitor/parcel workflow, offline queue, or label-printer integration. Badge
+  print is the browser print of one visit.
+- Mobile/tablet Store Manager reuses the web store manager console, including
+  mark ready/hand over, shelf transfer/purchase, the close sheet and browser
+  print; there is no native register/cash-drawer or door-sensor integration, and
+  the footfall line says the sensor is not connected.
 - Mobile copy lives in `dictionary.js` and renders through `translate()`.
   Missing entries fall back to the English key, so add the entry whenever a
   string moves or changes.

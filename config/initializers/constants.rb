@@ -191,6 +191,13 @@ COUNTRY_CODES = {
   vn: 704
 }
 
+# 100% expressed in basis points. Tax rates are stored as integer bp so no
+# float ever touches money (1000 = 10.00%; 825 = 8.25%).
+TAX_RATE_BP_MAX = 10_000
+
+# POS catalog page size before server-side search takes over.
+POS_CATALOG_LIMIT = 50
+
 # Lifecycle statuses used across all business models (lifecycle_status enum).
 LIFECYCLE_STATUS = {
   active: 0,
@@ -312,6 +319,12 @@ CACHE_DEFAULT_EXPIRY = 1.hour
 # change rarely. Explicit deletes keep them fresh; the TTL is a backstop.
 OPERATIONS_CACHE_EXPIRY = 1.day
 
+# Booking console reference/day caps. Lists are capped and labelled; KPI counts
+# are computed over the full data set. See docs/OPERATIONS.md §7.
+BOOKING_DAY_BOOKING_LIMIT = 200
+BOOKING_FACILITY_LIMIT = 100
+BOOKING_HOST_LIMIT = 100
+
 # =============================================================================
 # Owner Role Constants (ABAC)
 # Magic-string values used across the permission system to identify
@@ -392,6 +405,11 @@ CREDIT_USAGE_RATES = {
 # count is warehouse SKU rows whose available quantity (quantity - pending) is
 # below this value. Products do not carry a per-SKU reorder point yet.
 LOW_STOCK_THRESHOLD = 10
+
+# Allowed reasons on a manual stock adjustment (Inventory console Adjust
+# drawer). Stored verbatim on stock_adjustments.reason; the note lives on
+# stock_adjustments.description. docs/business_analysis/05-inventory.md.
+STOCK_ADJUSTMENT_REASONS = [ "Count correction", "Damage", "Found", "Other" ].freeze
 
 # =============================================================================
 # Company Support Tickets (B2B — company → Skycom)

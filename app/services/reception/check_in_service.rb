@@ -40,7 +40,12 @@ class Reception::CheckInService
     event = nil
 
     ActiveRecord::Base.transaction do
-      customer = find_or_create_customer(name, visitor_company)
+      customer = Reception::GuestResolver.call(
+        company: company,
+        branch: appointment.branch,
+        name: name,
+        visitor_company: visitor_company
+      )
       code = "VIS-#{SecureRandom.hex(3).upcase}"
       event = company.events.create!(
         name: "Walk-in · #{name} · #{code}",
@@ -53,16 +58,13 @@ class Reception::CheckInService
         end_at: now + 2.hours,
         metadata: {
           "reception_kind" => "visit",
-          "visitor_kind" => "Walk-In Inquiry",
+          "visitor_kind" => "Walk-in",
           "visitor_company" => visitor_company,
-          "zone" => facility&.name || "Lobby & Conference Center",
-          "vip" => false,
-          "checked_in_at" => now.iso8601,
-          "notify_host" => boolean(params[:notify]),
-          "auto_print" => boolean(params[:print])
+          "vip" => boolean(params[:vip]),
+          "lobby_entered_at" => now.iso8601
         }
       )
-      CustomerEventAppointment.create!(company: company, event: event, customer: customer, role: "visitor")
+      CustomerEventAppointment.create!(company: company, event: event, customer: customer)
       EmployeeEventAppointment.create!(company: company, event: event, employee: host) if host
       EventFacilityAppointment.create!(company: company, event: event, facility: facility) if facility
     end
@@ -81,36 +83,11 @@ class Reception::CheckInService
 
   attr_reader :company, :appointment, :params, :now
 
-  def find_or_create_customer(name, visitor_company)
-    customer = company.customers.find_by(name: name)
-    if customer
-      customer.update!(description: visitor_company) if customer.description.blank?
-      return customer
-    end
-
-    company.customers.create!(
-      name: name,
-      description: visitor_company,
-      branch: appointment.branch,
-      category: customer_category,
-      lifecycle_status: :active,
-      workflow_status: :confirmed,
-      business_type: :individual
-    )
-  end
-
   def event_category
     @event_category ||= Category.find_or_create_by!(
       company: company,
       resource_name: "events",
       name: "Reception"
-    )
-  end
-
-  def customer_category
-    @customer_category ||= Seed::CategoryService.find_or_create_for(
-      company: company,
-      resource_name: "customers"
     )
   end
 

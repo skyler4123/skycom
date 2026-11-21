@@ -2,8 +2,9 @@
 
 # Mobile::Companies::Operations::ReceptionController — Shell-First reception
 # console for the mobile/tablet app. The response is only a mount point;
-# Companies_Operations_Reception_ShowController hydrates the visitor queue,
-# rooms, parcels and walk-in station from the web JSON endpoint.
+# Companies_Operations_Reception_ShowController hydrates guest-linked visits,
+# pre-registrations, rooms, parcels, appointments and the scheduled shift from
+# the web JSON endpoint, and posts the same write actions.
 # Serves Stimulus: Companies_Operations_Reception_ShowController (hydrate)
 # Endpoints: GET /mobile/companies/:company_id/operations/reception/:operation_id
 # Docs: docs/MOBILE.md, docs/OPERATIONS.md

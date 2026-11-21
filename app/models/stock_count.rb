@@ -10,6 +10,7 @@ class StockCount < ApplicationRecord
 
   # --- Enums ---
   enum :count_type, STOCK_COUNT_TYPES, prefix: true, default: :cycle
+  enum :status, { draft: 0, in_progress: 1, completed: 2, cancelled: 3 }, prefix: true, default: :draft
 
   # --- Associations ---
   belongs_to :company
@@ -20,9 +21,30 @@ class StockCount < ApplicationRecord
   # --- Scopes ---
   scope :open_counts, -> { where(status: [ :draft, :in_progress ]) }
   scope :recent_first, -> { order(created_at: :desc) }
+  scope :completed_recent_first, -> { where(status: :completed).order(completed_at: :desc) }
+
+  # --- Validations ---
+  validate :single_open_count_per_warehouse, on: :create
 
   # --- Methods ---
   def variance_quantity
     stock_count_lines.sum(:variance_quantity)
+  end
+
+  def rows_counted
+    stock_count_lines.where.not(counted_quantity: nil).count
+  end
+
+  def rows_total
+    stock_count_lines.count
+  end
+
+  private
+
+  def single_open_count_per_warehouse
+    return unless status_draft? || status_in_progress?
+
+    exists = self.class.open_counts.where(warehouse_id: warehouse_id).where.not(id: id).exists?
+    errors.add(:base, "A count is already in progress for this warehouse") if exists
   end
 end

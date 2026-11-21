@@ -40,7 +40,9 @@ export default class Companies_TaxConfigs_ShowController extends Companies_Layou
         excluded_invoice_statuses: (data.get("excluded_invoice_statuses") || "").split(",").map(s => s.trim()).filter(Boolean),
         excluded_purchase_statuses: (data.get("excluded_purchase_statuses") || "").split(",").map(s => s.trim()).filter(Boolean),
         stock_export_business_types: (data.get("stock_export_business_types") || "").split(",").map(s => s.trim()).filter(Boolean),
-        branch_ids: (data.get("branch_ids") || "").split(",").map(s => s.trim()).filter(Boolean)
+        branch_ids: (data.get("branch_ids") || "").split(",").map(s => s.trim()).filter(Boolean),
+        pos_tax_rate_percent: data.get("pos_tax_rate_percent"),
+        pos_tax_name: data.get("pos_tax_name")
       }
     }
     try {
@@ -61,6 +63,22 @@ export default class Companies_TaxConfigs_ShowController extends Companies_Layou
         <div class="p-6 bg-card rounded-xl border border-line max-w-2xl">
           <h2 class="text-xl font-bold text-foreground mb-4">Tax Config</h2>
           <form data-action="submit->${this.identifier}#saveConfig" class="space-y-4">
+            <div class="p-4 bg-muted border border-line rounded-xl space-y-3">
+              <div>
+                <h3 class="text-sm font-bold text-foreground">${translate("Point of sale tax")}</h3>
+                <p class="text-[11px] text-muted-foreground mt-1">${translate("Added to POS totals. Set 0% to hide the tax line. Paid receipts keep the rate they were charged.")}</p>
+              </div>
+              <div>
+                <label class="text-xs text-muted-foreground uppercase" for="pos_tax_name">${translate("Tax label")}</label>
+                <input id="pos_tax_name" type="text" name="pos_tax_name" value="${Helpers.escapeHtml(cfg.pos_tax_name || "Tax")}" maxlength="50" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-card text-foreground" />
+                <p class="text-[11px] text-muted-foreground mt-1">${translate("Shown on the till and receipt, for example Sales tax.")}</p>
+              </div>
+              <div>
+                <label class="text-xs text-muted-foreground uppercase" for="pos_tax_rate_percent">${translate("POS tax rate (%)")}</label>
+                <input id="pos_tax_rate_percent" type="number" name="pos_tax_rate_percent" value="${cfg.pos_tax_rate_percent ?? 0}" min="0" max="100" step="0.01" class="w-full px-3 py-2 border border-line rounded-lg text-sm bg-card text-foreground" />
+                <p class="text-[11px] text-muted-foreground mt-1">${translate("0% means no tax. The rate is added to the discounted subtotal.")}</p>
+              </div>
+            </div>
             <div>
               <label class="text-xs text-muted-foreground uppercase">Date Basis</label>
               <select name="date_basis" class="w-full px-3 py-2 border rounded-lg text-sm">

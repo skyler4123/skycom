@@ -1,18 +1,21 @@
 # frozen_string_literal: true
 
 # Inventory::ConsoleService — builds the live payload for the Inventory
-# operation screen. Derives vital metrics, the granular stock ledger, active
-# freight docks, zone capacity and the audit summary from the stock domain
-# (Stock, StockImport, StockExport, Warehouse, Product).
+# operation screen. Every number comes from the stock domain, scoped to the
+# operation's warehouse: the server-paged ledger, the four KPI cards, open
+# inbound/outbound records and the cycle-count state.
 #
 # Why it exists: the Inventory operation is the warehouse-level command screen
-# for stock truth, inbound/outbound movement and capacity. Keeping the
-# aggregation here lets the controller stay a thin shell.
-# Docs: docs/OPERATIONS.md, docs/STOCK.md
+# for stock truth and the four loops (receive, transfer/export, adjust,
+# count). Keeping the aggregation here lets the controller stay a thin shell.
+# Docs: docs/OPERATIONS.md, docs/STOCK.md, docs/business_analysis/05-inventory.md
 class Inventory::ConsoleService
-  STOCK_LIMIT = 200
-  DOCK_LIMIT = 4
-  ZONE_LIMIT = 6
+  INBOUND_RECENT_LIMIT = 5
+  OUTBOUND_RECENT_LIMIT = 5
+
+  CLOSED_IMPORT_STATUSES = %w[received completed cancelled failed].freeze
+  CLOSED_TRANSFER_STATUSES = %w[received cancelled].freeze
+  CLOSED_EXPORT_STATUSES = %w[shipped completed cancelled failed].freeze
 
   def self.call(company:, appointment:, now: Time.current)
     new(company: company, appointment: appointment, now: now).call
@@ -22,253 +25,332 @@ class Inventory::ConsoleService
     @company = company
     @appointment = appointment
     @warehouse = appointment.warehouse
-    @branch = @warehouse&.branch
-    @branch ||= appointment.branch if appointment.respond_to?(:branch)
     @now = now
+
+    raise Inventory::Error, "Inventory requires a warehouse." if @warehouse.nil?
   end
 
   def call
+    ledger = Inventory::LedgerQueryService.call(company: company, warehouse: warehouse)
+
     {
       location: location_payload,
       currency: company.currency || "usd",
-      metrics: metrics_payload,
-      stocks: stocks_payload,
-      low_stock_count: low_stock_count,
-      docks: docks_payload,
-      zones: zones_payload,
-      global_utilization: global_utilization,
-      audit: audit_payload,
-      generated_at: now.iso8601
+      generated_at: now.iso8601,
+      metrics: metrics_payload(ledger),
+      stocks: ledger[:stocks],
+      pagination: ledger[:pagination],
+      counts: ledger[:counts],
+      search_capped: ledger[:search_capped],
+      reorder_default: LOW_STOCK_THRESHOLD,
+      reorder_rules_present: reorder_rules_present?,
+      adjustment_reasons: STOCK_ADJUSTMENT_REASONS,
+      inbound: inbound_payload,
+      outbound: outbound_payload,
+      open_count: open_count_payload,
+      last_count: last_count_payload,
+      reference: reference_payload
     }
   end
 
   private
 
-  attr_reader :company, :appointment, :branch, :warehouse, :now
+  attr_reader :company, :appointment, :warehouse, :now
 
   def location_payload
-    if warehouse.present?
-      {
-        id: warehouse.id,
-        name: warehouse.name,
-        code: warehouse.code,
-        kind: "warehouse"
-      }
-    else
-      {
-        id: branch&.id,
-        name: branch&.name,
-        code: branch&.code,
-        kind: "branch"
-      }
-    end
-  end
-
-  def scope_stocks
-    @scope_stocks ||= begin
-      scope = company.stocks.where(discarded_at: nil)
-      if warehouse.present?
-        scope = scope.where(warehouse_id: warehouse.id)
-      elsif branch.present?
-        scope = scope.where(branch_id: branch.id)
-      end
-      scope.includes(:product, :warehouse).order(:name)
-    end
-  end
-
-  def total_skus
-    @total_skus ||= scope_stocks.count
-  end
-
-  def low_stock_count
-    @low_stock_count ||= scope_stocks.where("quantity - pending <= ?", LOW_STOCK_THRESHOLD).count
-  end
-
-  def zero_stock_count
-    @zero_stock_count ||= scope_stocks.where("quantity - pending <= 0").count
-  end
-
-  def metrics_payload
-    inbound = recent_imports
-    outbound = recent_exports
-
     {
-      total_skus_active: total_skus,
-      total_skus_zones: warehouses_for_zones.count,
-      stock_criticality: low_stock_count,
-      zero_stock_outages: zero_stock_count,
-      inbound_shipments: inbound.length,
-      inbound_units: inbound.sum { |record| record.quantity.to_i },
-      inbound_docked: inbound.count { |record| %w[received in_progress confirmed].include?(record.workflow_status.to_s) },
-      outbound_dispatches: outbound.length,
-      outbound_cartons: outbound.sum { |record| record.quantity.to_i },
-      outbound_staged: outbound.count { |record| %w[confirmed in_progress].include?(record.workflow_status.to_s) },
-      bom_shortage_work_orders: 0,
-      bom_missing_parts: 0
+      id: warehouse.id,
+      name: warehouse.name,
+      code: warehouse.code,
+      kind: "warehouse",
+      timezone: warehouse.timezone,
+      utc_offset: LocalTime.offset_seconds(warehouse)
     }
   end
 
-  def stocks_payload
-    scope_stocks.limit(STOCK_LIMIT).map do |stock|
-      on_hand = stock.quantity.to_i
-      allocated = stock.pending.to_i
-      available = [ on_hand - allocated, 0 ].max
-      status = stock_status(available)
-
-      {
-        id: stock.id,
-        name: stock.name.presence || stock.product&.name.presence || "Stock item",
-        code: stock.code.presence || stock.product&.code.presence || "—",
-        price: stock.price&.to_f || stock.product&.price&.to_f || 0,
-        currency: stock.currency.presence || company.currency || "usd",
-        bin_location: stock.property_string_1.presence || stock.warehouse&.name.presence || "—",
-        on_hand: on_hand,
-        allocated: allocated,
-        available: available,
-        min_safe: LOW_STOCK_THRESHOLD,
-        status: status[:key],
-        status_label: status[:label],
-        status_tone: status[:tone],
-        stock_path: "/companies/#{company.id}/stocks/#{stock.id}"
-      }
-    end
+  def metrics_payload(ledger)
+    {
+      stock_rows: ledger[:counts][:all],
+      units_on_hand: base_stocks.sum(:quantity).to_i,
+      needs_attention: ledger[:counts][:low],
+      at_zero_available: ledger[:counts][:out],
+      inbound_open: open_imports.size,
+      inbound_units: open_imports.sum { |record| import_units(record) },
+      outbound_open: open_transfers.size + open_exports.size,
+      outbound_units: open_transfers.sum { |record| record.quantity.to_i } +
+        open_exports.sum { |record| record.quantity.to_i }
+    }
   end
 
-  def stock_status(available)
-    if available <= 0
-      { key: "critical", label: "Critical Stockout", tone: "danger" }
-    elsif available <= LOW_STOCK_THRESHOLD / 2
-      { key: "low", label: "Low Stock", tone: "danger" }
-    elsif available <= LOW_STOCK_THRESHOLD
-      { key: "reorder", label: "Reorder Alert", tone: "warning" }
-    else
-      { key: "in_stock", label: "In Stock", tone: "success" }
-    end
+  def base_stocks
+    @base_stocks ||= company.stocks.where(warehouse_id: warehouse.id, discarded_at: nil)
+  end
+
+  def reorder_rules_present?
+    ReorderRule.where(company_id: company.id, warehouse_id: warehouse.id, is_active: true, discarded_at: nil).exists?
+  end
+
+  # --- Inbound ---------------------------------------------------------------------
+
+  def inbound_payload
+    {
+      open_imports: open_imports.map { |record| import_card(record) },
+      incoming_transfers: incoming_transfers.map { |record| transfer_card(record, direction: :in) },
+      recent: recent_inbound
+    }
+  end
+
+  def open_imports
+    @open_imports ||= import_scope
+      .where.not(workflow_status: StockImport.workflow_statuses.values_at(*CLOSED_IMPORT_STATUSES))
+      .order(created_at: :desc)
+      .includes(:appoint_from, :stock_import_stock_appointments, purchase: :supplier)
+      .to_a
   end
 
   def recent_imports
-    @recent_imports ||= begin
-      scope = company.stock_imports.where(discarded_at: nil).order(created_at: :desc).limit(DOCK_LIMIT)
-      scope = scope.where(warehouse_id: warehouse.id) if warehouse.present?
-      scope = scope.where(branch_id: branch.id) if warehouse.blank? && branch.present?
-      scope.to_a
-    end
+    @recent_imports ||= import_scope
+      .where(workflow_status: StockImport.workflow_statuses.values_at("received", "completed"))
+      .order(updated_at: :desc)
+      .limit(INBOUND_RECENT_LIMIT)
+      .includes(:appoint_from, :stock_import_stock_appointments, purchase: :supplier)
+      .to_a
   end
 
-  def recent_exports
-    @recent_exports ||= begin
-      scope = company.stock_exports.where(discarded_at: nil).order(created_at: :desc).limit(DOCK_LIMIT)
-      scope = scope.where(warehouse_id: warehouse.id) if warehouse.present?
-      scope = scope.where(branch_id: branch.id) if warehouse.blank? && branch.present?
-      scope.to_a
-    end
+  def import_scope
+    company.stock_imports.where(warehouse_id: warehouse.id, discarded_at: nil)
   end
 
-  def docks_payload
+  def incoming_transfers
+    @incoming_transfers ||= transfer_scope
+      .where(destination_warehouse_id: warehouse.id, workflow_status: :initiated)
+      .order(created_at: :desc)
+      .includes(:warehouse, :destination_warehouse, :stock_transfer_stock_appointments)
+      .to_a
+  end
+
+  def recent_inbound_transfers
+    @recent_inbound_transfers ||= transfer_scope
+      .where(destination_warehouse_id: warehouse.id, workflow_status: :received)
+      .order(received_at: :desc)
+      .limit(INBOUND_RECENT_LIMIT)
+      .includes(:warehouse, :destination_warehouse, :stock_transfer_stock_appointments)
+      .to_a
+  end
+
+  def recent_inbound
+    entries = []
+    recent_imports.each { |record| entries << [ record.received_at || record.updated_at, import_card(record) ] }
+    recent_inbound_transfers.each { |record| entries << [ record.received_at || record.updated_at, transfer_card(record, direction: :in) ] }
+
+    entries.sort_by(&:first).last(INBOUND_RECENT_LIMIT).reverse.map(&:last)
+  end
+
+  # --- Outbound --------------------------------------------------------------------
+
+  def outbound_payload
     {
-      inbound: recent_imports.map { |record| inbound_dock_payload(record) },
-      outbound: recent_exports.map { |record| outbound_dock_payload(record) }
+      open: open_outbound_cards,
+      recent: recent_outbound
     }
   end
 
-  def inbound_dock_payload(record)
+  def open_outbound_cards
+    @open_outbound_cards ||= begin
+      cards = open_transfers.map { |record| transfer_card(record, direction: :out) }
+      cards += open_exports.map { |record| export_card(record) }
+      cards.sort_by { |card| card[:date] }.reverse
+    end
+  end
+
+  def open_transfers
+    @open_transfers ||= transfer_scope
+      .where(warehouse_id: warehouse.id, workflow_status: StockTransfer.workflow_statuses.values_at("draft", "pending", "initiated"))
+      .order(created_at: :desc)
+      .includes(:warehouse, :destination_warehouse, :stock_transfer_stock_appointments)
+      .to_a
+  end
+
+  def recent_out_transfers
+    @recent_out_transfers ||= transfer_scope
+      .where(warehouse_id: warehouse.id, workflow_status: :received)
+      .order(received_at: :desc)
+      .limit(OUTBOUND_RECENT_LIMIT)
+      .includes(:warehouse, :destination_warehouse, :stock_transfer_stock_appointments)
+      .to_a
+  end
+
+  def open_exports
+    @open_exports ||= export_scope
+      .where(workflow_status: StockExport.workflow_statuses.values_at("draft", "pending", "confirmed", "in_progress"))
+      .order(created_at: :desc)
+      .includes(:appoint_to, :stock_export_stock_appointments)
+      .to_a
+  end
+
+  def recent_shipped_exports
+    @recent_shipped_exports ||= export_scope
+      .where(workflow_status: StockExport.workflow_statuses.values_at("shipped", "completed"))
+      .order(updated_at: :desc)
+      .limit(OUTBOUND_RECENT_LIMIT)
+      .includes(:appoint_to, :stock_export_stock_appointments)
+      .to_a
+  end
+
+  def recent_outbound
+    entries = []
+    recent_out_transfers.each { |record| entries << [ record.received_at || record.updated_at, transfer_card(record, direction: :out) ] }
+    recent_shipped_exports.each { |record| entries << [ record.updated_at, export_card(record) ] }
+
+    entries.sort_by(&:first).last(OUTBOUND_RECENT_LIMIT).reverse.map(&:last)
+  end
+
+  def transfer_scope
+    company.stock_transfers.where(discarded_at: nil)
+  end
+
+  def export_scope
+    company.stock_exports.where(warehouse_id: warehouse.id, discarded_at: nil)
+  end
+
+  # --- Cards -----------------------------------------------------------------------
+
+  def import_card(record)
+    occurred_at = record.received_at || record.updated_at || record.created_at
     {
       id: record.id,
-      code: record.code.presence || "IMP-#{record.id.to_s.first(8).upcase}",
-      gate: "Gate #{gate_number(record)}",
-      supplier: party_name(record.appoint_from) || party_name(record.appoint_by) || record.name.presence || "Supplier",
-      pallets: [ record.quantity.to_i / 10, 1 ].max,
+      kind: "import",
+      code: record.code,
+      party: supplier_name(record),
+      date: occurred_at.iso8601,
+      units: import_units(record),
+      status: import_status(record),
+      status_label: import_status_label(record.workflow_status),
+      open: CLOSED_IMPORT_STATUSES.exclude?(record.workflow_status.to_s),
+      has_lines: record.stock_import_stock_appointments.any?
+    }
+  end
+
+  def transfer_card(record, direction:)
+    occurred_at = record.received_at || record.updated_at || record.created_at
+    party = direction == :in ? record.warehouse&.name : record.destination_warehouse&.name
+    {
+      id: record.id,
+      kind: "transfer",
+      code: record.code,
+      party: party,
+      date: occurred_at.iso8601,
       units: record.quantity.to_i,
-      workflow_status: record.workflow_status,
-      status_label: record.workflow_status.to_s.humanize,
-      progress: dock_progress(record)
+      status: "transfer",
+      status_label: transfer_status_label(record.workflow_status),
+      open: CLOSED_TRANSFER_STATUSES.exclude?(record.workflow_status.to_s),
+      direction: direction.to_s,
+      destination_warehouse_id: record.destination_warehouse_id,
+      source_warehouse_id: record.warehouse_id
     }
   end
 
-  def outbound_dock_payload(record)
+  def export_card(record)
+    occurred_at = record.updated_at || record.created_at
     {
       id: record.id,
-      code: record.code.presence || "EXP-#{record.id.to_s.first(8).upcase}",
-      bay: "Bay #{gate_number(record)}",
-      destination: party_name(record.appoint_to) || record.name.presence || "Destination",
-      cartons: [ record.quantity.to_i / 5, 1 ].max,
-      weight: record.quantity.to_i,
-      carrier: party_name(record.appoint_by) || "Carrier",
-      workflow_status: record.workflow_status,
-      status_label: record.workflow_status.to_s.humanize,
-      progress: dock_progress(record)
+      kind: "export",
+      code: record.code,
+      party: record.appoint_to&.try(:name).presence || record.name.presence,
+      date: occurred_at.iso8601,
+      units: record.quantity.to_i,
+      status: "export",
+      status_label: export_status_label(record.workflow_status),
+      open: CLOSED_EXPORT_STATUSES.exclude?(record.workflow_status.to_s)
     }
   end
 
-  def party_name(record)
-    record&.respond_to?(:name) ? record.name : nil
+  def import_units(record)
+    return record.quantity.to_i if record.quantity.to_i.positive?
+
+    record.stock_import_stock_appointments.sum(&:quantity).to_i
   end
 
-  def gate_number(record)
-    (record.id.to_s.bytes.sum % 8) + 1
+  def supplier_name(record)
+    record.purchase&.supplier&.name.presence ||
+      (record.appoint_from.is_a?(Supplier) ? record.appoint_from&.name.presence : nil) ||
+      (record.appoint_by.is_a?(Supplier) ? record.appoint_by&.name.presence : nil)
   end
 
-  def dock_progress(record)
-    case record.workflow_status.to_s
-    when "received", "completed", "paid" then 100
-    when "in_progress", "confirmed", "shipped" then 65
-    when "pending" then 35
-    else 15
+  def import_status(record)
+    record.workflow_status.to_s
+  end
+
+  def import_status_label(status)
+    case status.to_s
+    when "draft", "pending" then "Draft"
+    when "confirmed", "in_progress" then "Receiving"
+    when "received", "completed" then "Received"
+    when "cancelled" then "Cancelled"
+    when "failed" then "Failed"
+    else status.to_s.humanize
     end
   end
 
-  def warehouses_for_zones
-    @warehouses_for_zones ||= begin
-      scope = company.warehouses.where(discarded_at: nil)
-      if branch.present?
-        scope = scope.where(branch_id: branch.id)
-      elsif warehouse.present?
-        scope = scope.where(id: warehouse.id)
-      end
-      scope.limit(ZONE_LIMIT).to_a
+  def transfer_status_label(status)
+    case status.to_s
+    when "draft", "pending" then "Draft"
+    when "initiated" then "In transit"
+    when "received" then "Received"
+    when "cancelled" then "Cancelled"
+    else status.to_s.humanize
     end
   end
 
-  def zones_payload
-    warehouses_for_zones.map.with_index do |zone_warehouse, index|
-      stock_count = company.stocks.where(warehouse_id: zone_warehouse.id, discarded_at: nil).count
-      occupancy = [ stock_count * 5, 5 ].max.clamp(5, 98)
-      tone = if occupancy >= 90
-        "danger"
-      elsif occupancy >= 70
-        "primary"
-      else
-        "success"
-      end
-
-      {
-        id: zone_warehouse.id,
-        name: "Zone #{(65 + index).chr}: #{zone_warehouse.name}",
-        occupancy: occupancy,
-        tone: tone,
-        note: "#{stock_count} stock rows"
-      }
+  def export_status_label(status)
+    case status.to_s
+    when "draft", "pending" then "Draft"
+    when "confirmed", "in_progress" then "Processing"
+    when "shipped", "completed" then "Shipped"
+    when "cancelled" then "Cancelled"
+    when "failed" then "Failed"
+    else status.to_s.humanize
     end
   end
 
-  def global_utilization
-    zones = zones_payload
-    return 84 if zones.empty?
+  # --- Cycle count -----------------------------------------------------------------
 
-    (zones.sum { |zone| zone[:occupancy] }.to_f / zones.length).round(1)
+  def open_count_payload
+    count = company.stock_counts.where(warehouse_id: warehouse.id).open_counts.recent_first.includes(:created_by_employee).first
+    return nil if count.blank?
+
+    count_summary(count).merge(started_at: (count.started_at || count.created_at).iso8601)
   end
 
-  # Cycle audits are not modelled yet. Report availability honestly instead of
-  # inventing a clean percentage; the screen shows an empty state until an audit
-  # source exists.
-  def audit_payload
+  def last_count_payload
+    count = company.stock_counts.where(warehouse_id: warehouse.id).completed_recent_first.includes(:created_by_employee).first
+    return nil if count.blank?
+
+    count_summary(count).merge(completed_at: (count.completed_at || count.updated_at).iso8601)
+  end
+
+  def count_summary(count)
     {
-      available: false,
-      clean_pct: nil,
-      last_audit_days_ago: nil,
-      auditor: nil,
-      discrepancies: nil,
-      total_lines: total_skus
+      id: count.id,
+      status: count.status,
+      employee_name: count.metadata&.dig("completed_by_name").presence || count.created_by_employee&.name,
+      rows_counted: count.rows_counted,
+      rows_total: count.rows_total,
+      net_variance: count.variance_quantity,
+      failed_count: Array(count.metadata&.dig("failed_lines")).size
+    }
+  end
+
+  # --- Reference data --------------------------------------------------------------
+
+  def reference_payload
+    {
+      suppliers: company.suppliers.where(discarded_at: nil).order(:name).map { |supplier| { id: supplier.id, name: supplier.name } },
+      warehouses: company.warehouses
+        .where(discarded_at: nil)
+        .where.not(id: warehouse.id)
+        .order(:name)
+        .map { |record| { id: record.id, name: record.name, code: record.code } }
     }
   end
 end

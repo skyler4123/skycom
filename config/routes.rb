@@ -242,18 +242,44 @@ Rails.application.routes.draw do
 
         collection do
           get "pos/:operation_id", to: "operations/pos#show", as: :pos
+          get "pos/:operation_id/catalog", to: "operations/pos#catalog", as: :pos_catalog
           get "pos/:operation_id/customer_lookup", to: "operations/pos#customer_lookup", as: :pos_customer_lookup
+          post "pos/:operation_id/lock", to: "operations/pos#lock", as: :pos_lock
+          post "pos/:operation_id/unlock", to: "operations/pos#unlock", as: :pos_unlock
           get "booking/:operation_id", to: "operations/booking#show", as: :booking
+          get "booking/:operation_id/customers", to: "operations/booking#customers", as: :booking_customers
           post "booking/:operation_id/reservations", to: "operations/booking#create_reservation", as: :booking_reservations
+          post "booking/:operation_id/reservations/:reservation_id/extend", to: "operations/booking#extend_reservation", as: :booking_reservation_extend
+          post "booking/:operation_id/reservations/:reservation_id/end", to: "operations/booking#finish_reservation", as: :booking_reservation_end
+          post "booking/:operation_id/reservations/:reservation_id/cancel", to: "operations/booking#cancel_reservation", as: :booking_reservation_cancel
           get "inventory/:operation_id", to: "operations/inventory#show", as: :inventory
+          get "inventory/:operation_id/ledger", to: "operations/inventory#ledger", as: :inventory_ledger
+          get "inventory/:operation_id/export", to: "operations/inventory#export", as: :inventory_export
+          post "inventory/:operation_id/receipts", to: "operations/inventory#create_receipt", as: :inventory_receipts
+          post "inventory/:operation_id/receipts/:receipt_id/post", to: "operations/inventory#post_receipt", as: :inventory_receipt_post
+          post "inventory/:operation_id/transfers", to: "operations/inventory#create_transfer", as: :inventory_transfers
+          post "inventory/:operation_id/transfers/:transfer_id/receive", to: "operations/inventory#receive_transfer", as: :inventory_transfer_receive
+          post "inventory/:operation_id/exports", to: "operations/inventory#create_export", as: :inventory_exports
+          post "inventory/:operation_id/adjustments", to: "operations/inventory#create_adjustment", as: :inventory_adjustments
+          post "inventory/:operation_id/reorder", to: "operations/inventory#create_reorder", as: :inventory_reorder
+          post "inventory/:operation_id/counts", to: "operations/inventory#start_count", as: :inventory_counts
+          get "inventory/:operation_id/counts/:count_id", to: "operations/inventory#show_count", as: :inventory_count
+          patch "inventory/:operation_id/counts/:count_id", to: "operations/inventory#update_count", as: :inventory_count_update
+          post "inventory/:operation_id/counts/:count_id/submit", to: "operations/inventory#submit_count", as: :inventory_count_submit
           get "reception/:operation_id", to: "operations/reception#show", as: :reception
           post "reception/:operation_id/check_in", to: "operations/reception#check_in", as: :reception_check_in
+          post "reception/:operation_id/pre_register", to: "operations/reception#pre_register", as: :reception_pre_register
           post "reception/:operation_id/advance", to: "operations/reception#advance", as: :reception_advance
           post "reception/:operation_id/parcels", to: "operations/reception#create_parcel", as: :reception_parcels
           post "reception/:operation_id/parcels/:parcel_id/notify", to: "operations/reception#notify_parcel", as: :reception_parcel_notify
           post "reception/:operation_id/parcels/:parcel_id/pick_up", to: "operations/reception#pick_up_parcel", as: :reception_parcel_pick_up
           post "reception/:operation_id/notify_host", to: "operations/reception#notify_host", as: :reception_notify_host
           get "store_manager/:operation_id", to: "operations/store_manager#show", as: :store_manager
+          get "store_manager/:operation_id/queue", to: "operations/store_manager#queue", as: :store_manager_queue
+          post "store_manager/:operation_id/orders/:order_id/mark_ready", to: "operations/store_manager#mark_ready", as: :store_manager_order_mark_ready
+          post "store_manager/:operation_id/orders/:order_id/hand_over", to: "operations/store_manager#hand_over", as: :store_manager_order_hand_over
+          post "store_manager/:operation_id/replenishments", to: "operations/store_manager#create_replenishment", as: :store_manager_replenishments
+          post "store_manager/:operation_id/shift_close", to: "operations/store_manager#save_shift_close", as: :store_manager_shift_close
         end
       end
       resources :operation_configs, only: %i[index show edit update]
@@ -297,6 +323,9 @@ Rails.application.routes.draw do
       post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
       post "order_processing/v1/pay", to: "order_processing/v1#pay"
       post "order_processing/v1/pay_cancel", to: "order_processing/v1#pay_cancel"
+      post "order_processing/v1/apply_discount", to: "order_processing/v1#apply_discount"
+      post "order_processing/v1/remove_discount", to: "order_processing/v1#remove_discount"
+      post "order_processing/v1/cancel", to: "order_processing/v1#cancel"
     end
   end
 

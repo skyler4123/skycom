@@ -27,6 +27,13 @@ Every index page can optionally show an **Export** button (header, visible only 
 - `Helpers.exportEnabled(resource)` / `Helpers.downloadCSV(records, columns, filename)`.
 - Button renders in the layout header only on index pages (`/companies/:id/:resource`) when enabled.
 
+## Console exports
+A small number of consoles own a domain-specific export instead of a generic index
+export. The Inventory console's `GET .../operations/inventory/:operation_id/export`
+returns a server-rendered CSV of the current ledger search + filter (50-row pages do
+not apply to the file). It is not governed by `EXPORT_ENABLED_RESOURCES` because it is
+part of that console's warehouse workflow, not a generic index page.
+
 ## File reference
 - `config/initializers/constants.rb` — `EXPORT_ENABLED_RESOURCES`, `EXPORT_MAX_RECORDS`
 - `app/controllers/companies/application_controller.rb` — guard

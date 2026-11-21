@@ -975,6 +975,7 @@ Never declare done from request/model specs alone.
 Update:
 
 - `docs/OPERATIONS.md` — catalog table, routes table, frontend table, and link this guide from §8.
+- `docs/business_analysis/` — update the page's record (control inventory, numbers, gaps, ship-readiness verdict). A new visible control without an inventory row is an incomplete change.
 - `docs/MOBILE.md` — route table, data contract, flow.
 - `docs/MOBILE_FEATURE_MATRIX.md` — if mobile parity/status changes.
 - `AGENTS.md` doc map — add this guide.

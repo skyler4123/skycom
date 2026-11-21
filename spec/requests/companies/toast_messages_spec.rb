@@ -123,8 +123,8 @@ RSpec.describe "Toast message responses", type: :request do
 
   describe "OrderProcessing::V1#checkout" do
     let(:branch) { create(:branch, company: company) }
-    let(:product) { create(:product, company: company) }
-    let(:warehouse) { create(:warehouse, company: company) }
+    let(:product) { create(:product, company: company, branch: branch) }
+    let(:warehouse) { create(:warehouse, company: company, branch: branch) }
     let!(:stock) do
       cat = product.category
       Stock.create!(
@@ -144,7 +144,7 @@ RSpec.describe "Toast message responses", type: :request do
 
     it "returns message in checkout response" do
       post "/companies/#{company.id}/order_processing/v1/checkout",
-        params: { branch_id: branch.id, items: [ { stock_id: stock.id, product_id: product.id, quantity: 2, unit_price: 50.00 } ] },
+        params: { branch_id: branch.id, items: [ { product_id: product.id, quantity: 2 } ] },
         headers: headers
       expect(response).to have_http_status(:created)
       body = JSON.parse(response.body)

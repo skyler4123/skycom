@@ -1,8 +1,52 @@
 # Skycom Order Processing V1
 
+> **2026-11-19 POS completion update.** The till now uses server-owned prices,
+> sells services through `OrderServiceAppointment`, snapshots the company POS
+> tax on the order and invoice, supports discount apply/remove on the pending
+> order, voids a pending order, prints an 80 mm slip, locks the terminal
+> server-side, and resolves one selling-stock pile per product. The current
+> contract is summarized in §1.1. Older sections below that still describe a
+> client `unit_price`, a hardcoded 10% tax, or a local-only cancel are
+> superseded by §1.1.
+
 ## 1. Overview
 
 The **Order Processing V1** pipeline is a multi-step POS order lifecycle that connects the POS frontend to backend services, a controller API, a background job, and KRedis-based stock tracking.
+
+### 1.1 Current POS contract (2026-11-19)
+
+- **Cart → ORDER.** `POST checkout` accepts `{ branch_id, customer_id?, items: [{ product_id|service_id, quantity }] }`.
+  The server resolves the catalog record and its selling stock row, writes the
+  `Order` plus `OrderProductAppointment` / `OrderServiceAppointment` lines, and
+  snapshots `pos_tax_rate_bp` / `pos_tax_name` from Tax Config. The response is
+  in cents: `subtotal_cents`, `tax_cents`, `total_cents`, `currency`, `items`.
+  A client-supplied `unit_price` is ignored; a stale display is refreshed from
+  the response.
+- **Discount.** `POST apply_discount` reserves a single-use code on the pending
+  order and returns the new totals. `POST remove_discount` releases it. Pay
+  uses the pending reservation; a code passed to pay replaces it only after the
+  new reservation succeeds.
+- **Pay.** `POST pay` with `{ order_id, payment_method_appointment_id, cash_received_cents? }`.
+  The `Invoice` is created with `price_cents = total` (subtotal − discount +
+  tax), `tax_cents`, `total_cents`, and the tax snapshot. Cash validates
+  received ≥ total and stores `cash_received_cents` / `change_cents` on the
+  transaction. QR returns a token + `qr_string` and waits for the webhook.
+- **Void.** `POST cancel` marks the order `cancelled`, fails pending
+  transactions (releasing stock holds and the discount), and voids unpaid
+  invoices. Paid orders are refused; refunds stay in Orders.
+- **Receipt.** `GET receipt` returns cents, branch, cashier, line items,
+  subtotal, discount/code, tax/rate/name, total, tender, cash received, change.
+- **Lock.** `POST lock` / `POST unlock` set/clear a company-scoped session flag.
+  Money endpoints return `423 { errors: ["Terminal is locked"] }` while locked.
+- **Tax.** One company-wide POS rate from Tax Config, added on top of the
+  discounted subtotal. `0` hides the tax row. Tax-inclusive pricing is out of
+  scope for this iteration.
+- **Stock.** `Pos::SellingStockResolver` picks the branch's main warehouse
+  first, then the oldest, and the first warehouse in that order with available
+  stock. The label names it; the order line persists that `stock_id`; pay
+  reserves the same row.
+
+
 
 ### Core Flow
 
@@ -34,21 +78,21 @@ addToCart() ── local state only
 initiateOrder()                  CHECKOUT
   │
   └── POST /order_processing/v1/checkout
-        body: { branch_id, items: [{stock_id, product_id, quantity, unit_price}] }
+        body: { branch_id, items: [{product_id|service_id, quantity}] }
         │
         ▼
     V1Controller#checkout
       │
       ├── CheckAvailabilityService.call(items:)
       │     └── reads stock.available_counter (KRedis)
-      │         └── failure → 422 { error: "Insufficient stock for item ..." }
+      │         └── failure → 422 { errors: ["Insufficient stock for item ..."] }
       │
       ├── CreateOrderService.call(company:, branch:, items:, customer:)
       │     ├── Order.create!(workflow_status: :pending)
       │     ├── OrderProductAppointment.insert_all!(items)
       │     └── creates "Walk-in Customer" if none provided
       │
-      └── 201 { order_id, total_price }  ◄── stored in frontend state
+      └── 201 { order_id, subtotal_cents, tax_cents, total_cents, currency, items }
 
 pay()                              PAY
   │
@@ -132,19 +176,26 @@ endpoint. See `docs/MOBILE.md` §4.
 Clicking a product/service card does **not** hit the backend — it mutates local `tabs[].items[]` only. The DB link is created later by `ORDER`.
 
 ```
-Card (renderProductCard) ── data-action="click->...#addToCart" + params {id, name, price, stockId}
+Card (renderProductCard) ── data-action="click->...#addToCart" + params {kind, id, name, priceCents, stockQuantity}
         │
-        ▼ addToCart(event) :64
-        ├── if (this.orderId) return  // locked after checkout
-        ├── existing ? qty++ : push({ id, name, price, qty:1, stockId })
-        └── renderContent() → cart + Subtotal/Tax/Total (client-side)
+        ▼ addToCart(event)
+        ├── if (this.orderId || this.locked) return
+        ├── priceSet === false → warn; product stock 0 → warn
+        ├── existing ? qty++ (capped at stockQuantity) : push({ kind, id, name, priceCents, qty:1 })
+        └── renderContent() → cart + Subtotal/Discount/Tax/Total (cents)
         │
         ▼ initiateOrder() — only here does the cart flush to DB
-        items = activeTab.items.filter(i=>i.stockId).map(i=>({ stock_id, product_id, quantity: i.qty, unit_price: i.price }))
+        items = activeTab.items.map(i =>
+          i.kind === "service" ? { service_id: i.id, quantity: i.qty }
+                               : { product_id: i.id, quantity: i.qty })
         POST /order_processing/v1/checkout { branch_id, customer_id?, items } → CreateOrderService
-                └── Order.create! + OrderProductAppointment.insert_all!({ order_id, product_id, quantity, unit_price, total_price: qty*unit_price })
-        pay later reads order.line_total — never trusts the click params again.
+                └── server price + selling stock + tax snapshot; Order + lines
+        pay later reads the persisted line snapshots — never trusts the click params.
 ```
+
+The cart is per tab: `orderId`, `orderTotalCents`, `appliedDiscount`,
+`cashReceivedCents`, `awaitingToken`, and `receipt` live on the tab. Paid
+receipts are not persisted; open carts are saved in localStorage.
 
 ### State Machine
 
@@ -161,22 +212,24 @@ State ──► ORDER phase ──► COMPLETE PAYMENT phase ──► back to O
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `orderId` | `string\|null` | `null` | Active Order UUID after checkout; gates all cart mutations |
-| `orderTotal` | `number` | `0` | Total price from checkout response |
-| `selectedMethodId` | `string\|null` | first method | Branch payment-method appointment currently selected |
-| `cashReceived` | `number` | `0` | Cash input for change calculation |
-| `tabs` | `Array` | `[]` | Multi-customer tabs, each with `{ id, name, customer, items: [] }` |
-| `selectedCategoryName` | `string\|null` | `null` | Active catalog filter (`null` = All) |
-| `searchQuery` | `string` | `''` | Search/scan filter applied to products and services |
-| `products` / `services` | `Array` | `[]` | Loaded from server JSON on connect; include `category_id`, `category_name`, and product `stock_quantity` |
+| `currency` | `string` | `usd` | Company currency from the POS payload; every amount uses `Helpers.formatMoney`. |
+| `tax` | `Object` | `{ rate_bp: 0, rate_percent: 0, name: "Tax" }` | Company POS tax snapshot. `rate_bp = 0` hides the row. |
+| `catalogMeta` | `Object` | `{ limit: 50, products_total: 0, services_total: 0 }` | Cap counts for "Showing 50 of N". |
+| `viewMode` | `"grid"\|"list"` | `"grid"` | Catalog layout; persisted in localStorage. |
+| `locked` | `boolean` | `false` | Server terminal lock state; the overlay is only the visual half. |
+| `tabs` | `Array` | `[]` | Per-customer carts; each carries `{ id, name, customer, items, orderId, orderTotalCents, appliedDiscount, cashReceivedCents, awaitingToken }`. |
+| `selectedCategoryName` | `string\|null` | `null` | Active catalog filter (`null` = All). |
+| `searchQuery` | `string` | `''` | Search/scan filter; non-blank queries ask the server (Meilisearch). |
+| `products` / `services` | `Array` | `[]` | Server cents, `price_set`, `category_*`, product `stock_quantity` + `stock_warehouse_name`. |
 
 ### Order Methods
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `initiateOrder()` | `async ()` | POSTs cart items to `checkout`, sets `orderId`/`orderTotal` from response. Shows toast on success/error. |
-| `pay()` | `async ()` | POSTs `{ order_id, payment_method_appointment_id }` to `pay`. `paid` → clears cart; `pending` → renders QR wait screen + subscribes to `pos_payment_completed`. |
-| `cancelOrder()` | `()` | Resets `orderId`/`orderTotal` to null/0. No API call — unlocks cart locally. |
+| `initiateOrder()` | `async ()` | POSTs product/service ids + quantities; sets the tab order and applies the server's tax snapshot and line prices. |
+| `applyDiscount()` / `removeDiscount()` | `async ()` | Reserve/release a code on the pending order and render the server totals. |
+| `pay()` | `async ()` | POSTs `{ order_id, payment_method_appointment_id, cash_received_cents }`. `paid` → receipt; `pending` → QR wait + `pos_payment_completed`. |
+| `cancelOrder()` | `async ()` | Confirms "Void this order?", calls `POST cancel`, and unlocks the cart only on success. |
 
 ### Cart Locking Rules
 
@@ -189,21 +242,22 @@ The locked cart template (in `renderCartItems`) renders items as read-only text 
 
 ### Cart-to-Order Mapping
 
-`initiateOrder()` filters items to those with a `stockId`, then maps:
+`initiateOrder()` maps every line, including services, and sends no price:
 
 ```javascript
 {
   branch_id: this.appointment.branch.id,
-  items: this.activeTab.items
-    .filter(item => item.stockId)
-    .map(item => ({
-      stock_id: item.stockId,
-      product_id: item.id,
-      quantity: item.qty,
-      unit_price: item.price
-    }))
+  items: this.activeTab.items.map(item =>
+    item.kind === "service"
+      ? { service_id: item.id, quantity: item.qty }
+      : { product_id: item.id, quantity: item.qty }
+  )
 }
 ```
+
+The server resolves the product/service, the selling warehouse stock row, the
+price, and the tax snapshot. The response refreshes any stale cart line before
+COMPLETE PAYMENT is available.
 
 Items without `stockId` (services, non-tracked products) are excluded from the checkout payload.
 
@@ -226,23 +280,43 @@ Items without `stockId` (services, non-tracked products) are excluded from the c
 
 **Params** (via `checkout_params`):
 ```ruby
-params.permit(:branch_id, :customer_id, items: [ :stock_id, :product_id, :quantity, :unit_price ])
+params.permit(:branch_id, :customer_id, items: [ :product_id, :service_id, :quantity ])
 ```
 
 | Param | Required | Description |
 |-------|----------|-------------|
 | `branch_id` | Yes | Branch UUID scoped to current company |
-| `customer_id` | No | Existing Customer UUID; creates "Walk-in" if absent |
-| `items[]` | Yes | Array of line item hashes |
-| `items[][stock_id]` | Yes | Stock UUID (used for availability check) |
-| `items[][product_id]` | Yes | Product UUID |
-| `items[][quantity]` | Yes | Integer quantity (string is auto-converted via `.to_i`) |
-| `items[][unit_price]` | Yes | Float unit price |
+| `customer_id` | No | Existing Customer UUID; creates a timestamped Walk-in if absent |
+| `items[]` | Yes | At least one product or service line |
+| `items[][product_id]` | One of | Product UUID scoped to company + branch |
+| `items[][service_id]` | One of | Service UUID scoped to company + branch |
+| `items[][quantity]` | Yes | Integer ≥ 1 (string auto-converted via `.to_i`) |
+
+No `unit_price` and no `stock_id` are accepted. The server resolves the
+catalog record, its price, and `Pos::SellingStockResolver`'s selling stock row.
 
 **Flow:**
-1. Calls `CheckAvailabilityService.call(items:)` — returns 422 `{ error: "Insufficient stock for item ..." }` if insufficient
-2. Calls `CreateOrderService.call(company:, branch:, items:, customer:)`
-3. Returns `201 Created` with `{ order_id: "uuid", total_price: 49.99 }`
+1. `CreateOrderService` resolves items, checks availability against the
+   resolved stock, snapshots the Tax Config rate/name, and writes the `Order`
+   plus `OrderProductAppointment` / `OrderServiceAppointment` rows in one
+   transaction.
+2. Returns `201 Created` with `order_id`, `currency`, `subtotal_cents`,
+   `tax_cents`, `total_cents`, `tax_rate_bp`, `tax_name`, and authoritative
+   `items[]` (`kind`, `id`, `quantity`, `unit_price_cents`, `total_cents`).
+3. `422 { errors: [...] }` for an unknown/foreign item, unset price, unstocked
+   product, quantity < 1, or insufficient stock.
+
+### `apply_discount` / `remove_discount`
+
+**POST** `/companies/:company_id/order_processing/v1/apply_discount`
+**POST** `/companies/:company_id/order_processing/v1/remove_discount`
+
+`{ order_id, discount_code }` / `{ order_id }`. Apply reserves a single-use
+code on the pending order (`Discounts::ApplyService`); remove releases it
+(`Discounts::ReleaseService`). Both return `discount` (`code`,
+`amount_cents`, or `null`) plus `subtotal_cents`, `discount_cents`,
+`tax_cents`, `total_cents`, `currency`, `message`. Invalid codes return
+`422 { errors: [...] }` without changing the order.
 
 ### `pay`
 
@@ -250,27 +324,44 @@ params.permit(:branch_id, :customer_id, items: [ :stock_id, :product_id, :quanti
 
 **Params:**
 ```ruby
-params.permit(:order_id, :payment_method_appointment_id, :discount_code)
+params.permit(:order_id, :payment_method_appointment_id, :discount_code, :cash_received_cents)
 ```
 
 **Flow:**
-1. Loads `current_company.orders.find(params[:order_id])` — returns 404 if not found
-2. Loads the branch-level appointment scoped to `current_company` — 404 if unknown, 422 `{ errors: [...] }` if it belongs to another branch / is inactive
-3. Calls `InitiatePaymentService.call(order:, appointment:, discount_code:, employee:)`
-4. `discount_code` (optional) → `Discounts::ApplyService` reserves the single-use code (`unused → pending`) before the invoice is created at `gross - discount.amount_cents` (`docs/DISCOUNTS.md` §6)
-5. Cash → instant completion; QR → gateway call returning `qr_string`; both create Invoice + pending Transaction audit row
-6. Returns `200 OK`:
-   - Cash: `{ status: "paid", order_id, transaction_id, discount_amount_cents?, message }`
-   - QR: `{ status: "pending", order_id, transaction_token, qr_string, discount_amount_cents?, message }`
+1. Loads the tenant-scoped pending order (paid/cancelled → 422) and the
+   branch-level appointment (foreign/inactive → 422).
+2. Uses the order's pending discount, or reserves `discount_code` if supplied.
+   A new code replaces the old reservation only after the new one succeeds.
+3. Computes totals through `OrderTotalsService`: tax on
+   `subtotal − discount`, then creates the `Invoice` with
+   `price_cents = total_cents = subtotal − discount + tax`, `tax_cents`, and
+   `pos_tax_rate_bp` / `pos_tax_name` metadata.
+4. Cash validates `cash_received_cents ≥ total`, stores received/change on the
+   transaction, and completes synchronously. QR calls the gateway and returns
+   a pending token + `qr_string`.
+5. Returns `200 OK` with `status`, `order_id`, `subtotal_cents`,
+   `discount_cents`, `tax_cents`, `total_cents`, `currency`,
+   `cash_received_cents`, `change_cents`, and the transaction/QR identifiers.
+
+### `cancel`
+
+**POST** `/companies/:company_id/order_processing/v1/cancel`
+
+`{ order_id }` → `CancelOrderService` marks the order `cancelled`, cancels
+pending transactions (releasing stock holds and the discount), and voids
+unpaid invoices. Paid orders return `422 { errors: [...] }`. The response is
+`{ message: "Order voided" }`; already-cancelled orders are idempotent.
 
 ### `receipt`
 
 **GET** `/companies/:company_id/orders/:order_id/receipt`
 
-POS receipt payload for the post-payment panel: invoice code, issued_at,
-payment_status, item lines (snapshot name/qty/unit/total), subtotal from
-`invoice.price_cents` (net of any consumed discount), `discount_amount`
-display line, cart-mirrored 10% tax, total, and payment method name.
+Returns cents, not floats: `invoice_code`, `issued_at`, `payment_status`,
+`currency`, `branch_name`, `cashier_name`, line items (`name`, `quantity`,
+`unit_price_cents`, `total_cents`, `kind`), `subtotal_cents`,
+`discount_cents`/`discount_code`, `tax_cents`/`tax_rate_bp`/`tax_name`,
+`total_cents`, `payment_method_name`, `cash_received_cents`, `change_cents`.
+Legacy invoices without a tax snapshot show stored tax and no invented rate.
 404 when the order is unknown or belongs to another company.
 
 ### `pay_cancel`
@@ -285,10 +376,14 @@ Cancels an abandoned QR payment: releases reserved stock and marks the pending T
 
 | Scenario | Status | Body |
 |----------|--------|------|
-| Insufficient stock (checkout) | 422 | `{ error: "Insufficient stock for item ..." }` |
-| Insufficient stock (pay) | 422 | `{ error: "Insufficient stock for payment" }` |
+| Insufficient stock (checkout) | 422 | `{ errors: ["Insufficient stock for item ..."] }` |
+| Insufficient stock (pay) | 422 | `{ errors: ["Insufficient stock for payment"] }` |
 | Invalid/inactive/foreign-branch payment method | 422 | `{ errors: ["Payment method is not available for this branch"] }` |
 | Invalid discount code (pay) | 422 | `{ errors: ["Discount code not found or already used", ...] }` (`docs/DISCOUNTS.md` §6) |
+| Cash received below total | 422 | `{ errors: ["Cash received is less than the total"] }` |
+| Paid/cancelled order at pay | 422 | `{ errors: ["Order is not payable"] }` |
+| Paid order at cancel | 422 | `{ errors: ["Paid orders cannot be voided here"] }` |
+| Locked terminal on a money action | 423 | `{ errors: ["Terminal is locked"] }` |
 | Order or appointment not found (pay) | 404 | Rails default 404 |
 
 ---
@@ -296,6 +391,22 @@ Cancels an abandoned QR payment: releases reserved stock and marks the pending T
 ## 5. Services
 
 All services live under `OrderProcessingV1` module and use `self.call(...)` — no instances.
+
+Current POS services:
+- `CreateOrderService` — resolves/scopes items, server price, selling stock,
+  tax snapshot, product + service lines, cent totals.
+- `OrderTotalsService` — subtotal, discount, tax, total in integer cents;
+  reads the order tax snapshot.
+- `CheckAvailabilityService` / `ReserveStockService` — availability and exact
+  selling-stock holds.
+- `InitiatePaymentService` — pending discount, invoice total/tax snapshot,
+  cash validation and cash/change metadata, QR handoff.
+- `CancelOrderService` — void-before-paid lifecycle.
+- `CancelPaymentService` / `ReleaseReservedStockService` — abandoned QR and
+  reservation rollback.
+
+The older §5.3/§5.4 signatures below are historical; the current contracts
+are in §1.1 and §4.
 
 ### 5.1 `CheckAvailabilityService`
 
@@ -341,25 +452,30 @@ All services live under `OrderProcessingV1` module and use `self.call(...)` — 
 ### 5.3 `CreateOrderService`
 
 **File**: `app/services/order_processing_v1/create_order_service.rb`
-**Signature**: `call(company:, branch:, items:, customer: nil)`
+**Signature**: `call(company:, branch:, items:, customer: nil, employee: nil)`
 
 | Param | Type | Description |
 |-------|------|-------------|
 | `company` | `Company` | Current company scope |
 | `branch` | `Branch` | Branch where order is placed |
-| `items` | `Array` | `[{ product_id, quantity, unit_price }]` |
-| `customer` | `Customer\|nil` | Existing customer; creates "Walk-in Customer" if nil |
+| `items` | `Array` | `[{ product_id|service_id, quantity }]` |
+| `customer` | `Customer\|nil` | Existing customer; creates a timestamped Walk-in if nil |
+| `employee` | `Employee\|nil` | Cashier credited on the order |
 
 **Behavior:**
-- Calculates `total_price = sum(quantity * unit_price)`
-- Creates "Walk-in Customer" if none provided (name: `"Walk-in Customer"`)
-- Creates `Order` with `workflow_status: :pending, currency_code: :usd, business_type: :in_store`
-- Bulk-inserts `OrderProductAppointment` records via `insert_all!`
-- String quantity values are converted via `.to_i`
+- Resolves each product/service inside `company` + `branch`; rejects foreign or missing items.
+- Prices from `price_cents` (rejects unset prices) and resolves the selling stock row.
+- Checks availability against the exact stock ids, then creates the `Order` with
+  `currency: company.currency`, `business_type: :in_store`, and the Tax Config
+  rate/name snapshot.
+- Bulk-inserts product lines (`stock_id` persisted) and service lines via
+  `insert_all!` inside one transaction.
+- Returns integer cent totals and authoritative per-line prices.
 
 **Returns:**
 ```ruby
-{ order_id: "uuid", total_price: 49.99 }
+{ order_id:, currency:, subtotal_cents:, tax_cents:, total_cents:,
+  tax_rate_bp:, tax_name:, items: [...] }
 ```
 
 ### 5.4 `InitiatePaymentService`
@@ -518,10 +634,17 @@ On reservation failure (any line's hold rejected), prior holds release via
 ### Routes (in `config/routes.rb`)
 
 ```ruby
-post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
-post "order_processing/v1/pay",        to: "order_processing/v1#pay"
-post "order_processing/v1/pay_cancel", to: "order_processing/v1#pay_cancel"
+post "order_processing/v1/checkout",        to: "order_processing/v1#checkout"
+post "order_processing/v1/pay",             to: "order_processing/v1#pay"
+post "order_processing/v1/pay_cancel",      to: "order_processing/v1#pay_cancel"
+post "order_processing/v1/apply_discount",  to: "order_processing/v1#apply_discount"
+post "order_processing/v1/remove_discount", to: "order_processing/v1#remove_discount"
+post "order_processing/v1/cancel",          to: "order_processing/v1#cancel"
+get  "operations/pos/:operation_id",                 to: "operations/pos#show"
+get  "operations/pos/:operation_id/catalog",         to: "operations/pos#catalog"
 get  "operations/pos/:operation_id/customer_lookup", to: "operations/pos#customer_lookup"
+post "operations/pos/:operation_id/lock",            to: "operations/pos#lock"
+post "operations/pos/:operation_id/unlock",          to: "operations/pos#unlock"
 ```
 
 All are nested inside `resources :companies` (scoped to `/companies/:company_id/`).
@@ -537,15 +660,37 @@ export const order_processing_v1_pay_path = (companyId) =>
 
 export const order_processing_v1_pay_cancel_path = (companyId) =>
   `/companies/${companyId}/order_processing/v1/pay_cancel`
+export const order_processing_v1_apply_discount_path = (companyId) =>
+  `/companies/${companyId}/order_processing/v1/apply_discount`
+export const order_processing_v1_remove_discount_path = (companyId) =>
+  `/companies/${companyId}/order_processing/v1/remove_discount`
+export const order_processing_v1_cancel_path = (companyId) =>
+  `/companies/${companyId}/order_processing/v1/cancel`
 
 export const receipt_company_order_path = (companyId, orderId) =>
   `/companies/${companyId}/orders/${orderId}/receipt`
 
+const operationPath = (kind, companyId, operationId, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `/companies/${companyId}/operations/${kind}/${operationId}${query ? `?${query}` : ""}`
+}
+export const pos_company_operation_path = (companyId, operationId, params = {}) =>
+  operationPath("pos", companyId, operationId, params)
+export const pos_catalog_company_operation_path = (companyId, operationId, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `/companies/${companyId}/operations/pos/${operationId}/catalog${query ? `?${query}` : ""}`
+}
 export const pos_customer_lookup_company_operation_path = (companyId, operationId, params = {}) => {
   const query = new URLSearchParams(params).toString()
   return `/companies/${companyId}/operations/pos/${operationId}/customer_lookup${query ? `?${query}` : ""}`
 }
+export const pos_lock_company_operation_path = (companyId, operationId) =>
+  `/companies/${companyId}/operations/pos/${operationId}/lock`
+export const pos_unlock_company_operation_path = (companyId, operationId) =>
+  `/companies/${companyId}/operations/pos/${operationId}/unlock`
 ```
+
+
 
 ---
 
@@ -568,6 +713,8 @@ export const pos_customer_lookup_company_operation_path = (companyId, operationI
 | `checkout` | No (creates new Order each call) | Frontend only calls once per order |
 | `pay` (controller) | No | Frontend shows COMPLETE PAYMENT once |
 | `pay` (service) | No | Invoice name uniqueness blocks second call |
+| `apply_discount` | **Yes** for the same pending code | Existing pending code returns its totals; a different code reserves before releasing the old |
+| `cancel` / `CancelOrderService` | **Yes** for already-cancelled | `with_lock` + cancelled guard; paid orders refused |
 | `pay_cancel` / `CancelPaymentService` | Partial | Only pending transactions cancel; repeats return `not_pending` |
 | Webhook completion (`CompletePaymentService`) | **Yes** | Pending-only guard + row lock; cancelled txns are logged no-ops |
 | `FinalizeJob` | **Yes** | Checks `workflow_status` + `StockExport.exists?` |

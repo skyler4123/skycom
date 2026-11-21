@@ -1,32 +1,41 @@
 # frozen_string_literal: true
 
 # Starts a POS payment: optionally reserves a single-use discount code,
-# reserves stock, creates the Invoice (gross - discount) + pending Transaction
-# audit row, then either completes synchronously (cash) or hands off to the
-# configured gateway strategy (QR) using the branch appointment's merchant
-# identity. Any failure after the discount reservation releases both the stock
-# reservation and the discount code.
+# reserves stock, creates the Invoice (total including tax) + pending
+# Transaction audit row, then either completes synchronously (cash) or hands
+# off to the configured gateway strategy (QR) using the branch appointment's
+# merchant identity. Any failure after the discount reservation releases both
+# the stock reservation and the discount code.
 # TODO: transaction_token (Result/API) vs gateway_reference (Transaction DB column) name mismatch — unify later.
 module OrderProcessingV1
   class InitiatePaymentService
-    Result = Struct.new(:status, :order_id, :transaction_id, :transaction_token,
-      :qr_string, :discount, keyword_init: true)
+    Result = Struct.new(
+      :status, :order_id, :transaction_id, :transaction_token, :qr_string,
+      :discount, :subtotal_cents, :discount_cents, :tax_cents, :total_cents,
+      :currency, :cash_received_cents, :change_cents,
+      keyword_init: true
+    )
 
-    def self.call(order:, appointment:, discount_code: nil, employee: nil)
+    def self.call(order:, appointment:, discount_code: nil, employee: nil, cash_received_cents: nil)
       new(order: order, appointment: appointment,
-        discount_code: discount_code, employee: employee).call
+        discount_code: discount_code, employee: employee,
+        cash_received_cents: cash_received_cents).call
     end
 
-    def initialize(order:, appointment:, discount_code: nil, employee: nil)
+    def initialize(order:, appointment:, discount_code: nil, employee: nil, cash_received_cents: nil)
       @order = order
       @appointment = appointment
       @discount_code = discount_code
       @employee = employee
+      @cash_received_cents = cash_received_cents.presence&.to_i
     end
 
     def call
+      validate_order_state!
       validate_appointment!
-      discount = apply_discount!
+      @discount = resolve_discount!
+      @totals = OrderTotalsService.call(order: @order, discount_cents: @discount&.amount_cents.to_i)
+      validate_cash! if cash_mode?
 
       begin
         reserved = OrderProcessingV1::ReserveStockService.call(items: build_items)[:reserved]
@@ -37,26 +46,48 @@ module OrderProcessingV1
 
           if qr_mode?
             initiate_gateway(txn, invoice)
-            Result.new(status: "pending", order_id: @order.id,
+            Result.new(
+              status: "pending", order_id: @order.id,
               transaction_token: txn.gateway_reference,
               qr_string: txn.gateway_payload["qr_string"],
-              discount: discount)
+              discount: @discount, **totals_payload
+            )
           else
             OrderProcessingV1::CompletePaymentService.call(transaction: txn)
-            Result.new(status: "paid", order_id: @order.id, transaction_id: txn.id,
-              discount: discount)
+            Result.new(
+              status: "paid", order_id: @order.id, transaction_id: txn.id,
+              discount: @discount, **totals_payload
+            )
           end
         end
       rescue StandardError
         reserved&.each do |r|
           StockPendings::ReleaseService.call(stock_pending: r[:stock_pending]) if r[:stock_pending]
         end
-        discount&.release!
+        @discount&.release!
         raise
       end
     end
 
     private
+
+    def totals_payload
+      {
+        subtotal_cents: @totals.subtotal_cents,
+        discount_cents: @totals.discount_cents,
+        tax_cents: @totals.tax_cents,
+        total_cents: @totals.total_cents,
+        currency: @totals.currency,
+        cash_received_cents: cash_mode? ? @cash_received_cents : nil,
+        change_cents: cash_mode? ? change_cents : nil
+      }
+    end
+
+    def validate_order_state!
+      return if @order.workflow_status_pending?
+
+      raise InvalidOrderStateError, "Order is not payable"
+    end
 
     def validate_appointment!
       valid = @appointment.is_a?(BranchPaymentMethodAppointment) &&
@@ -65,10 +96,16 @@ module OrderProcessingV1
       raise InvalidPaymentMethodError, "Payment method is not available for this branch" unless valid
     end
 
-    # Reserve the single-use code before any side effects. On success the code
-    # is pending and bound to the order; failures raise (nothing to unwind).
-    def apply_discount!
-      return nil if @discount_code.blank?
+    # Reserve the single-use code against the order. The POS applies the code
+    # after ORDER, so pay normally finds an existing pending discount. A code
+    # passed to pay is kept for backwards compatibility and replaces the old
+    # reservation only after the new one succeeds.
+    def resolve_discount!
+      existing = @order.discounts.status_pending.first
+      return existing if @discount_code.blank?
+
+      normalized = @discount_code.to_s.strip.upcase
+      return existing if existing && existing.code == normalized
 
       result = Discounts::ApplyService.call(
         company: @order.company, order: @order,
@@ -76,7 +113,21 @@ module OrderProcessingV1
       )
       raise InvalidDiscountError, result[:errors].to_sentence unless result[:success]
 
-      @discount = result[:discount]
+      existing&.release! if existing
+      result[:discount]
+    end
+
+    def validate_cash!
+      return if @cash_received_cents.nil?
+      return if @cash_received_cents >= @totals.total_cents
+
+      raise InvalidPaymentAmountError, "Cash received is less than the total"
+    end
+
+    def change_cents
+      return 0 if @cash_received_cents.nil?
+
+      [ @cash_received_cents - @totals.total_cents, 0 ].max
     end
 
     def build_items
@@ -88,11 +139,16 @@ module OrderProcessingV1
     end
 
     # Stock belongs to a warehouse (docs/superpowers/specs/2026-09-23-stock-source-of-truth-
-    # design.md): resolve against the order's branch warehouses — never a
-    # company-wide first match. A product stocked only elsewhere is an
-    # availability failure (422), not a routing one: order/appointment lookups
-    # keep their 404s, this lookup maps to InsufficientStockError.
+    # design.md): use the exact row chosen at checkout, else resolve against
+    # the order's branch warehouses — never a company-wide first match.
     def resolve_stock(oa)
+      if oa.stock_id.present?
+        stock = @order.company.stocks
+          .joins(:warehouse)
+          .find_by(id: oa.stock_id, warehouses: { branch_id: @order.branch_id })
+        return stock if stock
+      end
+
       @order.company.stocks
         .joins(:warehouse)
         .find_by!(product_id: oa.product_id, warehouses: { branch_id: @order.branch_id })
@@ -102,21 +158,25 @@ module OrderProcessingV1
     end
 
     def create_invoice
-      gross = (@order.line_total * 100).to_i
       Invoice.create!(
         company_id: @order.company_id,
         branch_id: @order.branch_id,
         order_id: @order.id,
         name: "Invoice for Order #{@order.id}",
         code: "INV-#{Time.current.to_i}-#{SecureRandom.hex(3).upcase}",
-        price_cents: [ gross - (@discount&.amount_cents || 0), 0 ].max,
+        price_cents: @totals.total_cents,
+        tax_cents: @totals.tax_cents,
+        total_cents: @totals.total_cents,
         currency: @order.currency,
-        business_type: :sales
+        business_type: :sales,
+        pos_tax_rate_bp: @totals.tax_rate_bp,
+        pos_tax_name: @totals.tax_name,
+        pos_tax_inclusive: false
       )
     end
 
     def create_transaction(invoice)
-      Transaction.create!(
+      txn = Transaction.create!(
         company_id: @order.company_id,
         branch_id: @order.branch_id,
         invoice_id: invoice.id,
@@ -127,6 +187,20 @@ module OrderProcessingV1
         payment_method_id: @appointment.payment_method_id,
         gateway_reference: "POS_#{SecureRandom.hex(16)}" # TODO: column gateway_reference exposed as transaction_token — unify naming
       )
+
+      if cash_mode? && @cash_received_cents
+        txn.update!(cash_received_cents: @cash_received_cents, change_cents: change_cents)
+      end
+
+      txn
+    end
+
+    def payment_mode
+      @appointment.payment_method.payment_mode
+    end
+
+    def cash_mode?
+      payment_mode.to_s == "cash"
     end
 
     def qr_mode?

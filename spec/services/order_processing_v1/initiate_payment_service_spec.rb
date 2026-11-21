@@ -7,7 +7,7 @@ RSpec.describe OrderProcessingV1::InitiatePaymentService do
   let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :education).tap(&:save!) }
   let(:branch) { create(:branch, company: company) }
   let(:customer) { create(:customer, company: company) }
-  let(:order) { create(:order, company: company, branch: branch, customer: customer, workflow_status: :pending) }
+  let(:order) { create(:order, company: company, branch: branch, customer: customer, workflow_status: :pending, currency: :usd) }
   let(:product) { create(:product, company: company) }
   let(:warehouse) { create(:warehouse, company: company, branch: branch) }
   let!(:stock) do
@@ -51,6 +51,54 @@ RSpec.describe OrderProcessingV1::InitiatePaymentService do
   end
 
   describe "cash mode" do
+    it "writes the configured tax and total on the invoice and transaction" do
+      order.update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+
+      result = described_class.call(order: order, appointment: cash_appts.last, cash_received_cents: 12_000)
+
+      txn = Transaction.find(result.transaction_id)
+      invoice = txn.invoice.reload
+      expect(result.tax_cents).to eq(800)
+      expect(result.total_cents).to eq(10_800)
+      expect(invoice.price_cents).to eq(10_800)
+      expect(invoice.tax_cents).to eq(800)
+      expect(invoice.total_cents).to eq(10_800)
+      expect(invoice.pos_tax_rate_bp).to eq(800)
+      expect(invoice.pos_tax_name).to eq("Sales tax")
+      expect(txn.price_cents).to eq(10_800)
+      expect(txn.cash_received_cents).to eq(12_000)
+      expect(txn.change_cents).to eq(1_200)
+    end
+
+    it "rejects cash received below the total without creating an invoice" do
+      order.update!(pos_tax_rate_bp: 800)
+
+      expect {
+        described_class.call(order: order, appointment: cash_appts.last, cash_received_cents: 10_000)
+      }.to raise_error(OrderProcessingV1::InvalidPaymentAmountError, /less than the total/)
+
+      expect(Invoice.count).to eq(0)
+      expect(Transaction.count).to eq(0)
+      expect(stock.reload.pending).to eq(0)
+    end
+
+    it "rejects an order that is already paid" do
+      order.update!(workflow_status: :paid)
+
+      expect {
+        described_class.call(order: order, appointment: cash_appts.last)
+      }.to raise_error(OrderProcessingV1::InvalidOrderStateError)
+      expect(Invoice.count).to eq(0)
+    end
+
+    it "rejects an order that was voided" do
+      order.update!(workflow_status: :cancelled)
+
+      expect {
+        described_class.call(order: order, appointment: cash_appts.last)
+      }.to raise_error(OrderProcessingV1::InvalidOrderStateError)
+    end
+
     it "reserves stock, completes synchronously and returns a paid result" do
       result = described_class.call(order: order, appointment: cash_appts.last)
 
@@ -145,6 +193,21 @@ RSpec.describe OrderProcessingV1::InitiatePaymentService do
         expect(discount.invoice_id).to be_present
         expect(group.reload.current_spent_cents).to eq(1_000)
       end
+    end
+
+    it "uses a discount already reserved on the order when no code is passed" do
+      order.update!(pos_tax_rate_bp: 800)
+      discount.reserve!(order: order, employee: employee, amount_cents: 1_000)
+
+      result = described_class.call(order: order, appointment: cash_appts.last)
+
+      invoice = Transaction.find(result.transaction_id).invoice.reload
+      expect(result.status).to eq("paid")
+      expect(result.discount.id).to eq(discount.id)
+      expect(result.discount_cents).to eq(1_000)
+      expect(invoice.price_cents).to eq(9_720) # 100.00 - 10.00 + 7.20
+      expect(invoice.tax_cents).to eq(720)
+      expect(discount.reload).to be_status_used
     end
 
     it "leaves the code pending on the QR path until the webhook completes it" do

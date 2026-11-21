@@ -115,6 +115,20 @@ Rules:
 - `Invoice.payment_status` is **derived** from `SUM(transactions.price_cents)` of **completed** transactions — pending Mock QR payments never pay the invoice early.
 - `Transaction` is the **sole gateway interface** — invoices and orders never talk to gateways.
 - `FinalizeJob` (async) writes stock ledger, decrements balances, creates the export doc after the order is paid.
+- **POS invoice total includes tax.** `OrderTotalsService` computes integer
+  cents: `subtotal = order.line_total`, `taxable = subtotal − discount`,
+  `tax = round(taxable × rate_bp / 10_000)`, `total = taxable + tax`.
+  `Invoice.price_cents = Invoice.total_cents = total`; `Invoice.tax_cents` is
+  the tax component; `pos_tax_rate_bp` / `pos_tax_name` are snapshotted in
+  metadata. The transaction is created at the invoice total, so the existing
+  derived-paid rule is unchanged.
+- **Tax is a snapshot, not a live lookup.** The order snapshots the rate at
+  ORDER; the invoice snapshots it again at pay. A later Tax Config change never
+  rewrites an open sale or a paid receipt.
+- **Store Manager never moves money.** `StoreManager::SalesSummaryService`
+  reads paid invoice totals and completed transaction tenders for the branch day;
+  `ShiftClose` stores the cash count/variance. Payment, void and refund stay on
+  POS and the order page.
 
 ---
 

@@ -3,12 +3,14 @@
 # Booking::ConsoleService — builds the live booking console payload for a
 # branch appointment:
 #
-# - resources: branch Facilities (rooms, pods, studios, equipment) that act as
-#   the timeline rows
-# - bookings: the day's Events linked to those Facilities, together with the
-#   organiser, attendee count and a time-derived status
-# - upcoming: the next bookings used by the check-in queue
-# - counts: the KPI strip values (bookings, utilisation, equipment, desks)
+# - resources: branch Facilities (real categories, never inferred from names)
+# - bookings: the day's Events whose time touches the selected day, with the
+#   organiser, customer, facility links, attendee count and a clock-derived
+#   status
+# - counts: KPI counts over the full day/branch scope, even when the visible
+#   lists are capped
+# - upcoming: the next five not-yet-started bookings
+# - caps: explicit cap flags and limits for the UI
 #
 # Why Events + Facilities: a booking is an Event and the reserved space is a
 # Facility linked through EventFacilityAppointment. This reuses the existing
@@ -17,8 +19,7 @@
 class Booking::ConsoleService
   TIMELINE_START_HOUR = 8
   TIMELINE_END_HOUR = 18
-  EQUIPMENT_PATTERN = /equipment|device|camera|microphone|mic\b|projector|screen|beamer|vr\b|polycom|av\b/i
-  HOT_DESK_PATTERN = /desk|pod|booth|focus/i
+  UPCOMING_LIMIT = 5
 
   def self.call(company:, appointment:, now: Time.current, date: nil)
     new(company: company, appointment: appointment, now: now, date: date).call
@@ -35,11 +36,13 @@ class Booking::ConsoleService
   def call
     {
       date: date.iso8601,
+      now: now.utc.iso8601,
       timeline: { start_hour: TIMELINE_START_HOUR, end_hour: TIMELINE_END_HOUR },
       resources: resources,
       bookings: bookings,
       upcoming: upcoming,
-      counts: counts
+      counts: counts,
+      caps: caps
     }
   end
 
@@ -47,33 +50,50 @@ class Booking::ConsoleService
 
   attr_reader :company, :appointment, :branch, :now, :date
 
-  def facilities
-    @facilities ||= company.facilities
+  def facilities_scope
+    @facilities_scope ||= company.facilities
       .where("branch_id = ? OR branch_id IS NULL", branch.id)
       .includes(:category)
       .order(:name)
-      .limit(100)
-      .to_a
   end
 
-  def events
-    @events ||= begin
+  def facilities
+    return @facilities if defined?(@facilities)
+
+    records = facilities_scope.limit(BOOKING_FACILITY_LIMIT + 1).to_a
+    @resources_capped = records.length > BOOKING_FACILITY_LIMIT
+    @facilities = records.first(BOOKING_FACILITY_LIMIT)
+  end
+
+  def events_scope
+    @events_scope ||= begin
       day_range = LocalTime.day_range(date, branch)
 
       company.events
         .where(branch_id: branch.id)
-        .where("start_at >= :start AND start_at < :end", start: day_range.begin, end: day_range.end)
+        .where.not(start_at: nil)
+        .where.not(end_at: nil)
+        .where("start_at < :end AND end_at > :start", start: day_range.begin, end: day_range.end)
         .where.not(workflow_status: :cancelled)
-        .includes(
-          :category,
-          customer_event_appointments: :customer,
-          employee_event_appointments: :employee,
-          event_facility_appointments: :facility
-        )
-        .order(:start_at)
-        .limit(200)
-        .to_a
     end
+  end
+
+  def events
+    return @events if defined?(@events)
+
+    records = events_scope
+      .includes(
+        :category,
+        customer_event_appointments: :customer,
+        employee_event_appointments: :employee,
+        event_facility_appointments: :facility
+      )
+      .order(:start_at)
+      .limit(BOOKING_DAY_BOOKING_LIMIT + 1)
+      .to_a
+
+    @bookings_capped = records.length > BOOKING_DAY_BOOKING_LIMIT
+    @events = records.first(BOOKING_DAY_BOOKING_LIMIT)
   end
 
   def bookings
@@ -85,93 +105,122 @@ class Booking::ConsoleService
   end
 
   def resource_payload(facility)
-    category = facility.category&.name
-    category = nil if category == "Facilities"
-
     {
       id: facility.id,
       name: facility.name,
       code: facility.code,
-      category: category,
+      category: category_name(facility),
       capacity: facility.property_integer_1,
-      status: resource_busy?(facility) ? "busy" : "available"
+      in_use: busy_facility_ids.include?(facility.id)
     }
   end
 
-  def resource_busy?(facility)
-    bookings.any? do |booking|
-      booking[:resource_ids].include?(facility.id) && booking[:status] == "active"
-    end
-  end
-
   def booking_payload(event)
-    customer = event.customer_event_appointments.first&.customer
+    facilities = event.event_facility_appointments.map(&:facility)
     host = event.employee_event_appointments.first&.employee
-    facility_ids = event.event_facility_appointments.map(&:facility_id)
+    customer = event.customer_event_appointments.first&.customer
 
     {
       id: event.id,
       title: event.name,
       code: event.code,
-      category: event.category&.name,
-      resource_ids: facility_ids,
       start_at: event.start_at&.iso8601,
       end_at: event.end_at&.iso8601,
-      organizer: host&.name.presence || customer&.name.presence || "—",
-      customer: customer&.name,
-      attendees: event.customer_event_appointments.length + event.employee_event_appointments.length,
-      status: booking_status(event),
-      workflow_status: event.workflow_status
+      status: Booking::Status.for(event, now: now),
+      resource_ids: facilities.map(&:id),
+      facilities: facilities.map do |facility|
+        {
+          id: facility.id,
+          name: facility.name,
+          category: category_name(facility),
+          capacity: facility.property_integer_1
+        }
+      end,
+      host: host ? { id: host.id, name: host.name } : nil,
+      customer: customer ? { id: customer.id, name: customer.name } : nil,
+      attendees: event.customer_event_appointments.length + event.employee_event_appointments.length
     }
-  end
-
-  def booking_status(event)
-    return "cancelled" if event.workflow_status_cancelled?
-    return "active" if event.workflow_status_in_progress?
-    return "completed" if event.workflow_status_completed?
-
-    if event.start_at && event.end_at && event.start_at <= now && event.end_at >= now
-      "active"
-    elsif event.end_at && event.end_at < now
-      "completed"
-    else
-      "upcoming"
-    end
   end
 
   def upcoming
     @upcoming ||= bookings
-      .select { |booking| %w[upcoming active].include?(booking[:status]) && booking[:start_at].present? }
+      .select { |booking| booking[:status] == "upcoming" }
       .sort_by { |booking| booking[:start_at] }
-      .first(5)
+      .first(UPCOMING_LIMIT)
       .map do |booking|
-        resource = facilities.find { |facility| booking[:resource_ids].include?(facility.id) }
-        booking.merge(resource_name: resource&.name || "—")
+        booking.merge(
+          facility_name: booking[:facilities].map { |facility| facility[:name] }.join(", ").presence
+        )
       end
   end
 
   def counts
     @counts ||= begin
-      used_facility_ids = bookings.flat_map { |booking| booking[:resource_ids] }.uniq
-      equipment_resources = resources.select { |resource| searchable_resource_text(resource).match?(EQUIPMENT_PATTERN) }
-      hot_desk_resources = resources.select { |resource| searchable_resource_text(resource).match?(HOT_DESK_PATTERN) }
-      rooms_in_use = resources.count { |resource| resource[:status] == "busy" }
+      statuses = events_scope.select(:workflow_status, :start_at, :end_at).map do |event|
+        Booking::Status.for(event, now: now)
+      end
+      totals = category_totals.sort_by { |name, _| name.to_s }.to_h
+      in_use = category_in_use_counts
+      spaces_total = totals.values.sum
+      spaces_in_use = facilities_scope.where(id: busy_facility_ids).count
 
       {
-        total_bookings_today: bookings.length,
-        pending_checkin: bookings.count { |booking| booking[:status] == "upcoming" },
-        resources_total: resources.length,
-        resources_in_use: rooms_in_use,
-        room_utilization: resources.empty? ? 0 : ((rooms_in_use.to_f / resources.length) * 100).round,
-        equipment_deployed: equipment_resources.count { |resource| used_facility_ids.include?(resource[:id]) },
-        equipment_total: equipment_resources.length,
-        hot_desk_occupied: hot_desk_resources.count { |resource| resource[:status] == "busy" },
-        hot_desk_total: hot_desk_resources.length
+        total_bookings: statuses.length,
+        upcoming: statuses.count("upcoming"),
+        in_progress: statuses.count("in_progress"),
+        done: statuses.count("done"),
+        spaces_total: spaces_total,
+        spaces_in_use: spaces_in_use,
+        utilization: spaces_total.zero? ? 0 : ((spaces_in_use.to_f / spaces_total) * 100).round,
+        categories: totals.map do |name, total|
+          used = in_use[name] || 0
+          { name: name, total: total, in_use: used, free: total - used }
+        end
       }
     end
   end
 
-  def searchable_resource_text(resource)
-    [ resource[:category], resource[:name] ].compact.join(" ")
+  def caps
+    {
+      bookings: { capped: @bookings_capped || false, limit: BOOKING_DAY_BOOKING_LIMIT },
+      resources: { capped: @resources_capped || false, limit: BOOKING_FACILITY_LIMIT }
+    }
+  end
+
+  def category_totals
+    facilities_scope.reorder(nil).joins(:category).group("categories.name").count
+  end
+
+  def category_in_use_counts
+    return {} if busy_facility_ids.empty?
+
+    facilities_scope
+      .reorder(nil)
+      .where(id: busy_facility_ids)
+      .joins(:category)
+      .group("categories.name")
+      .count
+  end
+
+  def busy_facility_ids
+    @busy_facility_ids ||= begin
+      ids = events_scope
+        .where("events.end_at > ?", now)
+        .where.not(workflow_status: :completed)
+        .where(
+          "events.workflow_status = :in_progress OR (events.start_at <= :now AND events.end_at > :now)",
+          in_progress: Event.workflow_statuses[:in_progress], now: now
+        )
+        .select(:id)
+
+      EventFacilityAppointment
+        .where(company_id: company.id, event_id: ids)
+        .distinct
+        .pluck(:facility_id)
+    end
+  end
+
+  def category_name(facility)
+    facility.category&.name.presence || "Other spaces"
   end
 end

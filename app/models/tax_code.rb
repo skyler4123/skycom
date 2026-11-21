@@ -25,7 +25,7 @@ class TaxCode < ApplicationRecord
   # --- Validations ---
   validates :code, presence: true, length: { maximum: 32 }, uniqueness: { scope: :company_id }
   validates :name, presence: true, length: { maximum: 255 }
-  validates :rate_bp, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 10_000 }
+  validates :rate_bp, numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: TAX_RATE_BP_MAX }
 
   # --- Methods ---
   def rate

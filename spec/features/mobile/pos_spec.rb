@@ -42,6 +42,14 @@ RSpec.feature "Mobile POS", type: :feature, js: true do
   end
 
   scenario "adds a product to the cart" do
+    warehouse = create(:warehouse, company: company, branch: branch)
+    category = product.category
+    Stock.create!(
+      company: company, warehouse: warehouse, product: product,
+      quantity: 5, pending: 0, category: category,
+      property_mapping: category.default_property_mapping
+    ).tap { |record| record.send(:sync_available_counter) }
+
     visit pos_path
 
     find('[data-action*="addToCart"]', text: product.name, wait: 10).click

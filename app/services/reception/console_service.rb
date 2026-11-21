@@ -3,26 +3,32 @@
 # Reception::ConsoleService — builds the live reception console payload for a
 # branch appointment:
 #
-# - visits: today's Events (plus any still checked in from earlier) mapped to
-#   the lobby/inside/departed buckets from workflow_status
+# - visits: today's guest-linked visits plus any still in the lobby/inside from
+#   earlier, mapped to expected/lobby/inside/departed
 # - parcels: Events flagged `metadata["reception_kind"] = "parcel"` and still
 #   awaiting pickup
-# - rooms: branch Facilities whose current/next Event decides availability
-# - next_appointments: the next scheduled Events for the right-hand panel
+# - rooms: room-like branch facilities, with current/next Event availability
+# - appointments: today's facility Events that are not reception visits
+# - counts: full-data counts, independent of the display caps
+# - shift: this employee's scheduled shift covering now, or nil
 #
 # Why Events: the reception screen coordinates real bookings, so the visit is
 # the Event and the visitor/host/room are its atomic appointment rows.
 # Docs: docs/OPERATIONS.md, docs/EVENTS.md
 class Reception::ConsoleService
   ROOM_CATEGORY_PATTERN = /room|suite|pod|board|conference|meeting|hall|desk/i
+  VISIT_LIMIT = 200
+  PARCEL_LIMIT = 200
+  APPOINTMENT_LIMIT = 200
 
-  def self.call(company:, appointment:, now: Time.current)
-    new(company: company, appointment: appointment, now: now).call
+  def self.call(company:, appointment:, employee: nil, now: Time.current)
+    new(company: company, appointment: appointment, employee: employee, now: now).call
   end
 
-  def initialize(company:, appointment:, now:)
+  def initialize(company:, appointment:, employee:, now:)
     @company = company
     @appointment = appointment
+    @employee = employee
     @branch = appointment.branch
     @now = now
   end
@@ -32,108 +38,83 @@ class Reception::ConsoleService
       visits: visits.map { |event| visit_payload(event) },
       parcels: parcels.map { |event| parcel_payload(event) },
       rooms: rooms,
-      appointments: next_appointments,
-      counts: counts
+      appointments: appointments.map { |event| appointment_payload(event) },
+      counts: counts,
+      shift: Reception::ShiftService.call(employee: employee, branch: branch, now: now),
+      generated_at: now.utc.iso8601
     }
   end
 
   private
 
-  attr_reader :company, :appointment, :branch, :now
+  attr_reader :company, :appointment, :employee, :branch, :now
 
   def base_events
     @base_events ||= company.events.where(branch_id: branch.id)
   end
 
-  def parcels
-    @parcels ||= base_events
+  def day_range
+    @day_range ||= LocalTime.day_range(LocalTime.today(branch, at: now), branch)
+  end
+
+  def live_statuses
+    @live_statuses ||= [
+      Event.workflow_statuses.fetch("confirmed"),
+      Event.workflow_statuses.fetch("in_progress")
+    ]
+  end
+
+  def visit_scope
+    @visit_scope ||= base_events
+      .where("metadata ->> 'reception_kind' = ?", "visit")
+      .where.not(workflow_status: %i[cancelled])
+      .where.not(start_at: nil)
+      .where(id: CustomerEventAppointment.where(company_id: company.id).select(:event_id))
+      .where(
+        "(start_at >= :start AND start_at < :finish) OR workflow_status IN (:live)",
+        start: day_range.begin, finish: day_range.end, live: live_statuses
+      )
+      .includes(
+        :category,
+        customer_event_appointments: :customer,
+        employee_event_appointments: { employee: :category },
+        event_facility_appointments: :facility
+      )
+      .order(:start_at)
+  end
+
+  def visits
+    @visits ||= visit_scope.limit(VISIT_LIMIT).to_a
+  end
+
+  def waiting_parcel_scope
+    @waiting_parcel_scope ||= base_events
       .where("metadata ->> 'reception_kind' = ?", "parcel")
       .where.not(workflow_status: %i[completed cancelled])
       .includes(employee_event_appointments: :employee)
       .order(created_at: :desc)
-      .limit(50)
-      .to_a
   end
 
-  def visits
-    @visits ||= begin
-      day_range = LocalTime.day_range(LocalTime.today(branch, at: now), branch)
-      scope = base_events
-        .where.not(id: parcels.map(&:id))
-        .where(
-          "start_at >= :start AND start_at < :end OR workflow_status IN (:statuses)",
-          start: day_range.begin,
-          end: day_range.end,
-          statuses: [ Event.workflow_statuses.fetch("confirmed"), Event.workflow_statuses.fetch("in_progress") ]
-        )
-        .where.not(workflow_status: :cancelled)
-        .includes(
-          :category,
-          customer_event_appointments: :customer,
-          employee_event_appointments: { employee: :category },
-          event_facility_appointments: :facility
-        )
-        .order(:start_at)
-        .limit(200)
-
-      scope.to_a
-    end
+  def parcels
+    @parcels ||= waiting_parcel_scope.limit(PARCEL_LIMIT).to_a
   end
 
-  def visit_payload(event)
-    customer = event.customer_event_appointments.first&.customer
-    host = event.employee_event_appointments.first&.employee
-    facility = event.event_facility_appointments.first&.facility
-    status = visit_status(event)
-    note_key, note_at = visit_note(event, status)
-    kind = event.metadata&.dig("visitor_kind").presence || event.category&.name.presence
-    kind = "Visit" if kind.blank? || kind == "Events"
-    host_role = host&.category&.name.presence
-    host_role = "Host" if host_role.blank? || host_role == "Employees"
-
-    {
-      id: event.id,
-      event_id: event.id,
-      name: customer&.name.presence || event.name,
-      company: event.metadata&.dig("visitor_company").presence || customer&.description.presence || "—",
-      host: host&.name.presence || "—",
-      hostRole: host_role,
-      kind: kind,
-      badge: event.code.presence || "V-#{event.id.to_s.first(6).upcase}",
-      status: status,
-      arrival_at: LocalTime.utc_iso(event.start_at),
-      waitMin: wait_minutes(event, status),
-      note_key: note_key,
-      note_at: note_at,
-      vip: event.metadata&.dig("vip") == true,
-      zone: facility&.name.presence || event.metadata&.dig("zone").presence || "Reception",
-      start_at: event.start_at&.iso8601,
-      search: [
-        customer&.name, customer&.description, event.metadata&.dig("visitor_company"),
-        host&.name, event.code, event.category&.name, event.metadata&.dig("visitor_kind"),
-        facility&.name, event.metadata&.dig("zone")
-      ].compact.join(" ").downcase
-    }
+  def appointment_scope
+    @appointment_scope ||= base_events
+      .where(start_at: day_range)
+      .where.not(workflow_status: %i[cancelled])
+      .where(id: EventFacilityAppointment.where(company_id: company.id).select(:event_id))
+      .where("COALESCE(metadata ->> 'reception_kind', '') NOT IN (?)", %w[visit parcel])
+      .includes(
+        :category,
+        employee_event_appointments: { employee: :category },
+        event_facility_appointments: :facility
+      )
+      .order(:start_at)
   end
 
-  def parcel_payload(event)
-    employee = event.employee_event_appointments.first&.employee
-    metadata = event.metadata || {}
-    locker = metadata["locker"].presence
-    received_at = parse_time(metadata["received_at"])
-
-    {
-      id: event.id,
-      event_id: event.id,
-      carrier: metadata["carrier"].presence || "Parcel",
-      title: metadata["item"].presence || event.name,
-      recipient: employee&.name.presence || metadata["recipient_name"].presence || "—",
-      location: locker || "Held at desk",
-      received_at: LocalTime.utc_iso(received_at),
-      tone: "primary",
-      action: "Notify",
-      workflow_status: event.workflow_status
-    }
+  def appointments
+    @appointments ||= appointment_scope.limit(APPOINTMENT_LIMIT).to_a
   end
 
   def rooms
@@ -142,26 +123,41 @@ class Reception::ConsoleService
         .where("branch_id = ? OR branch_id IS NULL", branch.id)
         .includes(:category)
         .order(:name)
-        .limit(50)
         .to_a
       room_like = facilities.select { |facility| facility.category&.name.to_s.match?(ROOM_CATEGORY_PATTERN) }
       room_like = facilities if room_like.empty?
 
-      room_like.first(8).map { |facility| room_payload(facility) }
+      room_like.map { |facility| room_payload(facility) }
     end
   end
 
+  def room_events
+    @room_events ||= base_events
+      .where.not(workflow_status: %i[cancelled])
+      .where.not(start_at: nil)
+      .where(id: EventFacilityAppointment.where(company_id: company.id).select(:event_id))
+      .where(
+        "start_at < :finish AND (end_at IS NULL OR end_at > :start)",
+        start: day_range.begin, finish: day_range.end
+      )
+      .includes(:event_facility_appointments)
+      .to_a
+  end
+
   def room_payload(facility)
-    facility_events = visits.select do |event|
+    facility_events = room_events.select do |event|
       event.event_facility_appointments.any? { |link| link.facility_id == facility.id }
     end
-    current = facility_events.find do |event|
-      event.start_at && event.start_at <= now &&
-        (event.end_at.nil? || event.end_at >= now) &&
-        %w[confirmed in_progress].include?(event.workflow_status)
-    end
+    current = facility_events
+      .select do |event|
+        event.start_at <= now &&
+          (event.end_at.nil? || event.end_at >= now) &&
+          %w[pending confirmed in_progress].include?(event.workflow_status)
+      end
+      .sort_by { |event| event.workflow_status == "in_progress" ? 0 : 1 }
+      .first
     upcoming = facility_events
-      .select { |event| event.start_at && event.start_at > now }
+      .select { |event| event.start_at > now }
       .min_by(&:start_at)
 
     if current
@@ -169,7 +165,6 @@ class Reception::ConsoleService
       {
         id: facility.id,
         name: facility.name,
-        capacity: facility.property_integer_1,
         status: busy ? "busy" : "reserved",
         time_at: LocalTime.utc_iso(busy ? current.end_at : current.start_at),
         detail: current.name
@@ -178,7 +173,6 @@ class Reception::ConsoleService
       {
         id: facility.id,
         name: facility.name,
-        capacity: facility.property_integer_1,
         status: "reserved",
         time_at: LocalTime.utc_iso(upcoming.start_at),
         detail: upcoming.name
@@ -187,7 +181,6 @@ class Reception::ConsoleService
       {
         id: facility.id,
         name: facility.name,
-        capacity: facility.property_integer_1,
         status: "available",
         time_at: nil,
         detail: nil
@@ -195,42 +188,111 @@ class Reception::ConsoleService
     end
   end
 
-  def next_appointments
-    upcoming = visits
-      .select { |event| event.start_at && event.start_at >= now && %w[pending confirmed].include?(event.workflow_status) }
-      .sort_by(&:start_at)
-      .first(5)
+  def visit_payload(event)
+    customer = event.customer_event_appointments.first&.customer
+    host = event.employee_event_appointments.first&.employee
+    facility = event.event_facility_appointments.first&.facility
+    status = visit_status(event)
+    lobby_time = effective_lobby_time(event)
+    inside_time = effective_inside_time(event)
+    checked_out = parse_time(event.metadata&.dig("checked_out_at"))
+    notified = parse_time(event.metadata&.dig("host_notified_at"))
+    host_role = host&.category&.name
+    host_role = nil if host_role == "Employees"
+    kind = event.metadata&.dig("visitor_kind").presence || "Visit"
+    kind = "Visit" if kind == "Events"
 
-    upcoming.map do |event|
-      customer = event.customer_event_appointments.first&.customer
-      host = event.employee_event_appointments.first&.employee
-      facility = event.event_facility_appointments.first&.facility
+    {
+      id: event.id,
+      event_id: event.id,
+      name: customer&.name.presence || event.name,
+      company: event.metadata&.dig("visitor_company").presence || customer&.description.presence,
+      host: host&.name,
+      hostRole: host_role,
+      room: facility&.name,
+      kind: kind,
+      badge: event.code.presence || "V-#{event.id.to_s.first(6).upcase}",
+      status: status,
+      arrival_at: LocalTime.utc_iso(event.start_at),
+      lobby_entered_at: LocalTime.utc_iso(lobby_time),
+      inside_at: LocalTime.utc_iso(inside_time),
+      checked_out_at: LocalTime.utc_iso(checked_out),
+      notified_at: LocalTime.utc_iso(notified),
+      wait_minutes: status == "lobby" ? minutes_since(lobby_time) : nil,
+      inside_minutes: status == "active" ? minutes_since(inside_time) : nil,
+      vip: event.metadata&.dig("vip") == true,
+      can_notify: host.present? && %w[upcoming lobby].include?(status),
+      can_print: %w[lobby active].include?(status),
+      search: [
+        customer&.name, customer&.description, event.metadata&.dig("visitor_company"),
+        host&.name, event.code, event.name, kind, facility&.name
+      ].compact.join(" ").downcase
+    }
+  end
 
-      {
-        id: event.id,
-        start_at: LocalTime.utc_iso(event.start_at),
-        minutes_until: [ ((event.start_at - now) / 60).ceil, 0 ].max,
-        title: customer&.name.presence || event.name,
-        host: host&.name.presence || "—",
-        room: facility&.name.presence || event.metadata&.dig("zone").presence || "—",
-        status: appointment_status(event)
-      }
-    end
+  def parcel_payload(event)
+    employee = event.employee_event_appointments.first&.employee
+    metadata = event.metadata || {}
+    received_at = parse_time(metadata["received_at"])
+    notified_at = parse_time(metadata["notified_at"])
+
+    {
+      id: event.id,
+      event_id: event.id,
+      carrier: metadata["carrier"].presence || "Parcel",
+      title: metadata["item"].presence || event.name,
+      recipient: employee&.name.presence || metadata["recipient_name"].presence,
+      code: event.code,
+      location: "Held at desk",
+      received_at: LocalTime.utc_iso(received_at),
+      notified_at: LocalTime.utc_iso(notified_at),
+      workflow_status: event.workflow_status,
+      search: [
+        metadata["carrier"], metadata["item"], metadata["recipient_name"],
+        employee&.name, event.code, event.name
+      ].compact.join(" ").downcase
+    }
+  end
+
+  def appointment_payload(event)
+    host = event.employee_event_appointments.first&.employee
+    facility = event.event_facility_appointments.first&.facility
+
+    {
+      id: event.id,
+      start_at: LocalTime.utc_iso(event.start_at),
+      title: event.name,
+      host: host&.name,
+      room: facility&.name,
+      status: appointment_status(event)
+    }
   end
 
   def counts
-    day_range = LocalTime.day_range(LocalTime.today(branch, at: now), branch)
-
-    {
-      inside: visits.count { |event| visit_status(event) == "active" },
-      lobby: visits.count { |event| visit_status(event) == "lobby" },
-      departed: visits.count { |event| visit_status(event) == "departed" },
-      expected_today: visits.count { |event| event.start_at && day_range.cover?(event.start_at) },
-      remaining: visits.count { |event| %w[lobby active upcoming].include?(visit_status(event)) },
-      parcels: parcels.length,
-      rooms_available: rooms.count { |room| room[:status] == "available" },
-      rooms_total: rooms.length
+    @counts ||= {
+      inside: visit_scope.where(workflow_status: :in_progress).count,
+      lobby: visit_scope.where(workflow_status: :confirmed).count,
+      expected: visit_scope.where(workflow_status: %i[pending draft], start_at: day_range).count,
+      departed: visit_scope.where(workflow_status: :completed).count,
+      scheduled_today: visit_scope.where(start_at: day_range).count,
+      parcels: waiting_parcel_scope.count,
+      rooms_ready: rooms.count { |room| room[:status] == "available" },
+      rooms_total: rooms.length,
+      average_wait_minutes: average_wait_minutes,
+      visits_capped: visit_scope.count > VISIT_LIMIT,
+      parcels_capped: waiting_parcel_scope.count > PARCEL_LIMIT,
+      appointments: appointment_scope.count,
+      appointments_capped: appointment_scope.count > APPOINTMENT_LIMIT
     }
+  end
+
+  def average_wait_minutes
+    waits = visit_scope.where(workflow_status: :confirmed).map do |event|
+      minutes_since(effective_lobby_time(event))
+    end
+    return nil if waits.empty?
+
+    (waits.sum.to_f / waits.size).round(1)
   end
 
   def visit_status(event)
@@ -243,31 +305,33 @@ class Reception::ConsoleService
     end
   end
 
-  def wait_minutes(event, status)
-    return 0 unless status == "lobby" && event.start_at
-    [ ((now - event.start_at) / 60).floor, 0 ].max
+  def effective_lobby_time(event)
+    effective_lobby_time_from(event.start_at, event.metadata || {})
   end
 
-  def visit_note(event, status)
-    case status
-    when "lobby"
-      [ "waiting", nil ]
-    when "active"
-      checked_in = parse_time(event.metadata&.dig("checked_in_at"))
-      checked_in ? [ "checked_in", LocalTime.utc_iso(checked_in) ] : [ "inside", nil ]
-    when "departed"
-      checked_out = parse_time(event.metadata&.dig("checked_out_at"))
-      checked_out ? [ "checked_out", LocalTime.utc_iso(checked_out) ] : [ "completed", nil ]
-    else
-      [ "pre_registered", nil ]
-    end
+  def effective_lobby_time_from(start_at, metadata)
+    parse_time(metadata["lobby_entered_at"]) ||
+      parse_time(metadata["checked_in_at"]) ||
+      start_at
+  end
+
+  def effective_inside_time(event)
+    parse_time(event.metadata&.dig("inside_at")) ||
+      parse_time(event.metadata&.dig("checked_in_at")) ||
+      event.start_at
+  end
+
+  def minutes_since(value)
+    return 0 unless value
+    [ ((now - value) / 60).floor, 0 ].max
   end
 
   def appointment_status(event)
     case event.workflow_status
-    when "pending" then "Scheduled"
-    when "confirmed" then "Ready"
+    when "pending", "draft" then "Scheduled"
+    when "confirmed" then "Confirmed"
     when "in_progress" then "In progress"
+    when "completed" then "Completed"
     else "Scheduled"
     end
   end

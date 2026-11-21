@@ -175,24 +175,72 @@ export const pos_customer_lookup_company_operation_path = (companyId, operationI
   const query = new URLSearchParams(params).toString()
   return `/companies/${companyId}/operations/pos/${operationId}/customer_lookup${query ? `?${query}` : ""}`
 }
+export const pos_catalog_company_operation_path = (companyId, operationId, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `/companies/${companyId}/operations/pos/${operationId}/catalog${query ? `?${query}` : ""}`
+}
+export const pos_lock_company_operation_path = (companyId, operationId) =>
+  `/companies/${companyId}/operations/pos/${operationId}/lock`
+export const pos_unlock_company_operation_path = (companyId, operationId) =>
+  `/companies/${companyId}/operations/pos/${operationId}/unlock`
 export const booking_company_operation_path = (companyId, operationId, params = {}) => operationPath("booking", companyId, operationId, params)
 export const booking_reservations_company_operation_path = (companyId, operationId, params = {}) => {
   const query = new URLSearchParams(params).toString()
   return `${booking_company_operation_path(companyId, operationId)}/reservations${query ? `?${query}` : ""}`
 }
+export const booking_customers_company_operation_path = (companyId, operationId, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `${booking_company_operation_path(companyId, operationId)}/customers${query ? `?${query}` : ""}`
+}
+const bookingReservationActionPath = (companyId, operationId, reservationId, action, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `${booking_company_operation_path(companyId, operationId)}/reservations/${encodeURIComponent(reservationId)}/${action}${query ? `?${query}` : ""}`
+}
+export const booking_reservation_extend_company_operation_path = (companyId, operationId, reservationId, params = {}) => bookingReservationActionPath(companyId, operationId, reservationId, "extend", params)
+export const booking_reservation_end_company_operation_path = (companyId, operationId, reservationId, params = {}) => bookingReservationActionPath(companyId, operationId, reservationId, "end", params)
+export const booking_reservation_cancel_company_operation_path = (companyId, operationId, reservationId, params = {}) => bookingReservationActionPath(companyId, operationId, reservationId, "cancel", params)
 export const inventory_company_operation_path = (companyId, operationId, params = {}) => operationPath("inventory", companyId, operationId, params)
+const inventoryActionPath = (companyId, operationId, action, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `/companies/${companyId}/operations/inventory/${operationId}/${action}${query ? `?${query}` : ""}`
+}
+export const inventory_ledger_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "ledger", params)
+export const inventory_export_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "export", params)
+export const inventory_receipts_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "receipts", params)
+export const inventory_receipt_post_company_operation_path = (companyId, operationId, receiptId, params = {}) => inventoryActionPath(companyId, operationId, `receipts/${encodeURIComponent(receiptId)}/post`, params)
+export const inventory_transfers_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "transfers", params)
+export const inventory_transfer_receive_company_operation_path = (companyId, operationId, transferId, params = {}) => inventoryActionPath(companyId, operationId, `transfers/${encodeURIComponent(transferId)}/receive`, params)
+export const inventory_exports_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "exports", params)
+export const inventory_adjustments_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "adjustments", params)
+export const inventory_reorder_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "reorder", params)
+export const inventory_counts_company_operation_path = (companyId, operationId, params = {}) => inventoryActionPath(companyId, operationId, "counts", params)
+export const inventory_count_company_operation_path = (companyId, operationId, countId, params = {}) => inventoryActionPath(companyId, operationId, `counts/${encodeURIComponent(countId)}`, params)
+export const inventory_count_submit_company_operation_path = (companyId, operationId, countId, params = {}) => inventoryActionPath(companyId, operationId, `counts/${encodeURIComponent(countId)}/submit`, params)
 export const reception_company_operation_path = (companyId, operationId, params = {}) => operationPath("reception", companyId, operationId, params)
 export const reception_check_in_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/check_in`
+export const reception_pre_register_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/pre_register`
 export const reception_advance_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/advance`
 export const reception_parcels_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/parcels`
 export const reception_parcel_notify_company_operation_path = (companyId, operationId, parcelId) => `${reception_parcels_company_operation_path(companyId, operationId)}/${parcelId}/notify`
 export const reception_parcel_pick_up_company_operation_path = (companyId, operationId, parcelId) => `${reception_parcels_company_operation_path(companyId, operationId)}/${parcelId}/pick_up`
 export const reception_notify_host_company_operation_path = (companyId, operationId) => `${reception_company_operation_path(companyId, operationId)}/notify_host`
 export const store_manager_company_operation_path = (companyId, operationId, params = {}) => operationPath("store_manager", companyId, operationId, params)
+const storeManagerActionPath = (companyId, operationId, action, params = {}) => {
+  const query = new URLSearchParams(params).toString()
+  return `/companies/${companyId}/operations/store_manager/${operationId}/${action}${query ? `?${query}` : ""}`
+}
+export const store_manager_queue_company_operation_path = (companyId, operationId, params = {}) => storeManagerActionPath(companyId, operationId, "queue", params)
+export const store_manager_order_mark_ready_company_operation_path = (companyId, operationId, orderId) => storeManagerActionPath(companyId, operationId, `orders/${encodeURIComponent(orderId)}/mark_ready`)
+export const store_manager_order_hand_over_company_operation_path = (companyId, operationId, orderId) => storeManagerActionPath(companyId, operationId, `orders/${encodeURIComponent(orderId)}/hand_over`)
+export const store_manager_replenishments_company_operation_path = (companyId, operationId) => storeManagerActionPath(companyId, operationId, "replenishments")
+export const store_manager_shift_close_company_operation_path = (companyId, operationId) => storeManagerActionPath(companyId, operationId, "shift_close")
 
 export const order_processing_v1_checkout_path = (companyId) => `/companies/${companyId}/order_processing/v1/checkout`
 export const order_processing_v1_pay_path = (companyId) => `/companies/${companyId}/order_processing/v1/pay`
 export const order_processing_v1_pay_cancel_path = (companyId) => `/companies/${companyId}/order_processing/v1/pay_cancel`
+export const order_processing_v1_apply_discount_path = (companyId) => `/companies/${companyId}/order_processing/v1/apply_discount`
+export const order_processing_v1_remove_discount_path = (companyId) => `/companies/${companyId}/order_processing/v1/remove_discount`
+export const order_processing_v1_cancel_path = (companyId) => `/companies/${companyId}/order_processing/v1/cancel`
 export const receipt_company_order_path = (companyId, orderId) => `/companies/${companyId}/orders/${orderId}/receipt`
 
 export const company_permissions_path = (companyId) => `/companies/${companyId}/permissions`

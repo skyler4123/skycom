@@ -49,6 +49,36 @@ RSpec.describe Order, type: :model do
     it { should define_enum_for(:workflow_status) }
     it { should define_enum_for(:currency) }
     it { should define_enum_for(:business_type).with_values(online: 0, in_store: 1, phone: 2) }
+    it do
+      expect(Order.fulfillment_channels).to eq(
+        "walk_in" => 0, "click_collect" => 1, "local_delivery" => 2, "phone_hold" => 3
+      )
+    end
+    it do
+      expect(Order.fulfillment_statuses).to eq(
+        "unfulfilled" => 0, "ready" => 1, "handed_over" => 2
+      )
+    end
+  end
+
+  describe "order codes" do
+    it "assigns a unique code when the order is created without one" do
+      company = create(:company)
+      customer = create(:customer, company: company)
+      first = create(:order, company: company, customer: customer)
+      second = create(:order, company: company, customer: customer)
+
+      expect(first.code).to match(/\AORD-[0-9A-F]{8}\z/)
+      expect(second.code).to match(/\AORD-[0-9A-F]{8}\z/)
+      expect(first.code).not_to eq(second.code)
+    end
+
+    it "keeps a code supplied by the caller" do
+      company = create(:company)
+      order = create(:order, company: company, customer: create(:customer, company: company), code: "ORD-CUSTOM1")
+
+      expect(order.code).to eq("ORD-CUSTOM1")
+    end
   end
   it_behaves_like "property_mapping concern", Order
 end

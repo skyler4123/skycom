@@ -190,7 +190,11 @@ RSpec.describe "Company operations", type: :request do
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
       expect(body.fetch("coming_soon")).to be(false)
-      expect(body.fetch("inventory")).to include("metrics", "stocks", "docks", "zones", "audit")
+      expect(body.fetch("inventory")).to include(
+        "metrics", "stocks", "pagination", "counts", "inbound", "outbound",
+        "open_count", "last_count", "reference"
+      )
+      expect(body.fetch("inventory")).not_to include("docks", "zones", "audit")
     end
   end
 end

@@ -36,4 +36,18 @@ RSpec.feature "Companies::TaxConfigs Management", type: :feature, js: true do
     expect(page).to have_content("Tax Config", wait: 10)
     expect(page).to have_content("Save Config", wait: 10)
   end
+
+  scenario "saves the POS tax rate and label" do
+    visit company_tax_config_path(company)
+
+    find('input[name="pos_tax_rate_percent"]', wait: 10).set("8")
+    find('input[name="pos_tax_name"]').set("Sales tax")
+    click_button "Save Config"
+
+    expect(page).to have_field("pos_tax_rate_percent", with: "8", wait: 10)
+
+    config = TaxConfig.for_company!(company).reload
+    expect(config.pos_tax_rate_bp).to eq(800)
+    expect(config.pos_tax_name).to eq("Sales tax")
+  end
 end

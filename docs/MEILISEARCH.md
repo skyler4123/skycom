@@ -1,6 +1,6 @@
 # Skycom Meilisearch Integration
 
-> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Live consumers since 2026-09-06/07/08: ALL dynamic-table index pages (Products, Customers, Branches, Brands, Departments, Employees, Facilities, Invoices, Orders, Services, Warehouses) run dynamic search/filter (`DynamicSearch::BaseQueryService` subclasses); Stocks, StockTransfers, StockImports, StockExports joined 2026-09-09, Suppliers joined 2026-09-17 — per-page rollout recipe: `docs/DYNAMIC_TABLE.md` §8.
+> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Live consumers since 2026-09-06/07/08: ALL dynamic-table index pages (Products, Customers, Branches, Brands, Departments, Employees, Facilities, Invoices, Orders, Services, Warehouses) run dynamic search/filter (`DynamicSearch::BaseQueryService` subclasses); Stocks, StockTransfers, StockImports, StockExports joined 2026-09-09, Suppliers joined 2026-09-17; the Store Manager fulfilment queue joined 2026-11-20 (Orders + Customers search, exact codes in the DB) — per-page rollout recipe: `docs/DYNAMIC_TABLE.md` §8.
 
 ---
 
@@ -125,12 +125,16 @@ The concern merges a model-declared hook into `indexed_attributes` + `filterable
 
 ```ruby
 # app/models/stock.rb
-def self.ms_extra_filterable_columns = %w[quantity pending]  # MUST precede `include DynamicSearchConcern`
+def self.ms_extra_filterable_columns = %w[quantity pending warehouse_id]  # MUST precede `include DynamicSearchConcern`
 
 include CategoryConcern
 include PropertyMappingConcern
 include DynamicSearchConcern
 ```
+
+`warehouse_id` was added for the Inventory console's warehouse-scoped ledger search;
+after deploying the change, reindex stocks once (`bin/rails meilisearch:reindex[Stock]`)
+so the filterable attribute exists on the live index.
 
 The meilisearch settings block runs at **include time**, so the class method must be defined
 **above** the `include` line (a later `def self.` is silently ignored — hence the

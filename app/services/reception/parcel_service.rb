@@ -3,7 +3,7 @@
 # Reception::ParcelService — persists front-desk parcels as Events flagged with
 # `metadata["reception_kind"] = "parcel"`, linked to the recipient employee
 # through EmployeeEventAppointment. The console filters these Events out of the
-# visitor queue and shows them in the Couriers & Deliveries panel instead.
+# visitor queue and shows them in the parcels panel instead.
 # Docs: docs/OPERATIONS.md, docs/EVENTS.md
 class Reception::ParcelService
   def self.create(company:, appointment:, params:, now: Time.current)
@@ -50,7 +50,6 @@ class Reception::ParcelService
         "carrier" => carrier,
         "item" => item,
         "recipient_name" => employee.name,
-        "locker" => "Held at desk",
         "received_at" => now.iso8601
       }
     )
@@ -73,14 +72,28 @@ class Reception::ParcelService
     event = find_parcel(parcel_id)
     return failure([ "Parcel not found." ]) unless event
 
-    metadata = (event.metadata || {}).dup
-    metadata["notified_at"] = now.iso8601
-    event.update!(metadata: metadata)
+    recipient = event.employee_event_appointments.includes(:employee).first&.employee
+    return failure([ "Recipient not found." ]) unless recipient
 
-    recipient = event.employee_event_appointments.first&.employee&.name.presence ||
-      metadata["recipient_name"].presence || "recipient"
+    notification_result = nil
+    ActiveRecord::Base.transaction do
+      notification_result = Notifications::CreateService.call(
+        company: company,
+        name: "Parcel for #{recipient.name}",
+        description: parcel_description(event, recipient),
+        severity: :info,
+        recipient_employee: recipient
+      )
+      raise ActiveRecord::Rollback unless notification_result[:success]
 
-    { success: true, event: event, message: "Pickup notification sent for #{recipient}." }
+      metadata = (event.metadata || {}).dup
+      metadata["notified_at"] = now.iso8601
+      event.update!(metadata: metadata)
+    end
+
+    return failure(notification_result[:errors]) unless notification_result[:success]
+
+    { success: true, event: event, message: "Pickup notification sent for #{recipient.name}." }
   rescue ActiveRecord::RecordInvalid => e
     failure(e.record.errors.full_messages.presence || [ e.message ])
   end
@@ -119,6 +132,12 @@ class Reception::ParcelService
       resource_name: "events",
       name: "Parcels"
     )
+  end
+
+  def parcel_description(event, recipient)
+    metadata = event.metadata || {}
+    details = [ metadata["carrier"], metadata["item"] ].compact_blank.join(" · ")
+    "#{recipient.name}, a parcel is waiting at #{appointment.branch.name} reception#{details.present? ? " (#{details})" : ""}."
   end
 
   def failure(errors)

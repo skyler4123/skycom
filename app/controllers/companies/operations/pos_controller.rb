@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
 # Companies::Operations::PosController — the POS operation. Hydrates the
-# branch-scoped product/service catalog and the branch's non-redirect payment
-# methods for the resolved BranchOperationAppointment.
-# Serves Stimulus: Companies_Operations_Pos_ShowController (hydrate, customer lookup)
-# Endpoints: GET /companies/:company_id/operations/pos/:operation_id
-#            GET /companies/:company_id/operations/pos/:operation_id/customer_lookup?q=
+# branch-scoped product/service catalog (server cents, company currency, POS
+# tax, selling-warehouse stock), the branch payment methods, customer lookup,
+# search, and the server-enforced terminal lock.
+# Serves Stimulus: Companies_Operations_Pos_ShowController
+# Endpoints: GET  /companies/:company_id/operations/pos/:operation_id
+#            GET  /companies/:company_id/operations/pos/:operation_id/catalog?q=
+#            GET  /companies/:company_id/operations/pos/:operation_id/customer_lookup?q=
+#            POST /companies/:company_id/operations/pos/:operation_id/lock
+#            POST /companies/:company_id/operations/pos/:operation_id/unlock
 # Docs: docs/OPERATIONS.md, docs/ORDER_PROCESSING_V1.md
 class Companies::Operations::PosController < Companies::Operations::BaseController
   # Lightweight POS customer lookup (id/code/name/email/phone_number/property slots).
@@ -17,6 +21,33 @@ class Companies::Operations::PosController < Companies::Operations::BaseControll
 
     customer = find_customer(query)
     render json: { customer: customer ? customer_lookup_payload(customer) : nil }
+  end
+
+  # Catalog-only refresh for search-as-you-type. The operation/appointment
+  # gates still run; the payload is the same shape the initial show uses.
+  def catalog
+    render json: Pos::CatalogService.call(
+      company: current_company,
+      branch: @appointment.branch,
+      query: params[:q]
+    )
+  end
+
+  # Server-enforced terminal lock. The client overlay is only the visual half;
+  # checkout/pay reject with 423 while this session flag is set.
+  def lock
+    session[:pos_locked_company_id] = current_company.id
+    render json: { locked: true, message: "Terminal locked" }
+  end
+
+  def unlock
+    unless current_user.authenticate(params[:password].to_s)
+      render json: { errors: [ "Incorrect password" ] }, status: :unprocessable_content
+      return
+    end
+
+    session.delete(:pos_locked_company_id)
+    render json: { locked: false, message: "Terminal unlocked" }
   end
 
   private
@@ -52,40 +83,19 @@ class Companies::Operations::PosController < Companies::Operations::BaseControll
   end
 
   def operation_payload
-    branch = @appointment.branch
-    warehouse_ids = branch.warehouse_ids
+    Pos::CatalogService.call(
+      company: current_company,
+      branch: @appointment.branch,
+      query: params[:q]
+    ).merge(
+      coming_soon: false,
+      payment_methods: payment_methods,
+      locked: pos_locked?
+    )
+  end
 
-    products = current_company.products.includes(:category).where(branch_id: branch.id).limit(50).map do |product|
-      price = product.price
-      stock = Stock.find_by(product_id: product.id, warehouse_id: warehouse_ids)
-      {
-        id: product.id,
-        name: product.name,
-        code: product.code,
-        category_id: product.category_id,
-        category_name: product.category&.name,
-        stock_id: stock&.id,
-        stock_quantity: stock&.available_count || 0,
-        price: price&.to_f || 0,
-        currency: price&.currency.iso_code || "USD",
-        image_url: product.image_attachments.first&.variant(:thumb)&.processed&.url
-      }
-    end
-
-    services = current_company.services.includes(:category).where(branch_id: branch.id).limit(50).map do |service|
-      {
-        id: service.id,
-        name: service.name,
-        code: service.code,
-        category_id: service.category_id,
-        category_name: service.category&.name,
-        price: 0,
-        currency: "usd",
-        image_url: service.image_attachments.first&.variant(:thumb)&.processed&.url
-      }
-    end
-
-    payment_methods = branch.branch_payment_method_appointments
+  def payment_methods
+    @appointment.branch.branch_payment_method_appointments
       .includes(:payment_method)
       .where(lifecycle_status: LIFECYCLE_STATUS.fetch(:active))
       .reject { |appointment| appointment.payment_method.redirect? }
@@ -94,12 +104,9 @@ class Companies::Operations::PosController < Companies::Operations::BaseControll
           appointment.payment_method.slice(:name, :code, :payment_mode, :strategy)
         )
       end
+  end
 
-    {
-      coming_soon: false,
-      products: products,
-      services: services,
-      payment_methods: payment_methods
-    }
+  def pos_locked?
+    session[:pos_locked_company_id] == current_company.id
   end
 end

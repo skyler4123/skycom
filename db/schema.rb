@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_17_000091) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_20_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -5643,12 +5643,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000091) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "recipient_employee_id"
     t.index ["business_type"], name: "index_notifications_on_business_type"
     t.index ["company_id", "created_at"], name: "index_notifications_on_company_id_and_created_at"
+    t.index ["company_id", "recipient_employee_id"], name: "index_notifications_on_company_id_and_recipient_employee_id"
     t.index ["company_id"], name: "index_notifications_on_company_id"
     t.index ["discarded_at"], name: "index_notifications_on_discarded_at"
     t.index ["external_id"], name: "index_notifications_on_external_id"
     t.index ["lifecycle_status"], name: "index_notifications_on_lifecycle_status"
+    t.index ["recipient_employee_id"], name: "index_notifications_on_recipient_employee_id"
     t.index ["subject_type", "subject_id"], name: "index_notifications_on_subject_type_and_subject_id"
     t.index ["workflow_status"], name: "index_notifications_on_workflow_status"
   end
@@ -6086,6 +6089,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000091) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "fulfillment_channel", default: 0, null: false
+    t.integer "fulfillment_status", default: 0, null: false
+    t.datetime "handed_over_at"
+    t.index ["branch_id", "fulfillment_channel"], name: "index_orders_on_branch_id_and_fulfillment_channel"
+    t.index ["branch_id", "handed_over_at"], name: "index_orders_on_branch_id_and_handed_over_at"
     t.index ["branch_id"], name: "index_orders_on_branch_id"
     t.index ["business_type"], name: "index_orders_on_business_type"
     t.index ["category_id"], name: "index_orders_on_category_id"
@@ -8175,6 +8183,42 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000091) do
     t.index ["external_id"], name: "index_sessions_on_external_id"
     t.index ["single_access_token"], name: "index_sessions_on_single_access_token", unique: true
     t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "shift_closes", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id", null: false
+    t.uuid "closed_by_id"
+    t.date "business_date", null: false
+    t.string "closed_by_name"
+    t.string "shift_name"
+    t.datetime "shift_started_at"
+    t.datetime "shift_ended_at"
+    t.bigint "gross_sales_cents", default: 0, null: false
+    t.bigint "cash_sales_cents", default: 0, null: false
+    t.bigint "qr_sales_cents", default: 0, null: false
+    t.bigint "other_sales_cents", default: 0, null: false
+    t.bigint "cash_received_cents", default: 0, null: false
+    t.bigint "change_cents", default: 0, null: false
+    t.bigint "orders_count", default: 0, null: false
+    t.bigint "discounts_cents", default: 0, null: false
+    t.bigint "tax_cents", default: 0, null: false
+    t.bigint "opening_float_cents", default: 0, null: false
+    t.bigint "expected_cash_cents", default: 0, null: false
+    t.bigint "counted_cash_cents", default: 0, null: false
+    t.bigint "variance_cents", default: 0, null: false
+    t.integer "open_handovers_count", default: 0, null: false
+    t.integer "shelf_short_count", default: 0, null: false
+    t.jsonb "staff_names", default: [], null: false
+    t.jsonb "shelf_snapshot", default: [], null: false
+    t.jsonb "tender_lines", default: [], null: false
+    t.text "note"
+    t.datetime "closed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "open_handovers_snapshot", default: [], null: false
+    t.index ["branch_id", "business_date"], name: "index_shift_closes_on_branch_id_and_business_date", unique: true
+    t.index ["company_id", "business_date"], name: "index_shift_closes_on_company_id_and_business_date"
   end
 
   create_table "shift_templates", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -10902,6 +10946,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000091) do
   add_foreign_key "notification_tag_appointments", "notifications"
   add_foreign_key "notification_tags", "companies"
   add_foreign_key "notifications", "companies"
+  add_foreign_key "notifications", "employees", column: "recipient_employee_id"
   add_foreign_key "operation_warehouse_appointments", "companies"
   add_foreign_key "operation_warehouse_appointments", "operations"
   add_foreign_key "operation_warehouse_appointments", "warehouses"
@@ -11152,6 +11197,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_000091) do
   add_foreign_key "services", "companies"
   add_foreign_key "services", "property_mappings"
   add_foreign_key "sessions", "users"
+  add_foreign_key "shift_closes", "branches"
+  add_foreign_key "shift_closes", "companies"
+  add_foreign_key "shift_closes", "employees", column: "closed_by_id"
   add_foreign_key "shift_templates", "branches"
   add_foreign_key "shift_templates", "companies"
   add_foreign_key "sign_in_tokens", "users"

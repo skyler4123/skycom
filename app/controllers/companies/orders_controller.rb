@@ -40,47 +40,48 @@ class Companies::OrdersController < Companies::ApplicationController
   end
 
   # GET /companies/:company_id/orders/:id/receipt
-  # Tenant-scoped receipt for the POS post-payment panel. Finds the order via
-  # current_company (404 if foreign), then the latest invoice + transaction.
-  # Totals mirror the cart (subtotal from invoice.price_cents or items sum, 10% tax)
-  # so the receipt matches what the cashier displayed. Requires OrdersPolicy#receipt?.
+  # Tenant-scoped receipt for the POS post-payment panel. Totals come from the
+  # order/invoice snapshots written at sale time — never from a hardcoded rate.
+  # Requires OrdersPolicy#receipt?.
   def receipt
     order = current_company.orders.includes(
       { order_product_appointments: :product },
       { order_service_appointments: :service },
       { order_product_group_appointments: :product_group },
       { order_service_group_appointments: :service_group },
-      { order_subscription_plan_appointments: :subscription_plan }
+      { order_subscription_plan_appointments: :subscription_plan },
+      :branch, :employee
     ).find(params[:id])
     invoice = order.invoices.order(:created_at).last
     transaction = invoice&.transactions&.order(:created_at)&.last
+    used_discounts = invoice ? invoice.discounts.where(status: :used) : Discount.none
 
-    items = order.line_items.map do |oa|
-      item_name = oa.name.presence || line_item_name(oa) || "Item"
-      {
-        name: item_name,
-        quantity: oa.quantity,
-        unit_price: oa.unit_price.to_f,
-        total_price: oa.total_price.to_f
-      }
-    end
-
-    subtotal = invoice ? invoice.price_cents / 100.0 : items.sum { |i| i[:total_price] }.round(2)
-    tax = (subtotal * 0.10).round(2)
-    discount_amount = invoice ? invoice.discounts.where(status: :used).sum(:amount_cents) / 100.0 : 0.0
+    subtotal_cents = money_to_cents(order.line_total, order.currency)
+    discount_cents = used_discounts.sum(:amount_cents)
+    tax_cents = invoice ? invoice.tax_cents.to_i : order_tax_cents(order, subtotal_cents, discount_cents)
+    total_cents = invoice_total_cents(invoice, subtotal_cents, discount_cents, tax_cents)
+    tax_rate_bp = invoice&.pos_tax_rate_bp || order.pos_tax_rate_bp
+    tax_name = invoice&.pos_tax_name.presence || order.pos_tax_name.presence
 
     render json: {
       receipt: {
         invoice_code: invoice&.code,
-        issued_at: invoice&.created_at,
+        issued_at: invoice&.created_at || order.created_at,
         payment_status: invoice&.payment_status,
         currency: order.currency,
-        items: items,
-        subtotal: subtotal.round(2),
-        discount_amount: discount_amount.round(2),
-        tax: tax,
-        total: (subtotal + tax).round(2),
-        payment_method_name: transaction&.payment_method&.name
+        branch_name: order.branch&.name,
+        cashier_name: order.employee&.name,
+        items: receipt_items(order),
+        subtotal_cents: subtotal_cents,
+        discount_cents: discount_cents,
+        discount_code: used_discounts.order(:created_at).last&.code,
+        tax_cents: tax_cents,
+        tax_rate_bp: tax_rate_bp,
+        tax_name: tax_name,
+        total_cents: total_cents,
+        payment_method_name: transaction&.payment_method&.name,
+        cash_received_cents: transaction&.cash_received_cents,
+        change_cents: transaction&.change_cents
       }
     }
   end
@@ -139,6 +140,7 @@ class Companies::OrdersController < Companies::ApplicationController
       :description,
       :code,
       :business_type,
+      :fulfillment_channel,
       :workflow_status,
       :currency,
       :category_id,
@@ -158,6 +160,7 @@ class Companies::OrdersController < Companies::ApplicationController
     order.as_json(only: [
       :id, :name, :description, :code,
       :lifecycle_status, :workflow_status, :business_type,
+      :fulfillment_channel, :fulfillment_status, :handed_over_at,
       :currency, :category_id, :customer_id, :employee_id,
       :created_at, :updated_at,
       *property_keys
@@ -169,6 +172,52 @@ class Companies::OrdersController < Companies::ApplicationController
 
   def format_orders(orders)
     orders.map { |order| format_order(order) }
+  end
+
+  def receipt_items(order)
+    order.line_items.map do |oa|
+      {
+        name: oa.name.presence || line_item_name(oa) || "Item",
+        quantity: oa.quantity,
+        unit_price_cents: money_to_cents(oa.unit_price, order.currency),
+        total_cents: money_to_cents(oa.total_price, order.currency),
+        kind: line_item_kind(oa)
+      }
+    end
+  end
+
+  def line_item_kind(line_item)
+    case line_item
+    when OrderProductAppointment then "product"
+    when OrderServiceAppointment then "service"
+    when OrderProductGroupAppointment then "product_group"
+    when OrderServiceGroupAppointment then "service_group"
+    when OrderSubscriptionPlanAppointment then "subscription_plan"
+    else "item"
+    end
+  end
+
+  def money_to_cents(value, currency)
+    return 0 if value.nil?
+
+    Money.from_amount(value, currency).cents
+  end
+
+  def order_tax_cents(order, subtotal_cents, discount_cents)
+    rate_bp = order.pos_tax_rate_bp.to_i
+    return 0 if rate_bp.zero?
+
+    taxable = [ subtotal_cents - discount_cents, 0 ].max
+    (taxable * rate_bp / 10_000.0).round
+  end
+
+  def invoice_total_cents(invoice, subtotal_cents, discount_cents, tax_cents)
+    if invoice
+      total = invoice.total_cents.to_i
+      total.positive? ? total : invoice.price_cents.to_i
+    else
+      subtotal_cents - discount_cents + tax_cents
+    end
   end
 
   def line_item_name(line_item)

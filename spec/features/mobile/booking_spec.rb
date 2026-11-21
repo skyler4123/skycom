@@ -34,7 +34,7 @@ RSpec.feature "Mobile Booking", type: :feature, js: true do
     expect(page).to have_content("Booking Operations Console", wait: 10)
     expect(page).to have_content("Boardroom Orion")
     expect(page).to have_content("Executive Board Review")
-    expect(page).to have_content("Day Timeline Grid")
+    expect(page).to have_content("Day window 08:00–18:00")
   end
 
   scenario "opens booking from the mobile operations list" do
@@ -51,7 +51,7 @@ RSpec.feature "Mobile Booking", type: :feature, js: true do
     visit booking_path
 
     expect(page).to have_content("Booking Operations Console", wait: 10)
-    timeline = find("section", text: /Day Timeline Grid/i)
+    timeline = find("section", text: /Day window/i)
     panels = find("aside")
 
     expect(panels.native.rect.y).to be > timeline.native.rect.y
@@ -64,7 +64,7 @@ RSpec.feature "Mobile Booking", type: :feature, js: true do
     visit booking_path
 
     expect(page).to have_content("Booking Operations Console", wait: 10)
-    timeline = find("section", text: /Day Timeline Grid/i)
+    timeline = find("section", text: /Day window/i)
     panels = find("aside")
 
     expect(panels.native.rect.x).to be > timeline.native.rect.x

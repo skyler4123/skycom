@@ -2,19 +2,21 @@
 
 # Companies::Operations::ReceptionController — the Reception operation.
 # Hydrates the resolved BranchOperationAppointment, then exposes the live
-# console payload (today's visit Events, held parcels, facility rooms and next
-# appointments) plus the write actions the front desk uses:
+# console payload (today's guest-linked visit Events, held parcels, facility
+# rooms and non-visit appointments) plus the write actions the front desk uses:
 #
 #   POST check_in      — walk-in Customer + Event (+ host / room links)
-#   POST advance       — check in / check out / re-open a visit Event
+#   POST pre_register  — expected visit Event from a branch-local date/time
+#   POST advance       — arrive / mark inside / check out / reopen
 #   POST create_parcel — persist a held parcel as an Event
-#   POST notify_parcel — stamp the parcel's notified_at metadata
+#   POST notify_parcel — direct notification to the recipient + notified_at
 #   POST pick_up_parcel — complete the parcel Event
-#   POST notify_host   — stamp the visit's host_notified_at metadata
+#   POST notify_host   — direct notification to the host + host_notified_at
 #
 # Serves Stimulus: Companies_Operations_Reception_ShowController (reception console)
 # Endpoints: GET  /companies/:company_id/operations/reception/:operation_id
 #            POST /companies/:company_id/operations/reception/:operation_id/check_in
+#            POST /companies/:company_id/operations/reception/:operation_id/pre_register
 #            POST /companies/:company_id/operations/reception/:operation_id/advance
 #            POST /companies/:company_id/operations/reception/:operation_id/parcels
 #            POST /companies/:company_id/operations/reception/:operation_id/parcels/:parcel_id/notify
@@ -27,6 +29,15 @@ class Companies::Operations::ReceptionController < Companies::Operations::BaseCo
       company: current_company,
       appointment: @appointment,
       params: visitor_params
+    )
+    render_result(result, success_status: :created)
+  end
+
+  def pre_register
+    result = Reception::PreRegisterService.call(
+      company: current_company,
+      appointment: @appointment,
+      params: pre_registration_params
     )
     render_result(result, success_status: :created)
   end
@@ -68,14 +79,12 @@ class Companies::Operations::ReceptionController < Companies::Operations::BaseCo
   end
 
   def notify_host
-    event = current_company.events.find_by(id: params[:event_id], branch_id: @appointment.branch_id)
-    return render json: { errors: [ "Visit not found." ] }, status: :not_found unless event
-    return render json: { errors: [ "This is not a reception visit." ] }, status: :unprocessable_content if event.metadata&.dig("reception_kind") == "parcel"
-
-    event.update!(metadata: (event.metadata || {}).merge("host_notified_at" => Time.current.iso8601))
-    render json: { message: "Host notification logged for #{visit_name(event)}." }
-  rescue ActiveRecord::RecordInvalid => e
-    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
+    result = Reception::NotifyHostService.call(
+      company: current_company,
+      appointment: @appointment,
+      event_id: params[:event_id]
+    )
+    render_result(result)
   end
 
   private
@@ -87,7 +96,12 @@ class Companies::Operations::ReceptionController < Companies::Operations::BaseCo
   def operation_payload
     {
       coming_soon: false,
-      reception: Reception::ConsoleService.call(company: current_company, appointment: @appointment),
+      company: { id: current_company.id, name: current_company.name },
+      reception: Reception::ConsoleService.call(
+        company: current_company,
+        appointment: @appointment,
+        employee: current_employee
+      ),
       reference: reference_payload
     }
   end
@@ -121,7 +135,13 @@ class Companies::Operations::ReceptionController < Companies::Operations::BaseCo
   end
 
   def visitor_params
-    params.require(:visitor).permit(:name, :company, :host_id, :facility_id, :notify, :print)
+    params.require(:visitor).permit(:name, :company, :host_id, :facility_id, :vip)
+  end
+
+  def pre_registration_params
+    params.require(:pre_registration).permit(
+      :name, :company, :host_id, :facility_id, :vip, :date, :start_time, :end_time
+    )
   end
 
   def parcel_params
@@ -137,9 +157,5 @@ class Companies::Operations::ReceptionController < Companies::Operations::BaseCo
     else
       render json: { errors: result[:errors] }, status: :unprocessable_content
     end
-  end
-
-  def visit_name(event)
-    event.customer_event_appointments.first&.customer&.name.presence || event.name
   end
 end

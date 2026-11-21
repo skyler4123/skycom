@@ -9,7 +9,9 @@
 # How it works: belongs to company, optional branch/customer, category, and
 # property mapping; line items are Order*Appointment rows. #line_items combines
 # them and #line_total sums their total_price. Invoices and discounts hang off the
-# order (see docs/ORDER_PROCESSING_V1.md, docs/DISCOUNTS.md).
+# order (see docs/ORDER_PROCESSING_V1.md, docs/DISCOUNTS.md). Fulfilment state is
+# separate from payment: fulfillment_channel says how goods leave the branch,
+# fulfillment_status/ handed_over_at track the floor handover.
 # Main associations: belongs_to :company, :category, :property_mapping
 # (required), :branch, :customer, and :employee (optional; the employee credited
 # with the order, not necessarily its creator); has_many :invoices, :discounts,
@@ -24,6 +26,10 @@ class Order < ApplicationRecord
   include DynamicSearchConcern
   include TagConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
+  # POS tax snapshot at ORDER time. Stored in metadata so a later Tax Config
+  # change never rewrites an open sale.
+  attribute :metadata, default: -> { {} }
+  store_accessor :metadata, :pos_tax_rate_bp, :pos_tax_name, :pos_tax_inclusive
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
@@ -37,6 +43,17 @@ class Order < ApplicationRecord
     in_store: 1,
     phone: 2
   }
+  enum :fulfillment_channel, {
+    walk_in: 0,
+    click_collect: 1,
+    local_delivery: 2,
+    phone_hold: 3
+  }, prefix: true, default: :walk_in
+  enum :fulfillment_status, {
+    unfulfilled: 0,
+    ready: 1,
+    handed_over: 2
+  }, prefix: true, default: :unfulfilled
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
@@ -70,9 +87,13 @@ class Order < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :currency, presence: true
+  validates :code, uniqueness: true, allow_nil: true
 
   validates :business_type, presence: true
   validate :employee_belongs_to_company
+
+  # --- Callbacks ---
+  before_validation :assign_code, on: :create
 
   # --- Methods ---
   # Combined line items across all atomic order tables (products, services,
@@ -94,6 +115,15 @@ class Order < ApplicationRecord
   end
 
   private
+
+  def assign_code
+    return if code.present?
+
+    self.code = loop do
+      candidate = "ORD-#{SecureRandom.hex(4).upcase}"
+      break candidate unless self.class.exists?(code: candidate)
+    end
+  end
 
   def employee_belongs_to_company
     return if employee.nil? || company_id.nil?

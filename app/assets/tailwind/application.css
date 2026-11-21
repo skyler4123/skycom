@@ -130,3 +130,26 @@
   --color-info:               var(--info);
   --color-info-foreground:    var(--info-foreground);
 }
+
+/* POS receipt: the browser print dialog sees only the 80 mm slip. */
+@media print {
+  @page {
+    size: 80mm auto;
+    margin: 4mm;
+  }
+
+  /* Paper is light even when the register is in dark mode. */
+  :root,
+  .dark {
+    --background: #ffffff;
+    --card: #ffffff;
+    --muted: #f3f4f6;
+    --line: #000000;
+    --foreground: #000000;
+    --muted-foreground: #333333;
+  }
+
+  body {
+    background: white;
+  }
+}

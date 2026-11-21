@@ -68,6 +68,16 @@ RSpec.describe "Companies::NotificationsController", type: :request do
       expect(body).to have_key("pagination")
     end
 
+    it "lists a directly addressed notification for its recipient" do
+      Notifications::CreateService.call(company: company, name: "Guest arrived: Jessica Tan", recipient_employee: employee)
+
+      get company_notifications_path(company), as: :json
+
+      expect(response).to have_http_status(:ok)
+      names = JSON.parse(response.body)["notifications"].map { |n| n["name"] }
+      expect(names).to include("Guest arrived: Jessica Tan")
+    end
+
     it "never returns another company's notifications even with a forged tag link" do
       other = create(:company)
       foreign = Notification.create!(company: other, name: "foreign")

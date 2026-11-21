@@ -18,6 +18,7 @@ include SetDefaultCompanyConcern
 
   # --- Validations ---
   validates :expected_quantity, numericality: { only_integer: true }
+  validates :counted_quantity, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
   validates :stock_id, uniqueness: { scope: :stock_count_id }
 
   # --- Methods ---
@@ -25,9 +26,17 @@ include SetDefaultCompanyConcern
     !counted_quantity.nil?
   end
 
-  def recompute_variance!
-    return unless counted?
+  # Records a counted value and recomputes the stored variance. Clearing the
+  # counted value resets the variance to 0 (otherwise a stale finding survives).
+  def record_count!(value)
+    value = value.presence if value.is_a?(String)
+    update!(
+      counted_quantity: value,
+      variance_quantity: value.nil? ? 0 : value.to_i - expected_quantity.to_i
+    )
+  end
 
-    update!(variance_quantity: counted_quantity.to_i - expected_quantity.to_i)
+  def recompute_variance!
+    update!(variance_quantity: counted? ? counted_quantity.to_i - expected_quantity.to_i : 0)
   end
 end

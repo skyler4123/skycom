@@ -23,7 +23,7 @@ class Transaction < ApplicationRecord
   include TagConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :price_cents, :integer, default: 0
-  store_accessor :metadata, :gateway_payload
+  store_accessor :metadata, :gateway_payload, :cash_received_cents, :change_cents
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc

@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 # == Purpose:
-# System-generated broadcast: one Notification row per event plus tag links.
-# Employees subscribe via the same tags (EmployeeNotificationTagAppointment);
-# no per-employee fan-out rows are written here.
+# System-generated notification: one Notification row per event plus its tag
+# links and/or one directly addressed employee.
+# Employees subscribe via tags (EmployeeNotificationTagAppointment) or receive a
+# row through `recipient_employee_id`; no per-employee copies are written for
+# tag broadcasts.
 #
 # == Returns (never raises for business failures):
 #   { success: true, notification: <Notification> } | { success: false, errors: ["..."] }
@@ -12,27 +14,29 @@
 # (e.g. stock-low firing 20x/min creates 1 row, not 20).
 module Notifications
   class CreateService
-    def self.call(company:, name:, tag_ids:, description: nil, severity: :info, url: nil,
+    def self.call(company:, name:, tag_ids: [], recipient_employee: nil, description: nil, severity: :info, url: nil,
       throttle_key: nil, throttle_window: nil)
       new(company: company, name: name, description: description, severity: severity, url: url,
-        tag_ids: tag_ids, throttle_key: throttle_key,
+        tag_ids: tag_ids, recipient_employee: recipient_employee, throttle_key: throttle_key,
         throttle_window: throttle_window).call
     end
 
-    def initialize(company:, name:, tag_ids:, description:, severity:, url:, throttle_key:, throttle_window:)
+    def initialize(company:, name:, tag_ids:, description:, severity:, url:, recipient_employee:, throttle_key:, throttle_window:)
       @company = company
       @name = name
       @description = description
       @severity = severity
       @url = url
       @tag_ids = Array(tag_ids)
+      @recipient_employee = recipient_employee
       @throttle_key = throttle_key
       @throttle_window = throttle_window
     end
 
     def call
       return failure("Name is required") if @name.to_s.strip.empty?
-      return failure("At least one tag is required") if @tag_ids.empty?
+      return failure("At least one tag or recipient is required") if @tag_ids.empty? && @recipient_employee.nil?
+      return failure("Unknown recipient") if @recipient_employee && @recipient_employee.company_id != @company.id
 
       tags = NotificationTag.where(company: @company, id: @tag_ids)
       return failure("Unknown notification tags") if tags.size != @tag_ids.uniq.size
@@ -46,6 +50,7 @@ module Notifications
         ActiveRecord::Base.transaction(requires_new: true) do
           notification = Notification.create!(
             company: @company, name: @name, description: @description, severity: @severity, url: @url,
+            recipient_employee: @recipient_employee,
             metadata: @throttle_key.present? ? { "throttle_key" => @throttle_key } : {}
           )
           rows = @tag_ids.map do |tag_id|
@@ -53,7 +58,7 @@ module Notifications
               notification_id: notification.id, notification_tag_id: tag_id,
               created_at: Time.current, updated_at: Time.current }
           end
-          NotificationTagAppointment.insert_all!(rows)
+          NotificationTagAppointment.insert_all!(rows) if rows.any?
         end
       end
 
@@ -67,7 +72,7 @@ module Notifications
     private
 
     def throttled?
-      return false if @throttle_key.blank? || @throttle_window.blank?
+      return false if @throttle_key.blank? || @throttle_window.blank? || @tag_ids.empty?
 
       Notification
         .joins(:notification_tag_appointments)
@@ -82,7 +87,8 @@ module Notifications
       employee_ids = EmployeeNotificationTagAppointment
         .where(company: @company, notification_tag_id: @tag_ids)
         .distinct.pluck(:employee_id)
-      employee_ids.each do |employee_id|
+      employee_ids << @recipient_employee.id if @recipient_employee
+      employee_ids.uniq.each do |employee_id|
         Rails.sync_cache.delete(CacheKeyService.employee_unread_notifications(employee_id))
       end
     end

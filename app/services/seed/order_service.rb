@@ -11,8 +11,15 @@ class Seed::OrderService
     lifecycle_status: Order.lifecycle_statuses.keys.sample,
     workflow_status: Order.workflow_statuses.keys.sample,
     business_type: Order.business_types.keys.sample,
+    fulfillment_channel: nil,
+    fulfillment_status: nil,
+    handed_over_at: nil,
     discarded_at: nil
   )
+    channel = fulfillment_channel.presence || fulfillment_channel_for(business_type)
+    handed_over = fulfillment_status.to_s == "handed_over"
+    status = fulfillment_status.presence || "unfulfilled"
+
     Order.new(
       company: company,
       branch: branch,
@@ -25,8 +32,19 @@ class Seed::OrderService
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,
+      fulfillment_channel: channel,
+      fulfillment_status: status,
+      handed_over_at: handed_over_at.presence || (handed_over ? Time.current : nil),
       discarded_at: discarded_at
     )
+  end
+
+  def self.fulfillment_channel_for(business_type)
+    case business_type.to_s
+    when "online" then "local_delivery"
+    when "phone" then "phone_hold"
+    else "walk_in"
+    end
   end
 
   def self.create(...)
