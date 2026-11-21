@@ -56,10 +56,10 @@ RSpec.feature "Credit deduction E2E", type: :feature, js: true do
       delta = nil
       10.times do
         delta = company.credit_usage_delta
-        break if delta == CREDIT_USAGE_RATES[:access_dashboard]
+        break if delta == CREDIT_DEDUCTION_RATES.dig("companies/dashboards#index", :cost)
         sleep 0.2
       end
-      expect(delta).to eq(CREDIT_USAGE_RATES[:access_dashboard]) # 2
+      expect(delta).to eq(CREDIT_DEDUCTION_RATES.dig("companies/dashboards#index", :cost)) # 2
 
       # Wallet — promo-first priority (BaseService:65)
       wallet = company.company_wallet.reload

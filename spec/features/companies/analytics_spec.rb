@@ -184,4 +184,18 @@ RSpec.feature "Analytics Dashboard", type: :feature, js: true do
 
     expect(page).to have_selector('[data-analytics-metric="revenue"]', text: "$10.00", wait: 10)
   end
+
+  scenario "charges 2 credits once per page load and not on a period change" do
+    original_promo = company.company_wallet.reload.promo_credit_balance
+
+    visit company_analytics_path(company)
+    expect(page).to have_selector('[data-analytics-metric="revenue"]', text: "$50.00", wait: 10)
+
+    expect(company.company_wallet.reload.promo_credit_balance).to eq(original_promo - 2)
+
+    select "Last Month", from: "period"
+    expect(page).to have_selector('[data-analytics-metric="revenue"]', text: "$10.00", wait: 10)
+
+    expect(company.company_wallet.reload.promo_credit_balance).to eq(original_promo - 2)
+  end
 end

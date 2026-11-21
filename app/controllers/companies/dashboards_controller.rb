@@ -8,15 +8,15 @@
 #   GET/PATCH /companies/:company_id/dashboard(.json)
 #
 # The index JSON payload is cached in sync_cache for DASHBOARD_CACHE_EXPIRY (5 min)
-# per company and financial-visibility level. Credit deduction still runs on
-# every request through the after_action filter — caching never bypasses billing.
+# per company and financial-visibility level. Page access is charged once by
+# CreditDeductionConcern; caching never bypasses billing.
 # Dashboard config updates clear both cached payloads so the next visit reflects
 # the new block list immediately.
 class Companies::DashboardsController < Companies::ApplicationController
   DASHBOARD_CACHE_EXPIRY = 5.minutes
 
-  # Credit deduction is handled by the after_action filter — never inline.
-  deduct_company_credits_for :index, with: CompanyCreditDeduction::Companies::Dashboards::IndexService
+  # Credit deduction is priced in CREDIT_DEDUCTION_RATES and charged by the
+  # CreditDeductionConcern after the first JSON request for the page.
 
   def index
     respond_to do |format|

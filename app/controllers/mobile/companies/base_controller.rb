@@ -2,6 +2,7 @@ class Mobile::Companies::BaseController < Mobile::BaseController
   before_action :set_employee_and_company
   include Mobile::Companies::Authorizable
   include Mobile::Companies::SuspendedCompanyConcern
+  include Companies::CreditDeductionConcern
   include ApplicationController::WebsocketConcern
 
   before_action :set_websocket_channels

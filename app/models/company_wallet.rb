@@ -8,12 +8,12 @@
 # separate debt balance.
 # How it works: credit IN flows through the chain
 # (CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet) and promo
-# grants. Credit OUT is CONTROLLER-ONLY via CompanyCreditDeduction::* — never
-# from a background job, import, seed, or migration. Background jobs are
-# free-credit: they may grant credits and drain usage counters, but must never
-# call deduct_from! or CompanyCreditDeduction::*.
+# grants. Credit OUT goes through CompanyCreditDeduction::DeductionService from
+# any layer (controller, model, job, mailer); the service skips suspended
+# companies unless the caller passes allow_suspended: true. Callers must never
+# call deduct_from! directly.
 # Balances: main — real purchased credits (top-ups land here via add_credits!);
-# promo — promotional credits (deducted FIRST by CompanyCreditDeduction::*).
+# promo — promotional credits (deducted FIRST by the deduction service).
 # Main associations: belongs_to :company, :walletable (polymorphic, required);
 # has_many :company_wallet_logs, :company_usage_logs (dependent: :destroy).
 class CompanyWallet < ApplicationRecord
@@ -43,9 +43,9 @@ class CompanyWallet < ApplicationRecord
 
   # Low-level atomic mutation entry points.
   # add_to! / add_credits! are allowed from controllers, background jobs (promo
-  # grants, top-up completion), and seeds. deduct_from! is CONTROLLER-ONLY via
-  # CompanyCreditDeduction::* — background jobs are free-credit and must never
-  # take credits out of a wallet.
+  # grants, top-up completion), and seeds. deduct_from! is the wallet primitive
+  # behind CompanyCreditDeduction::DeductionService; callers must not use it
+  # directly.
 
   def add_to!(balance:, amount:, source: nil, description: nil, action_type: "top_up")
     column = balance_column!(balance)
@@ -65,7 +65,7 @@ class CompanyWallet < ApplicationRecord
     public_send(column)
   end
 
-  def deduct_from!(balance:, amount:, source: nil, description: nil, action_type: "deduction")
+  def deduct_from!(balance:, amount:, source: nil, description: nil, action_type: "deduction", external_id: nil)
     column = balance_column!(balance)
     raise ArgumentError, "amount must be a positive integer" unless amount.is_a?(Integer) && amount.positive?
 
@@ -75,9 +75,13 @@ class CompanyWallet < ApplicationRecord
       CompanyWalletLog.create!(
         company: company, company_wallet: self, change_type: :debit,
         change_amount: -amount, balance_before: current, balance_after: public_send(column),
-        balance_type: balance, source: source, description: description
+        balance_type: balance, source: source, description: description,
+        external_id: external_id
       )
-      record_usage_log!(action_type: action_type, source: source, change_amount: -amount, description: description)
+      record_usage_log!(
+        action_type: action_type, source: source, change_amount: -amount,
+        description: description, external_id: external_id
+      )
       company.sync_credit_status!(total_credit_balance: total_credit_balance)
     end
     public_send(column)
@@ -110,13 +114,14 @@ class CompanyWallet < ApplicationRecord
     column
   end
 
-  def record_usage_log!(action_type:, source:, change_amount:, description:)
+  def record_usage_log!(action_type:, source:, change_amount:, description:, external_id: nil)
     return unless usage_logging_active?
 
     CompanyUsageLog.create!(
       company: company, company_wallet: self,
       action_type: action_type, change_amount: change_amount,
-      balance_after: total_credit_balance, source: source, description: description
+      balance_after: total_credit_balance, source: source, description: description,
+      external_id: external_id
     )
   end
 end

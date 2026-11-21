@@ -102,15 +102,19 @@ RSpec.describe "Companies::Dashboards", type: :request do
       expect(Dashboards::OverviewService).to have_received(:call).twice
     end
 
-    it "still deducts dashboard credits on a cache hit" do
+    it "charges one page access even when the payload comes from cache" do
       company.company_wallet.update_columns(promo_credit_balance: 0)
       company.company_wallet.add_credits!(amount: 100)
 
-      get company_dashboards_path(company, format: :json)
-      get company_dashboards_path(company, format: :json)
+      get company_dashboards_path(company)
+      token = Nokogiri::HTML(response.body).at_css("body")["data-credit-page-token"]
+      expect(token).to be_present
 
-      expect(company.company_wallet.reload.main_credit_balance).to eq(96)
-      expect(company.credit_usage_delta).to eq(4)
+      get company_dashboards_path(company, format: :json), headers: { "X-Credit-Page-Token" => token }
+      get company_dashboards_path(company, format: :json), headers: { "X-Credit-Page-Token" => token }
+
+      expect(company.company_wallet.reload.main_credit_balance).to eq(98)
+      expect(company.credit_usage_delta).to eq(2)
     end
   end
 end

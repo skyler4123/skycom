@@ -11,6 +11,7 @@ RSpec.describe CompanyCreditDeduction::BaseService do
     Class.new(described_class) do
       def action_type = "access_dashboard"
       def description = "Dashboard access"
+      def cost = 2
     end
   end
 

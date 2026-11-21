@@ -44,6 +44,7 @@
   </head>
 
   <body
+    data-credit-page-token="<%= @credit_page_token %>"
     data-controller="responsive language svg img link open notification darkmode modal toasts client-cache authentication websocket"
     <% if is_signed_in? && @channels.present? %>
       data-websocket-url-value="ws://localhost:8000/connection/websocket"

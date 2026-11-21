@@ -143,11 +143,11 @@ RSpec.describe CompanyWallet, type: :model do
 
       wallet.enable_usage_logging!(window: 5.minutes)
       expect {
-        wallet.deduct_from!(balance: :main, amount: 10, source: nil, description: "Order", action_type: "create_order")
+        wallet.deduct_from!(balance: :main, amount: 10, source: nil, description: "Order", action_type: "access_dashboard")
       }.to change(CompanyUsageLog, :count).by(1)
 
       log = CompanyUsageLog.last
-      expect(log.action_type).to eq("create_order")
+      expect(log.action_type).to eq("access_dashboard")
       expect(log.change_amount).to eq(-10)
       expect(log.balance_after).to eq(90)
     end

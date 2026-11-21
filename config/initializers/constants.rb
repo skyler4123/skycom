@@ -239,8 +239,8 @@ EXAM_SUBMIT_GRACE_SECONDS = 30
 #            to active.
 # suspend  — no usable credit (main + promo <= 0). Web, JSON, and mobile requests
 #            are blocked and sent to the top-up flow. Still processed by
-#            company-wide background jobs (usage sync, promo grants) because
-#            those jobs are free-credit.
+#            company-wide background jobs (usage sync, promo grants); a job's
+#            deduction skips the suspended company unless it opts in.
 #
 # companies.lifecycle_status is legacy and is NOT used for access control.
 COMPANY_WORKFLOW_STATUS = {
@@ -382,9 +382,9 @@ MOCK_OAUTH_EMAIL = "Manager_1_clinic_1@company3.com".freeze
 # Credit System (Pay-as-You-Go)
 # =============================================================================
 
-# Promo credits granted to every newly created company (except system companies).
-# They land in promo_credit_balance so normal deductions drain them first.
-SIGNUP_PROMO_CREDITS = 1_000
+# Promo credits granted to every newly created company, including system-owned
+# companies. They land in promo_credit_balance so normal deductions drain them first.
+SIGNUP_PROMO_CREDITS = 1_000_000
 
 # Per-country credit purchase tiers: money in CENTS → credits.
 # CompanyOrder validates its money_amount_cents/credit_amount against these.
@@ -393,13 +393,53 @@ CREDIT_RATES = {
   vn: { 10_000_000 => 400_000, 100_000_000 => 800_000 }
 }.freeze
 
-# Per-action credit cost (global — not country-based).
-# CompanyUsageLog.action_type strings mirror these keys.
-CREDIT_USAGE_RATES = {
-  create_order: 10,
-  access_dashboard: 2,
-  create_customer: 7
+# Page-access credit prices, keyed by "controller_path#action". A page load is
+# charged once according to charge_on:
+#   :first_json     — the HTML shell is free; the first successful JSON request
+#                     for this page charges once, later JSON requests are free.
+#   :html           — the successful HTML page request charges; JSON is free.
+#   :every_request  — every successful JSON request charges.
+#   :none           — never charge.
+# Today every page uses :first_json. HTML charging is supported for later.
+CREDIT_DEDUCTION_RATES = {
+  "companies/dashboards#index" => {
+    cost: 2, action_type: "access_dashboard",
+    description: "Dashboard access", charge_on: :first_json
+  }.freeze,
+  "companies/analytics#index" => {
+    cost: 2, action_type: "access_analytics",
+    description: "Analytics access", charge_on: :first_json
+  }.freeze,
+  "companies/operations/pos#show" => {
+    cost: 3, action_type: "access_pos_console",
+    description: "POS console access", charge_on: :first_json
+  }.freeze,
+  "companies/operations/booking#show" => {
+    cost: 3, action_type: "access_booking_console",
+    description: "Booking console access", charge_on: :first_json
+  }.freeze,
+  "companies/operations/inventory#show" => {
+    cost: 3, action_type: "access_inventory_console",
+    description: "Inventory console access", charge_on: :first_json
+  }.freeze,
+  "companies/operations/reception#show" => {
+    cost: 3, action_type: "access_reception_console",
+    description: "Reception console access", charge_on: :first_json
+  }.freeze,
+  "companies/operations/store_manager#show" => {
+    cost: 3, action_type: "access_store_manager_console",
+    description: "Store Manager console access", charge_on: :first_json
+  }.freeze
 }.freeze
+
+# Valid CompanyUsageLog.action_type values. Page action types come from
+# CREDIT_DEDUCTION_RATES; add non-page job/mailer action types here when wired.
+CREDIT_DEDUCTION_ACTION_TYPES = (
+  CREDIT_DEDUCTION_RATES.values.map { |rule| rule[:action_type] } + %w[top_up deduction]
+).uniq.freeze
+
+# Lifetime of the signed page-load token and its one-time claim marker.
+CREDIT_PAGE_TOKEN_TTL = 1.hour
 
 # Dashboard/analytics low-stock alert threshold. Stock is per warehouse; the
 # count is warehouse SKU rows whose available quantity (quantity - pending) is

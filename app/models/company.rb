@@ -244,7 +244,8 @@ class Company < ApplicationRecord
   # --- Scopes ---
   scope :system_companies, -> { where(id: System.select(:company_id)) }
   # Companies that company-wide background jobs may process. Suspended companies
-  # stay in (jobs are free-credit); disabled companies are skipped.
+  # stay in (deductions made by jobs skip them by default); disabled companies
+  # are skipped.
   scope :for_background_jobs, -> { where.not(workflow_status: workflow_statuses[:disabled]) }
 
   # --- Validations ---
@@ -346,6 +347,22 @@ class Company < ApplicationRecord
 
   def credit_usage_delta
     credit_usage.value.to_i
+  end
+
+  # One-time claim for a signed page-load token. Redis SET NX makes parallel
+  # first-JSON requests safe: only the request that creates the marker charges.
+  def claim_credit_page_token!(token)
+    Kredis.flag(
+      CacheKeyService.company_credit_page_token(id, Digest::SHA256.hexdigest(token)),
+      expires_in: CREDIT_PAGE_TOKEN_TTL
+    ).mark(force: false).present?
+  end
+
+  # Releases a claim when the deduction itself failed, so a retry can charge.
+  def release_credit_page_token!(token)
+    Kredis.flag(
+      CacheKeyService.company_credit_page_token(id, Digest::SHA256.hexdigest(token))
+    ).remove
   end
 
   def as_json(options = {})
