@@ -382,9 +382,9 @@ MOCK_OAUTH_EMAIL = "Manager_1_clinic_1@company3.com".freeze
 # Credit System (Pay-as-You-Go)
 # =============================================================================
 
-# Promo credits granted to every newly created company (except system companies).
-# They land in promo_credit_balance so normal deductions drain them first.
-SIGNUP_PROMO_CREDITS = 1_000
+# Promo credits granted to every newly created company, including system-owned
+# companies. They land in promo_credit_balance so normal deductions drain them first.
+SIGNUP_PROMO_CREDITS = 1_000_000
 
 # Per-country credit purchase tiers: money in CENTS → credits.
 # CompanyOrder validates its money_amount_cents/credit_amount against these.

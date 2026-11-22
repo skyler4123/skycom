@@ -148,7 +148,7 @@ version as the library.
 
 | File | Purpose |
 |---|---|
-| `android/app/src/main/AndroidManifest.xml` | `INTERNET` permission, application class, Material theme, `SignInActivity` as the launcher, orientation/keyboard handling, predictive back. |
+| `android/app/src/main/AndroidManifest.xml` | `INTERNET` + `ACCESS_FINE_LOCATION` + `ACCESS_COARSE_LOCATION` permissions, application class, Material theme, `SignInActivity` as the launcher, orientation/keyboard handling, predictive back. |
 | `android/app/src/debug/AndroidManifest.xml` | Adds `android:usesCleartextTraffic="true"` **for debug builds only**, so the app can talk to `http://10.88.0.2:3000`. Release builds do not get this. |
 
 ### 3.3 Kotlin
@@ -601,6 +601,12 @@ server must be HTTPS.
 The debug setting allows cleartext to **any** host, not just `10.88.0.2`. If you
 want tighter security, replace it with a `network_security_config.xml` that
 allowlists only the dev host.
+
+Cleartext also matters for GPS check-in: the WebView Geolocation API requires a
+**secure context**. `http://10.88.0.2:3000` and LAN-IP hosts are not secure
+contexts, so location check-in shows the fallback message instead of asking for
+permission. Use `adb reverse tcp:3000 tcp:3000` with
+`http://127.0.0.1:3000` (loopback is treated as secure) or an HTTPS host.
 
 ### 7.4 The Rails server
 

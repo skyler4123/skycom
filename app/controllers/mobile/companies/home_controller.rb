@@ -21,6 +21,7 @@ class Mobile::Companies::HomeController < Mobile::Companies::BaseController
     @pending_requests_count = AttendanceRequest.where(employee: @employee, status: :pending).count
     @attendance_balance = AttendanceBalance.for(employee: @employee, year: company_today.year)
     @announcement = @employee.documents.announcements.published.order(updated_at: :desc).first
+    @geofence_required = @employee.branch&.attendance_config.present?
 
     respond_to do |format|
       format.html do
@@ -44,6 +45,7 @@ class Mobile::Companies::HomeController < Mobile::Companies::BaseController
       company: { id: @company.id, name: @company.name, utc_offset: @company_utc_offset },
       companies: @companies,
       checked_in: @checked_in,
+      geofence_required: @geofence_required,
       today_shift: @today_shift && {
         expected_start_at: @today_shift.expected_start_at,
         expected_end_at: @today_shift.expected_end_at

@@ -2790,6 +2790,21 @@ export const dictionary = () => {
     "Branch check-in": { vi: "Chấm công tại chi nhánh" },
     "Check In Again": { vi: "Chấm công lại" },
     "Clock In": { vi: "Chấm công" },
+    "Locating…": { vi: "Đang xác định vị trí…" },
+    "Your location is required to check in.": { vi: "Cần vị trí của bạn để chấm công." },
+    "Location is recorded when available.": { vi: "Vị trí sẽ được ghi nhận khi có sẵn." },
+    "Location permission is required to check in. Allow precise location for Skycom in your device settings.": {
+      vi: "Cần quyền vị trí để chấm công. Hãy cho phép vị trí chính xác cho Skycom trong cài đặt thiết bị.",
+    },
+    "Your location is unavailable. Turn on location services and try again.": {
+      vi: "Không thể xác định vị trí. Hãy bật dịch vụ vị trí và thử lại.",
+    },
+    "Could not get your location in time. Try again.": { vi: "Không lấy được vị trí kịp thời. Vui lòng thử lại." },
+    "Location is not available in this app. File an attendance request instead.": {
+      vi: "Ứng dụng không có quyền truy cập vị trí. Hãy gửi yêu cầu chấm công thay thế.",
+    },
+    "Location is required to check in.": { vi: "Cần vị trí để chấm công." },
+    "You are outside the allowed check-in area.": { vi: "Bạn đang ở ngoài khu vực chấm công được phép." },
     "Paid Leave": { vi: "Phép năm" },
     "Quick Operations": { vi: "Thao tác nhanh" },
     "Profile, branch, roles": { vi: "Hồ sơ, chi nhánh, vai trò" },

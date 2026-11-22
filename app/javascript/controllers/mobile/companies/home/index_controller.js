@@ -16,13 +16,21 @@ import {
 // stats, quick actions, company notice and today's activity.
 // Depends on BE: Mobile::Companies::HomeController#index
 // Endpoints: GET /mobile/companies/:company_id/home.json
+//            POST /mobile/companies/:company_id/attendances
 // Docs: docs/MOBILE.md §2-§4
 export default class Mobile_Companies_Home_IndexController extends Controller {
+  /** @type {boolean} */
+  geofenceRequired = false
+
+  /** @type {boolean} */
+  locating = false
+
   async connect() {
     document.title = "Home"
 
     try {
       const data = await fetchJson(this.element.dataset.jsonUrl)
+      this.geofenceRequired = Boolean(data.geofence_required)
       this.element.innerHTML = this.contentHTML(data)
     } catch (error) {
       renderMobileError(this.element, error, () => this.connect())
@@ -166,15 +174,131 @@ export default class Mobile_Companies_Home_IndexController extends Controller {
     return form({
       action: Helpers.mobile_company_attendances_path(company.id),
       method: "POST",
-      attributes: `data-turbo="false"`,
+      attributes: `data-turbo="false" data-action="submit->mobile--companies--home--index#handleCheckIn"`,
       html: `
-        <button type="submit"
+        <input type="hidden" name="attendance[latitude]" value="" autocomplete="off">
+        <input type="hidden" name="attendance[longitude]" value="" autocomplete="off">
+        <input type="hidden" name="attendance[accuracy]" value="" autocomplete="off">
+        <button type="submit" data-check-in-button
           class="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 active:scale-95">
           <span class="material-symbols-outlined text-xl">login</span>
           ${translate(checkedIn ? "Check In Again" : "Clock In")}
         </button>
+        <p class="mt-2 flex items-start justify-center gap-1 text-center text-xs text-muted-foreground">
+          <span class="material-symbols-outlined text-sm">location_on</span>
+          <span>${translate(this.geofenceRequired ? "Your location is required to check in." : "Location is recorded when available.")}</span>
+        </p>
       `
     })
+  }
+
+  async handleCheckIn(event) {
+    event.preventDefault()
+
+    const formElement = event.target
+    if (this.locating) return
+
+    const button = formElement.querySelector("[data-check-in-button]")
+    const originalButton = button ? button.innerHTML : ""
+
+    if (!window.isSecureContext) {
+      if (this.geofenceRequired) {
+        toast({ type: "error", message: translate("Location is not available in this app. File an attendance request instead.") })
+        return
+      }
+      formElement.submit()
+      return
+    }
+
+    try {
+      const permission = await this.geolocationPermission()
+
+      if (permission === "denied") {
+        if (this.geofenceRequired) {
+          toast({ type: "error", message: translate("Location permission is required to check in. Allow precise location for Skycom in your device settings.") })
+          return
+        }
+        formElement.submit()
+        return
+      }
+
+      this.setLocating(button, true)
+      const position = await this.currentPosition()
+      this.fillPosition(formElement, position)
+      formElement.submit()
+    } catch (error) {
+      this.setLocating(button, false, originalButton)
+
+      if (!this.geofenceRequired) {
+        formElement.submit()
+        return
+      }
+
+      toast({ type: "error", message: this.geolocationErrorMessage(error) })
+    }
+  }
+
+  currentPosition() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("unsupported"))
+        return
+      }
+
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 10000
+      })
+    })
+  }
+
+  async geolocationPermission() {
+    if (!navigator.permissions?.query) return "prompt"
+
+    try {
+      const status = await navigator.permissions.query({ name: "geolocation" })
+      return status.state
+    } catch (error) {
+      return "prompt"
+    }
+  }
+
+  fillPosition(formElement, position) {
+    const { latitude, longitude, accuracy } = position.coords
+    this.setHiddenValue(formElement, "attendance[latitude]", latitude)
+    this.setHiddenValue(formElement, "attendance[longitude]", longitude)
+    this.setHiddenValue(formElement, "attendance[accuracy]", accuracy)
+  }
+
+  setHiddenValue(formElement, name, value) {
+    const input = formElement.querySelector(`[name="${name}"]`)
+    if (input) input.value = value
+  }
+
+  setLocating(button, locating, original = "") {
+    this.locating = locating
+    if (!button) return
+
+    button.disabled = locating
+    button.classList.toggle("opacity-60", locating)
+    button.innerHTML = locating
+      ? `<span class="material-symbols-outlined animate-spin text-xl">progress_activity</span> ${translate("Locating…")}`
+      : original
+  }
+
+  geolocationErrorMessage(error) {
+    if (error?.code === 1) {
+      return translate("Location permission is required to check in. Allow precise location for Skycom in your device settings.")
+    }
+    if (error?.code === 2) {
+      return translate("Your location is unavailable. Turn on location services and try again.")
+    }
+    if (error?.code === 3) {
+      return translate("Could not get your location in time. Try again.")
+    }
+
+    return translate("Location is not available in this app. File an attendance request instead.")
   }
 
   statsHTML({ attendance_month: attendanceMonth, attendance_balance: balance }) {

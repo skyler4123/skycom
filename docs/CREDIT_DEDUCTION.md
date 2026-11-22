@@ -171,7 +171,7 @@ The wallet stores credit balance **numbers only** (atomic-purpose pattern — no
 | `main_credit_balance` | Purchased credits (top-ups land here) | ✅ Yes (`add_credits!`) | 2nd |
 | `promo_credit_balance` | Promotional credits (signup bonus, campaigns) | ❌ No | **1st** |
 
-- New companies get `SIGNUP_PROMO_CREDITS` (1,000) in the **promo** balance at
+- New companies get `SIGNUP_PROMO_CREDITS` (1,000,000) in the **promo** balance at
   creation, so they start active. System-owned companies receive the same grant;
   only their suspension exemption is special.
 - Both columns are BIGINT and may be **negative**. A negative total is allowed
@@ -330,7 +330,7 @@ If the same action also runs in a job, deduct only at the controller entry point
 
 ## 7. Testing — Wallet Seeding Requirement
 
-New companies start with `SIGNUP_PROMO_CREDITS` (1,000) in the promo balance.
+New companies start with `SIGNUP_PROMO_CREDITS` (1,000,000) in the promo balance.
 Credit-focused tests should use the `:without_signup_promo` company factory trait
 or the `seed_random_wallet!` helper so exact balance assertions stay
 deterministic. The trait is not a shortcut for the state machine: it gives a
@@ -341,7 +341,7 @@ transition.
 
 | State transition | Expected status | Covered by |
 |---|---|---|
-| Signup init (promo 1,000) | `active` | `company_credit_status_spec` |
+| Signup init (promo 1,000,000) | `active` | `company_credit_status_spec` |
 | `0` | `suspend` | `company_credit_status_spec`, `company_wallet_spec` |
 | `0` → positive (`SIGNUP_PROMO_CREDITS`) | `active` | `company_credit_status_spec` |
 | positive → `0` (deduction reaches zero) | `suspend` | `company_credit_status_spec`, `company_wallet_spec` |

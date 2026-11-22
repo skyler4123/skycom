@@ -76,6 +76,26 @@ adb reverse tcp:3000 tcp:3000
 ./gradlew :app:assembleDebug -PskycomBaseUrl=http://127.0.0.1:3000
 ```
 
+## Location permission (GPS check-in)
+
+The check-in form uses the WebView Geolocation API. The main manifest declares
+`ACCESS_FINE_LOCATION` and `ACCESS_COARSE_LOCATION`; Hotwire Native's
+`GeolocationPermissionDelegate` handles the runtime permission dialog and
+prefers precise location.
+
+Browser geolocation requires a secure origin:
+
+- **Production:** HTTPS (release builds do not allow cleartext).
+- **Development:** `adb reverse tcp:3000 tcp:3000` with
+  `-PskycomBaseUrl=http://127.0.0.1:3000`, or an HTTPS dev host.
+- The default `http://10.88.0.2:3000` is **not** a secure origin, so Chrome
+  refuses geolocation there and the check-in shows the "location unavailable"
+  message instead of submitting.
+
+The first check-in asks for precise location. Choosing only approximate location
+is treated as denied by the WebView, so the employee must allow precise location
+to check in against a branch geofence. See `docs/MOBILE.md` §4 for the full flow.
+
 ## Tabs
 
 The bottom navigation mirrors the mobile web surface. Roots are built from the
