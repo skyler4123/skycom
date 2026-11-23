@@ -18,7 +18,9 @@ RSpec.feature "Homepage", type: :feature, js: true do
     it "clicking Sign In goes to the sign-in page" do
       visit root_path
 
-      click_link "Sign In"
+      within("#header-guest") do
+        click_link "Sign In"
+      end
 
       expect(page).to have_current_path(sign_in_path, wait: 10)
       expect(page).to have_selector('form[role="sign-in-form"]', wait: 10)
@@ -43,10 +45,16 @@ RSpec.feature "Homepage", type: :feature, js: true do
       expect(page).to have_no_text(sales, wait: 8)
     end
 
+    it "labels the console as demo data" do
+      visit root_path
+
+      expect(page).to have_text("Demo preview · Sample data")
+    end
+
     it "switching tenant tab updates console title" do
       visit root_path
 
-      click_button "Grand Azalea Hotel PMS"
+      click_button "Grand Azalea Hotel"
 
       expect(page).to have_selector("#tenant-title", text: "Grand Azalea Hotel")
     end
