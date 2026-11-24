@@ -166,7 +166,6 @@ class Seed::HospitalEnrichService
   end
 
   def create_employees
-    puts "Creating employees..."
     @branches.each_with_index do |branch, index|
       HOSPITAL_ENRICH_EMPLOYEE_COUNTS.each do |role_name, count|
         count.times do |i|
@@ -197,7 +196,6 @@ class Seed::HospitalEnrichService
   end
 
   def seed_compensation
-    puts "Assigning compensation and reporting lines..."
     Seed::CompensationService.assign!(company: @company)
     refresh_owner
   end

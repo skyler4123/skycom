@@ -264,7 +264,6 @@ class Seed::RetailEnrichService
   end
 
   def seed_compensation
-    puts "Assigning compensation and reporting lines..."
     Seed::CompensationService.assign!(company: @retail)
     refresh_owner
   end
