@@ -20,9 +20,13 @@ RSpec.feature "Companies::Operations::Reception", type: :feature, js: true do
     page.driver.browser.manage.window.resize_to(1400, 900)
   end
 
+  # Anchor to today's midday (UTC) so the scenario's "2 hours ago" and
+  # "30 minutes ago" fixtures stay on the same branch day. Never hardcode the
+  # date: the 1-day session cookie is dated from the frozen clock, and the
+  # browser rejects it once a hardcoded date drifts into the past.
   around do |example|
     if example.metadata[:fixed_clock]
-      travel_to(Time.utc(2026, 11, 20, 15, 0, 0)) { example.run }
+      travel_to(Time.now.utc.change(hour: 15, min: 0, sec: 0)) { example.run }
     else
       example.run
     end
