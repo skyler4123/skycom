@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.feature "Mobile Booking", type: :feature, js: true do
-  let(:company) { create(:company) }
+  let(:company) { create(:company).tap { |record| record.update!(timezone: :utc) } }
   let(:user) { company.user }
   let(:branch) { create(:branch, company: company, name: "Downtown Branch") }
   let!(:operation_record) do
@@ -16,17 +16,24 @@ RSpec.feature "Mobile Booking", type: :feature, js: true do
     "/mobile/companies/#{company.id}/operations/booking/#{operation_record.id}?branch_id=#{branch.id}"
   end
 
+  # The console renders the branch-local day and its fixed 08:00–18:00 window.
+  # Sign in before freezing so the session cookie keeps a real-time expiry,
+  # then pin the branch clock so the booking always lands inside the window.
   before do
+    sign_in(user)
+    travel_to(Time.utc(2026, 11, 20, 10, 0, 0))
+
     customer = create(:customer, company: company, name: "Vanguard Capital")
     event = create(:event, company: company, branch: branch, category: event_category,
-      name: "Executive Board Review", code: "BKG-EXEC", start_at: Time.current.change(hour: 9, min: 0),
-      end_at: Time.current.change(hour: 11, min: 0), workflow_status: :confirmed)
+      name: "Executive Board Review", code: "BKG-EXEC",
+      start_at: LocalTime.parse(LocalTime.today(branch), "09:00", branch),
+      end_at: LocalTime.parse(LocalTime.today(branch), "11:00", branch), workflow_status: :confirmed)
     CustomerEventAppointment.create!(company: company, event: event, customer: customer)
     EmployeeEventAppointment.create!(company: company, event: event, employee: host)
     EventFacilityAppointment.create!(company: company, event: event, facility: room)
-
-    sign_in(user)
   end
+
+  after { travel_back }
 
   scenario "loads the booking console in the mobile shell" do
     visit booking_path
