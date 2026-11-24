@@ -75,6 +75,7 @@ development:
 
 | ENV | Constant | Credential key | Default | Read by |
 |---|---|---|---|---|
+| `CANONICAL_BASE_URL` | `CANONICAL_BASE_URL` | `canonical_base_url` | `https://skyceer.com` | `app/helpers/home_helper.rb`, homepage SEO |
 | `MEILISEARCH_HOST` | `MEILISEARCH_HOST` | `meilisearch_host` | `http://localhost:7700` | `meilisearch.rb` |
 | `MEILISEARCH_API_KEY` | `MEILISEARCH_API_KEY` | `meilisearch_api_key` | `skycom_master_key_password_2026` | `meilisearch.rb` |
 | `CENTRIFUGO_API_KEY` | `CENTRIFUGO_API_KEY` | `centrifugo_api_key` | `skycom_super_secret_api_key_2026` | `websocket.rb` |

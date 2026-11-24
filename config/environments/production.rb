@@ -69,9 +69,9 @@ Rails.application.configure do
   #   authentication: :plain
   # }
 
-  # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
-  # the I18n.default_locale when a translation cannot be found).
-  config.i18n.fallbacks = true
+  # Do not fall back to English on a non-English public URL. A published locale
+  # must be complete; the homepage locale spec enforces parity.
+  config.i18n.fallbacks = false
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false

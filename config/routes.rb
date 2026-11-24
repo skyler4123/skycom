@@ -379,6 +379,14 @@ Rails.application.routes.draw do
     resource :passwordless, only: [ :new, :edit, :create ]
   end
   resource :invitation, only: [ :new, :create ]
+
+  # Public marketing pages. The default locale lives at `/`; Vietnamese is
+  # path-prefixed. Unsupported locale segments fall through to a 404.
+  get "sitemap.xml", to: "home#sitemap", as: :sitemap, defaults: { format: :xml }
+  get "robots.txt", to: "home#robots", as: :robots, defaults: { format: :text }
+  get "en", to: redirect("/")
+  get ":locale", to: "home#index", as: :localized_home, constraints: { locale: /vi/ }
+
   root "home#index"
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

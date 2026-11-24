@@ -15,6 +15,18 @@ export default class Home_IndexController extends Controller {
   /** @type {number[]} */ hourly = [920, 1680, 2840, 3920, 2650, 3420, 1890]
 
   connect() {
+    this.locale = document.documentElement.lang || "en"
+    this.i18n = this.element.querySelector("[data-home-demo]")?.dataset || {}
+    this.numberFormatter = new Intl.NumberFormat(this.locale)
+    this.decimalFormatter = new Intl.NumberFormat(this.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+    this.moneyFormatter = new Intl.NumberFormat(this.locale, {
+      style: "currency",
+      currency: "USD",
+      currencyDisplay: "narrowSymbol",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })
+
     this.renderSignedInHeader()
     if (this.hasVelocityChartTarget) this.renderChart()
     this.paintNumbers()
@@ -97,21 +109,22 @@ export default class Home_IndexController extends Controller {
   renderChart() {
     const categories = ["08:00", "10:00", "12:00", "14:00", "16:00", "18:00", "20:00"]
     const colors = categories.map((_, i) => (i === 3 ? tokenColor("primary") : tokenColorAlpha("primary", 25)))
+    const salesLabel = this.i18n.salesLabel || "Sales"
     const options = {
-      series: [{ name: "Sales", data: this.hourly }],
+      series: [{ name: salesLabel, data: this.hourly }],
       chart: { height: 176, type: "bar", toolbar: { show: false }, animations: { enabled: true, dynamicAnimation: { speed: 500 } } },
       colors,
       plotOptions: { bar: { columnWidth: "55%", distributed: true, borderRadius: 4 } },
       dataLabels: { enabled: false },
       legend: { show: false },
-      tooltip: { y: { formatter: (val) => `$${Math.round(Number(val)).toLocaleString("en-US")} sales` } },
+      tooltip: { y: { formatter: (val) => `${this.moneyFormatter.format(Number(val))} ${salesLabel}` } },
       xaxis: {
         categories,
         labels: { style: { fontSize: "11px" } },
         axisBorder: { show: false },
         axisTicks: { show: false }
       },
-      yaxis: { labels: { style: { fontSize: "10px" }, formatter: (val) => Math.round(val).toLocaleString("en-US") }, tickAmount: 4 },
+      yaxis: { labels: { style: { fontSize: "10px" }, formatter: (val) => this.numberFormatter.format(Math.round(val)) }, tickAmount: 4 },
       grid: { borderColor: chartGridColor(), strokeDashArray: 4, xaxis: { lines: { show: false } } }
     }
     this.chart = new ApexCharts(this.velocityChartTarget, options)
@@ -146,12 +159,15 @@ export default class Home_IndexController extends Controller {
   }
 
   paintNumbers() {
-    this.setLive("sales", `$${this.live.sales.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)
-    this.setLive("txns", `${this.live.txns.toLocaleString("en-US")} transactions`)
-    this.setLive("credits", this.live.credits.toFixed(1))
-    this.setLive("pool", Math.floor(this.live.pool).toLocaleString("en-US"))
-    this.setLive("burn", `${this.live.credits.toFixed(1)} cr today`)
-    this.setLive("pool2", `Business balance: ${Math.floor(this.live.pool).toLocaleString("en-US")} / ${POOL_CAP.toLocaleString("en-US")} cr remaining`)
+    this.setLive("sales", this.moneyFormatter.format(this.live.sales))
+    this.setLive("txns", `${this.numberFormatter.format(this.live.txns)} ${this.i18n.transactionsLabel || "transactions"}`)
+    this.setLive("credits", this.decimalFormatter.format(this.live.credits))
+    this.setLive("pool", this.numberFormatter.format(Math.floor(this.live.pool)))
+    this.setLive("burn", `${this.decimalFormatter.format(this.live.credits)} ${this.i18n.crTodayLabel || "cr today"}`)
+    this.setLive(
+      "pool2",
+      `${this.i18n.businessBalanceLabel || "Business balance:"} ${this.numberFormatter.format(Math.floor(this.live.pool))} / ${this.numberFormatter.format(POOL_CAP)} ${this.i18n.remainingLabel || "cr remaining"}`
+    )
   }
 
   setLive(name, text) {
