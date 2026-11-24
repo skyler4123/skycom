@@ -1,16 +1,18 @@
 # Skycom Homepage System
 
-> **Status**: Live (2026-10-11). Static SEO marketing page + live multi-tenant
-> demo console. Brand is **"Skycom"** (not "Skycom ERP"). English-only.
+> **Status**: Live (2026-11-24). Static SEO marketing page + live multi-tenant
+> demo console. Brand is **"Skycom"** (not "Skycom ERP"). English at `/`,
+> Vietnamese at `/vi`; both are server-rendered.
 
 ---
 
 ## 1. Overview
 
-The homepage (`/`, `HomeController#index`) is Skycom's public marketing face:
-a full landing page (hero, vertical solutions, pricing, social proof, footer)
-with a **live demo console** mockup (tenant switcher, metric cards, ApexCharts
-chart, action ledger). It is intentionally the only page built this way:
+The homepage (`/` for English, `/vi` for Vietnamese, `HomeController#index`) is
+Skycom's public marketing face: a full landing page (hero, vertical solutions,
+pricing, social proof, footer) with a **live demo console** mockup (tenant
+switcher, metric cards, ApexCharts chart, action ledger). It is intentionally the
+only page built this way:
 
 | Property | Homepage | App pages |
 |----------|----------|-----------|
@@ -24,8 +26,10 @@ chart, action ledger). It is intentionally the only page built this way:
 ## 2. Architecture
 
 ```
-GET /  →  HomeController#index
+GET /      → HomeController#index, locale :en
+GET /vi    → HomeController#index, locale :vi
   │  static signed-out HTML (both header blocks, §3)
+  │  Rails I18n strings from config/locales/home.<locale>.yml
   │  Cache-Control: private, max-age=3600 + Vary: Cookie (§7)
   ▼
 Browser
@@ -33,9 +37,15 @@ Browser
   │     ├── cookie says signed in? ──yes──▶ hide #header-guest, show #header-signedin
   │     │                                    (avatar paints when client cache arrives)
   │     ├── render ApexCharts velocity chart
-  │     └── start 2s demo ticker (sales/txns/credits/pool/latency)
+  │     └── start 2s demo ticker (localized labels + Intl number formatting)
   └── ClientCacheController syncs client_cache_data in the background
 ```
+
+Locale routing is constrained to `PUBLISHED_LOCALES` (`en`, `vi`). `/en` and
+`/vi/` 301 to their canonical forms; any other locale segment is a 404. There is
+no IP or `Accept-Language` redirect. Auth pages remain English in this scope;
+the homepage switcher writes `localStorage.languageCode` so the signed-in app UI
+follows an explicit language choice.
 
 Rules:
 
@@ -55,7 +65,7 @@ Rules:
 
 | # | Section | Anchor | Notes |
 |---|---------|--------|-------|
-| 1 | Header | — | `#header-guest` (visible) + `#header-signedin` (`hidden`, §9) |
+| 1 | Header | — | `#header-guest` (visible) + `#header-signedin` (`hidden`, §9); locale switcher (`English` / `Tiếng Việt`) |
 | 2 | Hero | — | Trust tag (`$0 Base Fee` → `/sign_up`), H1 (single on page), CTA cluster, tick row |
 | 3 | Demo console | `#interactive-preview` | Tenant tabs, 3 metric cards, chart + ledger grid (§4) |
 | 4 | Vertical solutions | `#solutions` | Retail / Dental / Hotel / Restaurant cards + industry pills + custom-field callout |
@@ -65,11 +75,11 @@ Rules:
 | 8 | Enterprise scaling | — | 6 cards (workspaces, dynamic fields, one login, ABAC, imports, Android) |
 | 9 | Stats + operator scenarios | — | 4 platform facts, 4 anonymous operator scenarios (no named quotes) |
 | 10 | Final CTA | — | GET form → `/sign_up?email=` |
-| 11 | Footer | — | 5 columns + bottom bar, `© 2025 Skycom Technologies Inc.` |
+| 11 | Footer | — | 5 columns + bottom bar, localized `© <current year> Skycom Technologies Inc.` |
 
 Header nav links: Solutions → `#solutions`, Pricing → `#pricing`,
-Platform → `#platform`. Sections carrying anchors use `scroll-mt-*` for the
-sticky header offset.
+Platform → `#platform` (labels localized). Sections carrying anchors use
+`scroll-mt-*` for the sticky header offset.
 
 ---
 
@@ -86,7 +96,7 @@ Same ApexCharts pattern as
 |-------|----------|
 | Tenant tabs | `switchTenant` flips `aria-pressed` styling, retitles the panel (`#tenant-title`), reseeds sales/txns/credits from per-tab `data-*-param` bases (pool stays global — it is master-level) |
 | Ticker (2s) | `tick()` in `home/index_controller.js`: +1–3 txns, +$45–165 sales, +0.1 credit burn, −0.1 pool (floored at 0), latency jitter 100–124ms; skips when tab hidden |
-| Y-axis integers | Chart series stores **whole dollars** (`Math.round`), ticks format via `Math.round(val).toLocaleString("en-US")`, tooltip rounds too — float dust (`400.0000000000`) is impossible by construction |
+| Y-axis integers | Chart series stores **whole dollars** (`Math.round`), ticks/tooltips format through `Intl.NumberFormat` with the page locale, and the chart series name comes from `data-sales-label` — float dust (`400.0000000000`) is impossible by construction |
 | Reduced motion | `prefers-reduced-motion: reduce` renders the chart but never starts the ticker |
 | Cleanup | `disconnect()` clears the interval and destroys the chart (no leaks across Turbo navigations) |
 
@@ -151,6 +161,12 @@ end
 | **Never `public`** | The layout embeds a per-session CSRF token that modal/page forms submit. A shared copy serves one user's token to everyone → mass 422s; tokens also go stale across sign-out. Verified the hard way. |
 | `Vary: Cookie` | Cookie change (sign-in/out) = cache miss = fresh fetch; same-session revisits hit |
 | `expires_now` on flash | Post-auth landings carry one-time notices — never cache a response carrying one |
+| Locale in the URL | `/` and `/vi` are separate browser cache entries; do not add `Vary: Accept-Language` |
+| `Content-Language` | Set by `HomeController#set_content_language` after the locale is resolved |
+
+Do **not** switch this page to `public` or a shared CDN cache without a separate
+CSRF-free layout. The layout embeds a per-session CSRF token and the controller
+may delete stale session cookies, so a shared copy would leak per-user values.
 
 ---
 
@@ -158,11 +174,25 @@ end
 
 - Static crawlable HTML — all content (including demo initial values) is in
   the server response; no JS required to read the page.
-- Exactly one H1; page `<title>`, meta description, OG tags, and canonical
-  via the layout's `content_for(:title)` / `content_for(:head)` slots.
+- Exactly one H1; page `<title>`, meta description, OG/Twitter tags, and
+  canonical via the layout's `content_for(:title)` / `content_for(:head)` slots.
+- `<html lang="<%= I18n.locale %>">` and `Content-Language` follow the active
+  locale (`en` or `vi`).
+- Each locale is self-canonical: `/` for English, `/vi` for Vietnamese. The
+  canonical origin is `CANONICAL_BASE_URL` (`config/initializers/constants.rb`),
+  never the request host. The default is `https://skyceer.com`; set
+  `CANONICAL_BASE_URL` to the confirmed production origin before launch.
+- Every locale emits reciprocal `hreflang` links for `en`, `vi`, and
+  `x-default` (→ `/`). `/sitemap.xml` carries the same set with `xhtml:link`
+  alternates; `/robots.txt` points at the sitemap.
+- OG/Twitter metadata and JSON-LD (`Organization`, `WebSite`,
+  `SoftwareApplication`) are server-rendered in the active locale. No ratings
+  or reviews are invented.
 - CTAs are anchors (`/sign_up`, `/sign_in`, `#interactive-preview`), never
   JS-only buttons — except in-page actions (tenant tabs, chart), which carry
   no SEO weight.
+- The language switcher uses real `<a>` links with `hreflang`/`lang`, endonyms,
+  and `aria-current="page"`; it never redirects automatically.
 
 ### 8.1 Content claims contract (mandatory)
 
@@ -178,6 +208,7 @@ route, service, model, or operation console.
 | **Demo numbers must be visibly labeled.** | `docs/HOMEPAGE.md` §4: the console is a mockup, not account data. |
 | **No dead `href="#"` links.** Point at a real anchor or remove the link. | Dead links imply pages that do not exist. |
 | **Compliance copy changes need a matching code/doc change first.** | The page follows the product, not the other way around. |
+| **Localized copy passes the same claim review.** | Translation must not strengthen a claim, invent a certification, or change pricing/currency. Vietnamese copy needs native B2B review before launch. |
 
 ---
 
@@ -214,10 +245,13 @@ container and break `position: sticky`).
 | Spec | Coverage |
 |------|----------|
 | `spec/features/homepage_spec.rb` | Static header links + `href`s, swap to signed-in header, avatar, sign-out, dashboard nav, company page flows (owner reveal + manager-employee gating; flash pushes the header down, header stays pinned on scroll), live-tick (Capybara-waited, never `sleep`), tenant switch, visible demo label |
+| `spec/features/homepage_locales_spec.rb` | English↔Vietnamese switcher, `/vi` HTML lang, localized hero, logo locale, `languageCode` sync, localized demo labels |
 | `spec/features/authentication_spec.rb` | Signup/signin submit via pages, email prefill, signed-in redirects away |
 | `spec/features/sign_in_flash_spec.rb` / `sign_up_flash_spec.rb` | Success flashes, failure stays on auth page with alert, session persists across reload |
 | `spec/features/global_session_cache_spec.rb` / `omniauth_spec.rb` | Session lifecycle + Google OAuth, starting at `/sign_in` |
 | `spec/requests/home_spec.rb` | `private` + `max-age=3600` + `Vary: Cookie` on clean GET, static-markup anchors, no unbuilt certification/API claims, non-cacheable flash response (POSTs use the forgery-disable wrapper — CSRF is on in test env) |
+| `spec/requests/home_locales_spec.rb` | `/` and `/vi` canonical/hreflang/Content-Language, private cache, `/en` + trailing-slash redirects, invalid locale 404, sitemap, robots, JSON-LD |
+| `spec/i18n/home_locale_completeness_spec.rb` | `home.*` key parity and non-blank Vietnamese values |
 | `spec/requests/companies_controller_spec.rb` | `GET /companies/new` shell for owners/new accounts, redirect + JSON 403 for company members, redirect for guests; `POST /companies` guard blocks members (no self-promotion) |
 
 House patterns this page depends on: `bundle exec parallel_rspec -n 14`
@@ -231,9 +265,14 @@ controller deletion (§6).
 
 | File | Purpose |
 |------|---------|
-| `app/controllers/home_controller.rb` | `index` — static render + cache headers + flash guard |
-| `app/views/home/index.html.erb` | Entire page: head tags, dual header, all 11 sections, footer |
-| `app/javascript/controllers/home/index_controller.js` | Header swap, role-gated header links, ApexCharts chart, 2s ticker, tenant switch |
+| `app/controllers/home_controller.rb` | `index` — locale switch, static render, cache headers, flash guard; `sitemap`/`robots` |
+| `app/helpers/home_helper.rb` | Canonical URLs, hreflang set, OG locale, JSON-LD, demo number formatting |
+| `app/views/home/index.html.erb` | Entire page: localized head tags, dual header, all 11 sections, footer |
+| `app/views/home/sitemap.xml.erb` / `robots.text.erb` | Published locale sitemap and robots |
+| `config/locales/home.en.yml` / `home.vi.yml` | Server-rendered homepage copy |
+| `config/initializers/constants.rb` | `CANONICAL_BASE_URL`, `PUBLISHED_LOCALES`, `LANGUAGE_NAMES`, `OG_LOCALES` |
+| `app/javascript/controllers/home/index_controller.js` | Header swap, role-gated links, ApexCharts, ticker, tenant switch, localized demo labels |
+| `app/javascript/controllers/home/language_controller.js` | Syncs `localStorage.languageCode` on explicit switcher click |
 | `app/javascript/controllers/home/header/authentication_controller.js` | Avatar-only slot inside `#header-signedin` |
 | `app/javascript/controllers/sessions/new_controller.js` | Sign-in page form |
 | `app/javascript/controllers/registrations/new_controller.js` | Sign-up page form (+ `?email=` prefill) |
@@ -242,7 +281,7 @@ controller deletion (§6).
 | `app/controllers/registrations_controller.rb` | `new` shell + `create` (failures → `sign_up_path`) |
 | `app/controllers/companies_controller.rb` | `new` shell + `create` (owner/master-account guarded via `User#can_create_company?`) |
 | `app/controllers/concerns/sessions_controller/omniauth_concern.rb` | Auth filter — `new` must stay skipped |
-| `config/routes.rb` | `GET /sign_in`, `GET /sign_up` (helpers shared with POSTs) |
+| `config/routes.rb` | Locale root, `/en` redirect, `/sitemap.xml`, `/robots.txt`, `GET /sign_in`, `GET /sign_up` |
 | `config/importmap.rb` | `apexcharts` pin (@5.3.6); controllers auto-registered via `pin_all_from` |
 
 ---
@@ -251,6 +290,6 @@ controller deletion (§6).
 (session lifecycle), `docs/DASHBOARD_PATTERN.md` (Shell-First + controller
 registration), `docs/MODAL_PATTERN.md` (the pattern auth/company UI left),
 `docs/STYLING_GUIDELINES.md` (dark mode, `cursor-pointer`, single-line
-classes), `docs/LANGUAGE.md` (page is English-only by decision),
+classes), `docs/LANGUAGE.md` (server-side homepage i18n vs client app dictionary),
 `docs/FLAKY_TESTS.md` (no-`sleep`, navigation-first assertions),
 `docs/PARALLEL_TESTS.md` (how to run the suite).*

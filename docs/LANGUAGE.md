@@ -2,19 +2,34 @@
 
 ## 1. Overview
 
-Skycom implements a client-side multi-language system that supports 2 languages. The language preference is stored in the browser's `localStorage` under the key `languageCode`, which persists across sessions.
+Skycom has **two separate localization layers**:
+
+1. **Public homepage (SEO): server-side Rails `I18n`.** The URL is the source
+   of truth: `/` is English (`en`), `/vi` is Vietnamese (`vi`). Every crawled
+   string, meta tag, and JSON-LD value is rendered in the server response from
+   `config/locales/home.en.yml` / `home.vi.yml`. Do **not** use the client-side
+   `translate()` helper for homepage copy.
+2. **Signed-in app UI: client-side dictionary.** The language preference is
+   stored in `localStorage` under `languageCode` and read by `translate()`.
+   The homepage language switcher writes this key on explicit click so the app
+   UI follows the chosen locale, but it never redirects automatically.
 
 | Property | Value |
 |----------|-------|
-| Storage Key | `languageCode` |
-| Default Language | `en` (English) |
-| Storage Location | `localStorage` |
+| Homepage locales | `en` at `/`, `vi` at `/vi` (`PUBLISHED_LOCALES`) |
+| Homepage translation files | `config/locales/home.en.yml`, `config/locales/home.vi.yml` |
+| App storage key | `languageCode` |
+| App default language | `en` (English) |
+| App storage location | `localStorage` |
+| Homepage switcher | Real `<a>` links with `hreflang`/`lang`; no auto-redirect |
 
 ---
 
 ## 2. Architecture
 
-The translation system consists of three main components:
+### 2.1 App UI (client-side)
+
+The app-UI translation system consists of three main components:
 
 | Component | File | Responsibility |
 |-----------|------|-------------|
@@ -36,14 +51,26 @@ translate() reads localStorage.getItem("languageCode")
 Returns translated string from dictionary.js
 ```
 
+### 2.2 Homepage (server-side, SEO)
+
+The homepage never uses that client-side flow for crawled copy. `HomeController`
+resolves `en` or `vi` from the URL, wraps the action in `I18n.with_locale`, and
+the ERB renders `t("home.*")` from `config/locales/home.<locale>.yml`. The
+language switcher is a plain anchor; `home/language_controller.js` only mirrors
+the click into `localStorage.languageCode` for the signed-in app UI.
+
 ---
 
 ## 3. Supported Languages
 
-| Code | Language |
-|------|----------|
-| `en` | English |
-| `vi` | Tiếng Việt |
+| Code | Language | Homepage | App UI |
+|------|----------|----------|--------|
+| `en` | English | `/` | `languageCode=en` |
+| `vi` | Tiếng Việt | `/vi` | `languageCode=vi` |
+
+The homepage allowlist is `PUBLISHED_LOCALES` in
+`config/initializers/constants.rb`. Only published locales get routes, switcher
+links, hreflang, sitemap entries, and indexing.
 
 ---
 
@@ -102,9 +129,15 @@ export const translate = (key) => {
 
 ## 6. Usage Guidelines (MANDATORY)
 
-> **When adding any new text/string to UI, you MUST use `translate()` first.**
+> **Applies to JS-rendered app UI.**
+>
+> **When adding any new text/string to app UI, you MUST use `translate()` first.**
 >
 > **If the translated word doesn't exist in dictionary.js yet, you MUST add/update it to dictionary.js.**
+>
+> **Homepage exception:** server-rendered marketing copy uses
+> `t("home.*")` from `config/locales/home.<locale>.yml`; do not put it in
+> `dictionary.js`.
 
 ### Pattern Examples
 
@@ -169,7 +202,7 @@ However, this is a practical rule, not an absolute one. Some words are globally 
 | Brand names, product codes | Proper nouns — no translation needed |
 | Placeholder code examples | Technical examples (JSON, URLs) — translating would confuse |
 
-**Rule of thumb**: If a word looks awkward or unrecognizable when translated, leave it in English. The `translate()` fallback guarantees English display when no translation exists, so it's always safe to start without a dictionary entry.
+**Rule of thumb**: If a word looks awkward or unrecognizable when translated, leave it in English. The `translate()` fallback guarantees English display when no translation exists, so it's always safe to start without a dictionary entry **for app UI**. This does not apply to the homepage: `home.*` must be complete for every published locale.
 
 **Do NOT skip `translate()` for**: labels, section headings, button text, navigation items, error messages, status labels, empty-state messages, or tooltip text. These should always have a Vietnamese entry in `dictionary.js`.
 
@@ -192,10 +225,17 @@ The language switcher is in the header (see `layout_controller.js`). Click trigg
 
 ## 9. Adding a New Language
 
-The project currently supports only English and Vietnamese. To add a new language (e.g., `ja` for Japanese):
+The project currently supports English and Vietnamese. A new locale is a
+deliberate two-layer change:
 
-1. **Add the option to the language switcher** in `app/javascript/controllers/companies/layout_controller.js`
-2. **Add translations to `dictionary.js`** for every key:
+1. **Homepage (SEO):** add the locale to `PUBLISHED_LOCALES`, add
+   `config/locales/home.<locale>.yml` with every `home.*` key, extend
+   `OG_LOCALES` in `config/initializers/constants.rb`, add the route constraint, and update
+   hreflang/sitemap/switcher tests. The locale must be complete; production
+   fallbacks are disabled.
+2. **App UI:** add the option to the language switcher in
+   `app/javascript/controllers/companies/layout_controller.js` and add
+   translations to `dictionary.js` for every key:
    ```javascript
    "Save": {
      vi: "Lưu",
@@ -203,27 +243,35 @@ The project currently supports only English and Vietnamese. To add a new languag
    },
    ```
 
+Do not mix the two layers: homepage copy belongs in the Rails locale files,
+app UI copy belongs in `dictionary.js`.
+
 ---
 
 ## 10. File Reference
 
 | File | Description |
 |------|-----------|
-| `app/javascript/controllers/helpers/dictionary.js` | Translation dictionary |
+| `config/locales/home.en.yml` / `home.vi.yml` | Server-rendered homepage copy |
+| `app/helpers/home_helper.rb` | Homepage canonical/hreflang/OG/JSON-LD helpers |
+| `app/views/home/index.html.erb` | Homepage using `home.*` Rails i18n keys |
+| `app/views/home/sitemap.xml.erb` / `robots.text.erb` | Localized sitemap and robots |
+| `app/javascript/controllers/home/language_controller.js` | Syncs homepage switcher → `languageCode` |
+| `app/javascript/controllers/helpers/dictionary.js` | App UI translation dictionary |
 | `app/javascript/controllers/helpers/ui_helpers.js` | translate() function (line 272) |
-| `app/javascript/controllers/language_controller.js` | Language switch controller |
+| `app/javascript/controllers/language_controller.js` | App UI language switch controller |
 | `app/javascript/application.js` | window.translate exposure |
-| `app/javascript/controllers/companies/layout_controller.js` | Language dropdown UI |
+| `app/javascript/controllers/companies/layout_controller.js` | App UI language dropdown |
 
 ---
 
 ## 11. Best Practices
 
-1. **Always use translate()** - Never hardcode display strings
-2. **Keep keys in English** - The key should be the English version (source of truth)
-3. **Update dictionary first** - When adding new features, add translations in the same PR
-4. **Use consistent casing** - Keys should match exactly (case-sensitive)
-5. **Fallback is not perfect** - Missing translations show English keys; add them to dictionary.js
+1. **App UI: always use translate()** - Never hardcode display strings.
+2. **Homepage: always use Rails `t("home.*")`** - It must be in the server HTML for SEO; client-side `translate()` is too late.
+3. **Keep app dictionary keys in English** - The key is the English source of truth.
+4. **Update translations in the same PR** - App UI in `dictionary.js`; homepage in `home.<locale>.yml`.
+5. **Homepage fallback is disabled** - Missing `home.*` keys fail tests; do not rely on English fallback on `/vi`.
 
 ---
 

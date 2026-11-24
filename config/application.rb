@@ -11,6 +11,14 @@ module Skycom
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
 
+    # Public marketing pages are localized server-side. Missing translations must
+    # fail tests instead of silently mixing English into a non-English URL.
+    # Keep this list in sync with PUBLISHED_LOCALES
+    # (spec/i18n/home_locale_completeness_spec.rb guards the duplicate).
+    config.i18n.available_locales = %i[en vi]
+    config.i18n.default_locale = :en
+    config.i18n.fallbacks = false
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.

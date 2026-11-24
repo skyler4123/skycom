@@ -5,6 +5,32 @@
 # Every other file uses the constant, never ENV. See docs/ENVIRONMENT.md.
 # =============================================================================
 
+# --- Public site / SEO ---
+# Canonical origin for public marketing pages. The request host is not trusted
+# for canonical or hreflang URLs because the app may be reachable through
+# multiple hosts, ports, or proxies.
+CANONICAL_BASE_URL = (
+  ENV["CANONICAL_BASE_URL"].presence ||
+  Rails.application.credentials.dig(:canonical_base_url) ||
+  "https://skyceer.com"
+).sub(%r{/\z}, "")
+
+# --- Public homepage locales ---
+# The order is the language-switcher order. The default locale is served at `/`;
+# every other published locale is path-prefixed.
+DEFAULT_LOCALE = :en
+PUBLISHED_LOCALES = %i[en vi].freeze
+LANGUAGE_NAMES = {
+  en: "English",
+  vi: "Tiếng Việt"
+}.freeze
+
+# Open Graph uses language_TERRITORY while hreflang/html lang use BCP 47.
+OG_LOCALES = {
+  en: "en_US",
+  vi: "vi_VN"
+}.freeze
+
 # --- Meilisearch ---
 MEILISEARCH_HOST = ENV["MEILISEARCH_HOST"].presence ||
   Rails.application.credentials.dig(:meilisearch_host) ||

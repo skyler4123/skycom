@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <% PUBLISHED_LOCALES.each do |locale| %>
+    <url>
+      <loc><%= canonical_home_url(locale) %></loc>
+      <% home_alternate_urls.each do |hreflang, href| %>
+        <xhtml:link rel="alternate" hreflang="<%= hreflang %>" href="<%= href %>"/>
+      <% end %>
+    </url>
+  <% end %>
+</urlset>

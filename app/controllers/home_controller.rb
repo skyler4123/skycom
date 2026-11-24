@@ -1,5 +1,12 @@
 class HomeController < ApplicationController
-  skip_before_action :authenticate, only: [ :index ]
+  skip_before_action :authenticate, only: [ :index, :sitemap, :robots ]
+  skip_before_action :set_current_session, only: [ :sitemap, :robots ]
+  skip_before_action :sync_client_cache_version, only: [ :sitemap, :robots ]
+
+  before_action :redirect_trailing_slash, only: [ :index ]
+  before_action :redirect_default_locale, only: [ :index ]
+  around_action :switch_locale, only: [ :index ]
+  after_action :set_content_language, only: [ :index ]
 
   def index
     # The homepage is fully static HTML (signed-out state ships for everyone;
@@ -8,7 +15,8 @@ class HomeController < ApplicationController
     # a per-session CSRF token that modal forms submit, and a shared copy would
     # serve one user's token to everyone (mass 422s). Vary: Cookie keeps the
     # entry correct across sign-in/sign-out. Flash messages are per-user too —
-    # never cache a response carrying one.
+    # never cache a response carrying one. Locale isolation comes from the URL
+    # (`/` vs `/vi`), not from a shared cache key.
     if flash.any?
       expires_now
     else
@@ -26,6 +34,45 @@ class HomeController < ApplicationController
       # format.json do
       # end
     end
+  end
+
+  def sitemap
+    expires_in 1.day, public: true
+    render "home/sitemap", formats: [ :xml ], layout: false
+  end
+
+  def robots
+    expires_in 1.day, public: true
+    response.headers["Content-Type"] = "text/plain; charset=utf-8"
+    render "home/robots", formats: [ :text ], layout: false
+  end
+
+  private
+
+  def redirect_trailing_slash
+    path = request.original_fullpath.split("?", 2).first
+    return if path == "/"
+    return unless path.end_with?("/")
+
+    redirect_to path.chomp("/"), status: :moved_permanently
+  end
+
+  def redirect_default_locale
+    return if request.path_parameters[:locale].blank?
+    return unless request.path_parameters[:locale].to_s == DEFAULT_LOCALE.to_s
+
+    redirect_to root_path, status: :moved_permanently
+  end
+
+  def switch_locale(&action)
+    locale = request.path_parameters[:locale].presence || DEFAULT_LOCALE
+    raise ActionController::RoutingError, "Unknown locale" unless PUBLISHED_LOCALES.include?(locale.to_sym)
+
+    I18n.with_locale(locale, &action)
+  end
+
+  def set_content_language
+    response.headers["Content-Language"] = I18n.locale.to_s
   end
 
   # def retail

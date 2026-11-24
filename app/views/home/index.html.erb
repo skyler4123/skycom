@@ -1,10 +1,28 @@
-<% content_for :title, "Skycom - One Account for Every Business You Run" %>
+<% content_for :title, t("home.meta.title") %>
 <% content_for :head do %>
-  <meta name="description" content="Run retail, clinic, hotel, and restaurant operations from one account. Skycom gives each business its own isolated workspace, POS, booking, inventory, and invoicing — with free starter credits and no monthly base fee.">
-  <link rel="canonical" href="<%= root_url %>">
-  <meta property="og:title" content="Skycom - One Account for Every Business You Run">
-  <meta property="og:description" content="One account. Multiple businesses. Run every venture on one platform.">
+  <meta name="description" content="<%= t("home.meta.description") %>">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="<%= canonical_home_url %>">
+  <% home_alternate_urls.each do |hreflang, href| %>
+    <link rel="alternate" hreflang="<%= hreflang %>" href="<%= href %>">
+  <% end %>
+  <meta property="og:title" content="<%= t("home.meta.og_title") %>">
+  <meta property="og:description" content="<%= t("home.meta.og_description") %>">
   <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Skycom">
+  <meta property="og:url" content="<%= canonical_home_url %>">
+  <meta property="og:locale" content="<%= home_og_locale %>">
+  <% home_og_alternate_locales.each do |locale| %>
+    <meta property="og:locale:alternate" content="<%= locale %>">
+  <% end %>
+  <meta property="og:image" content="<%= "#{CANONICAL_BASE_URL}/icon.png" %>">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="<%= t("home.meta.og_title") %>">
+  <meta name="twitter:description" content="<%= t("home.meta.og_description") %>">
+  <meta name="twitter:image" content="<%= "#{CANONICAL_BASE_URL}/icon.png" %>">
+  <script type="application/ld+json">
+    <%= raw home_structured_data_json %>
+  </script>
 <% end %>
 <div class="bg-background ">
   <div class="relative flex min-h-screen w-full flex-col overflow-x-clip">
@@ -12,47 +30,67 @@
       <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-8">
         <a
           class="flex items-center gap-2 cursor-pointer"
-          href="/"
+          href="<%= home_locale_path(I18n.locale) %>"
         >
-          <img alt="Skycom Logo" class="h-8 w-auto object-contain" src="/icon.svg">
+          <img alt="<%= t("home.header.logo_alt") %>" class="h-8 w-auto object-contain" src="/icon.svg">
           <span class="text-lg font-bold tracking-tight text-foreground">Skycom</span>
         </a>
         <nav class="hidden items-center gap-6 lg:flex">
-          <a class="text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground " href="#solutions">Solutions</a>
-          <a class="text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground " href="#pricing">Pricing</a>
-          <a class="text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground " href="#platform">Platform</a>
+          <a class="text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground " href="#solutions"><%= t("home.header.solutions") %></a>
+          <a class="text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground " href="#pricing"><%= t("home.header.pricing") %></a>
+          <a class="text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground " href="#platform"><%= t("home.header.platform") %></a>
         </nav>
+        <div class="flex items-center gap-1 rounded-lg border border-line bg-card p-0.5 text-xs font-bold"
+             data-controller="home--language"
+             role="group"
+             aria-label="<%= t("home.language.label") %>">
+          <% PUBLISHED_LOCALES.each do |locale| %>
+            <a
+              href="<%= home_locale_path(locale) %>"
+              hreflang="<%= locale %>"
+              lang="<%= locale %>"
+              class="rounded-md px-2 py-1 transition-colors <%= I18n.locale == locale ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground" %>"
+              aria-label="<%= t("home.language.switch_to", language: LANGUAGE_NAMES.fetch(locale)) %>"
+              <%= 'aria-current="page"' if I18n.locale == locale %>
+              data-action="click->home--language#sync"
+              data-home--language-code-param="<%= locale %>"
+            >
+              <span class="hidden sm:inline"><%= LANGUAGE_NAMES.fetch(locale) %></span>
+              <span class="sm:hidden"><%= locale.to_s.upcase %></span>
+            </a>
+          <% end %>
+        </div>
         <div class="flex items-center gap-2" id="header-guest">
           <a
             class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground cursor-pointer "
             href="/sign_in"
             role="sign-in-button"
           >
-            Sign In
+            <%= t("home.header.sign_in") %>
           </a>
           <a
             class="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/90 cursor-pointer"
             href="/sign_up"
             role="sign-up-button"
           >
-            Claim Free Starter Credits
+            <%= t("home.header.claim_credits") %>
           </a>
         </div>
         <div class="hidden items-center gap-2" id="header-signedin">
-          <a class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground cursor-pointer " href="/redirect/companies" id="header-dashboard-link">Go to Dashboard</a>
+          <a class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground cursor-pointer " href="/redirect/companies" id="header-dashboard-link"><%= t("home.header.dashboard") %></a>
           <a
             class="hidden rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground cursor-pointer "
             href="/admin/companies"
             id="header-admin-link"
           >
-            Admin Dashboard
+            <%= t("home.header.admin_dashboard") %>
           </a>
           <a
             class="hidden rounded-lg px-4 py-2 text-sm font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground cursor-pointer "
             href="/companies/new"
             id="header-new-company-link"
           >
-            New Company
+            <%= t("home.header.new_company") %>
           </a>
           <div class="flex items-center" data-controller="home--header--authentication"></div>
         </div>
@@ -68,37 +106,44 @@
               <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-success/100 opacity-75"></span>
               <span class="relative inline-flex h-2 w-2 rounded-full bg-success"></span>
             </span>
-            <span class="text-xs font-bold text-success ">One Master Account • Multiple Businesses</span>
+            <span class="text-xs font-bold text-success "><%= t("home.hero.badge") %></span>
             <span class="text-muted-foreground/60">•</span>
             <a
               class="flex items-center gap-1 text-xs font-semibold text-primary cursor-pointer "
               href="/sign_up"
             >
-              <span class="material-symbols-outlined text-base">bolt</span> $0 Base Fee
+              <span class="material-symbols-outlined text-base">bolt</span> <%= t("home.hero.zero_base_fee") %>
             </a>
           </div>
-          <h1 class="max-w-5xl text-4xl font-black leading-tight tracking-tight text-foreground md:text-5xl ">One Account. Multiple Businesses. <span class="mt-1 block text-primary">Run Every Venture Under One Unified Platform.</span></h1>
-          <p class="mb-8 mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">Entrepreneurs, holding groups, and franchise operators can spin up and manage distinct businesses in minutes — a fashion boutique today, a hotel tomorrow, a bistro or dental clinic next. Each business gets its own isolated workspace, branches, stock, and team under <strong>one single account</strong>, with instant business switching, no per-business base fee, and a credit balance for each business.</p>
+          <h1 class="max-w-5xl text-4xl font-black leading-tight tracking-tight text-foreground md:text-5xl "><%= t("home.hero.title_primary") %> <span class="mt-1 block text-primary"><%= t("home.hero.title_secondary") %></span></h1>
+          <p class="mb-8 mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground"><%= t("home.hero.description_before") %><strong><%= t("home.hero.description_strong") %></strong><%= t("home.hero.description_after") %></p>
           <div class="flex w-full max-w-md flex-wrap items-center justify-center gap-3">
             <a
               class="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-6 text-base font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 cursor-pointer sm:flex-none"
               href="/sign_up"
             >
-              <span>Claim Free Starter Credits</span>
+              <span><%= t("home.hero.cta_primary") %></span>
               <span class="material-symbols-outlined text-lg">arrow_forward</span>
             </a>
             <a class="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-card px-6 text-base font-bold text-foreground shadow-sm transition-all hover:bg-muted sm:flex-none " href="#interactive-preview">
               <span class="material-symbols-outlined text-lg text-primary">play_circle</span>
-              <span>Explore Interactive Demo</span>
+              <span><%= t("home.hero.cta_demo") %></span>
             </a>
           </div>
           <div class="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
-            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-success ">card_giftcard</span> Free Starter Credits</span>
-            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-success ">timelapse</span> No Per-Seat Fees</span>
-            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-success ">block</span> No Fixed Monthly Subscriptions</span>
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-success ">card_giftcard</span> <%= t("home.hero.trust_free_credits") %></span>
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-success ">timelapse</span> <%= t("home.hero.trust_no_per_seat") %></span>
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-success ">block</span> <%= t("home.hero.trust_no_monthly") %></span>
           </div>
           <!-- Live Demo Console Mockup -->
-          <div class="mt-10 w-full max-w-6xl scroll-mt-24 rounded-2xl bg-card p-2 text-left shadow-xl " id="interactive-preview">
+          <div class="mt-10 w-full max-w-6xl scroll-mt-24 rounded-2xl bg-card p-2 text-left shadow-xl "
+               id="interactive-preview"
+               data-home-demo
+               data-sales-label="<%= t("home.demo.sales_label") %>"
+               data-transactions-label="<%= t("home.demo.transactions") %>"
+               data-cr-today-label="<%= t("home.demo.cr_today_label") %>"
+               data-business-balance-label="<%= t("home.demo.business_balance_prefix") %>"
+               data-remaining-label="<%= t("home.demo.remaining_label") %>">
             <div class="flex flex-col gap-3 rounded-xl bg-muted p-4 ">
               <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3 ">
                 <div class="flex items-center gap-2.5">
@@ -107,9 +152,9 @@
                   </div>
                   <div class="text-left">
                     <div class="flex flex-wrap items-center gap-2">
-                      <span class="text-xs font-bold uppercase tracking-wider text-muted-foreground">Master Account</span>
-                      <span class="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-xs font-semibold text-success "><span class="h-1.5 w-1.5 rounded-full bg-success"></span> 3 Isolated Businesses</span>
-                      <span class="inline-flex items-center gap-1 rounded-full bg-warning/10 px-2 py-0.5 text-xs font-semibold text-warning ">Demo preview · Sample data</span>
+                      <span class="text-xs font-bold uppercase tracking-wider text-muted-foreground"><%= t("home.demo.master_account") %></span>
+                      <span class="inline-flex items-center gap-1 rounded-full bg-success/10 px-2 py-0.5 text-xs font-semibold text-success "><span class="h-1.5 w-1.5 rounded-full bg-success"></span> <%= t("home.demo.isolated_businesses", count: 3) %></span>
+                      <span class="inline-flex items-center gap-1 rounded-full bg-warning/10 px-2 py-0.5 text-xs font-semibold text-warning "><%= t("home.demo.demo_label") %></span>
                     </div>
                     <p class="text-sm font-bold leading-tight text-foreground">Apex Multi-Venture Group Holdings</p>
                   </div>
@@ -118,19 +163,19 @@
                   <div class="flex items-center gap-2 rounded-lg border border-line bg-card px-3 py-1.5 text-left shadow-sm ">
                     <span class="material-symbols-outlined text-xl text-primary">account_balance_wallet</span>
                     <div>
-                      <p class="text-xs font-semibold uppercase leading-none text-muted-foreground">Business Credit Balance</p>
-                      <p class="text-sm font-bold leading-tight text-foreground"><span data-live="pool">9,420</span> <span class="text-xs font-normal text-muted-foreground">/ 10,000 Credits</span></p>
+                      <p class="text-xs font-semibold uppercase leading-none text-muted-foreground"><%= t("home.demo.business_credit_balance") %></p>
+                      <p class="text-sm font-bold leading-tight text-foreground"><span data-live="pool"><%= home_demo_number(9_420) %></span> <span class="text-xs font-normal text-muted-foreground"><%= t("home.demo.out_of", count: home_demo_number(10_000)) %></span></p>
                     </div>
                   </div>
                   <div class="inline-flex items-center gap-1.5 rounded-lg border border-success/30 bg-success/10 px-2.5 py-1.5 text-sm font-semibold text-success ">
                     <span class="material-symbols-outlined text-base text-success ">toll</span>
-                    <span>Prepaid credits</span>
+                    <span><%= t("home.demo.prepaid_credits") %></span>
                   </div>
                 </div>
               </div>
               <div class="flex flex-wrap items-center justify-between gap-2 pt-0.5">
                 <div class="flex flex-wrap items-center gap-2">
-                  <span class="mr-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Active Space:</span>
+                  <span class="mr-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground"><%= t("home.demo.active_space") %></span>
                   <button
                     aria-pressed="true"
                     class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-bold text-muted-foreground transition-colors aria-pressed:bg-card aria-pressed:text-primary aria-pressed:shadow-sm hover:text-foreground cursor-pointer "
@@ -144,7 +189,7 @@
                   >
                     <span class="material-symbols-outlined text-lg">storefront</span>
                     <span>Apex Retail Flagship POS</span>
-                    <span class="rounded bg-primary px-1.5 py-0.5 text-xs font-bold text-primary-foreground">Active Space</span>
+                    <span class="rounded bg-primary px-1.5 py-0.5 text-xs font-bold text-primary-foreground"><%= t("home.demo.active_space_badge") %></span>
                   </button>
                   <button
                     aria-pressed="false"
@@ -159,7 +204,7 @@
                   >
                     <span class="material-symbols-outlined text-lg">hotel</span>
                     <span>Grand Azalea Hotel</span>
-                    <span class="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground ">Isolated</span>
+                    <span class="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground "><%= t("home.demo.isolated") %></span>
                   </button>
                   <button
                     aria-pressed="false"
@@ -174,7 +219,7 @@
                   >
                     <span class="material-symbols-outlined text-lg">restaurant</span>
                     <span>Bistro 88 Bar &amp; Grill</span>
-                    <span class="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground ">Isolated</span>
+                    <span class="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground "><%= t("home.demo.isolated") %></span>
                   </button>
                 </div>
                 <a
@@ -182,7 +227,7 @@
                   href="/sign_up"
                 >
                   <span class="material-symbols-outlined text-base">add_business</span>
-                  <span>+ Add New Business</span>
+                  <span><%= t("home.demo.add_business") %></span>
                 </a>
               </div>
             </div>
@@ -190,50 +235,50 @@
               <div class="rounded-xl border border-line bg-background p-4 transition-colors hover:border-line ">
                 <div class="flex items-start justify-between">
                   <div>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Today's Gross Sales</span>
-                    <p class="mt-1 text-2xl font-bold tracking-tight text-foreground" data-live="sales">$18,450.00</p>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"><%= t("home.demo.today_gross_sales") %></span>
+                    <p class="mt-1 text-2xl font-bold tracking-tight text-foreground" data-live="sales"><%= home_demo_money(18_450) %></p>
                   </div>
                   <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary /50 ">
                     <span class="material-symbols-outlined text-xl">point_of_sale</span>
                   </div>
                 </div>
                 <div class="mt-2.5 flex items-center justify-between border-t border-line pt-2 text-xs text-muted-foreground ">
-                  <span class="flex items-center gap-1 font-semibold text-success "><span class="material-symbols-outlined text-base">trending_up</span> <span data-live="txns">248 transactions</span></span>
-                  <span>Across 3 demo registers</span>
+                  <span class="flex items-center gap-1 font-semibold text-success "><span class="material-symbols-outlined text-base">trending_up</span> <span data-live="txns"><%= home_demo_number(248) %> <%= t("home.demo.transactions") %></span></span>
+                  <span><%= t("home.demo.across_registers", count: 3) %></span>
                 </div>
               </div>
               <div class="rounded-xl border border-line bg-background p-4 transition-colors hover:border-line ">
                 <div class="flex items-start justify-between">
                   <div>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Live Inventory</span>
-                    <p class="mt-1 text-2xl font-bold tracking-tight text-foreground">194,204 SKUs</p>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"><%= t("home.demo.live_inventory") %></span>
+                    <p class="mt-1 text-2xl font-bold tracking-tight text-foreground"><%= home_demo_number(194_204) %> <%= t("home.demo.skus") %></p>
                   </div>
                   <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10 text-success ">
                     <span class="material-symbols-outlined text-xl">inventory_2</span>
                   </div>
                 </div>
                 <div class="mt-2.5 flex items-center justify-between border-t border-line pt-2 text-xs text-muted-foreground ">
-                  <span class="flex items-center gap-1 font-semibold text-success "><span class="material-symbols-outlined text-base">verified</span> Barcode input &amp; live stock</span>
-                  <span>Live stock ledger</span>
+                  <span class="flex items-center gap-1 font-semibold text-success "><span class="material-symbols-outlined text-base">verified</span> <%= t("home.demo.barcode_live_stock") %></span>
+                  <span><%= t("home.demo.live_stock_ledger") %></span>
                 </div>
               </div>
               <div class="rounded-xl border border-line bg-background p-4 transition-colors hover:border-line ">
                 <div class="flex items-start justify-between">
                   <div>
-                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Today's Action Cost</span>
-                    <p class="mt-1 text-2xl font-bold tracking-tight text-foreground"><span data-live="credits">34.2</span> <span class="text-base font-normal text-muted-foreground">Credits</span></p>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"><%= t("home.demo.today_action_cost") %></span>
+                    <p class="mt-1 text-2xl font-bold tracking-tight text-foreground"><span data-live="credits"><%= home_demo_precision(34.2) %></span> <span class="text-base font-normal text-muted-foreground"><%= t("home.demo.credits") %></span></p>
                   </div>
                   <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-warning/10 text-warning ">
                     <span class="material-symbols-outlined text-xl">toll</span>
                   </div>
                 </div>
                 <div class="mt-2.5 flex items-center justify-between border-t border-line pt-2 text-xs text-muted-foreground ">
-                  <span class="flex items-center gap-1 font-semibold text-primary"><span class="material-symbols-outlined text-base">hub</span> From prepaid credits</span>
+                  <span class="flex items-center gap-1 font-semibold text-primary"><span class="material-symbols-outlined text-base">hub</span> <%= t("home.demo.from_prepaid") %></span>
                   <a
                     class="font-bold text-success cursor-pointer "
                     href="/sign_up"
                   >
-                    $0 base fee
+                    <%= t("home.demo.zero_base_fee") %>
                   </a>
                 </div>
               </div>
@@ -245,26 +290,26 @@
                     <div>
                       <div class="flex items-center gap-2">
                         <h3 class="text-base font-bold text-foreground" id="tenant-title">Apex Retail Flagship</h3>
-                        <span class="rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary /50 ">POS Operational View</span>
+                        <span class="rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary /50 "><%= t("home.demo.pos_operational_view") %></span>
                       </div>
-                      <p class="mt-0.5 text-sm text-muted-foreground">Hourly transaction velocity &amp; register throughput (08:00 - 20:00)</p>
+                      <p class="mt-0.5 text-sm text-muted-foreground"><%= t("home.demo.velocity_subtitle") %></p>
                     </div>
                     <div class="flex items-center gap-1.5 rounded-md border border-line bg-card px-2.5 py-1 text-sm font-semibold text-foreground shadow-sm ">
                       <span class="h-2 w-2 animate-pulse rounded-full bg-success"></span>
-                      <span>Cloud-Connected</span>
+                      <span><%= t("home.demo.cloud_connected") %></span>
                     </div>
                   </div>
                   <div class="my-3 grid grid-cols-3 gap-2">
                     <div class="rounded-lg border border-line bg-card p-2 text-center ">
-                      <p class="text-xs font-semibold uppercase text-muted-foreground">Peak Hourly Pace</p>
-                      <p class="text-sm font-bold text-primary">42 tx/hr (14:00)</p>
+                      <p class="text-xs font-semibold uppercase text-muted-foreground"><%= t("home.demo.peak_hourly_pace") %></p>
+                      <p class="text-sm font-bold text-primary"><%= t("home.demo.peak_hourly_value", count: 42, time: "14:00") %></p>
                     </div>
                     <div class="rounded-lg border border-line bg-card p-2 text-center ">
-                      <p class="text-xs font-semibold uppercase text-muted-foreground">Average Basket</p>
-                      <p class="text-sm font-bold text-foreground">$74.40</p>
+                      <p class="text-xs font-semibold uppercase text-muted-foreground"><%= t("home.demo.average_basket") %></p>
+                      <p class="text-sm font-bold text-foreground"><%= home_demo_money(74.40) %></p>
                     </div>
                     <div class="rounded-lg border border-line bg-card p-2 text-center ">
-                      <p class="text-xs font-semibold uppercase text-muted-foreground">Server Response</p>
+                      <p class="text-xs font-semibold uppercase text-muted-foreground"><%= t("home.demo.server_response") %></p>
                       <p class="text-sm font-bold text-success " data-live="latency">110ms</p>
                     </div>
                   </div>
@@ -272,64 +317,64 @@
                 <div class="pt-3">
                   <div data-home--index-target="velocityChart" class="h-44"></div>
                   <div class="flex items-center justify-between border-t border-line pt-2 text-xs text-muted-foreground ">
-                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded bg-primary"></span> Peak Traffic: 14:00 - 15:30</span>
-                    <span class="font-semibold text-success ">Server-Authoritative Stock &amp; Pricing</span>
+                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded bg-primary"></span> <%= t("home.demo.peak_traffic", start: "14:00", end: "15:30") %></span>
+                    <span class="font-semibold text-success "><%= t("home.demo.server_stock_pricing") %></span>
                   </div>
                 </div>
               </div>
               <div class="flex flex-col justify-between rounded-xl border border-line bg-background p-4 lg:col-span-5 ">
                 <div>
                   <div class="mb-3 flex items-center justify-between">
-                    <h3 class="text-base font-bold text-foreground">Active Business Action Ledger</h3>
-                    <span class="rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-bold text-success ">Action-Based Credits</span>
+                    <h3 class="text-base font-bold text-foreground"><%= t("home.demo.action_ledger") %></h3>
+                    <span class="rounded-full bg-success/10 px-2.5 py-0.5 text-xs font-bold text-success "><%= t("home.demo.action_based_credits") %></span>
                   </div>
-                  <p class="mb-3 text-xs text-muted-foreground">Sample credit usage for the active business.</p>
+                  <p class="mb-3 text-xs text-muted-foreground"><%= t("home.demo.sample_usage") %></p>
                   <div class="space-y-2.5">
                     <div class="flex items-center justify-between gap-2.5 rounded-lg border border-line bg-card p-2.5 ">
                       <div class="flex min-w-0 items-center gap-2.5">
                         <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-success/10 text-success "><span class="material-symbols-outlined text-base">receipt</span></span>
                         <div class="min-w-0">
-                          <p class="truncate text-sm font-bold leading-tight text-foreground">Retail Checkout #1042</p>
-                          <p class="truncate text-xs text-muted-foreground">Register 02 • $142.50 order</p>
+                          <p class="truncate text-sm font-bold leading-tight text-foreground"><%= t("home.demo.retail_checkout") %></p>
+                          <p class="truncate text-xs text-muted-foreground"><%= t("home.demo.register_order", register: "02", amount: home_demo_money(142.50)) %></p>
                         </div>
                       </div>
-                      <span class="whitespace-nowrap rounded bg-success/10 px-2 py-0.5 text-xs font-bold text-success ">-0.10 Credits</span>
+                      <span class="whitespace-nowrap rounded bg-success/10 px-2 py-0.5 text-xs font-bold text-success ">-0.10 <%= t("home.demo.credits") %></span>
                     </div>
                     <div class="flex items-center justify-between gap-2.5 rounded-lg border border-line bg-card p-2.5 ">
                       <div class="flex min-w-0 items-center gap-2.5">
                         <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary /50 "><span class="material-symbols-outlined text-base">local_shipping</span></span>
                         <div class="min-w-0">
-                          <p class="truncate text-sm font-bold leading-tight text-foreground">Purchase Draft Created</p>
-                          <p class="truncate text-xs text-muted-foreground">Reorder below stock point</p>
+                          <p class="truncate text-sm font-bold leading-tight text-foreground"><%= t("home.demo.purchase_draft_created") %></p>
+                          <p class="truncate text-xs text-muted-foreground"><%= t("home.demo.reorder_below") %></p>
                         </div>
                       </div>
-                      <span class="whitespace-nowrap rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary /50 ">-0.05 Credits</span>
+                      <span class="whitespace-nowrap rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary /50 ">-0.05 <%= t("home.demo.credits") %></span>
                     </div>
                     <div class="flex items-center justify-between gap-2.5 rounded-lg border border-line bg-card p-2.5 ">
                       <div class="flex min-w-0 items-center gap-2.5">
                         <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground "><span class="material-symbols-outlined text-base">print</span></span>
                         <div class="min-w-0">
-                          <p class="truncate text-sm font-bold leading-tight text-foreground">Receipt Printed</p>
-                          <p class="truncate text-xs text-muted-foreground">Browser print from POS</p>
+                          <p class="truncate text-sm font-bold leading-tight text-foreground"><%= t("home.demo.receipt_printed") %></p>
+                          <p class="truncate text-xs text-muted-foreground"><%= t("home.demo.browser_print") %></p>
                         </div>
                       </div>
-                      <span class="whitespace-nowrap rounded bg-muted px-2 py-0.5 text-xs font-bold text-muted-foreground ">-0.02 Credits</span>
+                      <span class="whitespace-nowrap rounded bg-muted px-2 py-0.5 text-xs font-bold text-muted-foreground ">-0.02 <%= t("home.demo.credits") %></span>
                     </div>
                     <div class="flex items-center justify-between gap-2.5 rounded-lg border border-line bg-card p-2.5 ">
                       <div class="flex min-w-0 items-center gap-2.5">
                         <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-warning/10 text-warning "><span class="material-symbols-outlined text-base">swap_horiz</span></span>
                         <div class="min-w-0">
-                          <p class="truncate text-sm font-bold leading-tight text-foreground">Inter-Store Stock Transfer</p>
-                          <p class="truncate text-xs text-muted-foreground">To Westside Mall Hub • 24 items</p>
+                          <p class="truncate text-sm font-bold leading-tight text-foreground"><%= t("home.demo.inter_store_transfer") %></p>
+                          <p class="truncate text-xs text-muted-foreground"><%= t("home.demo.to_westside", count: 24) %></p>
                         </div>
                       </div>
-                      <span class="whitespace-nowrap rounded bg-warning/10 px-2 py-0.5 text-xs font-bold text-warning ">-0.10 Credits</span>
+                      <span class="whitespace-nowrap rounded bg-warning/10 px-2 py-0.5 text-xs font-bold text-warning ">-0.10 <%= t("home.demo.credits") %></span>
                     </div>
                   </div>
                 </div>
                 <div class="-mx-4 -mb-4 mt-3 flex flex-col items-start justify-between gap-1 rounded-b-xl border-t border-line bg-muted p-4 sm:flex-row sm:items-center ">
-                  <span class="text-xs text-muted-foreground">Business burn: <strong class="text-foreground" data-live="burn">34.2 cr today</strong></span>
-                  <span class="flex items-center gap-1 text-xs font-bold text-success "><span class="material-symbols-outlined text-base">verified_user</span> <span data-live="pool2">Business balance: 9,420 / 10,000 cr remaining</span></span>
+                  <span class="text-xs text-muted-foreground"><%= t("home.demo.business_burn") %> <strong class="text-foreground" data-live="burn"><%= t("home.demo.cr_today", credits: home_demo_precision(34.2)) %></strong></span>
+                  <span class="flex items-center gap-1 text-xs font-bold text-success "><span class="material-symbols-outlined text-base">verified_user</span> <span data-live="pool2"><%= t("home.demo.business_balance", balance: home_demo_number(9_420), cap: home_demo_number(10_000)) %></span></span>
                 </div>
               </div>
             </div>
@@ -341,181 +386,181 @@
         <div class="mx-auto max-w-7xl">
           <div class="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <span class="text-sm font-bold uppercase tracking-wider text-primary">One universal platform core • Multiple industry adaptations</span>
-              <h2 class="mt-1 text-3xl font-bold text-foreground md:text-4xl ">Any Domain, Any Workflow. One Universal Platform Core.</h2>
-              <p class="mt-1 max-w-2xl text-base text-muted-foreground">Why pay for four platforms with four logins? One Skycom account lets you run distinct businesses — retail, clinic, hotel, and restaurant — on the same POS, booking, reception, inventory, and invoicing core, with one set of credentials and a separate workspace for each business.</p>
+              <span class="text-sm font-bold uppercase tracking-wider text-primary"><%= t("home.solutions.eyebrow") %></span>
+              <h2 class="mt-1 text-3xl font-bold text-foreground md:text-4xl "><%= t("home.solutions.title") %></h2>
+              <p class="mt-1 max-w-2xl text-base text-muted-foreground"><%= t("home.solutions.intro") %></p>
             </div>
             <div class="inline-flex items-center gap-2 self-start rounded-xl bg-card px-4 py-2 shadow-sm md:self-auto ">
               <span class="material-symbols-outlined text-xl text-success ">token</span>
-              <span class="text-sm font-semibold text-foreground">Shared POS, Booking, Reception, Inventory &amp; Invoicing Core</span>
+              <span class="text-sm font-semibold text-foreground"><%= t("home.solutions.shared_core") %></span>
             </div>
           </div>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="group flex flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-all hover:shadow-md ">
               <div class="relative h-64 overflow-hidden">
-                <img alt="A modern high-tech retail boutique interior" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?q=80&w=1470&auto=format&fit=crop">
+                <img alt="<%= t("home.solutions.retail.image_alt") %>" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?q=80&w=1470&auto=format&fit=crop">
                 <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-card/90 px-3 py-1 shadow-sm backdrop-blur-md ">
                   <span class="h-2 w-2 rounded-full bg-success"></span>
-                  <span class="text-sm font-bold text-success ">Retail &amp; Multi-Store</span>
+                  <span class="text-sm font-bold text-success "><%= t("home.solutions.retail.badge") %></span>
                 </div>
               </div>
               <div class="flex flex-1 flex-col justify-between p-6">
                 <div>
-                  <h3 class="text-xl font-bold text-foreground">Multi-Store Retail Operations</h3>
-                  <p class="mt-2 text-base text-muted-foreground">Run POS checkout, stock, and purchasing across stores from one workspace. Each business keeps its own branches, warehouses, and team.</p>
+                  <h3 class="text-xl font-bold text-foreground"><%= t("home.solutions.retail.title") %></h3>
+                  <p class="mt-2 text-base text-muted-foreground"><%= t("home.solutions.retail.description") %></p>
                   <div class="mt-4 grid grid-cols-2 gap-2">
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">POS Checkout &amp; Receipts</p>
-                      <p class="text-xs text-muted-foreground">Cash or QR, server-priced</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.retail.feature_1_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.retail.feature_1_body") %></p>
                     </div>
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Multi-Warehouse Stock</p>
-                      <p class="text-xs text-muted-foreground">Transfers, imports, exports, adjustments</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.retail.feature_2_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.retail.feature_2_body") %></p>
                     </div>
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Reorder to Purchase</p>
-                      <p class="text-xs text-muted-foreground">Low stock to draft purchase</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.retail.feature_3_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.retail.feature_3_body") %></p>
                     </div>
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Custom Product Fields</p>
-                      <p class="text-xs text-muted-foreground">Size, color, supplier and more</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.retail.feature_4_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.retail.feature_4_body") %></p>
                     </div>
                   </div>
                 </div>
                 <div class="mt-6 flex items-center justify-between pt-4">
-                  <a class="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 " href="#interactive-preview">See the POS in the demo <span class="material-symbols-outlined text-base">arrow_forward</span></a>
-                  <span class="text-sm text-muted-foreground">No platform sales commission</span>
+                  <a class="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 " href="#interactive-preview"><%= t("home.solutions.retail.link") %> <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+                  <span class="text-sm text-muted-foreground"><%= t("home.solutions.retail.footnote") %></span>
                 </div>
               </div>
             </div>
             <div class="group flex flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-all hover:shadow-md ">
               <div class="relative h-64 overflow-hidden">
-                <img alt="A modern dental clinic operatory room" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=1470&auto=format&fit=crop">
+                <img alt="<%= t("home.solutions.dental.image_alt") %>" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=1470&auto=format&fit=crop">
                 <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-card/90 px-3 py-1 shadow-sm backdrop-blur-md ">
                   <span class="h-2 w-2 rounded-full bg-primary"></span>
-                  <span class="text-sm font-bold text-primary">Dental &amp; Clinics</span>
+                  <span class="text-sm font-bold text-primary"><%= t("home.solutions.dental.badge") %></span>
                 </div>
               </div>
               <div class="flex flex-1 flex-col justify-between p-6">
                 <div>
-                  <h3 class="text-xl font-bold text-foreground">Clinic Scheduling &amp; Front Desk</h3>
-                  <p class="mt-2 text-base text-muted-foreground">Book chairs and rooms, check patients in at the front desk, keep patient details in custom fields, and invoice from the same workspace.</p>
+                  <h3 class="text-xl font-bold text-foreground"><%= t("home.solutions.dental.title") %></h3>
+                  <p class="mt-2 text-base text-muted-foreground"><%= t("home.solutions.dental.description") %></p>
                   <div class="mt-4 grid grid-cols-2 gap-2">
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Chair &amp; Room Booking</p>
-                      <p class="text-xs text-muted-foreground">Conflict-checked reservations</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.dental.feature_1_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.dental.feature_1_body") %></p>
                     </div>
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Front-Desk Check-In</p>
-                      <p class="text-xs text-muted-foreground">Visits, host alerts, parcels</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.dental.feature_2_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.dental.feature_2_body") %></p>
                     </div>
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Patient Records</p>
-                      <p class="text-xs text-muted-foreground">Typed custom fields per category</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.dental.feature_3_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.dental.feature_3_body") %></p>
                     </div>
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Invoices &amp; Supply Stock</p>
-                      <p class="text-xs text-muted-foreground">Tax rate snapshotted per sale</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.dental.feature_4_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.dental.feature_4_body") %></p>
                     </div>
                   </div>
                 </div>
                 <div class="mt-6 flex items-center justify-between pt-4">
-                  <a class="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 " href="#platform">See the shared core <span class="material-symbols-outlined text-base">arrow_forward</span></a>
-                  <span class="text-sm text-muted-foreground">Built on the booking core</span>
+                  <a class="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 " href="#platform"><%= t("home.solutions.dental.link") %> <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+                  <span class="text-sm text-muted-foreground"><%= t("home.solutions.dental.footnote") %></span>
                 </div>
               </div>
             </div>
             <div class="group flex flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-all hover:shadow-md ">
               <div class="relative h-64 overflow-hidden">
-                <img alt="A luxury boutique hotel reception and lobby lounge" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=1470&auto=format&fit=crop">
+                <img alt="<%= t("home.solutions.hotel.image_alt") %>" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=1470&auto=format&fit=crop">
                 <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-card/90 px-3 py-1 shadow-sm backdrop-blur-md ">
                   <span class="h-2 w-2 rounded-full bg-warning"></span>
-                  <span class="text-sm font-bold text-warning ">Hotels &amp; Hospitality</span>
+                  <span class="text-sm font-bold text-warning "><%= t("home.solutions.hotel.badge") %></span>
                 </div>
               </div>
               <div class="flex flex-1 flex-col justify-between p-6">
                 <div>
-                  <h3 class="text-xl font-bold text-foreground">Room Reservations &amp; Front Desk</h3>
-                  <p class="mt-2 text-base text-muted-foreground">See the day's room reservations, lock a booking without double-booking, and check guests in from the front desk.</p>
+                  <h3 class="text-xl font-bold text-foreground"><%= t("home.solutions.hotel.title") %></h3>
+                  <p class="mt-2 text-base text-muted-foreground"><%= t("home.solutions.hotel.description") %></p>
                   <div class="mt-4 grid grid-cols-2 gap-2">
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Day Reservation Timeline</p>
-                      <p class="text-xs text-muted-foreground">Facilities, hosts, and guests</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.hotel.feature_1_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.hotel.feature_1_body") %></p>
                     </div>
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Conflict-Checked Locking</p>
-                      <p class="text-xs text-muted-foreground">Overlaps refused with the conflicting time</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.hotel.feature_2_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.hotel.feature_2_body") %></p>
                     </div>
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Front-Desk Check-In</p>
-                      <p class="text-xs text-muted-foreground">Walk-ins, host alerts, parcels</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.hotel.feature_3_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.hotel.feature_3_body") %></p>
                     </div>
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Guest Invoices</p>
-                      <p class="text-xs text-muted-foreground">Orders, invoices, receipts</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.hotel.feature_4_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.hotel.feature_4_body") %></p>
                     </div>
                   </div>
                 </div>
                 <div class="mt-6 flex items-center justify-between pt-4">
-                  <a class="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 " href="#platform">See the booking core <span class="material-symbols-outlined text-base">arrow_forward</span></a>
-                  <span class="text-sm text-muted-foreground">No platform booking fee</span>
+                  <a class="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 " href="#platform"><%= t("home.solutions.hotel.link") %> <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+                  <span class="text-sm text-muted-foreground"><%= t("home.solutions.hotel.footnote") %></span>
                 </div>
               </div>
             </div>
             <div class="group flex flex-col overflow-hidden rounded-2xl bg-card shadow-sm transition-all hover:shadow-md ">
               <div class="relative h-64 overflow-hidden">
-                <img alt="A bustling upscale restaurant kitchen and dining hall" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1470&auto=format&fit=crop">
+                <img alt="<%= t("home.solutions.restaurant.image_alt") %>" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1470&auto=format&fit=crop">
                 <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-card/90 px-3 py-1 shadow-sm backdrop-blur-md ">
                   <span class="h-2 w-2 rounded-full bg-danger"></span>
-                  <span class="text-sm font-bold text-danger ">Restaurants &amp; Cafes</span>
+                  <span class="text-sm font-bold text-danger "><%= t("home.solutions.restaurant.badge") %></span>
                 </div>
               </div>
               <div class="flex flex-1 flex-col justify-between p-6">
                 <div>
-                  <h3 class="text-xl font-bold text-foreground">Counter Service &amp; Table Reservations</h3>
-                  <p class="mt-2 text-base text-muted-foreground">Take counter orders, reserve tables as bookable spaces, and keep stock and purchasing in the same workspace.</p>
+                  <h3 class="text-xl font-bold text-foreground"><%= t("home.solutions.restaurant.title") %></h3>
+                  <p class="mt-2 text-base text-muted-foreground"><%= t("home.solutions.restaurant.description") %></p>
                   <div class="mt-4 grid grid-cols-2 gap-2">
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">POS Counter Service</p>
-                      <p class="text-xs text-muted-foreground">Cash or QR checkout</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.restaurant.feature_1_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.restaurant.feature_1_body") %></p>
                     </div>
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Table Reservations</p>
-                      <p class="text-xs text-muted-foreground">Bookable spaces on the timeline</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.restaurant.feature_2_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.restaurant.feature_2_body") %></p>
                     </div>
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Stock &amp; Purchases</p>
-                      <p class="text-xs text-muted-foreground">Ingredients as stocked products</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.restaurant.feature_3_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.restaurant.feature_3_body") %></p>
                     </div>
                     <div class="rounded-lg bg-background p-2.5 ">
-                      <p class="text-sm font-semibold text-foreground">Invoices &amp; Receipts</p>
-                      <p class="text-xs text-muted-foreground">Tax snapshot on every sale</p>
+                      <p class="text-sm font-semibold text-foreground"><%= t("home.solutions.restaurant.feature_4_title") %></p>
+                      <p class="text-xs text-muted-foreground"><%= t("home.solutions.restaurant.feature_4_body") %></p>
                     </div>
                   </div>
                 </div>
                 <div class="mt-6 flex items-center justify-between pt-4">
-                  <a class="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 " href="#platform">See the POS &amp; booking core <span class="material-symbols-outlined text-base">arrow_forward</span></a>
-                  <span class="text-sm text-muted-foreground">Same POS &amp; booking core</span>
+                  <a class="inline-flex items-center gap-1 text-sm font-bold text-primary hover:gap-2 " href="#platform"><%= t("home.solutions.restaurant.link") %> <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+                  <span class="text-sm text-muted-foreground"><%= t("home.solutions.restaurant.footnote") %></span>
                 </div>
               </div>
             </div>
           </div>
           <div class="mt-6 border-t border-line pt-6 ">
             <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-              <span class="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Adaptable to Any Industry:</span>
-              <span class="flex items-center gap-1 text-xs font-bold text-success "><span class="material-symbols-outlined text-base">auto_awesome</span> Dynamic Categories &amp; Fields</span>
+              <span class="text-sm font-semibold uppercase tracking-wider text-muted-foreground"><%= t("home.solutions.industries.label") %></span>
+              <span class="flex items-center gap-1 text-xs font-bold text-success "><span class="material-symbols-outlined text-base">auto_awesome</span> <%= t("home.solutions.industries.dynamic") %></span>
             </div>
             <div class="flex flex-wrap gap-2">
-              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-primary">fitness_center</span> Gyms &amp; Fitness Studios</span>
-              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-success ">car_repair</span> Automotive &amp; Fleet Repair</span>
-              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-warning ">school</span> Education &amp; Academies</span>
-              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-primary">local_shipping</span> Logistics &amp; Field Services</span>
-              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-success ">gavel</span> Professional &amp; Legal Services</span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-primary">fitness_center</span> <%= t("home.solutions.industries.gyms") %></span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-success ">car_repair</span> <%= t("home.solutions.industries.automotive") %></span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-warning ">school</span> <%= t("home.solutions.industries.education") %></span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-primary">local_shipping</span> <%= t("home.solutions.industries.logistics") %></span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold text-foreground shadow-sm "><span class="material-symbols-outlined text-base text-success ">gavel</span> <%= t("home.solutions.industries.professional") %></span>
               <a
                 class="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground shadow-sm cursor-pointer"
                 href="/sign_up"
               >
-                <span class="material-symbols-outlined text-base">add_circle</span> + Create Your Free Account
+                <span class="material-symbols-outlined text-base">add_circle</span> <%= t("home.solutions.industries.cta") %>
               </a>
             </div>
             <div class="mt-4 flex flex-col items-center justify-between gap-4 rounded-xl border-l-2 border-success/40 bg-card p-4 shadow-sm sm:flex-row ">
@@ -524,11 +569,11 @@
                   <span class="material-symbols-outlined text-xl">schema</span>
                 </div>
                 <div>
-                  <p class="text-base font-bold text-foreground">Need custom fields for your industry?</p>
-                  <p class="text-sm text-muted-foreground">Categories, typed fields, and table views let you model patient details, room attributes, product specs, or menu data — without a raw JSON editor or a separate database.</p>
+                  <p class="text-base font-bold text-foreground"><%= t("home.solutions.custom.title") %></p>
+                  <p class="text-sm text-muted-foreground"><%= t("home.solutions.custom.body") %></p>
                 </div>
               </div>
-              <a class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-muted " href="#platform">See the platform core <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+              <a class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-primary transition-all hover:bg-muted " href="#platform"><%= t("home.solutions.custom.link") %> <span class="material-symbols-outlined text-base">arrow_forward</span></a>
             </div>
           </div>
         </div>
@@ -538,16 +583,16 @@
         <div class="mx-auto max-w-7xl">
           <div class="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <span class="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-success "><span class="material-symbols-outlined text-lg">domain_add</span> One Login, Multiple Distinct Ventures</span>
-              <h2 class="mt-1 text-3xl font-bold text-foreground md:text-4xl ">Single Master Account. Multiple Isolated Businesses.</h2>
-              <p class="mt-1 max-w-2xl text-base text-muted-foreground">Designed for serial entrepreneurs, family holding offices, hotel-and-restaurant operators, and franchise owners. Stop wrestling with fragmented accounts, passwords, and duplicate monthly base retainers.</p>
+              <span class="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-success "><span class="material-symbols-outlined text-lg">domain_add</span> <%= t("home.multi_tenant.eyebrow") %></span>
+              <h2 class="mt-1 text-3xl font-bold text-foreground md:text-4xl "><%= t("home.multi_tenant.title") %></h2>
+              <p class="mt-1 max-w-2xl text-base text-muted-foreground"><%= t("home.multi_tenant.intro") %></p>
             </div>
             <div class="flex items-center gap-2">
               <a
                 class="flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground shadow-sm cursor-pointer"
                 href="/sign_up"
               >
-                <span class="material-symbols-outlined text-lg">verified</span> $0 Base Fee per Business
+                <span class="material-symbols-outlined text-lg">verified</span> <%= t("home.multi_tenant.cta") %>
               </a>
             </div>
           </div>
@@ -557,17 +602,17 @@
                 <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary /50 ">
                   <span class="material-symbols-outlined text-2xl">switch_account</span>
                 </div>
-                <h3 class="text-xl font-bold text-foreground">One Master Login, Diverse Holdings</h3>
-                <p class="mt-2 text-sm text-muted-foreground">Run an apparel boutique, a hotel, and a restaurant from one account. Seamlessly switch contexts with one click — no logging out, no multiple tabs, no separate apps.</p>
+                <h3 class="text-xl font-bold text-foreground"><%= t("home.multi_tenant.card_1.title") %></h3>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.multi_tenant.card_1.body") %></p>
                 <ul class="mt-4 space-y-2 text-sm text-foreground">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Complete workspace isolation &amp; separate branch ledgers</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Granular staff permissions scoped per business</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Separate dashboards, analytics, and billing per business</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.multi_tenant.card_1.bullet_1") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.multi_tenant.card_1.bullet_2") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.multi_tenant.card_1.bullet_3") %></li>
                 </ul>
               </div>
               <div class="mt-6 flex items-center justify-between border-t border-line pt-3 ">
-                <span class="text-sm font-semibold text-primary">1-Click Business Switcher</span>
-                <span class="rounded bg-success/10 px-2 py-0.5 text-xs font-bold text-success ">Isolated Workspaces</span>
+                <span class="text-sm font-semibold text-primary"><%= t("home.multi_tenant.card_1.footer") %></span>
+                <span class="rounded bg-success/10 px-2 py-0.5 text-xs font-bold text-success "><%= t("home.multi_tenant.card_1.badge") %></span>
               </div>
             </div>
             <div class="flex flex-col justify-between rounded-2xl border border-line bg-card p-6 shadow-sm transition-all hover:shadow-md ">
@@ -575,17 +620,17 @@
                 <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-success/10 text-success ">
                   <span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
                 </div>
-                <h3 class="text-xl font-bold text-foreground">Prepaid Credits per Business</h3>
-                <p class="mt-2 text-sm text-muted-foreground">Each business keeps its own credit balance and usage history, so spend stays visible per venture. There is no monthly base fee and no per-seat charge.</p>
+                <h3 class="text-xl font-bold text-foreground"><%= t("home.multi_tenant.card_2.title") %></h3>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.multi_tenant.card_2.body") %></p>
                 <ul class="mt-4 space-y-2 text-sm text-foreground">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Separate credit balance and usage log per business</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> No monthly base fee or per-seat software charge</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Billing and usage history remain available</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.multi_tenant.card_2.bullet_1") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.multi_tenant.card_2.bullet_2") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.multi_tenant.card_2.bullet_3") %></li>
                 </ul>
               </div>
               <div class="mt-6 flex items-center justify-between border-t border-line pt-3 ">
-                <span class="text-sm font-semibold text-success ">Per-Business Credit Wallet</span>
-                <span class="rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary /50 ">No Monthly Base Fee</span>
+                <span class="text-sm font-semibold text-success "><%= t("home.multi_tenant.card_2.footer") %></span>
+                <span class="rounded bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary /50 "><%= t("home.multi_tenant.card_2.badge") %></span>
               </div>
             </div>
             <div class="flex flex-col justify-between rounded-2xl border border-line bg-card p-6 shadow-sm transition-all hover:shadow-md ">
@@ -593,17 +638,17 @@
                 <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-warning/10 text-warning ">
                   <span class="material-symbols-outlined text-2xl">bolt</span>
                 </div>
-                <h3 class="text-xl font-bold text-foreground">Create a New Business in Minutes</h3>
-                <p class="mt-2 text-sm text-muted-foreground">Add a business under the same login and get its own branches, warehouses, roles, categories, and staff. Each business stays fully isolated.</p>
+                <h3 class="text-xl font-bold text-foreground"><%= t("home.multi_tenant.card_3.title") %></h3>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.multi_tenant.card_3.body") %></p>
                 <ul class="mt-4 space-y-2 text-sm text-foreground">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Separate branches, warehouses, and staff per business</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Starter roles, categories, and dynamic fields</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> No setup fees and no monthly base fee</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.multi_tenant.card_3.bullet_1") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.multi_tenant.card_3.bullet_2") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.multi_tenant.card_3.bullet_3") %></li>
                 </ul>
               </div>
               <div class="mt-6 flex items-center justify-between border-t border-line pt-3 ">
-                <span class="text-sm font-semibold text-warning ">Separate Workspace per Business</span>
-                <span class="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground ">No Setup Fee</span>
+                <span class="text-sm font-semibold text-warning "><%= t("home.multi_tenant.card_3.footer") %></span>
+                <span class="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground "><%= t("home.multi_tenant.card_3.badge") %></span>
               </div>
             </div>
           </div>
@@ -613,9 +658,9 @@
       <section class="scroll-mt-20 px-4 py-16 md:px-8 md:py-24" id="platform">
         <div class="mx-auto max-w-7xl">
           <div class="mx-auto mb-10 max-w-3xl text-center">
-            <span class="text-sm font-bold uppercase tracking-wider text-primary">The Core Platform</span>
-            <h2 class="mt-1 text-3xl font-bold text-foreground md:text-4xl ">Core Operational Pillars Built For Scale</h2>
-            <p class="mt-2 text-base text-muted-foreground">Five purpose-built operation consoles — POS, Booking, Reception, Inventory, and Store Manager — plus the shared catalog, stock, people, and money primitives underneath. Every business runs on the same foundation.</p>
+            <span class="text-sm font-bold uppercase tracking-wider text-primary"><%= t("home.platform.eyebrow") %></span>
+            <h2 class="mt-1 text-3xl font-bold text-foreground md:text-4xl "><%= t("home.platform.title") %></h2>
+            <p class="mt-2 text-base text-muted-foreground"><%= t("home.platform.intro") %></p>
           </div>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div class="flex flex-col justify-between rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md ">
@@ -623,17 +668,17 @@
                 <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary /50 ">
                   <span class="material-symbols-outlined text-2xl">cloud_done</span>
                 </div>
-                <h3 class="text-xl font-bold text-foreground">Cloud POS</h3>
-                <p class="mt-2 text-sm text-muted-foreground">Server-priced checkout with real-time stock, tax, discounts, and a locked till. Cash and QR payments, with a printable receipt. Online-only, with no local software to maintain.</p>
+                <h3 class="text-xl font-bold text-foreground"><%= t("home.platform.pos.title") %></h3>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.platform.pos.body") %></p>
                 <ul class="mt-4 space-y-2 text-sm text-foreground">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Cash and QR checkout</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Server-authoritative prices, stock, and tax</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Discounts, void, and browser-printable receipt</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.pos.bullet_1") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.pos.bullet_2") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.pos.bullet_3") %></li>
                 </ul>
               </div>
               <div class="mt-6 flex items-center justify-between rounded-b-2xl bg-background p-4 ">
-                <span class="text-sm font-bold text-primary">Real-Time Stock &amp; Pricing</span>
-                <span class="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground ">Online-Only</span>
+                <span class="text-sm font-bold text-primary"><%= t("home.platform.pos.footer") %></span>
+                <span class="rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground "><%= t("home.platform.pos.badge") %></span>
               </div>
             </div>
             <div class="flex flex-col justify-between rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md ">
@@ -641,16 +686,16 @@
                 <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-success/10 text-success ">
                   <span class="material-symbols-outlined text-2xl">inventory_2</span>
                 </div>
-                <h3 class="text-xl font-bold text-foreground">Multi-Warehouse Inventory</h3>
-                <p class="mt-2 text-sm text-muted-foreground">One stock ledger across branches and warehouses, with transfers, imports, exports, and reason-coded adjustments.</p>
+                <h3 class="text-xl font-bold text-foreground"><%= t("home.platform.inventory.title") %></h3>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.platform.inventory.body") %></p>
                 <ul class="mt-4 space-y-2 text-sm text-foreground">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Immutable stock movement ledger</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Branch and warehouse transfers</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Low stock to draft purchase order</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.inventory.bullet_1") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.inventory.bullet_2") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.inventory.bullet_3") %></li>
                 </ul>
               </div>
               <div class="mt-6 rounded-b-2xl bg-background p-4 ">
-                <span class="text-sm font-bold text-success ">Manual Reorder to Purchase</span>
+                <span class="text-sm font-bold text-success "><%= t("home.platform.inventory.footer") %></span>
               </div>
             </div>
             <div class="flex flex-col justify-between rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md ">
@@ -658,16 +703,16 @@
                 <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-warning/10 text-warning ">
                   <span class="material-symbols-outlined text-2xl">groups</span>
                 </div>
-                <h3 class="text-xl font-bold text-foreground">HR, Attendance &amp; Team Records</h3>
-                <p class="mt-2 text-sm text-muted-foreground">Employee records, departments, roles, documents, shift templates, attendance, and leave requests in one place.</p>
+                <h3 class="text-xl font-bold text-foreground"><%= t("home.platform.hr.title") %></h3>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.platform.hr.body") %></p>
                 <ul class="mt-4 space-y-2 text-sm text-foreground">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Employee profiles, departments, and groups</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Shift templates, attendance days, and leave requests</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Document storage and role-based access</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.hr.bullet_1") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.hr.bullet_2") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.hr.bullet_3") %></li>
                 </ul>
               </div>
               <div class="mt-6 rounded-b-2xl bg-background p-4 ">
-                <span class="text-sm font-bold text-warning ">Attendance &amp; Leave</span>
+                <span class="text-sm font-bold text-warning "><%= t("home.platform.hr.footer") %></span>
               </div>
             </div>
             <div class="flex flex-col justify-between rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md ">
@@ -675,16 +720,16 @@
                 <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary /50 ">
                   <span class="material-symbols-outlined text-2xl">location_on</span>
                 </div>
-                <h3 class="text-xl font-bold text-foreground">GPS-Geofenced Attendance</h3>
-                <p class="mt-2 text-sm text-muted-foreground">Clock-in is validated against the branch's configured radius and stored with GPS coordinates for audit.</p>
+                <h3 class="text-xl font-bold text-foreground"><%= t("home.platform.gps.title") %></h3>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.platform.gps.body") %></p>
                 <ul class="mt-4 space-y-2 text-sm text-foreground">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Configurable branch radius</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> GPS coordinates and distance stored per check-in</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Rejected check-ins create no attendance event</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.gps.bullet_1") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.gps.bullet_2") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.gps.bullet_3") %></li>
                 </ul>
               </div>
               <div class="mt-6 rounded-b-2xl bg-background p-4 ">
-                <span class="text-sm font-bold text-primary">GPS Audit Trail</span>
+                <span class="text-sm font-bold text-primary"><%= t("home.platform.gps.footer") %></span>
               </div>
             </div>
             <div class="flex flex-col justify-between rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md ">
@@ -692,16 +737,16 @@
                 <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-success/10 text-success ">
                   <span class="material-symbols-outlined text-2xl">calendar_month</span>
                 </div>
-                <h3 class="text-xl font-bold text-foreground">Operations Calendar</h3>
-                <p class="mt-2 text-sm text-muted-foreground">A shared calendar for appointments, bookings, and team rosters, with conflict-checked reservations for rooms and spaces.</p>
+                <h3 class="text-xl font-bold text-foreground"><%= t("home.platform.calendar.title") %></h3>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.platform.calendar.body") %></p>
                 <ul class="mt-4 space-y-2 text-sm text-foreground">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Events and resource reservations</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Facility, host, and customer on each booking</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Extend, end, or cancel from the console</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.calendar.bullet_1") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.calendar.bullet_2") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.calendar.bullet_3") %></li>
                 </ul>
               </div>
               <div class="mt-6 rounded-b-2xl bg-background p-4 ">
-                <span class="text-sm font-bold text-success ">Conflict-Checked Reservations</span>
+                <span class="text-sm font-bold text-success "><%= t("home.platform.calendar.footer") %></span>
               </div>
             </div>
             <div class="flex flex-col justify-between rounded-2xl bg-card p-6 shadow-sm transition-all hover:shadow-md ">
@@ -709,16 +754,16 @@
                 <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary /50 ">
                   <span class="material-symbols-outlined text-2xl">receipt_long</span>
                 </div>
-                <h3 class="text-xl font-bold text-foreground">Invoicing &amp; Tax Snapshot</h3>
-                <p class="mt-2 text-sm text-muted-foreground">Turn orders into invoices, keep payment status, and snapshot the tax rate on every sale so later rate changes never rewrite history.</p>
+                <h3 class="text-xl font-bold text-foreground"><%= t("home.platform.invoicing.title") %></h3>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.platform.invoicing.body") %></p>
                 <ul class="mt-4 space-y-2 text-sm text-foreground">
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Orders to invoices and receipts</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Tax rate captured per sale</li>
-                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> Branch-scoped invoices and payment status</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.invoicing.bullet_1") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.invoicing.bullet_2") %></li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-success ">check</span> <%= t("home.platform.invoicing.bullet_3") %></li>
                 </ul>
               </div>
               <div class="mt-6 rounded-b-2xl bg-background p-4 ">
-                <span class="text-sm font-bold text-primary">Tax Rate Captured per Sale</span>
+                <span class="text-sm font-bold text-primary"><%= t("home.platform.invoicing.footer") %></span>
               </div>
             </div>
           </div>
@@ -730,26 +775,26 @@
           <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
             <div class="lg:col-span-7">
               <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-success/10 px-3 py-1 text-sm text-success ">
-                <span class="material-symbols-outlined text-base">toll</span> Start Free: No Monthly Base Fee
+                <span class="material-symbols-outlined text-base">toll</span> <%= t("home.pricing.badge") %>
               </div>
-              <h2 class="text-3xl font-extrabold leading-tight text-foreground md:text-4xl ">Start Free. Add Businesses Without Monthly Base Fees.</h2>
-              <p class="mt-4 text-base text-muted-foreground">No per-seat fees, no per-business base subscription, and no charge for an idle business. A single account can hold multiple distinct businesses across retail, clinic, hotel, and restaurant operations — each with its own isolated workspace and credit balance. Start with free starter credits; no credit card is required.</p>
+              <h2 class="text-3xl font-extrabold leading-tight text-foreground md:text-4xl "><%= t("home.pricing.title") %></h2>
+              <p class="mt-4 text-base text-muted-foreground"><%= t("home.pricing.intro") %></p>
               <div class="mt-6 space-y-3 text-base text-foreground">
                 <div class="flex items-start gap-3">
                   <span class="material-symbols-outlined mt-0.5 text-success ">card_giftcard</span>
-                  <p><strong>Free Starter Credits:</strong> Every new business starts with promotional credits. No credit card needed.</p>
+                  <p><strong><%= t("home.pricing.free_credits_label") %></strong> <%= t("home.pricing.free_credits_body") %></p>
                 </div>
                 <div class="flex items-start gap-3">
                   <span class="material-symbols-outlined mt-0.5 text-success ">badge</span>
-                  <p><strong>No Per-Seat Billing:</strong> Add staff without adding a software bill. Staff accounts are not priced per seat.</p>
+                  <p><strong><%= t("home.pricing.no_per_seat_label") %></strong> <%= t("home.pricing.no_per_seat_body") %></p>
                 </div>
                 <div class="flex items-start gap-3">
                   <span class="material-symbols-outlined mt-0.5 text-success ">trending_up</span>
-                  <p><strong>No Monthly Base Fee:</strong> An idle business does not carry a monthly subscription or a per-business retainer.</p>
+                  <p><strong><%= t("home.pricing.no_monthly_label") %></strong> <%= t("home.pricing.no_monthly_body") %></p>
                 </div>
                 <div class="flex items-start gap-3">
                   <span class="material-symbols-outlined mt-0.5 text-success ">receipt_long</span>
-                  <p><strong>Transparent Usage:</strong> Billing and usage pages show the credit balance and movement history for each business.</p>
+                  <p><strong><%= t("home.pricing.transparent_label") %></strong> <%= t("home.pricing.transparent_body") %></p>
                 </div>
               </div>
               <div class="mt-8 flex flex-wrap items-center gap-4">
@@ -757,7 +802,7 @@
                   class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 cursor-pointer"
                   href="/sign_up"
                 >
-                  <span>Get Started with Free Credits</span>
+                  <span><%= t("home.pricing.cta") %></span>
                   <span class="material-symbols-outlined text-lg">launch</span>
                 </a>
               </div>
@@ -765,41 +810,41 @@
             <div class="rounded-2xl bg-background p-6 lg:col-span-5 ">
               <div class="flex items-center justify-between pb-4">
                 <div class="text-left">
-                  <h4 class="text-base font-bold text-foreground">Free Starter Tier</h4>
-                  <p class="text-xs text-muted-foreground">Promotional credits included when the business is created</p>
+                  <h4 class="text-base font-bold text-foreground"><%= t("home.pricing.tier_title") %></h4>
+                  <p class="text-xs text-muted-foreground"><%= t("home.pricing.tier_note") %></p>
                 </div>
-                <span class="text-xl font-extrabold text-success ">$0 / mo</span>
+                <span class="text-xl font-extrabold text-success "><%= t("home.pricing.price") %></span>
               </div>
               <div class="space-y-3 text-sm text-muted-foreground">
                 <div class="flex items-center justify-between rounded-lg bg-card px-3 py-1.5 ">
-                  <span>Business Base</span>
+                  <span><%= t("home.pricing.business_base") %></span>
                   <a
                     class="font-bold text-success cursor-pointer "
                     href="/sign_up"
                   >
-                    Unlimited Businesses ($0 Base)
+                    <%= t("home.pricing.unlimited_businesses") %>
                   </a>
                 </div>
                 <div class="flex items-center justify-between rounded-lg bg-card px-3 py-1.5 ">
-                  <span>Monthly Subscription</span>
-                  <span class="font-bold text-foreground">None</span>
+                  <span><%= t("home.pricing.monthly_subscription") %></span>
+                  <span class="font-bold text-foreground"><%= t("home.pricing.none") %></span>
                 </div>
                 <div class="flex items-center justify-between rounded-lg bg-card px-3 py-1.5 ">
-                  <span>Per-Seat Fees</span>
-                  <span class="font-bold text-foreground">None</span>
+                  <span><%= t("home.pricing.per_seat_fees") %></span>
+                  <span class="font-bold text-foreground"><%= t("home.pricing.none") %></span>
                 </div>
                 <div class="flex items-center justify-between rounded-lg bg-card px-3 py-1.5 ">
-                  <span>Starter Credits</span>
-                  <span class="font-bold text-foreground">Included</span>
+                  <span><%= t("home.pricing.starter_credits") %></span>
+                  <span class="font-bold text-foreground"><%= t("home.pricing.included") %></span>
                 </div>
                 <div class="flex items-center justify-between rounded-lg bg-card px-3 py-1.5 ">
-                  <span>Credit Balance</span>
-                  <span class="font-bold text-foreground">Per Business</span>
+                  <span><%= t("home.pricing.credit_balance") %></span>
+                  <span class="font-bold text-foreground"><%= t("home.pricing.per_business") %></span>
                 </div>
               </div>
               <div class="mt-6 border-t border-line pt-4 text-center ">
                 <div class="inline-flex items-center gap-1.5 text-sm font-semibold text-success ">
-                  <span class="material-symbols-outlined text-base">verified</span> No credit card required to sign up
+                  <span class="material-symbols-outlined text-base">verified</span> <%= t("home.pricing.no_credit_card") %>
                 </div>
               </div>
             </div>
@@ -810,52 +855,52 @@
       <section class="px-4 py-16 md:px-8 md:py-24">
         <div class="mx-auto max-w-7xl">
           <div class="mb-10 max-w-3xl">
-            <span class="text-sm font-bold uppercase tracking-wider text-primary">Built for Multi-Business Operations</span>
-            <h2 class="mt-1 text-3xl font-bold text-foreground md:text-4xl ">Built for Operators Who Run More Than One Business</h2>
-            <p class="mt-2 text-base text-muted-foreground">One login, isolated workspaces, and shared operational primitives. Each business keeps its own branches, stock, people, and money — without a separate software stack.</p>
+            <span class="text-sm font-bold uppercase tracking-wider text-primary"><%= t("home.operators.eyebrow") %></span>
+            <h2 class="mt-1 text-3xl font-bold text-foreground md:text-4xl "><%= t("home.operators.title") %></h2>
+            <p class="mt-2 text-base text-muted-foreground"><%= t("home.operators.intro") %></p>
           </div>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div class="rounded-2xl bg-card p-6 shadow-sm ">
               <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary /50 ">
                 <span class="material-symbols-outlined text-xl">hub</span>
               </div>
-              <h3 class="text-base font-bold text-foreground">One Platform, Separate Workspaces</h3>
-              <p class="mt-2 text-sm text-muted-foreground">Each business gets its own isolated workspace, branches, warehouses, and team. Switch businesses from the company menu.</p>
+              <h3 class="text-base font-bold text-foreground"><%= t("home.operators.one_platform_title") %></h3>
+              <p class="mt-2 text-sm text-muted-foreground"><%= t("home.operators.one_platform_body") %></p>
             </div>
             <div class="rounded-2xl bg-card p-6 shadow-sm ">
               <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-success/10 text-success ">
                 <span class="material-symbols-outlined text-xl">dashboard_customize</span>
               </div>
-              <h3 class="text-base font-bold text-foreground">Dynamic Categories, Fields &amp; Table Views</h3>
-              <p class="mt-2 text-sm text-muted-foreground">Model industry data with typed custom fields and per-category table columns — no raw JSON and no separate database.</p>
+              <h3 class="text-base font-bold text-foreground"><%= t("home.operators.dynamic_title") %></h3>
+              <p class="mt-2 text-sm text-muted-foreground"><%= t("home.operators.dynamic_body") %></p>
             </div>
             <div class="rounded-2xl bg-card p-6 shadow-sm ">
               <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-warning/10 text-warning ">
                 <span class="material-symbols-outlined text-xl">device_hub</span>
               </div>
-              <h3 class="text-base font-bold text-foreground">One Login for Every Business</h3>
-              <p class="mt-2 text-sm text-muted-foreground">Move between businesses without logging out or opening separate apps. Dashboards, analytics, and billing stay scoped to the active business.</p>
+              <h3 class="text-base font-bold text-foreground"><%= t("home.operators.one_login_title") %></h3>
+              <p class="mt-2 text-sm text-muted-foreground"><%= t("home.operators.one_login_body") %></p>
             </div>
             <div class="rounded-2xl bg-card p-6 shadow-sm ">
               <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary /50 ">
                 <span class="material-symbols-outlined text-xl">fingerprint</span>
               </div>
-              <h3 class="text-base font-bold text-foreground">Role &amp; Policy-Based Access</h3>
-              <p class="mt-2 text-sm text-muted-foreground">ABAC roles and policies control who can see and do what; permission and configuration changes are logged.</p>
+              <h3 class="text-base font-bold text-foreground"><%= t("home.operators.access_title") %></h3>
+              <p class="mt-2 text-sm text-muted-foreground"><%= t("home.operators.access_body") %></p>
             </div>
             <div class="rounded-2xl bg-card p-6 shadow-sm ">
               <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-success/10 text-success ">
                 <span class="material-symbols-outlined text-xl">import_export</span>
               </div>
-              <h3 class="text-base font-bold text-foreground">Bulk Import, Export &amp; Migration</h3>
-              <p class="mt-2 text-sm text-muted-foreground">Bring products, stock, customers, and employees in with dry-run imports and configurable migrations; export page data to CSV.</p>
+              <h3 class="text-base font-bold text-foreground"><%= t("home.operators.import_title") %></h3>
+              <p class="mt-2 text-sm text-muted-foreground"><%= t("home.operators.import_body") %></p>
             </div>
             <div class="rounded-2xl bg-card p-6 shadow-sm ">
               <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary /50 ">
                 <span class="material-symbols-outlined text-xl">android</span>
               </div>
-              <h3 class="text-base font-bold text-foreground">Web + Android Companion</h3>
-              <p class="mt-2 text-sm text-muted-foreground">Run the business on the web and give employees the Android shell for attendance, payroll view, requests, and operation consoles.</p>
+              <h3 class="text-base font-bold text-foreground"><%= t("home.operators.android_title") %></h3>
+              <p class="mt-2 text-sm text-muted-foreground"><%= t("home.operators.android_body") %></p>
             </div>
           </div>
         </div>
@@ -866,24 +911,24 @@
           <div class="grid grid-cols-2 gap-6 pb-10 text-center lg:grid-cols-4">
             <div>
               <p class="text-4xl font-extrabold leading-none text-primary">5</p>
-              <p class="mt-2 text-sm font-semibold uppercase text-muted-foreground">Operation Consoles</p>
+              <p class="mt-2 text-sm font-semibold uppercase text-muted-foreground"><%= t("home.facts.consoles") %></p>
             </div>
             <div>
               <p class="text-4xl font-extrabold leading-none text-success ">1</p>
-              <p class="mt-2 text-sm font-semibold uppercase text-muted-foreground">Login for Every Business</p>
+              <p class="mt-2 text-sm font-semibold uppercase text-muted-foreground"><%= t("home.facts.login") %></p>
             </div>
             <div>
               <p class="text-4xl font-extrabold leading-none text-primary">$0</p>
-              <p class="mt-2 text-sm font-semibold uppercase text-muted-foreground">Monthly Base Fee</p>
+              <p class="mt-2 text-sm font-semibold uppercase text-muted-foreground"><%= t("home.facts.monthly_fee") %></p>
             </div>
             <div>
-              <p class="text-4xl font-extrabold leading-none text-warning ">Android</p>
-              <p class="mt-2 text-sm font-semibold uppercase text-muted-foreground">Companion App</p>
+              <p class="text-4xl font-extrabold leading-none text-warning "><%= t("home.facts.android") %></p>
+              <p class="mt-2 text-sm font-semibold uppercase text-muted-foreground"><%= t("home.facts.companion_app") %></p>
             </div>
           </div>
           <div class="mb-4 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-6 ">
-            <span class="text-sm font-bold uppercase tracking-wider text-muted-foreground">How teams use Skycom</span>
-            <span class="flex items-center gap-1 text-xs font-bold text-success "><span class="material-symbols-outlined text-base">verified</span> Shipped platform capabilities</span>
+            <span class="text-sm font-bold uppercase tracking-wider text-muted-foreground"><%= t("home.facts.how_teams") %></span>
+            <span class="flex items-center gap-1 text-xs font-bold text-success "><span class="material-symbols-outlined text-base">verified</span> <%= t("home.facts.shipped") %></span>
           </div>
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <div class="flex flex-col justify-between rounded-xl bg-card p-4 shadow-sm ">
@@ -891,8 +936,8 @@
                 <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-success/10 text-success ">
                   <span class="material-symbols-outlined text-xl">storefront</span>
                 </div>
-                <p class="text-sm font-bold leading-tight text-foreground">Multi-Store Retail</p>
-                <p class="mt-2 text-sm text-muted-foreground">POS, stock transfers, and purchasing across stores — without a separate login per store.</p>
+                <p class="text-sm font-bold leading-tight text-foreground"><%= t("home.facts.multi_store_title") %></p>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.facts.multi_store_body") %></p>
               </div>
             </div>
             <div class="flex flex-col justify-between rounded-xl bg-card p-4 shadow-sm ">
@@ -900,8 +945,8 @@
                 <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary /50 ">
                   <span class="material-symbols-outlined text-xl">medical_services</span>
                 </div>
-                <p class="text-sm font-bold leading-tight text-foreground">Clinic Group</p>
-                <p class="mt-2 text-sm text-muted-foreground">Chair and room booking, front-desk check-in, patient fields, and invoices in one workspace.</p>
+                <p class="text-sm font-bold leading-tight text-foreground"><%= t("home.facts.clinic_group_title") %></p>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.facts.clinic_group_body") %></p>
               </div>
             </div>
             <div class="flex flex-col justify-between rounded-xl bg-card p-4 shadow-sm ">
@@ -909,8 +954,8 @@
                 <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-warning/10 text-warning ">
                   <span class="material-symbols-outlined text-xl">hotel</span>
                 </div>
-                <p class="text-sm font-bold leading-tight text-foreground">Hotel Front Desk</p>
-                <p class="mt-2 text-sm text-muted-foreground">Day reservations, conflict-checked room locking, and guest check-in at the desk.</p>
+                <p class="text-sm font-bold leading-tight text-foreground"><%= t("home.facts.hotel_front_desk_title") %></p>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.facts.hotel_front_desk_body") %></p>
               </div>
             </div>
             <div class="flex flex-col justify-between rounded-xl bg-card p-4 shadow-sm ">
@@ -918,8 +963,8 @@
                 <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-danger/10 text-danger ">
                   <span class="material-symbols-outlined text-xl">restaurant</span>
                 </div>
-                <p class="text-sm font-bold leading-tight text-foreground">Restaurant Counter</p>
-                <p class="mt-2 text-sm text-muted-foreground">Cash or QR counter orders with stock and purchasing in the same workspace.</p>
+                <p class="text-sm font-bold leading-tight text-foreground"><%= t("home.facts.restaurant_counter_title") %></p>
+                <p class="mt-2 text-sm text-muted-foreground"><%= t("home.facts.restaurant_counter_body") %></p>
               </div>
             </div>
           </div>
@@ -931,9 +976,9 @@
           <div class="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-primary opacity-50 blur-3xl"></div>
           <div class="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-success/100 opacity-40 blur-3xl"></div>
           <div class="relative z-10">
-            <span class="mb-4 inline-block rounded-full bg-overlay-foreground/10 px-4 py-1.5 text-sm uppercase tracking-wider text-success backdrop-blur-md font-bold">Free Starter Credits • No Credit Card • No Monthly Base Fee</span>
-            <h2 class="mx-auto max-w-2xl text-3xl font-extrabold leading-tight md:text-4xl">Start Free. Add Businesses as You Grow.</h2>
-            <p class="mx-auto mb-8 mt-3 max-w-xl text-lg text-primary">Create your account, get free starter credits, and run every business from one login. No monthly base fee, no per-seat charge.</p>
+            <span class="mb-4 inline-block rounded-full bg-overlay-foreground/10 px-4 py-1.5 text-sm uppercase tracking-wider text-success backdrop-blur-md font-bold"><%= t("home.final_cta.badge") %></span>
+            <h2 class="mx-auto max-w-2xl text-3xl font-extrabold leading-tight md:text-4xl"><%= t("home.final_cta.title") %></h2>
+            <p class="mx-auto mb-8 mt-3 max-w-xl text-lg text-primary"><%= t("home.final_cta.intro") %></p>
             <form
               action="/sign_up"
               class="mx-auto flex max-w-xl flex-col gap-2.5 sm:flex-row"
@@ -943,7 +988,7 @@
               <input
                 class="h-12 flex-1 rounded-xl bg-card px-4 text-base text-foreground shadow-sm outline-none placeholder:text-muted-foreground"
                 name="email"
-                placeholder="Enter your business email"
+                placeholder="<%= t("home.final_cta.placeholder") %>"
                 required=""
                 type="email"
               >
@@ -951,11 +996,11 @@
                 class="flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-success px-6 text-base font-bold text-success-foreground shadow-md transition-all hover:bg-success/90 cursor-pointer"
                 type="submit"
               >
-                <span>Claim Free Starter Credits</span>
+                <span><%= t("home.final_cta.button") %></span>
                 <span class="material-symbols-outlined text-xl">bolt</span>
               </button>
             </form>
-            <p class="mt-4 text-xs text-primary/80">Your data stays in its own isolated workspace, with role-based access for your team.</p>
+            <p class="mt-4 text-xs text-primary/80"><%= t("home.final_cta.privacy") %></p>
           </div>
         </div>
       </section>
@@ -965,52 +1010,52 @@
         <div class="grid grid-cols-1 gap-10 pb-10 md:grid-cols-2 lg:grid-cols-5">
           <div class="lg:col-span-1">
             <div class="mb-4 flex items-center gap-2">
-              <img alt="Skycom Logo" class="h-7 w-auto object-contain" src="/icon.svg">
+              <img alt="<%= t("home.footer.logo_alt") %>" class="h-7 w-auto object-contain" src="/icon.svg">
               <span class="text-base font-bold text-foreground">Skycom</span>
             </div>
-            <p class="mb-4 text-sm text-muted-foreground">One account for retail, clinic, hotel, and restaurant operations — each in its own isolated workspace.</p>
+            <p class="mb-4 text-sm text-muted-foreground"><%= t("home.footer.tagline") %></p>
             <div class="inline-flex items-center gap-2 rounded-full bg-card px-3 py-1 ">
               <span class="h-2 w-2 rounded-full bg-success"></span>
-              <span class="text-sm text-foreground">Isolated Workspaces</span>
+              <span class="text-sm text-foreground"><%= t("home.footer.isolated") %></span>
             </div>
           </div>
           <div>
-            <h4 class="mb-4 text-base font-bold text-foreground">Solutions</h4>
+            <h4 class="mb-4 text-base font-bold text-foreground"><%= t("home.footer.solutions") %></h4>
             <ul class="space-y-2">
-              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-success"></span><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions">Retail &amp; Multi-store</a></li>
-              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-success"></span><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions">Dental &amp; Clinics</a></li>
-              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-warning/100"></span><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions">Hotels &amp; Hospitality</a></li>
-              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-danger/50"></span><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions">Restaurants &amp; Cafes</a></li>
+              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-success"></span><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions"><%= t("home.footer.retail") %></a></li>
+              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-success"></span><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions"><%= t("home.footer.dental") %></a></li>
+              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-warning/100"></span><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions"><%= t("home.footer.hotels") %></a></li>
+              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-danger/50"></span><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions"><%= t("home.footer.restaurants") %></a></li>
             </ul>
           </div>
           <div>
-            <h4 class="mb-4 text-base font-bold text-foreground">Platform Features</h4>
+            <h4 class="mb-4 text-base font-bold text-foreground"><%= t("home.footer.platform_features") %></h4>
             <ul class="space-y-2">
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Cloud POS</a></li>
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Stock Ledger</a></li>
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">GPS Attendance</a></li>
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">HR &amp; Team Records</a></li>
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Operations Calendar</a></li>
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Invoicing &amp; Tax</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform"><%= t("home.footer.cloud_pos") %></a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform"><%= t("home.footer.stock_ledger") %></a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform"><%= t("home.footer.gps_attendance") %></a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform"><%= t("home.footer.hr_records") %></a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform"><%= t("home.footer.operations_calendar") %></a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform"><%= t("home.footer.invoicing_tax") %></a></li>
             </ul>
           </div>
           <div>
-            <h4 class="mb-4 text-base font-bold text-foreground">Security &amp; Trust</h4>
+            <h4 class="mb-4 text-base font-bold text-foreground"><%= t("home.footer.security") %></h4>
             <ul class="space-y-2">
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Workspace Data Isolation</a></li>
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Role &amp; Policy-Based Access</a></li>
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Permission &amp; Config Logs</a></li>
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Single-Session Sign-In</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform"><%= t("home.footer.workspace_isolation") %></a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform"><%= t("home.footer.role_policy") %></a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform"><%= t("home.footer.permission_logs") %></a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform"><%= t("home.footer.single_session") %></a></li>
             </ul>
           </div>
           <div>
-            <h4 class="mb-4 text-base font-bold text-foreground">Resources</h4>
+            <h4 class="mb-4 text-base font-bold text-foreground"><%= t("home.footer.resources") %></h4>
             <ul class="space-y-2">
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform">Platform Overview</a></li>
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions">Solutions</a></li>
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#pricing">Pricing</a></li>
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="/sign_in">Sign In</a></li>
-              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="/sign_up">Create Account</a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#platform"><%= t("home.footer.platform_overview") %></a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#solutions"><%= t("home.footer.solutions_link") %></a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="#pricing"><%= t("home.footer.pricing_link") %></a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="/sign_in"><%= t("home.footer.sign_in") %></a></li>
+              <li><a class="text-sm text-muted-foreground transition-colors hover:text-foreground " href="/sign_up"><%= t("home.footer.create_account") %></a></li>
             </ul>
           </div>
         </div>
