@@ -63,7 +63,7 @@ export default class Companies_Faqs_ShowController extends Companies_LayoutContr
     const shownQuestions = this.shownQuestions(visibleGroups)
 
     return `
-      <div class="mx-auto w-full max-w-5xl px-4 py-8 md:px-8">
+      <div class="mx-auto w-full px-4 py-8 md:px-8">
         ${this.headerHTML(totalGroups, totalQuestions, shownQuestions)}
         ${this.toolbarHTML()}
         <div data-faq-results class="mt-6 space-y-4">
