@@ -52,6 +52,22 @@ RSpec.feature "Sidebar favourites", type: :feature, js: true do
     end
   end
 
+  scenario "renders General, Operations, and My Profile as the first three groups" do
+    visit company_dashboards_path(company)
+
+    within("aside", visible: :all) do
+      general_pos = page.body.index('data-sidebar-group="general"')
+      operations_pos = page.body.index('data-sidebar-group="operations"')
+      my_profile_pos = page.body.index('data-sidebar-group="my_profile"')
+      notification_pos = page.body.index('data-sidebar-group="notification"')
+
+      expect([ general_pos, operations_pos, my_profile_pos, notification_pos ]).to all(be_a(Integer))
+      expect(general_pos).to be < operations_pos
+      expect(operations_pos).to be < my_profile_pos
+      expect(my_profile_pos).to be < notification_pos
+    end
+  end
+
   scenario "opening a group reveals its items and persists across reload" do
     visit company_dashboards_path(company)
 

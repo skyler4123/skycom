@@ -3,18 +3,20 @@
 // FE-only (localStorage, per employee) — see docs/SIDEBAR.md.
 import { myProfilePath } from "controllers/helpers/auth_helpers"
 
-// Group registry — array order is the sidebar render order.
+// Group registry — list order is the sidebar render order. Company Quick Links
+// groups (the Quick Links CompanySetting) are spread in after Operations.
 // `locked: true` groups can never be hidden via company settings.
-export const SIDEBAR_GROUPS = [
-  { key: "my_profile", label: "My Profile" },
+export const sidebarGroups = (quickLinks = []) => [
   { key: "general", label: "General" },
+  { key: "operations", label: "Operations" },
+  ...quickLinks,
+  { key: "my_profile", label: "My Profile" },
   { key: "notification", label: "Notification" },
   { key: "catalog", label: "Catalog" },
   { key: "sales", label: "Sales" },
   { key: "organization", label: "Organization" },
   { key: "exams", label: "Exams" },
   { key: "platform", label: "Platform" },
-  { key: "operations", label: "Operations" },
   { key: "storage", label: "Storage" },
   { key: "calendar", label: "Schedule" },
   { key: "attendance", label: "Attendance" },

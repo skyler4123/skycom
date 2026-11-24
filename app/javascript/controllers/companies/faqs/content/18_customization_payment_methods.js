@@ -132,8 +132,8 @@ export default {
         {
           type: "p",
           text: {
-            en: "Open Settings → Quick Links. The editor lets the owner create custom groups and items with a name and a URL; custom groups render above the built-in sidebar for the whole company. Use an in-app path such as a filtered order list or a dashboard, not an external script. Saving refreshes the browser data and reloads the sidebar; only the owner can update this configuration.",
-            vi: "Mở Settings → Quick Links. Trình sửa cho chủ sở hữu tạo nhóm và mục tùy chỉnh với tên và URL; nhóm tùy chỉnh hiện phía trên thanh bên mặc định cho cả công ty. Dùng đường dẫn trong ứng dụng như danh sách đơn đã lọc hoặc bảng điều khiển, không dùng script bên ngoài. Lưu sẽ làm mới dữ liệu trình duyệt và tải lại thanh bên; chỉ chủ sở hữu cập nhật được cấu hình này."
+            en: "Open Settings → Quick Links. The editor lets the owner create Quick Links groups and items with a name and a URL; Quick Links groups render between Operations and My Profile in the built-in sidebar for the whole company. Use an in-app path such as a filtered order list or a dashboard, not an external script. Saving refreshes the browser data and reloads the sidebar; only the owner can update this configuration.",
+            vi: "Mở Settings → Quick Links. Trình sửa cho chủ sở hữu tạo nhóm và mục Liên Kết Nhanh với tên và URL; nhóm Liên Kết Nhanh hiện giữa Operations và My Profile trong thanh bên mặc định cho cả công ty. Dùng đường dẫn trong ứng dụng như danh sách đơn đã lọc hoặc bảng điều khiển, không dùng script bên ngoài. Lưu sẽ làm mới dữ liệu trình duyệt và tải lại thanh bên; chỉ chủ sở hữu cập nhật được cấu hình này."
           }
         },
         {

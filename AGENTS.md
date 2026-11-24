@@ -79,7 +79,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | Index/table pages with filtering or dynamic properties | `docs/DYNAMIC_TABLE.md` — three resolutions + category filtering + rollout recipe |
 | Adding a new Operation page / `operation_type` (web + mobile) | `docs/OPERATION_PAGES.md` — end-to-end guide: design intake, real data, backend, web, mobile, exact-value feature tests, DoD; `docs/OPERATIONS.md` — domain, catalog, appointments, seeding |
 | Resource dashboard pages | `docs/DASHBOARD_PATTERN.md` — backend implementation, no hardcoded paths |
-| Sidebar items, settings, custom groups | `docs/SIDEBAR.md` |
+| Sidebar items, settings, Quick Links groups | `docs/SIDEBAR.md` |
 | Marketing homepage, sign-in/up, company page | `docs/HOMEPAGE.md` — caching contract + SEO rules, read before touching |
 | Semantic colors, Tailwind classes, dark mode, mobile layout | `docs/STYLING_GUIDELINES.md` |
 | Any `/mobile/*` page, mobile controller, or Android shell work | `docs/MOBILE.md` — implementation contract; `docs/MOBILE_FEATURE_MATRIX.md` — web parity, backlog, native audit |

@@ -2,17 +2,17 @@
 
 > **Status**: Live. Sidebar control is **FE-only** — per-employee favourites and
 > group open-state live in the browser's localStorage. Static structure lives in
-> `sidebar_items.js`; company-level **custom groups** live in the company's
+> `sidebar_items.js`; company-level **Quick Links groups** live in the company's
 > active sidebar `CompanySetting` and render from the client cache (§7).
 
 ## 1. Architecture
 
 | File | Responsibility |
 |------|----------------|
-| `app/javascript/controllers/companies/sidebar_items.js` | Registry — `SIDEBAR_GROUPS` + `SIDEBAR_ITEMS` are the static structural source of truth (render order, icons, hrefs, `comingSoon`/`locked` flags) |
-| `app/javascript/controllers/companies/sidebar_custom.js` | Reader — custom groups from the client-cache active sidebar `CompanySetting` (`business_type: sidebar_groups`), key namespacing (`custom_` / `custom_item_`), `javascript:` URL rejection |
+| `app/javascript/controllers/companies/sidebar_items.js` | Registry — `sidebarGroups()` + `SIDEBAR_ITEMS` are the static structural source of truth (render order, icons, hrefs, `comingSoon`/`locked` flags) |
+| `app/javascript/controllers/companies/sidebar_quick_links.js` | Reader — Quick Links groups from the client-cache active sidebar `CompanySetting` (`business_type: sidebar_groups`), key namespacing (`custom_` / `custom_item_`), `javascript:` URL rejection |
 | `app/javascript/controllers/companies/sidebar_storage.js` | localStorage helpers — favourites + open-group state, per employee (company + user) |
-| `app/javascript/controllers/companies/sidebars/show_controller.js` | Renderer — Favourites section + custom groups (above static) + collapsible `<details>` static groups + star toggles (`Companies_Sidebars_ShowController`, identifier `companies--sidebars--show`) |
+| `app/javascript/controllers/companies/sidebars/show_controller.js` | Renderer — Favourites section + Quick Links groups (after Operations, before My Profile) + collapsible `<details>` static groups + star toggles (`Companies_Sidebars_ShowController`, identifier `companies--sidebars--show`) |
 | `app/javascript/controllers/companies/settings/index_controller.js` | Editor — sidebar group/item CRUD (company form → PATCH `CompanySetting`) on the Settings page |
 | `app/javascript/controllers/companies/layout_controller.js` | Mounts the sidebar controller inside the `<aside>`; owns the header |
 
@@ -27,6 +27,9 @@
 - **Groups** — every group renders as `<details>/<summary>` (label only),
   collapsed by default; open state persists per employee. Clicking a search
   result opens the group that owns the item before navigating.
+- **Group order** — static groups follow the `sidebarGroups()` list order;
+  company Quick Links groups are spread into that list after Operations (before My
+  Profile). Top order: General → Operations → Quick Links → My Profile.
 - **Coming-soon** groups/items keep the amber badge + tooltip; no star.
 - **System group** — `locked: true`; no stars; still collapsible.
 
@@ -47,7 +50,7 @@
 ## 4. How to Add a Sidebar Item
 
 1. Add an entry to `SIDEBAR_ITEMS` in `sidebar_items.js` (pick the group, icon, label, href helper).
-2. If the group is new, add it to `SIDEBAR_GROUPS` (array order = render order).
+2. If the group is new, add it to the `sidebarGroups()` list (list order = render order).
 3. Add the label (and any new UI strings) to `app/javascript/controllers/helpers/dictionary.js`.
 4. Ensure the URL helper exists in `app/javascript/controllers/helpers/url_helpers.js`.
 5. Run `bin/rails assets:clobber` and reload.
@@ -67,24 +70,25 @@ the sidebar re-renders from the fresh client cache.
 | File | Purpose |
 |------|---------|
 | `app/javascript/controllers/companies/sidebar_items.js` | Static registry (`Operations` → operation appointments, `Operation Configs` → company-wide Operation metadata) |
-| `app/javascript/controllers/companies/sidebar_custom.js` | Dynamic reader (active `sidebar_groups` record, key namespacing) |
+| `app/javascript/controllers/companies/sidebar_quick_links.js` | Dynamic reader (active `sidebar_groups` record, key namespacing) |
 | `app/javascript/controllers/companies/sidebar_storage.js` | localStorage helpers |
-| `app/javascript/controllers/companies/sidebars/show_controller.js` | Renderer (custom groups above static) |
+| `app/javascript/controllers/companies/sidebars/show_controller.js` | Renderer (Quick Links groups between Operations and My Profile) |
 | `app/javascript/controllers/companies/settings/index_controller.js` | Dynamic Sidebar editor |
 | `app/javascript/controllers/companies/layout_controller.js` | Mount point |
 | `app/models/company_setting.rb` | `store_accessor :metadata, :sidebar_groups` + shape validation + `active_sidebar` scope + single-active validation |
 | `app/controllers/companies/company_settings_controller.rb` | Index (Shell-First JSON) + update (sidebar metadata JSON) |
 | `app/controllers/client_cache_controller.rb` | Includes `company_settings` in the company payload |
 | `spec/features/companies/layouts/sidebar_spec.rb` | E2E (favourites, groups, persistence, per-employee scoping) |
-| `spec/features/companies/layouts/dynamic_sidebar_spec.rb` | E2E (custom groups above static, pasted URLs, custom stars) |
+| `spec/features/companies/layouts/dynamic_sidebar_spec.rb` | E2E (Quick Links groups between Operations and My Profile, pasted URLs, Quick Links stars) |
 | `spec/features/companies/settings/dynamic_sidebar_editor_spec.rb` | E2E (editor CRUD → sidebar reflects) |
 | `spec/services/seed/dynamic_sidebar_init_spec.rb` | Init record + Admin/Manager grants (retail/hospital/hotel) |
 | `docs/CACHE.md` §8 | localStorage key inventory + client-cache payload |
 
-## 7. Dynamic Sidebar (custom groups)
+## 7. Dynamic Sidebar (Quick Links)
 
-Company-level shortcuts that render **above** the static groups, next to the
-built-in sidebar — the user builds their own sidebar without touching code.
+Company-level shortcuts that render **between** the Operations and My Profile
+groups of the built-in sidebar — the user builds their own sidebar without
+touching code.
 
 ### Storage
 
@@ -114,17 +118,19 @@ single-active enforced by model validation + partial unique index):
 
 ### Render
 
-`sidebar_custom.js` reads the active sidebar record from `currentSettings()`
+`sidebar_quick_links.js` reads the active sidebar record from `currentSettings()`
 (`company_settings` client-cache payload), filters invalid entries, and maps them
-to the static item shape (`{ key, group, icon: "link", label, href: (cid) => url, custom: true }`):
+to the static item shape (`{ key, group, icon: "link", label, href: (cid) => url, quickLink: true }`):
 
 - Group keys are namespaced `custom_<slug>`, item keys `custom_item_<slug>` —
   favourites + open-group localStorage entries can never collide with static
-  keys, so custom items star/unstar exactly like normal items (same
+  keys, so Quick Links items star/unstar exactly like normal items (same
   `data-sidebar-star` button, same Favourites section).
 - Labels + hrefs are `escapeHtml`'d at render (user-controlled strings);
   `markCurrentPath()` compares pathnames only, so pasted query params never
-  break highlighting. Corrupt metadata renders as no custom groups.
+  break highlighting. Corrupt metadata renders as no Quick Links groups.
+- Groups keep their metadata array order inside the Quick Links slot. A company
+  with no Quick Links groups simply reads General → Operations → My Profile → …
 
 ### Editing
 

@@ -1,17 +1,17 @@
-// Dynamic sidebar (custom groups) reader — company level only.
+// Dynamic sidebar (Quick Links) reader — company level only.
 //
 // Source record: the company's ACTIVE CompanySetting with
 // business_type "sidebar_groups" (BE: app/models/company_setting.rb),
 // read from currentSettings() (the company_settings client-cache payload).
 // Its metadata.sidebar_groups = [{ key, name, items: [{ key, name, url }] }].
-// The record renders above the static SIDEBAR_GROUPS in
-// companies/sidebars/show_controller.js (see docs/SIDEBAR.md).
+// The record is spread between Operations and My Profile by sidebarGroups()
+// in companies/sidebars/show_controller.js (see docs/SIDEBAR.md).
 //
 // Key namespacing: group keys are `custom_<slug>` (items `custom_item_<slug>`),
 // so favourites + open-group localStorage entries can never collide with static
 // SIDEBAR_ITEMS keys.
 
-export const customSidebarRecord = () => {
+export const quickLinksRecord = () => {
   const settings = (typeof currentSettings === "function" ? currentSettings() : []) || []
   const sidebar = settings.filter((s) => s.business_type === "sidebar_groups" || s.business_type === 0)
   return sidebar.find((s) => s.workflow_status === "active" || s.workflow_status === 1)
@@ -29,9 +29,11 @@ const isSafeUrl = (url) => {
   return trimmed !== "" && !trimmed.toLowerCase().startsWith("javascript:")
 }
 
-export const customSidebarGroups = () => groupsFromRecord(customSidebarRecord(), "custom", "custom_item")
+// Prefixes stay `custom_` / `custom_item_` for localStorage compatibility with
+// saved favourites and open-group state.
+export const quickLinksGroups = () => groupsFromRecord(quickLinksRecord(), "custom", "custom_item")
 
-export const customSidebarItems = () => customSidebarGroups().flatMap((g) => g.items)
+export const quickLinksItems = () => quickLinksGroups().flatMap((g) => g.items)
 
 const groupsFromRecord = (record, groupPrefix, itemPrefix) => {
   const raw = record?.metadata?.sidebar_groups || record?.sidebar_groups || []
@@ -50,8 +52,8 @@ const groupsFromRecord = (record, groupPrefix, itemPrefix) => {
           icon: "link",
           label: String(item.name),
           href: (_cid) => String(item.url),
-          custom: true
+          quickLink: true
         }))
-      return { key: groupKey, label: String(g.name), items, custom: true }
+      return { key: groupKey, label: String(g.name), items, quickLink: true }
     })
 }

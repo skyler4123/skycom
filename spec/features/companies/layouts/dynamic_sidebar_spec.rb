@@ -48,20 +48,25 @@ RSpec.feature "Dynamic sidebar", type: :feature, js: true do
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
-  scenario "renders custom groups above the static groups" do
+  scenario "renders Quick Links groups between Operations and My Profile" do
     visit company_dashboards_path(company)
 
     within("aside", visible: :all) do
       expect(page).to have_selector("details[data-sidebar-group='custom_my-links']", visible: :all, wait: 10)
-      custom_pos = page.body.index('data-sidebar-group="custom_my-links"')
+
       general_pos = page.body.index('data-sidebar-group="general"')
-      expect(custom_pos).not_to be_nil
-      expect(general_pos).not_to be_nil
-      expect(custom_pos).to be < general_pos
+      operations_pos = page.body.index('data-sidebar-group="operations"')
+      custom_pos = page.body.index('data-sidebar-group="custom_my-links"')
+      my_profile_pos = page.body.index('data-sidebar-group="my_profile"')
+
+      expect([ general_pos, operations_pos, custom_pos, my_profile_pos ]).to all(be_a(Integer))
+      expect(general_pos).to be < operations_pos
+      expect(operations_pos).to be < custom_pos
+      expect(custom_pos).to be < my_profile_pos
     end
   end
 
-  scenario "custom items keep pasted urls with params and can be starred" do
+  scenario "Quick Links items keep pasted urls with params and can be starred" do
     visit company_dashboards_path(company)
 
     find("details[data-sidebar-group='custom_my-links'] summary", visible: :all).click

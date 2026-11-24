@@ -45,7 +45,7 @@ RSpec.feature "Dynamic sidebar editor", type: :feature, js: true do
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
-  scenario "owner creates a custom group with an item and it appears in the sidebar" do
+  scenario "owner creates a Quick Links group with an item and it appears in the sidebar" do
     visit company_company_settings_path(company)
 
     expect(page).to have_content("Company Quick Links", wait: 10)
