@@ -420,6 +420,7 @@ export const company_payment_method_appointment_path = (companyId, id) =>
 export const company_billing_path = (companyId) => `/companies/${companyId}/billing`
 
 export const company_usage_path = (companyId) => `/companies/${companyId}/usage`
+export const company_faq_path = (companyId) => `/companies/${companyId}/faq`
 export const company_usage_enable_logging_path = (companyId) => `/companies/${companyId}/usage/enable_logging`
 export const company_usage_disable_logging_path = (companyId) => `/companies/${companyId}/usage/disable_logging`
 export const new_company_top_up_path = (companyId) => `/companies/${companyId}/top_ups/new`

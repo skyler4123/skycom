@@ -186,6 +186,7 @@ RSpec.feature "Sidebar favourites", type: :feature, js: true do
       expect(page).to have_no_selector("button[data-sidebar-star='billing']", visible: :all)
       expect(page).to have_no_selector("button[data-sidebar-star='settings']", visible: :all)
       expect(page).to have_no_selector("button[data-sidebar-star='help_center']", visible: :all)
+      expect(page).to have_no_selector("button[data-sidebar-star='faq']", visible: :all)
       expect(page).to have_selector("details[data-sidebar-group='chat_help_desk']", visible: :all, wait: 10)
       expect(page).to have_no_selector("details[data-sidebar-group='chat_help_desk'] button[data-sidebar-star]", visible: :all)
       expect(page).to have_selector("details[data-sidebar-group='ai_assistant']", visible: :all, wait: 10)

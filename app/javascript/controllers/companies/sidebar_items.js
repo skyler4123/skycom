@@ -106,5 +106,6 @@ export const SIDEBAR_ITEMS = [
   { key: "usage", group: "system", icon: "monitoring", label: "Usage", href: (cid) => Helpers.company_usage_path(cid) },
   { key: "top_up", group: "system", icon: "account_balance_wallet", label: "Top Up", href: (cid) => Helpers.new_company_top_up_path(cid) },
   { key: "billing", group: "system", icon: "receipt_long", label: "Billing", href: (cid) => Helpers.company_billing_path(cid) },
-  { key: "help_center", group: "system", icon: "help", label: "Help Center", href: (cid) => Helpers.company_company_tickets_path(cid) }
+  { key: "help_center", group: "system", icon: "help", label: "Help Center", href: (cid) => Helpers.company_company_tickets_path(cid) },
+  { key: "faq", group: "system", icon: "live_help", label: "FAQ", href: (cid) => Helpers.company_faq_path(cid) }
 ]

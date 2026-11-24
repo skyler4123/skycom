@@ -90,6 +90,63 @@ Future task:
 - Add the enum value, `Companies::Operations::<Type>Controller`, route,
   `OperationLaunchService` mapping, FE Stimulus controller, and `OPERATION_TYPES` entry.
 
+## FAQ — deferred answers (feature backlog)
+
+The System → FAQ page (`docs/FAQ.md`) states current limits honestly. Every
+`planned` or `manual` answer maps to an item here. Existing roadmap entries are
+cross-referenced instead of duplicated.
+
+New items:
+
+- [ ] **Company ownership transfer** — move the Owner role and owner employee to
+      another employee with an explicit confirmation and audit row. FAQ: owner role.
+- [ ] **POS price override** — manager-approved line-price override with a reason
+      and audit trail. FAQ: "Who sets the price?"
+- [ ] **POS thermal receipt printer** — direct ESC/POS or driver integration; the
+      current receipt is an 80 mm browser print. FAQ: "What can't I do in POS?"
+- [ ] **POS cash drawer, float, and split payments** — cash-drawer integration,
+      opening float, split tender, and open-item sales; Store Manager stores the
+      shift close, but POS does not control the drawer. FAQ: "What can't I do in
+      POS today?"
+- [ ] **Non-POS payment screen** — take payment for an order created outside POS
+      without editing transaction rows by hand. FAQ: "Can I take payment outside POS?"
+- [ ] **Booking recurrence** — repeat rules for weekly/monthly reservations. FAQ:
+      "Can I create recurring bookings?"
+- [ ] **Booking deposit/payment** — collect a deposit at reservation and link it to
+      the booking. FAQ: "Can I create recurring bookings or take a deposit?"
+- [ ] **Footfall sensor** — door-counter integration; today the page shows only the
+      real buyer count. FAQ: "Why is there no footfall sensor?"
+- [ ] **Attendance month scheduled refresh** — nightly job that resolves days and
+      rebuilds months without manual re-runs. FAQ: "Why is my attendance month out of date?"
+- [ ] **Mobile check-out** — expose check-out (and break) on mobile Home; the service
+      exists but the screen does not. FAQ: "Can employees check out on mobile?"
+- [ ] **Leave request workflow** — file, approve, and list leave requests; balances
+      and records exist but there is no form or approval inbox. FAQ: leave questions.
+- [ ] **Mobile exam pages** — question bank/exam/My Exams/timed attempt on the
+      Android shell. FAQ: "Are exams available on mobile?"
+- [ ] **Storage quota and billing** — per-company quota, versioning, and credit
+      deduction for stored bytes. FAQ: "Is storage billed or quota-limited?"
+- [ ] **BOM, zones, pallets, RFID** — inventory expansion only if a customer needs
+      it; intentionally not modelled today. FAQ: "Why are BOM, zones, pallets, and
+      RFID not available?"
+- [ ] **Automatic refund reversal** — gateway refund + restock + invoice adjustment
+      in one audited flow; today approval and reversal are separate. FAQ: "Why
+      doesn't a refund reverse money or stock automatically?"
+
+Existing roadmap references:
+
+- Per-product / tax-inclusive rates → **POS follow-ups** (`Tax-inclusive / per-line
+  TaxCode rates`).
+- POS refund/exchange from the till → **POS follow-ups** + roadmap item **53**.
+- Offline POS and mobile → roadmap items **50** and **94**.
+- Mobile push and Vietnamese UI → roadmap items **89** and **93**
+  (`docs/MOBILE_FEATURE_MATRIX.md`).
+- Reception SMS/email/push → roadmap item **89** (delivery channels).
+- Payroll amount intake and draft-only editing → **Payroll — client-calculated
+  results** section above.
+- Adding an operation type → **Operations — new operation_type backfill** section.
+- KPI → commission/bonus → roadmap item **48**.
+
 ## Company#business_type is seed-only
 
 `Company#business_type` does not change runtime business logic. Skycom is a

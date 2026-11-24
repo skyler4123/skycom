@@ -319,6 +319,7 @@ Rails.application.routes.draw do
         post :disable_logging
       end
       resource :billing, only: :show, controller: :billing
+      resource :faq, only: :show, controller: :faqs
 
       post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
       post "order_processing/v1/pay", to: "order_processing/v1#pay"

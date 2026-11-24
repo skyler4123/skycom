@@ -1,5 +1,16 @@
+let registeredDictionary = {}
+
+/**
+ * Registers page-scoped translations (for example the FAQ content modules) so
+ * `translate()` can resolve them. Core entries win when a key collides.
+ */
+export const registerDictionary = (entries) => {
+  registeredDictionary = { ...registeredDictionary, ...entries }
+}
+
 export const dictionary = () => {
   return {
+    ...registeredDictionary,
     // === Navigation ===
     "Dashboard": { vi: "Bảng điều khiển" },
     "Branches": { vi: "Chi nhánh" },
@@ -1572,6 +1583,29 @@ export const dictionary = () => {
     "AI Assistant": { vi: "Trợ lý AI" },
     "Coming soon": { vi: "Sắp ra mắt" },
     "Help Center": { vi: "Trung tâm hỗ trợ" },
+    "FAQ": { vi: "Câu hỏi thường gặp" },
+    "Frequently asked questions": { vi: "Câu hỏi thường gặp" },
+    "Answers to common questions about using Skycom.": { vi: "Câu trả lời cho các câu hỏi thường gặp về cách dùng Skycom." },
+    "Search questions and answers": { vi: "Tìm câu hỏi và câu trả lời" },
+    "All groups": { vi: "Tất cả nhóm" },
+    "groups": { vi: "nhóm" },
+    "questions": { vi: "câu hỏi" },
+    "Expand all": { vi: "Mở rộng tất cả" },
+    "Collapse all": { vi: "Thu gọn tất cả" },
+    "No questions match your search.": { vi: "Không có câu hỏi nào phù hợp với tìm kiếm của bạn." },
+    "Clear search": { vi: "Xóa tìm kiếm" },
+    "Not available yet": { vi: "Chưa khả dụng" },
+    "Manual step": { vi: "Bước thủ công" },
+    "Link copied": { vi: "Đã sao chép liên kết" },
+    "Copy link to this question": { vi: "Sao chép liên kết câu hỏi này" },
+    "Copy link": { vi: "Sao chép liên kết" },
+    "Could not copy the link.": { vi: "Không thể sao chép liên kết." },
+    "Still need help?": { vi: "Vẫn cần trợ giúp?" },
+    "Open a Help Center ticket and include the page, what you expected, and what happened.": { vi: "Mở phiếu Trung tâm hỗ trợ và ghi rõ trang, điều bạn mong đợi và điều đã xảy ra." },
+    "Open a Help Center ticket": { vi: "Mở phiếu Trung tâm hỗ trợ" },
+    "Last reviewed: November 2026": { vi: "Cập nhật lần cuối: Tháng 11, 2026" },
+    "The FAQ could not be loaded.": { vi: "Không thể tải FAQ." },
+    "Reload page": { vi: "Tải lại trang" },
     "Choose which navigation groups and items appear in the sidebar": { vi: "Chọn nhóm và mục điều hướng hiển thị trên thanh bên" },
     "This Month": { vi: "Tháng này" },
     "Last Month": { vi: "Tháng trước" },
