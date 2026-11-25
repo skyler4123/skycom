@@ -8,6 +8,9 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
   /** @type {any | null} */
   summary = null
 
+  /** @type {any[]} */
+  taxBreakdown = []
+
   /** @type {string} */
   tab = "invoices"
 
@@ -45,6 +48,7 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
     try {
       const summaryResponse = await fetchJson(`${Helpers.company_tax_summary_path(companyId)}.json?from=${this.from}&to=${this.to}`)
       this.summary = summaryResponse.summary
+      this.taxBreakdown = summaryResponse.tax_breakdown || []
       await this.loadTabData(companyId)
     } catch (error) {
       toast({ type: "error", message: error.errors?.join(", ") || "Failed to load tax data" })
@@ -134,6 +138,54 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
     downloadCSV(records, cols, `tax-${this.tab}-${this.from}-to-${this.to}.csv`)
   }
 
+  taxBreakdownHTML() {
+    if (this.taxBreakdown.length === 0) {
+      return `
+        <div class="p-4 bg-card rounded-xl border border-line">
+          <h3 class="text-sm font-bold text-foreground">${translate("Tax collected by code")}</h3>
+          <p class="text-sm text-muted-foreground mt-1">${translate("No tax recorded in this period.")}</p>
+        </div>
+      `
+    }
+
+    const money = (cents) => Helpers.formatMoney(Number(cents || 0), currentCompany().currency)
+
+    return `
+      <div class="p-4 bg-card rounded-xl border border-line">
+        <h3 class="text-sm font-bold text-foreground mb-3">${translate("Tax collected by code")}</h3>
+        <div class="overflow-x-auto border border-line rounded-xl">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-muted/50 text-muted-foreground">
+              <tr>
+                <th class="px-4 py-2 font-semibold">${translate("Tax")}</th>
+                <th class="px-4 py-2 font-semibold">${translate("Rate")}</th>
+                <th class="px-4 py-2 font-semibold">${translate("Price treatment")}</th>
+                <th class="px-4 py-2 font-semibold text-right">${translate("Taxable")}</th>
+                <th class="px-4 py-2 font-semibold text-right">${translate("Tax")}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-line">
+              ${this.taxBreakdown.map((row) => `
+                <tr>
+                  <td class="px-4 py-2 text-foreground">${escapeHtml(row.name)}</td>
+                  <td class="px-4 py-2 font-mono text-foreground">${this.rateLabel(row.rate_percent)}%</td>
+                  <td class="px-4 py-2 text-muted-foreground">${translate(row.inclusive ? "Included in price" : "Added on top")}</td>
+                  <td class="px-4 py-2 text-right font-mono text-foreground">${money(row.taxable_cents)}</td>
+                  <td class="px-4 py-2 text-right font-mono font-semibold text-foreground">${money(row.tax_cents)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `
+  }
+
+  rateLabel(ratePercent) {
+    const rate = Number(ratePercent || 0)
+    return Number.isInteger(rate) ? String(rate) : rate.toFixed(2).replace(/0+$/, "").replace(/\.$/, "")
+  }
+
   contentHTML() {
     const s = this.summary || {}
     const inv = s.invoices || {}
@@ -200,6 +252,8 @@ export default class Companies_Taxes_IndexController extends Companies_LayoutCon
             <p class="text-sm text-muted-foreground">Quantity: ${stk.total_quantity ?? 0}</p>
           </div>
         </div>
+
+        ${this.taxBreakdownHTML()}
 
         <form data-action="submit->${this.identifier}#applyPeriod" class="flex flex-wrap items-end gap-3">
           <div>

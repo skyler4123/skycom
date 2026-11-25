@@ -36,6 +36,27 @@ RSpec.feature "Companies::Taxes Management", type: :feature, js: true do
     expect(page).to have_content("Export CSV", wait: 10)
   end
 
+  scenario "shows tax collected by code" do
+    invoice_category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "invoices")
+    customer = create(:customer, company: company)
+    invoice = create(:invoice, company: company, category: invoice_category,
+      order: create(:order, company: company, customer: customer), discarded_at: nil)
+    invoice.update_columns(
+      created_at: Time.current,
+      updated_at: Time.current,
+      metadata: { "tax_breakdown" => [
+        { "name" => "VAT", "rate_bp" => 1_000, "inclusive" => false,
+          "taxable_cents" => 10_000, "tax_cents" => 1_000 }
+      ] }
+    )
+
+    visit company_tax_path(company)
+
+    expect(page).to have_content("Tax collected by code", wait: 10)
+    expect(page).to have_content("VAT")
+    expect(page).to have_content("$10.00")
+  end
+
   scenario "shows only invoices inside the requested period" do
     invoice_category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "invoices")
     customer = create(:customer, company: company)

@@ -28,7 +28,10 @@ class Companies::TaxesController < Companies::ApplicationController
         invoices: invoice_summary(config, from, to),
         purchases: purchase_summary(config, from, to),
         stock_exports: stock_export_summary(config, from, to)
-      }
+      },
+      tax_breakdown: Taxes::InvoiceTaxBreakdownService.call(
+        invoices: scoped_invoices(config, from, to)
+      )
     }
   end
 
