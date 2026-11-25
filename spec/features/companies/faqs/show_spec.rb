@@ -71,6 +71,14 @@ RSpec.feature "Companies::Faqs Show", type: :feature, js: true do
     expect(page).to have_content("a multi-tenant business management platform", wait: 10)
   end
 
+  scenario "explains per-product tax codes" do
+    visit "#{company_faq_path(company)}#faq-per-product-tax"
+
+    expect(page).to have_selector("[data-faq-question='per-product-tax'][open]", wait: 10)
+    expect(page).to have_content("Yes. Create each rate under Tax", wait: 10)
+    expect(page).to have_link("Open Tax Codes", wait: 10)
+  end
+
   scenario "searches answer text inside a selected group" do
     visit company_faq_path(company)
     expect(page).to have_selector("[data-faq-group]", count: 20, wait: 10)

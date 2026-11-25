@@ -120,8 +120,8 @@ export default {
         {
           type: "p",
           text: {
-            en: "POS reads one company-wide tax rate and name from Tax Config, calculates tax on the discounted subtotal, and snapshots both onto the order and invoice. The receipt prints the same snapshot, so a later rate change cannot rewrite an open sale. When the configured rate is zero, the tax row is hidden instead of showing a zero. Mixed tax rates per product and tax-inclusive pricing are not supported yet.",
-            vi: "POS đọc một mức thuế và tên thuế chung của công ty từ Cấu hình thuế, tính thuế trên tạm tính sau giảm giá, và sao lưu cả hai vào đơn hàng lẫn hóa đơn. Biên lai in đúng bản sao lưu đó, nên thay đổi thuế sau này không viết lại một đơn đang mở. Khi mức thuế bằng 0, dòng thuế được ẩn thay vì hiện số 0. Hiện chưa hỗ trợ nhiều mức thuế theo sản phẩm hoặc giá đã gồm thuế."
+            en: "POS reads each item's tax code, allocates any discount across the lines, and calculates tax per line. A code can add tax on top or include it in the price. The order line and invoice keep the code, rate, treatment, taxable amount, and tax amount, and the receipt groups tax by code. When a line has no code, the company default from Tax Config applies; a zero rate hides the tax row. A later rate change cannot rewrite an open sale or a paid receipt.",
+            vi: "POS đọc mã thuế của từng mục, phân bổ giảm giá theo từng dòng và tính thuế theo dòng. Mỗi mã có thể cộng thuế lên trên hoặc đã bao gồm trong giá. Dòng đơn và hóa đơn giữ mã, mức thuế, cách tính, tiền chịu thuế và tiền thuế; biên lai nhóm thuế theo mã. Khi dòng chưa có mã, mức mặc định trong Cấu hình thuế sẽ áp dụng; mức 0 sẽ ẩn dòng thuế. Đổi thuế sau này không viết lại đơn đang mở hoặc biên lai đã thanh toán."
           }
         },
         {

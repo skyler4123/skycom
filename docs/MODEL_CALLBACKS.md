@@ -381,6 +381,14 @@ now matches a stock by `company_id + warehouse_id + product_id` only.
 
 ---
 
+### TaxCode (`app/models/tax_code.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :normalize_code` | — | `normalize_code` | Uppercases and strips an entered code; when blank on a new record it generates an uppercase identifier from the name (`VAT 10%` → `VAT_10`) and appends `_2`, `_3`, … until unique inside the company. |
+
+---
+
 ### TableConfig (`app/models/table_config.rb`)
 
 | Callback | Line | Method | Description |

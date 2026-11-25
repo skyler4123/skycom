@@ -44,7 +44,7 @@ dynamic properties, location appointments, and access policies.
 
 | Console | What it is for | Verdict | Why |
 |---|---|---|---|
-| [POS](02-pos.md) | Taking money at the counter | 🟢 | Tax/currency from config, services, server prices, discounts, void, receipt slip, real lock, persisted tabs; one company-wide tax rate |
+| [POS](02-pos.md) | Taking money at the counter | 🟢 | Per-product/service tax codes, mixed tax-included/added rates, currency from company, services, server prices, discounts, void, receipt slip, real lock, persisted tabs |
 | [Booking](03-booking.md) | Reserving rooms and spaces | 🟢 | Conflict-safe locking, click-to-inspect, real host/customer, extend/end/cancel, real category occupancy, run sheet |
 | [Reception](04-reception.md) | Front desk, visitors, parcels | 🟢 | Guest-linked visits only, pre-registration, browser badge print, direct notifications, real shift/timers/polling |
 | [Inventory](05-inventory.md) | Warehouse stock command screen | 🟢 | Four real KPIs, server-paged ledger, receive/transfer/export/adjust/reorder/count loops |

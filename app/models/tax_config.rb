@@ -26,9 +26,9 @@ class TaxConfig < ApplicationRecord
   belongs_to :company
 
   validates :company_id, uniqueness: true
+  validate :default_tax_code_belongs_to_company
 
   after_initialize :set_defaults, if: :new_record?
-  validate :default_tax_code_belongs_to_company
 
   def set_defaults
     self.metadata = {} if metadata.blank?

@@ -95,20 +95,21 @@ export default {
     {
       slug: "set-pos-tax-rate",
       question: {
-        en: "Where do I set the tax name and rate used by POS?",
-        vi: "Đặt tên và mức thuế POS dùng ở đâu?"
+        en: "Where do I set the tax rates used by POS?",
+        vi: "Đặt các mức thuế POS dùng ở đâu?"
       },
       answer: [
         {
           type: "p",
           text: {
-            en: "Open Tax → Tax Config and set the POS tax name and rate. POS reads that one rate, applies it to the discounted subtotal, and snapshots the name and rate onto the order and invoice, so the receipt and the books agree even after a later change. Setting the rate to zero hides the tax row instead of printing a zero. The Tax Config page also owns the reporting sources, date basis, excluded statuses, and branch filters used by Tax Data.",
-            vi: "Mở Thuế → Cấu hình thuế và đặt tên cùng mức thuế POS. POS đọc một mức đó, áp lên tạm tính sau giảm giá, và sao lưu tên cùng mức vào đơn hàng và hóa đơn, nên biên lai và sổ sách khớp nhau kể cả sau khi đổi thuế. Đặt mức bằng 0 sẽ ẩn dòng thuế thay vì in số 0. Trang Cấu hình thuế cũng quản lý nguồn báo cáo, cơ sở ngày, trạng thái loại trừ và bộ lọc chi nhánh mà Dữ liệu thuế dùng."
+            en: "Open Tax → Tax Codes and add each rate you charge. Choose whether prices using that code already include the tax or whether it is added on top. Then assign a code on each product or service page. Tax Config owns only the company default, used when an item has no code of its own. POS reads the item's code, snapshots the rate and treatment per line, and groups tax by code on the receipt, so a later rate change never rewrites an old sale.",
+            vi: "Mở Thuế → Mã thuế và thêm từng mức thuế bạn thu. Chọn giá dùng mã đó đã bao gồm thuế hay thuế được cộng thêm. Sau đó gán mã trên trang từng sản phẩm hoặc dịch vụ. Cấu hình thuế chỉ quản lý mức mặc định của công ty, dùng khi mục chưa có mã riêng. POS đọc mã của mục, sao lưu mức và cách tính theo từng dòng, rồi nhóm thuế theo mã trên biên lai, nên đổi thuế sau này không viết lại đơn cũ."
           }
         },
         {
           type: "links",
           items: [
+            { label: { en: "Open Tax Codes", vi: "Mở Mã thuế" }, path: "company_tax_codes_path" },
             { label: { en: "Open Tax Config", vi: "Mở Cấu hình thuế" }, path: "company_tax_config_path" }
           ]
         }
@@ -124,8 +125,8 @@ export default {
         {
           type: "p",
           text: {
-            en: "Tax Data is a read-only reporting surface for the documents selected in Tax Config: sales invoices, purchases, and stock exports. It shows the period total and the detail lists, filtered by the configured date basis, excluded statuses, and branches. It is not a tax filing engine and does not calculate jurisdiction-specific rules; it helps you collect the figures your accountant needs. Change the sources in Tax Config if a document type should not appear.",
-            vi: "Dữ liệu thuế là bề mặt báo cáo chỉ đọc cho các chứng từ được chọn trong Cấu hình thuế: hóa đơn bán hàng, mua hàng và xuất kho. Trang hiển thị tổng theo giai đoạn và danh sách chi tiết, lọc theo cơ sở ngày, trạng thái loại trừ và chi nhánh đã cấu hình. Đây không phải công cụ khai thuế và không tự tính quy tắc riêng của từng khu vực; trang giúp bạn thu thập số liệu kế toán cần. Hãy đổi nguồn trong Cấu hình thuế nếu một loại chứng từ không nên xuất hiện."
+            en: "Tax Data is a read-only reporting surface for the documents selected in Tax Config: sales invoices, purchases, and stock exports. It shows the period totals, the detail lists, and a Tax collected by code table built from the invoice tax snapshots. Filters use the configured date basis, excluded statuses, and branches. It is not a tax filing engine and does not calculate jurisdiction-specific rules; it helps you collect the figures your accountant needs. Change the sources in Tax Config if a document type should not appear.",
+            vi: "Dữ liệu thuế là bề mặt báo cáo chỉ đọc cho các chứng từ được chọn trong Cấu hình thuế: hóa đơn bán hàng, mua hàng và xuất kho. Trang hiển thị tổng theo giai đoạn, danh sách chi tiết và bảng Thuế đã thu theo mã lấy từ bản sao lưu thuế trên hóa đơn. Bộ lọc dùng cơ sở ngày, trạng thái loại trừ và chi nhánh đã cấu hình. Đây không phải công cụ khai thuế và không tự tính quy tắc riêng của từng khu vực; trang giúp bạn thu thập số liệu kế toán cần. Hãy đổi nguồn trong Cấu hình thuế nếu một loại chứng từ không nên xuất hiện."
           }
         },
         {
@@ -138,7 +139,6 @@ export default {
     },
     {
       slug: "per-product-tax",
-      status: "planned",
       question: {
         en: "Can different products use different tax rates?",
         vi: "Các sản phẩm khác nhau có thể dùng mức thuế khác nhau không?"
@@ -147,9 +147,15 @@ export default {
         {
           type: "p",
           text: {
-            en: "Not in POS today. POS uses one company-wide Tax Config rate added on top of the discounted subtotal, so every line in a sale carries the same rate. Mixed-rate sales and tax-inclusive pricing would need per-line tax totals and the TaxCode owner wired into the POS pipeline; that work is tracked in the backlog. For now, if you sell mixed-rate goods, keep the POS rate as the default and handle the exception in your accounting process.",
-            vi: "Hiện POS chưa hỗ trợ. POS dùng một mức thuế chung của công ty cộng lên tạm tính sau giảm giá, nên mọi dòng trong một đơn đều cùng mức. Bán hàng nhiều mức thuế và giá đã gồm thuế sẽ cần tổng thuế theo từng dòng và đưa TaxCode vào luồng POS; công việc này đang được ghi trong backlog. Trong thời gian đó, nếu bán hàng nhiều mức thuế, hãy giữ mức POS làm mặc định và xử lý ngoại lệ trong quy trình kế toán."
+            en: "Yes. Create each rate under Tax → Tax Codes, then assign a code to each product or service. A sale can mix rates, and each code says whether its price includes tax or tax is added on top. The company default covers items without a code. The receipt groups tax by code and keeps the snapshot it charged, even if you later edit the code.",
+            vi: "Có. Tạo từng mức thuế trong Thuế → Mã thuế, rồi gán mã cho từng sản phẩm hoặc dịch vụ. Một đơn có thể trộn nhiều mức, và mỗi mã cho biết giá đã gồm thuế hay thuế được cộng thêm. Mức mặc định của công ty áp cho mục chưa có mã. Biên lai nhóm thuế theo mã và giữ bản sao lưu đã tính, kể cả khi bạn sửa mã sau này."
           }
+        },
+        {
+          type: "links",
+          items: [
+            { label: { en: "Open Tax Codes", vi: "Mở Mã thuế" }, path: "company_tax_codes_path" }
+          ]
         }
       ]
     }

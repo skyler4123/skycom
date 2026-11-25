@@ -3,12 +3,13 @@
 > **Last audited:** 2026-11-19 · **Audit scope:** frontend controller, POS
 > controller payload, order-processing V1 create/pay path, receipt endpoint,
 > feature and request specs. Re-audited after the Slice 1–3 implementation.
-> **Ship readiness:** 🟢 shippable for a single-rate retail counter — dead
-> controls removed or wired, tax comes from Tax Config, services sell at their
+> **Ship readiness:** 🟢 shippable for a mixed-rate retail counter — dead
+> controls removed or wired, each product/service carries its own tax code,
+> tax-included and tax-added lines can share a sale, services sell at their
 > configured price, prices are server-owned, discounts and void work, and the
-> register survives refresh/lock. Remaining limits: one company-wide tax rate,
-> browser-print slip (no thermal printer), no offline/refund/price override,
-> and open tabs are per browser profile.
+> register survives refresh/lock. Remaining limits: browser-print slip (no
+> thermal printer), no offline/refund/price override, and open tabs are per
+> browser profile.
 > **Who this is for:** the cashier at the counter.
 > **Mobile:** same console, mounted through the Hotwire shell.
 > **Read first:** [README](README.md) · **Related:** [00-app-overview](00-app-overview.md),
@@ -161,7 +162,7 @@ controls.
 | POS-23 Cancel after ORDER | ✅ “Void this order?” → cancelled in DB; stock/discount released. |
 | POS-28 Print Receipt | ✅ Print-only 80 mm slip with branch, cashier, lines, discount, tax, tender, change. |
 | POS-29 Open Drawer | 🗑️ Removed. |
-| POS-D2 Tax | ✅ Tax Config owns `pos_tax_rate_bp` / `pos_tax_name`; order/invoice/receipt snapshots; 0% hides the row. |
+| POS-D2 Tax | ✅ Tax Codes own each rate; product/service assignment + company default; per-line order/invoice/receipt snapshots; 0% hides the row. |
 | POS-D3 Discount | ✅ Apply after ORDER reserves the code; Remove/void/close releases; receipt shows the row. |
 | POS-D5 Held sales | ✅ Tabs/customers/quantities persist in the browser; paid receipts are not restored. |
 | POS-D7 Catalog cap | ✅ “Showing 50 of N”; Slice 3 Meilisearch search finds past the cap by name/code. |
@@ -182,12 +183,12 @@ controls.
 | "N in cart" badge | Units of this product in the active cart | Local cart count, capped at the selling pile | ✅ |
 | Subtotal | Sum of cart lines | Client cents before ORDER; server cents after ORDER | ✅ |
 | Discount | Code amount off | `appliedDiscount.amountCents` from the reserve response | ✅ |
-| **"Tax (8%)"** | The company's sales tax | `TaxConfig#pos_tax_rate_bp`/`pos_tax_name`, snapshotted on the order/invoice | ✅ 0% hides it |
-| Total Amount | What the customer owes | `(subtotal − discount) + tax`, integer cents | ✅ |
+| **"VAT (8%)"** | The line's sales tax | `TaxCode` assigned to the product/service, or the Tax Config default; snapshotted per order line/invoice | ✅ 0% hides it; included lines label the tax |
+| Total Amount | What the customer owes | `(subtotal − discount) + added tax`, integer cents; tax-included lines stay inside the price | ✅ |
 | Change Due | Cash back | Received cents minus total cents | ✅ |
 | Quick-cash amounts | Convenient notes | Currency-aware round-ups (USD cents / VND dong) | ✅ |
 | Receipt subtotal | Pre-discount lines | `order.line_total` in cents | ✅ |
-| Receipt tax | Tax charged | `invoice.tax_cents` + rate/name snapshot | ✅ |
+| Receipt tax | Tax charged | `invoice.tax_cents` + grouped `tax_breakdown` snapshot | ✅ |
 | Receipt total | Amount paid | `invoice.total_cents` / `price_cents` | ✅ |
 | Receipt discount line | Code amount off | `invoice` used discount amount + code | ✅ |
 | Receipt tender/change | Cash received/back | Transaction `cash_received_cents`/`change_cents` | ✅ |
@@ -215,13 +216,11 @@ POS has no field to enter a code, and the receipt would not display the result.
 - Smallest real version: a discount-code field on the payment block (M).
 - Full version: automatic membership discounts at cart level (L).
 
-### G3 — "The tax is wrong."
-POS invents 10% and the receipt repeats it. Any company whose tax is not 10% is
-mis-selling, and the invoice may disagree with the screen.
-
-- Smallest real version: read the company's tax configuration and display it (M).
-- Alternative: remove the tax line until tax is wired, showing a tax-inclusive
-  total (S).
+### G3 — "The tax is wrong." (resolved 2026-11-25)
+POS now reads each product/service `TaxCode` (or the company default), supports
+mixed tax-added and tax-included rates, and snapshots the charged amount per
+line onto the invoice and receipt. The screen and the books agree, and a later
+rate edit cannot rewrite an old sale.
 
 ### G4 — "I took the wrong payment / the customer changed their mind."
 There is no refund, void, or exchange from the till. A cashier must leave POS
@@ -368,7 +367,6 @@ recovery. A network drop stops selling.
 - Refund/exchange from the till (use Orders).
 - Server-side held sales, float/shift close, or a cash drawer.
 - Price override, thermal printing, or offline selling.
-- Tax-inclusive or mixed per-product tax rates.
 - A second register in the same browser profile (localStorage is shared).
 
 ---
@@ -391,10 +389,10 @@ recovery. A network drop stops selling.
 **Order path:** `OrderProcessingV1::CheckoutService` (implemented as
 `CreateOrderService`) resolves the catalog record and selling stock row from
 `product_id`/`service_id` + quantity only. It prices from the server, writes
-`Order` + `OrderProductAppointment`/`OrderServiceAppointment`, and snapshots
-`pos_tax_rate_bp`/`pos_tax_name`. `OrderTotalsService` supplies subtotal,
-discount, tax, and total cents. `pay` records the transaction at the invoice
-total.
+`Order` + `OrderProductAppointment`/`OrderServiceAppointment`, and snapshots each
+line's tax code/rate/treatment. `OrderTotalsService` supplies proportional
+discount allocation, per-line tax, grouped breakdown, and total cents. `pay`
+records the transaction at the invoice total.
 
 **Frontend:** `app/javascript/controllers/companies/operations/pos/show_controller.js`
 (`Companies_Operations_Pos_ShowController`). F1 focuses `#barcode-input`;
@@ -405,8 +403,10 @@ lock is server-enforced.
 
 **Current money behavior:**
 
-- Tax comes from `TaxConfig#pos_tax_rate_bp` / `pos_tax_name`, is snapshotted on
-  the order and invoice, and is hidden at 0%. The receipt reads the snapshot.
+- Tax comes from each product/service `TaxCode` (or the Tax Config default), is
+  snapshotted per order line and grouped on the invoice, and is hidden at 0%.
+  Tax-included prices extract tax instead of adding it. The receipt reads the
+  snapshot.
 - Services sell at `Service#price_cents` through `OrderServiceAppointment`.
 - Discounts reserve at Apply, are released by Remove/void/close, and the receipt
   shows the discount/code.
@@ -431,6 +431,7 @@ server search, two-warehouse pile), `spec/features/mobile/pos_spec.rb`,
 `spec/requests/companies/tax_configs_controller_spec.rb`, plus the POS/order
 service specs.
 
-**Not covered by tests:** tax-inclusive pricing, mixed per-product tax rates,
-thermal printing, offline queueing, refunds from the till, and browser-profile
-multi-register conflicts. These are documented limits, not silent gaps.
+**Not covered by tests:** thermal printing, offline queueing, refunds from the
+till, and browser-profile multi-register conflicts. Mixed-rate and tax-included
+sales are covered by the POS feature spec. These remaining items are documented
+limits, not silent gaps.

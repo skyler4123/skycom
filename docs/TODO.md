@@ -135,8 +135,6 @@ New items:
 
 Existing roadmap references:
 
-- Per-product / tax-inclusive rates → **POS follow-ups** (`Tax-inclusive / per-line
-  TaxCode rates`).
 - POS refund/exchange from the till → **POS follow-ups** + roadmap item **53**.
 - Offline POS and mobile → roadmap items **50** and **94**.
 - Mobile push and Vietnamese UI → roadmap items **89** and **93**
@@ -562,9 +560,6 @@ Each one is a broken link in the product today.
       50; a category with no items in the first page can look empty. Pass
       `category_id` to the catalog service when the catalog grows beyond 50
       per category.
-- [ ] **Tax-inclusive / per-line TaxCode rates** — POS currently uses one
-      company-wide Tax Config rate added on top. Mixed-rate or inclusive
-      pricing needs the TaxCode owner and per-line tax totals.
 - [ ] **POS refund / exchange** — void is before payment only; paid sales still
       go to Orders/Refunds. Build the reason-coded flow from the paid receipt.
 

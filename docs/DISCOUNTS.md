@@ -49,6 +49,10 @@ Consequences:
 - The `amount_cents` snapshot on the Discount (computed against the ORDER subtotal
   at reservation time) is the single source for the price reduction AND the budget
   accounting — never recomputed.
+- With mixed tax rates, `OrderTotalsService` allocates the discount across lines
+  proportionally to line gross, then computes tax per line. Leftover cents go to
+  the largest remainders so the shares sum exactly to `amount_cents`. The invoice
+  carries the grouped tax breakdown and `tax_cents` from that allocation.
 - Receipt shows the net subtotal (`invoice.price_cents`) plus a `discount_amount`
   display line (`Companies::OrdersController#receipt`).
 
@@ -154,10 +158,10 @@ Discounts::ApplyService → code unused → pending; amount snapshot
             ▼
       InitiatePaymentService.call(order:, appointment:, discount_code?, ...)
         ├── use the pending discount, or reserve a pay-time code
-        ├── OrderTotalsService: tax on (subtotal − discount)
+        ├── OrderTotalsService: proportional discount allocation + per-line tax
         ├── ReserveStockService (selling stock row persisted at checkout)
-        ├── Invoice: price_cents = total = subtotal − discount + tax;
-        │            tax_cents + pos_tax_rate_bp/name snapshot
+        ├── Invoice: price_cents = total = subtotal − discount + added tax;
+        │            tax_cents + metadata tax_breakdown snapshot
         ├── CASH → CompletePaymentService → Invoice paid
         │     └─ Invoice#sync_discount_state → discount.consume! → budget +
         └── QR → gateway → txn pending; code stays pending
