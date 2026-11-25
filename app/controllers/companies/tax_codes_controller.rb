@@ -83,8 +83,8 @@ class Companies::TaxCodesController < Companies::ApplicationController
     return [ {}, {} ] if ids.empty?
 
     [
-      current_company.products.where(tax_code_id: ids).group(:tax_code_id).count,
-      current_company.services.where(tax_code_id: ids).group(:tax_code_id).count
+      current_company.products.where(tax_code_id: ids, discarded_at: nil).group(:tax_code_id).count,
+      current_company.services.where(tax_code_id: ids, discarded_at: nil).group(:tax_code_id).count
     ]
   end
 
