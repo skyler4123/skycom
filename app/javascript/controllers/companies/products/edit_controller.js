@@ -7,6 +7,14 @@ export default class Companies_Products_EditController extends Companies_LayoutC
   /** @type {Array<{key: string, label: string, type: string}>} */
   propertyMetadata = []
 
+  /** @type {Array<{id: string, name: string, rate_percent: number, inclusive: boolean}>} */
+  taxCodes = []
+
+  /** @type {any | null} */
+  defaultTaxCode = null
+
+  taxCodeError = false
+
   async connect() {
     super.connect()
 
@@ -15,8 +23,10 @@ export default class Companies_Products_EditController extends Companies_LayoutC
     const companyId = pathParts[2]
 
     try {
-      const response = await fetchJson(`${Helpers.company_product_path(companyId, productId)}.json`)
+      const response = await fetchJson(`${Helpers.edit_company_product_path(companyId, productId)}.json`)
       this.product = response.product
+      this.taxCodes = response.tax_codes || []
+      this.defaultTaxCode = response.default_tax_code || null
 
       if (this.product?.category_id) {
         const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.product.category_id)
@@ -39,6 +49,42 @@ export default class Companies_Products_EditController extends Companies_LayoutC
         return false
       })
     }
+  }
+
+  taxCodeFieldHTML() {
+    const p = this.product || {}
+    if (this.taxCodeError) {
+      return `
+        <div class="space-y-1">
+          <label class="text-xs font-medium text-muted-foreground">${translate("Tax")}</label>
+          <p class="text-[11px] text-warning">${translate("Tax codes could not be loaded. The company default will apply.")}</p>
+        </div>
+      `
+    }
+
+    const defaultLabel = this.defaultTaxCode
+      ? this.taxCodeLabel(this.defaultTaxCode)
+      : translate("none configured")
+
+    return `
+      <div class="space-y-1">
+        <label class="text-xs font-medium text-muted-foreground" for="product_tax_code_id">${translate("Tax")}</label>
+        <select id="product_tax_code_id" name="product[tax_code_id]"
+          class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground">
+          <option value="">${translate("Use company default")} — ${escapeHtml(defaultLabel)}</option>
+          ${this.taxCodes.map((code) => `
+            <option value="${code.id}" ${code.id === p.tax_code_id ? "selected" : ""}>${escapeHtml(this.taxCodeLabel(code))}</option>
+          `).join("")}
+        </select>
+        <p class="text-[11px] text-muted-foreground">${translate("Leave blank to use the company default. Tax is applied at checkout.")}</p>
+      </div>
+    `
+  }
+
+  taxCodeLabel(taxCode) {
+    const rate = Number(taxCode.rate_percent || 0)
+    const rateLabel = Number.isInteger(rate) ? String(rate) : rate.toFixed(2).replace(/0+$/, "").replace(/\.$/, "")
+    return `${taxCode.name} (${rateLabel}%${taxCode.inclusive ? `, ${translate("included")}` : ""})`
   }
 
   contentHTML() {
@@ -132,6 +178,8 @@ export default class Companies_Products_EditController extends Companies_LayoutC
             <input type="hidden" name="product[category_id]" value="${p.category_id}">
           </div>
         </div>
+
+        ${this.taxCodeFieldHTML()}
 
         ${dynamicFields}
 

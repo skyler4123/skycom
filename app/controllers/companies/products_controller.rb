@@ -14,7 +14,7 @@ class Companies::ProductsController < Companies::ApplicationController
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        scope = current_company.products
+        scope = current_company.products.includes(:category, :tax_code)
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
         scope = scope.where(branch_id: params[:branch_id]) if params[:branch_id].present?
 
@@ -44,14 +44,26 @@ class Companies::ProductsController < Companies::ApplicationController
 
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { product: format_product(product), stocks: product_stocks(product).map { |s| format_stock(s) } } }
+      format.json do
+        render json: {
+          product: format_product(product),
+          stocks: product_stocks(product).map { |s| format_stock(s) },
+          effective_tax_code: TaxCodes::Resolver.call(record: product)&.option_payload,
+          uses_default_tax: product.tax_code.nil? || product.tax_code.discarded?
+        }
+      end
     end
   end
 
   def new
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: {} }
+      format.json do
+        render json: {
+          tax_codes: tax_code_options,
+          default_tax_code: TaxConfig.for_company!(current_company).default_tax_code&.option_payload
+        }
+      end
     end
   end
 
@@ -60,7 +72,15 @@ class Companies::ProductsController < Companies::ApplicationController
 
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { product: format_product(product) } }
+      format.json do
+        render json: {
+          product: format_product(product),
+          tax_codes: tax_code_options,
+          default_tax_code: TaxConfig.for_company!(current_company).default_tax_code&.option_payload,
+          effective_tax_code: TaxCodes::Resolver.call(record: product)&.option_payload,
+          uses_default_tax: product.tax_code.nil? || product.tax_code.discarded?
+        }
+      end
     end
   end
 
@@ -109,14 +129,14 @@ class Companies::ProductsController < Companies::ApplicationController
 
     params.require(:product).permit(
       :name, :description, :business_type, :workflow_status, :category_id,
-      :price_cents, :currency,
+      :price_cents, :currency, :tax_code_id,
       *property_keys
     )
   end
 
   def format_product(product)
     product.as_json(only: [
-      :id, :name, :description, :code, :category_id,
+      :id, :name, :description, :code, :category_id, :tax_code_id,
       :lifecycle_status, :workflow_status, :business_type,
       :created_at, :updated_at,
       :price_cents, :currency,
@@ -127,8 +147,13 @@ class Companies::ProductsController < Companies::ApplicationController
       :property_boolean_1, :property_boolean_2, :property_boolean_3, :property_boolean_4, :property_boolean_5,
       :property_datetime_1, :property_datetime_2, :property_datetime_3, :property_datetime_4, :property_datetime_5
     ]).merge(
-      category: product.category&.as_json(only: [ :id, :name ])
+      category: product.category&.as_json(only: [ :id, :name ]),
+      tax_code: product.tax_code&.option_payload
     )
+  end
+
+  def tax_code_options
+    current_company.tax_codes.kept.ordered.map(&:option_payload)
   end
 
   def format_products(products)

@@ -121,6 +121,19 @@ RSpec.feature "Companies::Products Edit", type: :feature, js: true do
     expect(page).to have_current_path(company_product_path(company, product), wait: 10)
   end
 
+  scenario "assigns a tax code and shows it on the product page" do
+    code = create(:tax_code, company: company, name: "VAT 10%", rate_bp: 1_000, is_inclusive: true)
+
+    visit edit_company_product_path(company, product)
+
+    expect(page).to have_selector('select[name="product[tax_code_id]"]', wait: 10)
+    select "VAT 10% (10%, included)", from: "product[tax_code_id]"
+    click_button "Save Changes"
+
+    expect(page).to have_content("VAT 10%", wait: 10)
+    expect(product.reload.tax_code).to eq(code)
+  end
+
   scenario "handles validation error and redirects back to edit page with alert" do
     visit edit_company_product_path(company, product)
 

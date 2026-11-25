@@ -7,13 +7,32 @@ export default class Companies_Services_NewController extends Companies_LayoutCo
   /** @type {Array<{key: string, label: string, type: string}>} */
   propertyMetadata = []
 
-  connect() {
+  /** @type {Array<{id: string, name: string, rate_percent: number, inclusive: boolean}>} */
+  taxCodes = []
+
+  /** @type {any | null} */
+  defaultTaxCode = null
+
+  taxCodeError = false
+
+  async connect() {
     super.connect()
 
     this.categoryId = new URLSearchParams(window.location.search).get('category_id') || this.defaultFilterCategory()?.id || null
 
     const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.categoryId)
     this.propertyMetadata = propertyMapping?.metadata?.properties || []
+
+    const companyId = currentCompany()?.id
+    if (companyId) {
+      try {
+        const response = await fetchJson(`${Helpers.new_company_service_path(companyId)}.json`)
+        this.taxCodes = response.tax_codes || []
+        this.defaultTaxCode = response.default_tax_code || null
+      } catch (_error) {
+        this.taxCodeError = true
+      }
+    }
 
     poll(() => {
       if (this.hasContentTarget) {
@@ -98,6 +117,41 @@ export default class Companies_Services_NewController extends Companies_LayoutCo
     }
   }
 
+  taxCodeFieldHTML() {
+    if (this.taxCodeError) {
+      return `
+        <div class="space-y-1">
+          <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Tax")}</label>
+          <p class="text-[11px] text-warning">${translate("Tax codes could not be loaded. The company default will apply.")}</p>
+        </div>
+      `
+    }
+
+    const defaultLabel = this.defaultTaxCode
+      ? this.taxCodeLabel(this.defaultTaxCode)
+      : translate("none configured")
+
+    return `
+      <div class="space-y-1">
+        <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Tax")}</label>
+        <select name="service[tax_code_id]"
+          class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
+          <option value="">${translate("Use company default")} — ${escapeHtml(defaultLabel)}</option>
+          ${this.taxCodes.map((code) => `
+            <option value="${code.id}">${escapeHtml(this.taxCodeLabel(code))}</option>
+          `).join("")}
+        </select>
+        <p class="text-[11px] text-muted-foreground">${translate("Leave blank to use the company default. Tax is applied at checkout.")}</p>
+      </div>
+    `
+  }
+
+  taxCodeLabel(taxCode) {
+    const rate = Number(taxCode.rate_percent || 0)
+    const rateLabel = Number.isInteger(rate) ? String(rate) : rate.toFixed(2).replace(/0+$/, "").replace(/\.$/, "")
+    return `${taxCode.name} (${rateLabel}%${taxCode.inclusive ? `, ${translate("included")}` : ""})`
+  }
+
   contentHTML() {
     const categoryFilter = this.servicesCategories()
     const typeOptions = (ENUMS?.service?.business_types || []).map(t =>
@@ -149,6 +203,8 @@ export default class Companies_Services_NewController extends Companies_LayoutCo
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none placeholder:text-muted-foreground"></textarea>
           </div>
         </div>
+
+        ${this.taxCodeFieldHTML()}
 
         <div id="dynamic-fields">
           ${this.dynamicFieldsHTML()}

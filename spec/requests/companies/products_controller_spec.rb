@@ -105,6 +105,13 @@ RSpec.describe "Companies::ProductsController show", type: :request do
     get sign_in_for_test_path(email: company.user.email)
   end
 
+  around do |example|
+    original = ActionController::Base.allow_forgery_protection
+    ActionController::Base.allow_forgery_protection = false
+    example.run
+    ActionController::Base.allow_forgery_protection = original
+  end
+
   it "embeds stocks of this product in the show JSON" do
     warehouse_a = create(:warehouse, company: company)
     warehouse_b = create(:warehouse, company: company)
@@ -126,5 +133,32 @@ RSpec.describe "Companies::ProductsController show", type: :request do
     expect(row_a["pending"]).to eq(3)
     expect(row_a["available"]).to eq(9)
     expect(row_a["warehouse"]["id"]).to eq(warehouse_a.id)
+  end
+
+  it "returns the effective tax code" do
+    code = create(:tax_code, company: company, name: "VAT", rate_bp: 1_000)
+    TaxConfig.for_company!(company).update!(default_tax_code_id: code.id)
+
+    get "/companies/#{company.id}/products/#{product.id}.json"
+
+    body = JSON.parse(response.body)
+    expect(body.dig("effective_tax_code", "id")).to eq(code.id)
+    expect(body["uses_default_tax"]).to be(true)
+  end
+
+  it "assigns a tax code and rejects another company's code" do
+    code = create(:tax_code, company: company)
+
+    patch "/companies/#{company.id}/products/#{product.id}.json",
+      params: { product: { tax_code_id: code.id } }
+
+    expect(response).to have_http_status(:ok), response.body
+    expect(product.reload.tax_code).to eq(code)
+
+    patch "/companies/#{company.id}/products/#{product.id}.json",
+      params: { product: { tax_code_id: create(:tax_code).id } }
+
+    expect(response).to have_http_status(:unprocessable_content), response.body
+    expect(product.reload.tax_code).to eq(code)
   end
 end
