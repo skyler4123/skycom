@@ -6,8 +6,8 @@ Skycom has a two-phase company setup:
 
 | Phase | Service | What It Creates | When It Runs |
 |-------|---------|-----------------|-------------|
-| **Init** | `Seed::RetailInitService` | Roles, Categories, PropertyMappings, TableConfigs, CRUD Policies | Automatically on company creation (`after_create`) |
-| **Enrich** | `Seed::RetailEnrichService` | Brands, Branches, Employees, Customers, Products, Stocks, Orders, Invoices | Explicitly during development seeding |
+| **Init** | `Seed::RetailInitService` | Roles, Categories, PropertyMappings, TableConfigs, CRUD Policies, one neutral tax code | Automatically on company creation (`after_create`) |
+| **Enrich** | `Seed::RetailEnrichService` | Brands, Branches, Employees, Customers, Products, Services, Stocks, Orders, Invoices, tax profiles | Explicitly during development seeding |
 
 ## Init Phase (Production + Development)
 
@@ -27,6 +27,7 @@ When a user creates a new company (either via signup or during seeding), the `Co
 | TableConfigs | ~40 | Visible column configuration per category |
 | Policies | ~600 | CRUD policies for all resource x action combinations |
 | PolicyAppointments | ~80 | Role-to-policy assignments with active/inactive status |
+| TaxCodes | 1 | `NO_TAX` — a 0% neutral code (`vat` for VN, `sales` otherwise). Not set as the default. |
 
 After init, the company is ready to use — users can navigate dashboards, create records, and manage the business.
 
@@ -53,7 +54,8 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Company announcement | 1 published `Document` (`business_type: announcement`) linked to every employee |
 | Customers | 100 (50 per branch) |
 | Products | 28 (14 per branch) |
-| Services | 10 (5 per branch) |
+| Services | 10 (5 per branch), each with a demo price in the company currency |
+| Tax codes | 2 profile codes per company (product + service), assigned to seeded items; the product code becomes the default |
 | Stocks | ~28 |
 | Stock Transfers/Imports/Exports | ~48 (each with line rows summing to the header; every 3rd doc splits into 2 lines) |
 | Stock Adjustments | ≤3 (increase + decreases, with line rows; lines only, no ledger — seeded quantities were written directly) |
@@ -111,6 +113,8 @@ Seed::ApplicationService.run
    +- Demo payroll + KPI for all 4 companies
        +- Seed::PayrollService.ensure_current_month!
        +- Seed::KpiService.create_samples!
+   +- Every enrich service ends with Seed::TaxService.enrich!
+       +- Adds the company profile and assigns product/service codes
 ```
 
 All three enrich services call `Seed::CompensationService`,
@@ -133,6 +137,40 @@ owner's own screens empty.
 
 Future business types (Restaurant, Education) will follow the same pattern
 with their own `*InitService` and `*EnrichService`.
+
+### Tax seeding (`Seed::TaxService`)
+
+Init creates only `NO_TAX`, a 0% neutral code, and does not set it as the
+default. Production companies therefore start with an empty default, exactly
+where the owner must choose their rate.
+
+Development enrich adds the demo profiles below, assigns the codes to seeded
+products and services that have no code yet, and sets the product code as the
+default only when the company has no default. Existing code attributes,
+assignments, and defaults are never overwritten. Orders and invoices are not
+recalculated, so existing seeded invoices keep their zero-tax state.
+
+| Seeded company | Product code | Service code | Default |
+|---|---|---|---|
+| Grocery 1 — retail, US | `SALES_825` — Sales tax 8.25%, added | `SALES_0_SERVICE` — Sales tax 0% (services), added | Product code |
+| Grocery VN — retail, VN | `VAT_10` — VAT 10%, included | `VAT_8` — VAT 8%, included | Product code |
+| Smile Dental Center — hospital, VN | `VAT_5_PHARMACY` — VAT 5% (pharmacy), included | `VAT_0_MEDICAL` — VAT 0% (medical services), included | Product code |
+| Sunrise Hotel — hotel, VN | `VAT_10_MINIBAR` — VAT 10% (minibar), included | `VAT_5_ACCOMMODATION` — VAT 5% (accommodation & services), included | Product code |
+
+These are demo profiles, not legal advice. Each seeded code is marked
+`metadata: { "seeded" => true }` and its description says to review it before
+production use.
+
+The three enrich services call `Seed::TaxService.enrich!(company:)` after their
+inventory exists. For existing dev data, run it directly:
+
+```ruby
+Seed::TaxService.enrich!(company: Company.find_by(name: "Grocery 1"))
+Seed::TaxService.enrich_all!
+```
+
+`enrich_all!` skips system companies. It is idempotent, so re-running it after a
+partial seed is safe.
 
 ### Seeding naming convention — "number name" fallback
 

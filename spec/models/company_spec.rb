@@ -269,6 +269,14 @@ RSpec.describe Company, type: :model do
       Company.skip_init = true
     end
 
+    it "seeds a neutral zero-rate tax code without making it the default" do
+      code = company.tax_codes.find_by(code: "NO_TAX")
+
+      expect(code).to be_present
+      expect(code).to have_attributes(kind: "sales", rate_bp: 0)
+      expect(TaxConfig.for_company!(company).default_tax_code_id).to be_nil
+    end
+
     it "does not create a generic 'Employees' category alongside the seeded role categories" do
       expect(company.categories.where(resource_name: "employees", name: "Employees")).to be_empty
       expect(company.categories.where(resource_name: "employees").count).to eq(5)

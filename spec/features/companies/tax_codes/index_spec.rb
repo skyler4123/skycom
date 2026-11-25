@@ -56,6 +56,17 @@ RSpec.feature "Companies::TaxCodes Management", type: :feature, js: true do
     expect(code.is_inclusive).to be(true)
   end
 
+  scenario "shows a seeded company tax profile" do
+    company.update!(business_type: :retail, country: :us, currency: :usd)
+    Seed::TaxService.enrich!(company: company)
+
+    visit company_tax_codes_path(company)
+
+    expect(page).to have_content("Sales tax 8.25%", wait: 10)
+    expect(page).to have_content("Sales tax 0% (services)")
+    expect(page).to have_content("No tax")
+  end
+
   scenario "edits a tax code rate" do
     create(:tax_code, company: company, name: "VAT 10%", code: "VAT10", rate_bp: 1_000)
 

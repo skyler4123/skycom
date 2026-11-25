@@ -83,6 +83,7 @@ class Seed::HospitalEnrichService
     create_attendance_event_data
     create_attendance_request_samples
     seed_credit_data
+    seed_tax_data
 
     print_footer
     true
@@ -99,6 +100,10 @@ class Seed::HospitalEnrichService
     puts "\n========================================================="
     puts "🏥 Hospital Company Seeding Complete!"
     puts "========================================================="
+  end
+
+  def seed_tax_data
+    Seed::TaxService.enrich!(company: @company)
   end
 
   def create_hospital_company
@@ -267,6 +272,7 @@ class Seed::HospitalEnrichService
           company: @company,
           branch: branch,
           name: "#{svc_name} - #{branch.name}",
+          price: Seed::ServiceService.demo_price(@company),
           duration: [ 30, 45, 60, 90 ].sample,
           category: service_categories[i % service_categories.length]
         )

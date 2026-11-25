@@ -87,6 +87,7 @@ class Seed::HotelEnrichService
     create_attendance_configs
     create_attendance_event_data
     seed_credit_data
+    seed_tax_data
 
     print_footer
     true
@@ -103,6 +104,10 @@ class Seed::HotelEnrichService
     puts "\n========================================================="
     puts "🏨 Hotel Company Seeding Complete!"
     puts "========================================================="
+  end
+
+  def seed_tax_data
+    Seed::TaxService.enrich!(company: @company)
   end
 
   def create_hotel_company
@@ -271,6 +276,7 @@ class Seed::HotelEnrichService
           company: @company,
           branch: branch,
           name: "#{svc_name} - #{branch.name}",
+          price: Seed::ServiceService.demo_price(@company),
           duration: [ 30, 45, 60, 90 ].sample,
           category: service_categories[i % service_categories.length]
         )
