@@ -41,6 +41,7 @@ class Service < ApplicationRecord
   belongs_to :branch, optional: true
   belongs_to :category
   belongs_to :property_mapping
+  belongs_to :tax_code, optional: true
 
   has_many :order_service_appointments, dependent: :destroy
   has_many :orders, through: :order_service_appointments
@@ -63,4 +64,14 @@ class Service < ApplicationRecord
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true
+  validate :tax_code_belongs_to_company
+
+  private
+
+  def tax_code_belongs_to_company
+    return if tax_code.nil? || company_id.nil?
+    return if tax_code.company_id == company_id && !tax_code.discarded?
+
+    errors.add(:tax_code, "must be an available tax code for this company")
+  end
 end

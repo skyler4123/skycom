@@ -81,8 +81,18 @@ class Product < ApplicationRecord
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :business_type, presence: true
   validates :price_cents, numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
+  validate :tax_code_belongs_to_company
 
   def price_currency
     currency&.upcase || "USD"
+  end
+
+  private
+
+  def tax_code_belongs_to_company
+    return if tax_code.nil? || company_id.nil?
+    return if tax_code.company_id == company_id && !tax_code.discarded?
+
+    errors.add(:tax_code, "must be an available tax code for this company")
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_20_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_25_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -5852,6 +5852,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "tax_code_id"
+    t.string "tax_name"
+    t.integer "tax_rate_bp", default: 0, null: false
+    t.boolean "tax_inclusive", default: false, null: false
+    t.bigint "taxable_cents", default: 0, null: false
+    t.bigint "tax_cents", default: 0, null: false
     t.index ["business_type"], name: "index_order_product_appointments_on_business_type"
     t.index ["company_id", "order_id", "product_id"], name: "idx_order_product_appointments_triple"
     t.index ["company_id"], name: "index_order_product_appointments_on_company_id"
@@ -5861,6 +5867,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_000004) do
     t.index ["order_id"], name: "index_order_product_appointments_on_order_id"
     t.index ["product_id"], name: "index_order_product_appointments_on_product_id"
     t.index ["stock_id"], name: "index_order_product_appointments_on_stock_id"
+    t.index ["tax_code_id"], name: "index_order_product_appointments_on_tax_code_id"
     t.index ["workflow_status"], name: "index_order_product_appointments_on_workflow_status"
   end
 
@@ -5918,6 +5925,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "tax_code_id"
+    t.string "tax_name"
+    t.integer "tax_rate_bp", default: 0, null: false
+    t.boolean "tax_inclusive", default: false, null: false
+    t.bigint "taxable_cents", default: 0, null: false
+    t.bigint "tax_cents", default: 0, null: false
     t.index ["business_type"], name: "index_order_service_appointments_on_business_type"
     t.index ["company_id", "order_id", "service_id"], name: "idx_order_service_appointments_triple"
     t.index ["company_id"], name: "index_order_service_appointments_on_company_id"
@@ -5927,6 +5940,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_000004) do
     t.index ["order_id"], name: "index_order_service_appointments_on_order_id"
     t.index ["service_id"], name: "index_order_service_appointments_on_service_id"
     t.index ["stock_id"], name: "index_order_service_appointments_on_stock_id"
+    t.index ["tax_code_id"], name: "index_order_service_appointments_on_tax_code_id"
     t.index ["workflow_status"], name: "index_order_service_appointments_on_workflow_status"
   end
 
@@ -8158,6 +8172,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_000004) do
     t.datetime "property_datetime_5"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "tax_code_id"
     t.index ["branch_id"], name: "index_services_on_branch_id"
     t.index ["business_type"], name: "index_services_on_business_type"
     t.index ["category_id"], name: "index_services_on_category_id"
@@ -8168,6 +8183,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_000004) do
     t.index ["external_id"], name: "index_services_on_external_id"
     t.index ["lifecycle_status"], name: "index_services_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_services_on_property_mapping_id"
+    t.index ["tax_code_id"], name: "index_services_on_tax_code_id"
     t.index ["workflow_status"], name: "index_services_on_workflow_status"
   end
 
@@ -10966,6 +10982,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_000004) do
   add_foreign_key "order_product_appointments", "orders"
   add_foreign_key "order_product_appointments", "products"
   add_foreign_key "order_product_appointments", "stocks"
+  add_foreign_key "order_product_appointments", "tax_codes"
   add_foreign_key "order_product_group_appointments", "companies"
   add_foreign_key "order_product_group_appointments", "orders"
   add_foreign_key "order_product_group_appointments", "product_groups"
@@ -10974,6 +10991,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_000004) do
   add_foreign_key "order_service_appointments", "orders"
   add_foreign_key "order_service_appointments", "services"
   add_foreign_key "order_service_appointments", "stocks"
+  add_foreign_key "order_service_appointments", "tax_codes"
   add_foreign_key "order_service_group_appointments", "companies"
   add_foreign_key "order_service_group_appointments", "orders"
   add_foreign_key "order_service_group_appointments", "service_groups"
@@ -11196,6 +11214,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_20_000004) do
   add_foreign_key "services", "categories"
   add_foreign_key "services", "companies"
   add_foreign_key "services", "property_mappings"
+  add_foreign_key "services", "tax_codes"
   add_foreign_key "sessions", "users"
   add_foreign_key "shift_closes", "branches"
   add_foreign_key "shift_closes", "companies"
