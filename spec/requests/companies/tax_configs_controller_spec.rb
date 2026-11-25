@@ -15,44 +15,59 @@ RSpec.describe "Companies::TaxConfigsController", type: :request do
   end
 
   describe "GET /companies/:company_id/tax_config" do
-    it "returns the POS tax fields with defaults" do
+    it "returns the default tax code as nil when unset" do
       get company_tax_config_path(company, format: :json)
 
       expect(response).to have_http_status(:ok)
       config = response.parsed_body["tax_config"]
-      expect(config["pos_tax_rate_bp"]).to eq(0)
-      expect(config["pos_tax_rate_percent"]).to eq(0.0)
-      expect(config["pos_tax_name"]).to eq("Tax")
+      expect(config["default_tax_code_id"]).to be_nil
+      expect(config["default_tax_code"]).to be_nil
+    end
+
+    it "returns the selected default tax code" do
+      code = create(:tax_code, company: company, name: "VAT 10%", rate_bp: 1_000)
+      TaxConfig.for_company!(company).update!(default_tax_code_id: code.id)
+
+      get company_tax_config_path(company, format: :json)
+
+      config = response.parsed_body["tax_config"]
+      expect(config["default_tax_code_id"]).to eq(code.id)
+      expect(config.dig("default_tax_code", "name")).to eq("VAT 10%")
     end
   end
 
   describe "PATCH /companies/:company_id/tax_config" do
-    it "converts the percent input to basis points" do
+    it "saves the default tax code" do
+      code = create(:tax_code, company: company)
+
       patch company_tax_config_path(company, format: :json),
-        params: { tax_config: { pos_tax_rate_percent: "8.25", pos_tax_name: "Sales tax" } }
+        params: { tax_config: { default_tax_code_id: code.id } }
 
       expect(response).to have_http_status(:ok), response.body
-      config = TaxConfig.for_company!(company).reload
-      expect(config.pos_tax_rate_bp).to eq(825)
-      expect(config.pos_tax_name).to eq("Sales tax")
-      expect(response.parsed_body.dig("tax_config", "pos_tax_rate_percent")).to eq(8.25)
+      expect(TaxConfig.for_company!(company).reload.default_tax_code_id).to eq(code.id)
+      expect(response.parsed_body.dig("tax_config", "default_tax_code", "id")).to eq(code.id)
     end
 
-    it "rejects a rate above 100 without saving" do
+    it "rejects another company's tax code without saving" do
+      other = create(:tax_code)
+
       patch company_tax_config_path(company, format: :json),
-        params: { tax_config: { pos_tax_rate_percent: "101" } }
+        params: { tax_config: { default_tax_code_id: other.id } }
 
       expect(response).to have_http_status(:unprocessable_content), response.body
       expect(response.parsed_body["errors"]).to be_present
-      expect(TaxConfig.for_company!(company).reload.pos_tax_rate_bp).to eq(0)
+      expect(TaxConfig.for_company!(company).reload.default_tax_code_id).to be_nil
     end
 
-    it "rejects a non-numeric rate without saving" do
-      patch company_tax_config_path(company, format: :json),
-        params: { tax_config: { pos_tax_rate_percent: "not-a-rate" } }
+    it "clears the default" do
+      code = create(:tax_code, company: company)
+      TaxConfig.for_company!(company).update!(default_tax_code_id: code.id)
 
-      expect(response).to have_http_status(:unprocessable_content)
-      expect(TaxConfig.for_company!(company).reload.pos_tax_rate_bp).to eq(0)
+      patch company_tax_config_path(company, format: :json),
+        params: { tax_config: { default_tax_code_id: "" } }
+
+      expect(response).to have_http_status(:ok), response.body
+      expect(TaxConfig.for_company!(company).reload.default_tax_code_id).to be_nil
     end
   end
 end

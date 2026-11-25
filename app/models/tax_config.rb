@@ -2,13 +2,14 @@
 
 # TaxConfig — Atomic purpose: company-wide tax reporting settings (date basis,
 # included invoice/purchase/stock-export sources, excluded statuses, branch
-# filters).
+# filters) plus the default tax code used when a product/service has none.
 #
-# Why it exists: one persisted configuration per company keeps tax reports
-# consistent instead of scattering source/filter defaults.
+# Why it exists: one persisted configuration per company keeps tax reports and
+# the default tax rate consistent instead of scattering source/filter defaults.
 # How it works: belongs to a company (unique); metadata-backed settings are
 # seeded on initialize, and `for_company!` finds or creates the row idempotently.
-# Main associations: belongs_to :company (required, unique).
+# Main associations: belongs_to :company (required, unique); the default tax
+# code is a metadata-backed pointer resolved through #default_tax_code.
 class TaxConfig < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
@@ -21,18 +22,10 @@ class TaxConfig < ApplicationRecord
     :excluded_purchase_statuses,
     :stock_export_business_types,
     :branch_ids,
-    :default_tax_code_id,
-    :pos_tax_rate_bp,
-    :pos_tax_name
+    :default_tax_code_id
   belongs_to :company
-  belongs_to :default_tax_code, class_name: "TaxCode", optional: true
 
   validates :company_id, uniqueness: true
-  validates :pos_tax_rate_bp,
-    numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: TAX_RATE_BP_MAX },
-    allow_nil: true
-  validates :pos_tax_name, length: { maximum: 50 }, allow_blank: true
-
 
   after_initialize :set_defaults, if: :new_record?
   validate :default_tax_code_belongs_to_company
@@ -47,22 +40,19 @@ class TaxConfig < ApplicationRecord
     self.excluded_purchase_statuses = [] if excluded_purchase_statuses.nil?
     self.stock_export_business_types = [ "sale" ] if stock_export_business_types.nil?
     self.branch_ids = [] if branch_ids.nil?
-    self.pos_tax_rate_bp = 0 if metadata["pos_tax_rate_bp"].nil?
-    self.pos_tax_name = "Tax" if metadata["pos_tax_name"].blank?
   end
 
-  # POS default tax: one company-wide rate, added on top of the discounted
-  # subtotal. The rate is stored in basis points so money never touches floats.
-  def pos_tax_rate
-    pos_tax_rate_bp.to_i / 10_000.0
+  # The default is a pointer, never a copied rate. Discarded codes are ignored
+  # so a sale cannot silently use a retired code. This stays a method because
+  # the foreign key lives in metadata, not in a column.
+  def default_tax_code
+    return nil if default_tax_code_id.blank?
+
+    company&.tax_codes&.kept&.find_by(id: default_tax_code_id)
   end
 
-  def pos_tax_rate_percent
-    pos_tax_rate_bp.to_i / 100.0
-  end
-
-  def pos_tax?
-    pos_tax_rate_bp.to_i.positive?
+  def default_tax_code=(code)
+    self.default_tax_code_id = code&.id
   end
 
   def self.for_company!(company)
