@@ -94,6 +94,7 @@ export const SIDEBAR_ITEMS = [
   { key: "stock_pendings", group: "inventory", icon: "schedule", label: "Stock Pendings", href: (cid) => Helpers.company_stock_pendings_path(cid) },
   { key: "suppliers", group: "inventory", icon: "local_shipping", label: "Suppliers", href: (cid) => Helpers.company_suppliers_path(cid) },
   { key: "tax_data", group: "tax", icon: "calculate", label: "Tax Data", href: (cid) => Helpers.company_tax_path(cid) },
+  { key: "tax_codes", group: "tax", icon: "percent", label: "Tax Codes", href: (cid) => Helpers.company_tax_codes_path(cid) },
   { key: "tax_config", group: "tax", icon: "tune", label: "Tax Config", href: (cid) => Helpers.company_tax_config_path(cid) },
   { key: "payroll_data", group: "payroll", icon: "payments", label: "Payroll Data", href: (cid) => Helpers.company_payroll_path(cid) },
   { key: "payroll_config", group: "payroll", icon: "tune", label: "Payroll Config", href: (cid) => Helpers.company_payroll_config_path(cid) },

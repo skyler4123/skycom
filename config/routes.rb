@@ -290,6 +290,7 @@ Rails.application.routes.draw do
       resource :analytic, only: %i[show update], controller: :analytics
 
       resource :tax_config, only: %i[show update], controller: :tax_configs
+      resources :tax_codes, only: %i[index create update destroy]
       get "tax", to: "taxes#index"
       get "tax/summary", to: "taxes#summary"
       get "tax/invoices", to: "taxes#invoices"

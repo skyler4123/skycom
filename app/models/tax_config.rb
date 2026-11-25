@@ -21,9 +21,11 @@ class TaxConfig < ApplicationRecord
     :excluded_purchase_statuses,
     :stock_export_business_types,
     :branch_ids,
+    :default_tax_code_id,
     :pos_tax_rate_bp,
     :pos_tax_name
   belongs_to :company
+  belongs_to :default_tax_code, class_name: "TaxCode", optional: true
 
   validates :company_id, uniqueness: true
   validates :pos_tax_rate_bp,
@@ -33,6 +35,7 @@ class TaxConfig < ApplicationRecord
 
 
   after_initialize :set_defaults, if: :new_record?
+  validate :default_tax_code_belongs_to_company
 
   def set_defaults
     self.metadata = {} if metadata.blank?
@@ -68,5 +71,16 @@ class TaxConfig < ApplicationRecord
     rescue ActiveRecord::RecordNotUnique
       find_by!(company: company)
     end
+  end
+
+  private
+
+  def default_tax_code_belongs_to_company
+    return if default_tax_code_id.blank?
+
+    code = TaxCode.kept.find_by(id: default_tax_code_id)
+    return if code && code.company_id == company_id
+
+    errors.add(:default_tax_code, "must be an available tax code for this company")
   end
 end

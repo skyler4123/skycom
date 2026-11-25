@@ -515,6 +515,8 @@ export const company_tax_invoices_path = (companyId) => `/companies/${companyId}
 export const company_tax_purchases_path = (companyId) => `/companies/${companyId}/tax/purchases`
 export const company_tax_stock_exports_path = (companyId) => `/companies/${companyId}/tax/stock_exports`
 export const company_tax_config_path = (companyId) => `/companies/${companyId}/tax_config`
+export const company_tax_codes_path = (companyId) => `/companies/${companyId}/tax_codes`
+export const company_tax_code_path = (companyId, id) => `/companies/${companyId}/tax_codes/${id}`
 
 export const company_payroll_path = (companyId) => `/companies/${companyId}/payroll`
 export const company_payroll_summary_path = (companyId) => `/companies/${companyId}/payroll/summary`
