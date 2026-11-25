@@ -45,6 +45,35 @@ RSpec.describe Seed::TableConfigService do
       expect(col).not_to have_key("filter")
     end
 
+    it "uses canonical labels for product standard columns" do
+      expect(described_class.field_hash("brand")).to include("name" => "Brand")
+      expect(described_class.field_hash("price_cents")).to include("name" => "Price")
+      expect(described_class.field_hash("cost_cents")).to include("name" => "Cost")
+      expect(described_class.field_hash("stock_quantity")).to include("name" => "Stock on hand")
+      expect(described_class.field_hash("unit_of_measure")).to include("name" => "Unit")
+    end
+
+    it "keeps display-only product columns free of search and filter" do
+      %w[brand price_cents cost_cents stock_quantity unit_of_measure workflow_status].each do |key|
+        col = described_class.field_hash(key)
+        expect(col).not_to have_key("search")
+        expect(col).not_to have_key("filter")
+      end
+    end
+
+    it "seeds the rich product columns for every retail and hotel product category" do
+      [
+        Seed::RetailInitService::RETAIL_INIT_CATEGORIES,
+        Seed::HotelInitService::HOTEL_INIT_CATEGORIES
+      ].each do |categories|
+        categories.fetch(:products).each_value do |entry|
+          expect(entry[:visible_columns]).to include(
+            "brand", "price_cents", "cost_cents", "stock_quantity", "unit_of_measure", "workflow_status"
+          )
+        end
+      end
+    end
+
     it "produces hashes that pass the model's column validation" do
       keys = %w[name description code business_type workflow_status category_id] +
         %w[property_string_1 property_integer_1 property_decimal_1 property_boolean_1 property_datetime_1]

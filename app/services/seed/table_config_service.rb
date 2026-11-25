@@ -1,11 +1,16 @@
 class Seed::TableConfigService
+  # Default product grid: core catalog columns first, then each category's
+  # dynamic properties. Mirrors docs/DYNAMIC_TABLE.md and TableConfig's labels.
+  PRODUCT_GRID_COLUMNS = %w[name code brand price_cents cost_cents stock_quantity unit_of_measure workflow_status].freeze
+
   # Builds one columns_metadata entry with every applicable search/filter option turned ON
   # (owner disables per column in the TableConfig editor — docs/DYNAMIC_TABLE.md §2.5).
   # String-capable columns get `search: true`; integer/decimal get half-open range buckets,
   # boolean gets true/false options, datetime gets year buckets around the current year.
   # `active: true` is required in every filter hash (TableConfig validation).
   def self.field_hash(key, name = nil)
-    col = { "key" => key.to_s, "name" => name.presence || key.to_s.humanize,
+    col = { "key" => key.to_s,
+            "name" => name.presence || TableConfig.standard_column_name(key) || key.to_s.humanize,
             "visible" => true }
 
     case key.to_s

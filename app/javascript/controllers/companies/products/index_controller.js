@@ -4,9 +4,10 @@ export default class Companies_Products_IndexController extends Companies_Layout
   // Products dashboard — table hydrates from the index JSON of the current URL.
   // Search/filter form controls render from the active TableConfig columns
   // (`search: true` → keyword input, `filter: {type,...}` → dropdown with bucket/option labels).
-  // Depends on BE: Companies::ProductsController#index (list + Meilisearch q / filters[key])
-  // Endpoints: GET <pathname>.json?category_id&q&filters[key] — traditional GET form, full-page submit
-  // Docs: docs/DYNAMIC_TABLE.md, docs/MEILISEARCH.md
+  // Depends on BE: Companies::ProductsController#index (list + brand/cost/unit/stock_quantity
+  //               + Meilisearch q / filters[key])
+  // Endpoints: GET <pathname>.json?category_id&branch_id&q&filters[key] — traditional GET form, full-page submit
+  // Docs: docs/DYNAMIC_TABLE.md §2.3.1, docs/MEILISEARCH.md
   static targets = ["productsList"]
 
   /** @type {(Product & { name: string })[]} */
@@ -62,6 +63,11 @@ export default class Companies_Products_IndexController extends Companies_Layout
     const fallbackColumns = [
       { key: "name", name: translate("Product Name") },
       { key: "code", name: translate("Product Code") },
+      { key: "brand", name: translate("Brand") },
+      { key: "price_cents", name: translate("Price") },
+      { key: "cost_cents", name: translate("Cost") },
+      { key: "stock_quantity", name: translate("Stock on hand") },
+      { key: "unit_of_measure", name: translate("Unit") },
       { key: "workflow_status", name: translate("Status") }
     ]
 
@@ -151,6 +157,17 @@ export default class Companies_Products_IndexController extends Companies_Layout
                 `,
                 code: (value) => `<span class="font-mono text-xs bg-muted/60 px-2 py-0.5 rounded text-muted-foreground font-medium">${value || '—'}</span>`,
                 category: (value, record) => record.category?.name || '<span class="text-muted-foreground/60">—</span>',
+                brand: (value) => value?.name ? escapeHtml(value.name) : '<span class="text-muted-foreground/60">—</span>',
+                price_cents: (value, record) => value == null
+                  ? '<span class="text-muted-foreground/60">—</span>'
+                  : `<span class="font-mono font-medium text-foreground">${Helpers.formatMoney(value, record.currency)}</span>`,
+                cost_cents: (value, record) => value == null
+                  ? '<span class="text-muted-foreground/60">—</span>'
+                  : `<span class="font-mono text-muted-foreground">${Helpers.formatMoney(value, record.currency)}</span>`,
+                stock_quantity: (value) => value == null
+                  ? '<span class="text-muted-foreground/60">—</span>'
+                  : `<span class="font-mono text-foreground">${Number(value).toLocaleString()}</span>`,
+                unit_of_measure: (value) => value ? escapeHtml(value) : '<span class="text-muted-foreground/60">—</span>',
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">

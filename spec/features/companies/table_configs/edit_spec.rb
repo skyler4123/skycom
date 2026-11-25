@@ -104,6 +104,34 @@ RSpec.feature "Companies::TableConfigs edit search/filter", type: :feature, js: 
     end
   end
 
+  scenario "offers product columns only for product configs" do
+    visit edit_company_table_config_path(company, config)
+    expect(page).to have_selector("#new-column-slot", wait: 10)
+
+    expect(page).to have_selector("option[value='price_cents']", visible: :all)
+    expect(page).to have_selector("option[value='brand']", visible: :all)
+    expect(page).to have_selector("option[value='stock_quantity']", visible: :all)
+    expect(page).to have_selector("option[value='unit_of_measure']", visible: :all)
+
+    stocks_category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "stocks")
+    stocks_config = TableConfig.create!(
+      company: company,
+      category: stocks_category,
+      property_mapping: stocks_category.default_property_mapping,
+      resource_name: "stocks",
+      name: "Stocks Grid",
+      metadata: { "columns" => [ { "key" => "name", "name" => "Name", "visible" => true } ] }
+    )
+
+    visit edit_company_table_config_path(company, stocks_config)
+    expect(page).to have_selector("#new-column-slot", wait: 10)
+
+    expect(page).to have_no_selector("option[value='price_cents']", visible: :all)
+    expect(page).to have_no_selector("option[value='brand']", visible: :all)
+    expect(page).to have_no_selector("option[value='stock_quantity']", visible: :all)
+    expect(page).to have_no_selector("option[value='unit_of_measure']", visible: :all)
+  end
+
   scenario "reorders columns up and down and persists the order" do
     visit edit_company_table_config_path(company, config)
     expect(page).to have_selector('[data-column-row="name"]', wait: 10)

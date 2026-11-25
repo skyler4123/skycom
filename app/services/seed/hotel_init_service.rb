@@ -57,15 +57,15 @@ class Seed::HotelInitService
     products: {
       "Bottled Water" => {
         properties: { property_string_1: "Bottle Size", property_decimal_1: "Unit Price" },
-        visible_columns: %w[name code property_string_1 property_decimal_1 workflow_status]
+        visible_columns: Seed::TableConfigService::PRODUCT_GRID_COLUMNS + %w[property_string_1 property_decimal_1]
       },
       "Fast-food" => {
         properties: { property_string_1: "Menu Item", property_decimal_1: "Unit Price" },
-        visible_columns: %w[name code property_string_1 property_decimal_1 workflow_status]
+        visible_columns: Seed::TableConfigService::PRODUCT_GRID_COLUMNS + %w[property_string_1 property_decimal_1]
       },
       "Minibar Snacks" => {
         properties: { property_string_1: "Snack Type", property_boolean_1: "Refrigerated" },
-        visible_columns: %w[name code property_string_1 workflow_status]
+        visible_columns: Seed::TableConfigService::PRODUCT_GRID_COLUMNS + %w[property_string_1]
       }
     },
     warehouses: {

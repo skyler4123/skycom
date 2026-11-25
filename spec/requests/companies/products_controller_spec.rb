@@ -97,6 +97,64 @@ RSpec.describe "Companies::ProductsController search/filter", type: :request do
   end
 end
 
+RSpec.describe "Companies::ProductsController index columns", type: :request do
+  let(:company) { create(:company) }
+  let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "products") }
+  let(:brand) { create(:brand, company: company, name: "Acme Goods") }
+  let(:branch_a) { create(:branch, company: company) }
+  let(:branch_b) { create(:branch, company: company) }
+  let!(:product) do
+    create(:product, company: company, category: category, branch: branch_a, brand: brand,
+      price_cents: 1234, cost_cents: 500, unit_of_measure: "pcs")
+  end
+
+  before do
+    get sign_in_for_test_path(email: company.user.email)
+  end
+
+  def index_url(params = {})
+    "/companies/#{company.id}/products.json?#{ { category_id: category.id }.merge(params).to_query }"
+  end
+
+  def stock_row(branch, warehouse, quantity, pending)
+    Stock.create!(company: company, branch: branch, warehouse: warehouse, product: product,
+      quantity: quantity, pending: pending, name: "PRD Stock #{SecureRandom.hex(2)}",
+      code: "STK-COL-#{SecureRandom.hex(3).upcase}")
+  end
+
+  it "includes brand, price, cost, unit, and summed stock on hand" do
+    stock_row(branch_a, create(:warehouse, company: company, branch: branch_a), 7, 2)
+    stock_row(branch_b, create(:warehouse, company: company, branch: branch_b), 5, 0)
+
+    get index_url
+    row = JSON.parse(response.body)["products"].find { |p| p["id"] == product.id }
+
+    expect(row["brand"]).to eq("id" => brand.id, "name" => "Acme Goods")
+    expect(row["price_cents"]).to eq(1234)
+    expect(row["cost_cents"]).to eq(500)
+    expect(row["unit_of_measure"]).to eq("pcs")
+    expect(row["stock_quantity"]).to eq(12)
+  end
+
+  it "narrows stock on hand to the selected branch" do
+    stock_row(branch_a, create(:warehouse, company: company, branch: branch_a), 7, 2)
+    stock_row(branch_b, create(:warehouse, company: company, branch: branch_b), 5, 0)
+
+    get index_url(branch_id: branch_a.id)
+    row = JSON.parse(response.body)["products"].find { |p| p["id"] == product.id }
+
+    expect(row["stock_quantity"]).to eq(7)
+  end
+
+  it "returns nil stock on hand when the product has no stock rows" do
+    get index_url
+    row = JSON.parse(response.body)["products"].find { |p| p["id"] == product.id }
+
+    expect(row).to have_key("stock_quantity")
+    expect(row["stock_quantity"]).to be_nil
+  end
+end
+
 RSpec.describe "Companies::ProductsController show", type: :request do
   let(:company) { create(:company) }
   let(:product) { create(:product, company: company) }

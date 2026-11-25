@@ -89,6 +89,11 @@ All stock availability flows through three model wrappers
 | `reserve_stock!(qty)` | Atomic Redis decrement + DB `pending += qty`; returns `false` with both stores untouched when insufficient (self-reverting) |
 | `release_reserved!(qty)` | Redis increment + DB `pending -= qty` (floored at 0) |
 
+Read-only reporting may aggregate DB rows directly — the Products index shows
+**Stock on hand** as `SUM(stocks.quantity)` across warehouses, narrowed to
+`branch_id` when that filter is active. This is physical quantity, not
+availability (pending holds are not subtracted), and it never writes.
+
 Callers: `CheckAvailabilityService` reads via `available_count`;
 `ReserveStockService` heals then holds per item via `StockPendings::HoldService`
 (first failure releases prior holds, raises `InsufficientStockError` → 422);

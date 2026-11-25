@@ -1,6 +1,5 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import {
-  STANDARD_COLUMN_NAMES,
   canFilter,
   columnName,
   columnSource,
@@ -12,7 +11,8 @@ import {
   filterSummary,
   filterTypeLabel,
   filterTypeOptions,
-  isSearchableColumn
+  isSearchableColumn,
+  standardColumnKeysFor
 } from "controllers/helpers/table_config_helpers"
 
 export default class Companies_TableConfigs_EditController extends Companies_LayoutController {
@@ -624,7 +624,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   availableColumns() {
     const usedKeys = new Set((this.columnsMetadata || []).map(column => column.key))
 
-    const standard = Object.keys(STANDARD_COLUMN_NAMES)
+    const standard = standardColumnKeysFor(this.config?.resource_name)
       .filter(key => !usedKeys.has(key))
       .map(key => ({
         key,

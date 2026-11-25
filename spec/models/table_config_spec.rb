@@ -16,6 +16,19 @@ RSpec.describe TableConfig, type: :model do
     end
   end
 
+  describe ".standard_column_keys_for" do
+    it "offers product keys only for the products resource" do
+      product_keys = described_class.standard_column_keys_for("products")
+      expect(product_keys).to include(
+        "brand", "price_cents", "cost_cents", "stock_quantity", "unit_of_measure", "workflow_status"
+      )
+
+      other_keys = described_class.standard_column_keys_for("stocks")
+      expect(other_keys).to include("workflow_status")
+      expect(other_keys).not_to include("brand", "price_cents", "cost_cents", "stock_quantity", "unit_of_measure")
+    end
+  end
+
   describe "columns_metadata validation" do
     subject(:config) { build(:table_config) }
 
@@ -72,13 +85,13 @@ RSpec.describe TableConfig, type: :model do
 
     context "with missing or blank name" do
       it "rejects when name is missing on an unknown key" do
-        config.metadata = { "columns" => [ { "key" => "workflow_status" } ] }
+        config.metadata = { "columns" => [ { "key" => "custom_key" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/name is required/))
       end
 
       it "rejects when name is blank on an unknown key" do
-        config.metadata = { "columns" => [ { "key" => "workflow_status", "name" => "" } ] }
+        config.metadata = { "columns" => [ { "key" => "custom_key", "name" => "" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/name is required/))
       end
@@ -123,10 +136,26 @@ RSpec.describe TableConfig, type: :model do
 
       it "keeps the submitted name for an unknown key" do
         config.metadata = { "columns" => [
-          { "key" => "workflow_status", "name" => "Status", "visible" => true }
+          { "key" => "custom_key", "name" => "Custom", "visible" => true }
         ] }
         expect(config).to be_valid
-        expect(config.columns.first["name"]).to eq("Status")
+        expect(config.columns.first["name"]).to eq("Custom")
+      end
+
+      it "normalizes product standard keys to their fixed labels" do
+        config.metadata = { "columns" => [
+          { "key" => "brand", "visible" => true },
+          { "key" => "price_cents", "visible" => true },
+          { "key" => "cost_cents", "visible" => true },
+          { "key" => "stock_quantity", "visible" => true },
+          { "key" => "unit_of_measure", "visible" => true },
+          { "key" => "workflow_status", "visible" => true }
+        ] }
+
+        expect(config).to be_valid
+        expect(config.columns.map { |column| column["name"] }).to eq(
+          [ "Brand", "Price", "Cost", "Stock on hand", "Unit", "Status" ]
+        )
       end
     end
 
@@ -182,6 +211,15 @@ RSpec.describe TableConfig, type: :model do
     it "rejects range filter on a non-numeric standard column" do
       expect(with_column({ "key" => "workflow_status", "name" => "Status", "visible" => true,
                            "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 5 ] ] } })).not_to be_valid
+    end
+
+    it "rejects filters on display-only product standard columns" do
+      %w[price_cents cost_cents stock_quantity].each do |key|
+        col = { "key" => key, "name" => key.humanize, "visible" => true,
+                "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ] } }
+        expect(with_column(col)).not_to be_valid
+        expect(config.errors[:metadata].join).to match(/filter is not supported for standard column '#{key}'/)
+      end
     end
 
     it "rejects range with an empty or malformed buckets array" do

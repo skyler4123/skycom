@@ -17,7 +17,13 @@ export const STANDARD_COLUMN_NAMES = {
   code: "Code",
   title: "Title",
   quantity: "Quantity",
-  pending: "Pending"
+  pending: "Pending",
+  workflow_status: "Status",
+  brand: "Brand",
+  price_cents: "Price",
+  cost_cents: "Cost",
+  stock_quantity: "Stock on hand",
+  unit_of_measure: "Unit"
 }
 
 export const STANDARD_COLUMN_TYPES = {
@@ -26,10 +32,28 @@ export const STANDARD_COLUMN_TYPES = {
   code: "string",
   title: "string",
   quantity: "integer",
-  pending: "integer"
+  pending: "integer",
+  workflow_status: "string",
+  brand: "string",
+  price_cents: "integer",
+  cost_cents: "integer",
+  stock_quantity: "integer",
+  unit_of_measure: "string"
 }
 
+// Mirrors TableConfig::PRODUCT_STANDARD_KEYS. Offered only for product configs.
+export const PRODUCT_STANDARD_KEYS = [ "brand", "price_cents", "cost_cents", "stock_quantity", "unit_of_measure" ]
+
+// Mirrors TableConfig::FILTERABLE_STANDARD_KEYS — the only standard keys with a Meilisearch filter.
+const FILTERABLE_STANDARD_KEYS = [ "quantity", "pending" ]
+
 const SEARCHABLE_STANDARD_KEYS = [ "name", "description", "code", "title" ]
+
+/** Standard keys the Table Config editor may offer for one resource. */
+export const standardColumnKeysFor = (resourceName) => {
+  const productOnly = resourceName === "products" ? [] : PRODUCT_STANDARD_KEYS
+  return Object.keys(STANDARD_COLUMN_NAMES).filter((key) => !productOnly.includes(key))
+}
 
 const FILTER_LABELS = {
   range: "Range",
@@ -119,6 +143,9 @@ export const filterTypeOptions = (key, propertyEntries = [], extraColumns = []) 
   // Extra columns are presentation-only today: the backend filter validator
   // does not resolve their type, so they must stay non-filterable.
   if (columnSource(key) === "extra") return []
+
+  // Standard columns are filterable only when the Meilisearch index exposes them.
+  if (columnSource(key) === "standard" && !FILTERABLE_STANDARD_KEYS.includes(String(key))) return []
 
   const type = columnType(key, propertyEntries, extraColumns)
   const options = []

@@ -5,11 +5,17 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
   let(:company) { branch.company }
   let(:owner) { company.user }
 
+  let(:brand) { create(:brand, company: company, name: "Acme Goods") }
+
   let!(:product) do
     create(:product,
       company: company,
       name: "Base Physical Product #{SecureRandom.hex(4)}",
-      business_type: "physical"
+      business_type: "physical",
+      brand: brand,
+      price_cents: 1234,
+      cost_cents: 500,
+      unit_of_measure: "pcs"
     )
   end
 
@@ -36,6 +42,11 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       metadata: { "columns" => [
         { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
         { "key" => "code", "name" => "Code", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "brand", "name" => "Brand", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "price_cents", "name" => "Price", "visible" => true, "align" => "right", "width" => nil },
+        { "key" => "cost_cents", "name" => "Cost", "visible" => true, "align" => "right", "width" => nil },
+        { "key" => "stock_quantity", "name" => "Stock on hand", "visible" => true, "align" => "right", "width" => nil },
+        { "key" => "unit_of_measure", "name" => "Unit", "visible" => true, "align" => "center", "width" => nil },
         { "key" => "business_type", "name" => "Type", "visible" => true, "align" => "center", "width" => nil },
         { "key" => "workflow_status", "name" => "Status", "visible" => true, "align" => "center", "width" => nil }
       ] }
@@ -80,6 +91,49 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
     expect(page).to have_selector('tbody tr')
     expect(page).to have_content(product.name)
+  end
+
+  scenario "index page shows the richer product columns with real values" do
+    warehouse = create(:warehouse, company: company)
+    Stock.create!(company: company, warehouse: warehouse, product: product,
+      quantity: 7, pending: 0, name: "PRD Stock A", code: "STK-RICH-A-#{SecureRandom.hex(2).upcase}")
+    Stock.create!(company: company, warehouse: create(:warehouse, company: company), product: product,
+      quantity: 5, pending: 2, name: "PRD Stock B", code: "STK-RICH-B-#{SecureRandom.hex(2).upcase}")
+
+    visit company_products_path(company, category_id: default_category.id)
+    expect(page).to have_selector('table', wait: 10)
+
+    %w[Brand Price Cost Stock\ on\ hand Unit Status].each do |header|
+      expect(page).to have_selector('th', text: header)
+    end
+
+    row = find('tbody tr', text: product.name)
+    expect(row).to have_content(brand.name)
+    expect(row).to have_content("$12.34")
+    expect(row).to have_content("$5.00")
+    expect(row).to have_content("12")
+    expect(row).to have_content("pcs")
+  end
+
+  scenario "falls back to the rich product columns when no table config exists" do
+    category = Seed::CategoryService.create(
+      company: company, name: "Fallback Category", resource_name: "products"
+    )
+    category.default_property_mapping.table_configs.destroy_all
+    product.update!(category: category, property_mapping: category.default_property_mapping)
+
+    visit company_products_path(company, category_id: category.id)
+    expect(page).to have_selector('table', wait: 10)
+
+    %w[Category Brand Price Cost Stock\ on\ hand Unit Status].each do |header|
+      expect(page).to have_selector('th', text: header)
+    end
+
+    row = find('tbody tr', text: product.name)
+    expect(row).to have_content(brand.name)
+    expect(row).to have_content("$12.34")
+    expect(row).to have_content("$5.00")
+    expect(row).to have_content("pcs")
   end
 
   scenario "edit button links to show page for product" do

@@ -81,7 +81,8 @@ The `name` value from `TableConfig.columns_metadata[].name` is used directly as 
 
 | Column Type | Source |
 |-------------|--------|
-| Standard (`name`, `description`, `code`, `title`, `quantity`, `pending`) | Fixed label from `TableConfig::STANDARD_COLUMN_NAMES` (`Name`, `Description`, `Code`, `Title`, `Quantity`, `Pending`) |
+| Standard (`name`, `description`, `code`, `title`, `quantity`, `pending`, `workflow_status`) | Fixed label from `TableConfig::STANDARD_COLUMN_NAMES` (`Name`, `Description`, `Code`, `Title`, `Quantity`, `Pending`, `Status`) |
+| Product standard (`brand`, `price_cents`, `cost_cents`, `stock_quantity`, `unit_of_measure`) | Fixed labels (`Brand`, `Price`, `Cost`, `Stock on hand`, `Unit`); offered only for `resource_name = "products"` |
 | `property_*` (dynamic) | `PropertyMapping.metadata.properties[].name` |
 | `extra_*` | `PropertyMapping.metadata.extra_columns[].name` |
 | Unknown key | Stored `columns_metadata[].name` (kept as submitted) |
@@ -106,6 +107,37 @@ Existing configs that still carry custom standard labels are normalized on their
 `240px` and long values are truncated with an ellipsis plus a hover tooltip.
 `align` and `width` are no longer configurable — they were removed from
 `TableConfig` and the editor.
+
+### 2.3.1 Product standard columns
+
+The Products index ships with a richer default grid:
+
+| Key | Label | Index payload |
+|-----|-------|---------------|
+| `brand` | Brand | `brand: { id, name }` |
+| `price_cents` | Price | `price_cents` + product `currency` |
+| `cost_cents` | Cost | `cost_cents` + product `currency` |
+| `stock_quantity` | Stock on hand | `SUM(stocks.quantity)`, branch-scoped |
+| `unit_of_measure` | Unit | `unit_of_measure` |
+
+- **Product-only:** `TableConfig::PRODUCT_STANDARD_KEYS` gates these keys.
+  `TableConfig.standard_column_keys_for(resource_name)` and the FE
+  `standardColumnKeysFor(resourceName)` helper offer them only while
+  `resource_name == "products"`.
+- **Stock on hand:** physical units across warehouses
+  (`quantity`), not available; pending holds are not subtracted. When the
+  index request carries `branch_id`, only stock rows in that branch count.
+  A product with no stock rows returns `stock_quantity: null` and renders `—`.
+- **Money:** the FE formats `price_cents` / `cost_cents` through
+  `Helpers.formatMoney(value, record.currency)`.
+- **Display-only:** the five product keys are not in the Meilisearch index, so
+  they can carry neither keyword search nor filters.
+  `TableConfig::FILTERABLE_STANDARD_KEYS` (only `quantity`, `pending`) and the
+  FE `filterTypeOptions` guard enforce this.
+- **Existing configs:** `Seed::ProductTableConfigService.ensure_columns!`
+  inserts only the missing columns after `code`, preserving order and
+  `visible: false`. New companies get them from
+  `Seed::TableConfigService::PRODUCT_GRID_COLUMNS`.
 
 ### 2.4 Page-Navigation Category Switch
 
@@ -201,6 +233,8 @@ See `docs/MEILISEARCH.md` §4 and `docs/superpowers/specs/2026-09-06-dynamic-sea
 (`search: true` for string-capable columns; active `range`/`boolean`/`date` filters for
 integer/decimal/boolean/datetime) — so every new company starts fully searchable/filterable and
 owners dial it back per column. Enum filters stay off (no seeded `input_type=select` properties yet).
+The product standard columns (§2.3.1) intentionally get neither search nor filters because they
+are not in the Meilisearch index.
 
 **Numeric standard columns (`quantity`, `pending`):** beyond `property_*` slots, the plain metric
 columns in `TableConfig::NUMERIC_STANDARD_KEYS` are range-filterable too. `field_hash` seeds them
@@ -467,8 +501,10 @@ after_commit auto-sync) and `Model.ms_clear_index!` before/after — see `docs/M
 | `app/javascript/controllers/companies/products/new_controller.js` | Dynamic form fields (new page) |
 | `app/javascript/controllers/companies/products/edit_controller.js` | Dynamic form fields (edit page) |
 | `app/javascript/controllers/companies/products/show_controller.js` | Read-only dynamic property display |
- | `app/controllers/companies/products_controller.rb` | JSON API with all `property_*` columns |
+ | `app/controllers/companies/products_controller.rb` | JSON API with all `property_*` columns + product standard fields and `stock_quantity` |
  | `app/services/products/search_query_service.rb` | TableConfig → Meilisearch search/filter query translation |
+ | `app/services/seed/product_table_config_service.rb` | Idempotent backfill of product standard columns into existing configs |
+ | `spec/services/seed/product_table_config_service_spec.rb` | Backfill order, idempotency, hidden-column preservation, scope |
  | `app/services/{branches,brands,departments,employees,facilities,invoices,orders,services,warehouses}/search_query_service.rb` | One 3-line subclass per wired index page |
  | `app/javascript/controllers/companies/table_configs/edit_controller.js` | Column editor incl. Search/Filter settings |
  | `spec/features/companies/products/search_filter_spec.rb` | Dynamic search + filter dropdowns E2E |

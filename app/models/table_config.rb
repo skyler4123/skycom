@@ -22,6 +22,10 @@ class TableConfig < ApplicationRecord
   # Must mirror an `ms_extra_filterable_columns` declaration on the indexed model
   # to actually filter (docs/MEILISEARCH.md §2).
   NUMERIC_STANDARD_KEYS = %w[quantity pending].freeze
+  # Standard columns that only make sense for one resource. The Table Config
+  # editor offers these only while editing that resource's config.
+  PRODUCT_STANDARD_KEYS = %w[brand price_cents cost_cents stock_quantity unit_of_measure].freeze
+  RESOURCE_STANDARD_COLUMN_KEYS = { "products" => PRODUCT_STANDARD_KEYS }.freeze
   # Valid strategy types for a column's "filter" setting.
   FILTER_TYPES = %w[range enum boolean date].freeze
   # Allowed keys inside a column "filter" hash (strict shape).
@@ -34,8 +38,18 @@ class TableConfig < ApplicationRecord
     "code" => "Code",
     "title" => "Title",
     "quantity" => "Quantity",
-    "pending" => "Pending"
+    "pending" => "Pending",
+    "workflow_status" => "Status",
+    "brand" => "Brand",
+    "price_cents" => "Price",
+    "cost_cents" => "Cost",
+    "stock_quantity" => "Stock on hand",
+    "unit_of_measure" => "Unit"
   }.freeze
+  # Standard columns that may carry a filter. Mirrors the Meilisearch index:
+  # property_* columns and the numeric stock metrics only.
+  FILTERABLE_STANDARD_KEYS = NUMERIC_STANDARD_KEYS
+
   store_accessor :metadata, :columns
   attribute :permission_resource_name, :string, default: -> { self.name }
 
@@ -86,6 +100,17 @@ class TableConfig < ApplicationRecord
   validate :columns_metadata_must_conform_to_schema
   before_validation :normalize_column_names
   after_initialize :set_default_columns, if: :new_record?
+
+  # Canonical label for a standard key, or nil for property/extra/unknown keys.
+  def self.standard_column_name(key)
+    STANDARD_COLUMN_NAMES[key.to_s]
+  end
+
+  # Standard keys offered by the Table Config editor for one resource.
+  def self.standard_column_keys_for(resource_name)
+    resource_keys = RESOURCE_STANDARD_COLUMN_KEYS.fetch(resource_name.to_s, [])
+    STANDARD_COLUMN_NAMES.keys - PRODUCT_STANDARD_KEYS + resource_keys
+  end
 
   private
 
@@ -197,6 +222,11 @@ class TableConfig < ApplicationRecord
       return
     end
 
+    unless key.start_with?("property_") || FILTERABLE_STANDARD_KEYS.include?(key)
+      errors.add(:metadata, "columns element #{idx}: filter is not supported for standard column '#{key}'")
+      return
+    end
+
     unless filter.key?("active") && [ true, false ].include?(filter["active"])
       errors.add(:metadata, "columns element #{idx}: filter requires \"active\" true or false")
     end
@@ -258,6 +288,8 @@ class TableConfig < ApplicationRecord
     when /\Aproperty_datetime_/    then "datetime"
     when *SEARCHABLE_STANDARD_KEYS then "string"
     when *NUMERIC_STANDARD_KEYS    then "integer"
+    when "workflow_status", "brand", "unit_of_measure" then "string"
+    when "price_cents", "cost_cents", "stock_quantity"  then "integer"
     end
   end
 end
