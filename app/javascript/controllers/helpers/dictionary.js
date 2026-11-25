@@ -76,6 +76,7 @@ export const dictionary = () => {
     "No tax codes yet. Add your first rate, then choose it here as the default.": { vi: "Chưa có mã thuế. Thêm mức thuế đầu tiên rồi chọn làm mặc định tại đây." },
     "Manage tax codes": { vi: "Quản lý mã thuế" },
     "included": { vi: "đã gồm" },
+    "Included": { vi: "Đã gồm" },
     "Date Basis": { vi: "Cơ sở ngày" },
     "Created At": { vi: "Ngày tạo" },
     "Updated At": { vi: "Ngày cập nhật" },

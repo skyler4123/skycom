@@ -58,10 +58,11 @@ class Companies::OrdersController < Companies::ApplicationController
 
     subtotal_cents = money_to_cents(order.line_total, order.currency)
     discount_cents = used_discounts.sum(:amount_cents)
-    tax_cents = invoice ? invoice.tax_cents.to_i : order_tax_cents(order, subtotal_cents, discount_cents)
+    tax_lines = invoice&.tax_breakdown.presence || order_tax_lines(order, discount_cents)
+    tax_cents = invoice ? invoice.tax_cents.to_i : OrderProcessingV1::OrderTotalsService.call(
+      order: order, discount_cents: discount_cents
+    ).tax_cents
     total_cents = invoice_total_cents(invoice, subtotal_cents, discount_cents, tax_cents)
-    tax_rate_bp = invoice&.pos_tax_rate_bp || order.pos_tax_rate_bp
-    tax_name = invoice&.pos_tax_name.presence || order.pos_tax_name.presence
 
     render json: {
       receipt: {
@@ -76,8 +77,7 @@ class Companies::OrdersController < Companies::ApplicationController
         discount_cents: discount_cents,
         discount_code: used_discounts.order(:created_at).last&.code,
         tax_cents: tax_cents,
-        tax_rate_bp: tax_rate_bp,
-        tax_name: tax_name,
+        tax_lines: tax_lines,
         total_cents: total_cents,
         payment_method_name: transaction&.payment_method&.name,
         cash_received_cents: transaction&.cash_received_cents,
@@ -176,14 +176,25 @@ class Companies::OrdersController < Companies::ApplicationController
 
   def receipt_items(order)
     order.line_items.map do |oa|
+      tax = oa.respond_to?(:tax_cents) ? oa : nil
       {
         name: oa.name.presence || line_item_name(oa) || "Item",
         quantity: oa.quantity,
         unit_price_cents: money_to_cents(oa.unit_price, order.currency),
         total_cents: money_to_cents(oa.total_price, order.currency),
+        tax_cents: tax ? tax.tax_cents.to_i : 0,
+        tax_name: tax&.tax_name,
+        tax_rate_bp: tax ? tax.tax_rate_bp.to_i : 0,
+        tax_inclusive: tax ? tax.tax_inclusive? : false,
         kind: line_item_kind(oa)
       }
     end
+  end
+
+  def order_tax_lines(order, discount_cents)
+    OrderProcessingV1::OrderTotalsService.call(
+      order: order, discount_cents: discount_cents
+    ).tax_lines
   end
 
   def line_item_kind(line_item)
@@ -201,14 +212,6 @@ class Companies::OrdersController < Companies::ApplicationController
     return 0 if value.nil?
 
     Money.from_amount(value, currency).cents
-  end
-
-  def order_tax_cents(order, subtotal_cents, discount_cents)
-    rate_bp = order.pos_tax_rate_bp.to_i
-    return 0 if rate_bp.zero?
-
-    taxable = [ subtotal_cents - discount_cents, 0 ].max
-    (taxable * rate_bp / 10_000.0).round
   end
 
   def invoice_total_cents(invoice, subtotal_cents, discount_cents, tax_cents)

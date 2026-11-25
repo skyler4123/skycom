@@ -67,6 +67,12 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     find('[data-action*="addToCart"]', text: product.name, wait: 10).click
   end
 
+  def assign_tax(record, rate_bp: 800, name: "Sales tax", inclusive: false)
+    code = create(:tax_code, company: company, name: name, rate_bp: rate_bp, is_inclusive: inclusive)
+    record.update!(tax_code: code)
+    code
+  end
+
   scenario "operation screen loads and displays products gallery" do
     visit pos_path
 
@@ -369,7 +375,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   scenario "shows the configured tax on the till, invoice, and receipt" do
     company.update!(currency: :usd)
     product_a.update!(price_cents: 5_000)
-    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+    assign_tax(product_a)
 
     visit pos_path
     add_to_cart(product_a)
@@ -392,10 +398,59 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(Transaction.order(:created_at).last.price_cents).to eq(5_400)
   end
 
-  scenario "hides the tax row when the configured rate is zero" do
+  scenario "shows mixed tax-added and tax-included groups on the cart and receipt" do
     company.update!(currency: :usd)
     product_a.update!(price_cents: 5_000)
-    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 0, pos_tax_name: "Sales tax")
+    assign_tax(product_a, name: "VAT added", rate_bp: 1_000, inclusive: false)
+
+    service = Seed::ServiceService.create(company: company, branch: branch, name: "Included Service")
+    service.update!(price_cents: 11_000)
+    assign_tax(service, name: "VAT included", rate_bp: 1_000, inclusive: true)
+
+    visit pos_path
+    add_to_cart(product_a)
+    find('[data-action*="addToCart"]', text: "Included Service", wait: 10).click
+
+    expect(page).to have_content("VAT added (10%)", wait: 10)
+    expect(page).to have_content("VAT included (10%) · Included", wait: 10)
+    expect(page).to have_content("$165.00", wait: 10)
+
+    click_button "ORDER"
+    click_button "COMPLETE PAYMENT"
+
+    expect(page).to have_content(/receipt/i, wait: 10)
+    expect(page).to have_content("VAT added (10%)")
+    expect(page).to have_content("VAT included (10%) · Included")
+
+    invoice = Invoice.order(:created_at).last
+    expect(invoice.tax_cents).to eq(1_500)
+    expect(invoice.total_cents).to eq(16_500)
+    expect(invoice.tax_breakdown.map { |row| row["name"] }).to contain_exactly("VAT added", "VAT included")
+    expect(invoice.tax_breakdown.map { |row| row["tax_cents"] }).to contain_exactly(500, 1_000)
+  end
+
+  scenario "uses the company default tax when the product has no code" do
+    company.update!(currency: :usd)
+    product_a.update!(price_cents: 5_000, tax_code: nil)
+    code = create(:tax_code, company: company, name: "Default VAT", rate_bp: 500)
+    TaxConfig.for_company!(company).update!(default_tax_code_id: code.id)
+
+    visit pos_path
+    add_to_cart(product_a)
+
+    expect(page).to have_content("Default VAT (5%)", wait: 10)
+    expect(page).to have_content("$52.50", wait: 10)
+
+    click_button "ORDER"
+    click_button "COMPLETE PAYMENT"
+
+    expect(page).to have_content(/receipt/i, wait: 10)
+    expect(Invoice.order(:created_at).last.tax_cents).to eq(250)
+  end
+
+  scenario "hides the tax row when the configured rate is zero" do
+    company.update!(currency: :usd)
+    product_a.update!(price_cents: 5_000, tax_code: nil)
 
     visit pos_path
     add_to_cart(product_a)
@@ -412,8 +467,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
 
   scenario "uses the company currency instead of a hardcoded dollar sign" do
     company.update!(country: :vn, currency: :vnd)
-    product_a.update!(price_cents: 50_000)
-    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 0)
+    product_a.update!(price_cents: 50_000, tax_code: nil)
 
     visit pos_path
     add_to_cart(product_a)
@@ -522,7 +576,6 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
 
   scenario "sells a service at its configured price" do
     company.update!(currency: :usd)
-    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 0)
     service = Seed::ServiceService.create(company: company, branch: branch, name: "Assembly")
     service.update!(price_cents: 2_500)
 
@@ -545,7 +598,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   scenario "applies and removes a discount code" do
     company.update!(currency: :usd)
     product_a.update!(price_cents: 5_000)
-    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+    assign_tax(product_a)
     group = Seed::DiscountGroupService.create(company: company, name: "POS Discounts", prefix: "POS",
       discount_type: :percentage, percentage: 10, campaign_status: :active)
     discount = Seed::DiscountService.create(company: company, discount_group: group, code: "POS-DISC")
@@ -574,7 +627,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   scenario "a bad discount code leaves the total unchanged" do
     company.update!(currency: :usd)
     product_a.update!(price_cents: 5_000)
-    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+    assign_tax(product_a)
 
     visit pos_path
     add_to_cart(product_a)
@@ -696,7 +749,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
   scenario "prints only the receipt slip" do
     company.update!(currency: :usd)
     product_a.update!(price_cents: 5_000)
-    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+    assign_tax(product_a)
 
     visit pos_path
     add_to_cart(product_a)

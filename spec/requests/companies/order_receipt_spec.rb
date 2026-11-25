@@ -23,7 +23,10 @@ RSpec.describe "Companies::OrdersController#receipt", type: :request do
       price_cents: 10_800, tax_cents: 800, total_cents: 10_800,
       currency: order.currency, business_type: :sales,
       workflow_status: :paid, payment_status: :paid,
-      pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+      metadata: { "tax_breakdown" => [
+        { "name" => "Sales tax", "rate_bp" => 800, "inclusive" => false,
+          "taxable_cents" => 10_000, "tax_cents" => 800 }
+      ] })
   end
   let!(:txn) do
     cash_pm = PaymentMethod.create!(name: "Cash Rcpt", code: "RCPT_CASH", business_type: :b2c,
@@ -51,13 +54,17 @@ RSpec.describe "Companies::OrdersController#receipt", type: :request do
       expect(receipt["currency"]).to eq("usd")
       expect(receipt["items"]).to eq([
         { "name" => "Receipt Widget", "quantity" => 2, "unit_price_cents" => 5_000,
-          "total_cents" => 10_000, "kind" => "product" }
+          "total_cents" => 10_000, "tax_cents" => 0, "tax_name" => nil,
+          "tax_rate_bp" => 0, "tax_inclusive" => false, "kind" => "product" }
       ])
       expect(receipt["subtotal_cents"]).to eq(10_000)
       expect(receipt["discount_cents"]).to eq(0)
       expect(receipt["tax_cents"]).to eq(800)
-      expect(receipt["tax_rate_bp"]).to eq(800)
-      expect(receipt["tax_name"]).to eq("Sales tax")
+      expect(receipt["tax_lines"]).to contain_exactly(
+        include("name" => "Sales tax", "rate_bp" => 800, "inclusive" => false, "tax_cents" => 800)
+      )
+      expect(receipt).not_to have_key("tax_rate_bp")
+      expect(receipt).not_to have_key("tax_name")
       expect(receipt["total_cents"]).to eq(10_800)
       expect(receipt["payment_method_name"]).to eq("Cash Rcpt")
       expect(receipt["cash_received_cents"]).to eq(12_000)
@@ -74,7 +81,7 @@ RSpec.describe "Companies::OrdersController#receipt", type: :request do
     receipt = JSON.parse(response.body)["receipt"]
     expect(receipt["subtotal_cents"]).to eq(10_000)
     expect(receipt["tax_cents"]).to eq(0)
-    expect(receipt["tax_rate_bp"]).to be_nil
+    expect(receipt["tax_lines"]).to eq([])
     expect(receipt["total_cents"]).to eq(10_000)
     expect(receipt["cash_received_cents"]).to be_nil
     expect(receipt["change_cents"]).to be_nil
@@ -83,7 +90,7 @@ RSpec.describe "Companies::OrdersController#receipt", type: :request do
   it "falls back to item sums when no invoice exists yet" do
     invoice.destroy
     txn.destroy
-    order.update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+    item.update!(tax_name: "Sales tax", tax_rate_bp: 800, tax_inclusive: false)
 
     get "/companies/#{company.id}/orders/#{order.id}/receipt", as: :json
 
