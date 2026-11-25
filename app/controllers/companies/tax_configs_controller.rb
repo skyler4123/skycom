@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Companies::TaxConfigsController — company-level tax rebuild configuration.
-# Serves Stimulus: Companies_TaxConfigs_ShowController (if used) and Tax page settings.
+# Companies::TaxConfigsController — company-level tax reporting configuration.
+# Serves Stimulus: Companies_TaxConfigs_ShowController and Tax page settings.
 # Endpoints: GET/PATCH /companies/:company_id/tax_config(.json)
 class Companies::TaxConfigsController < Companies::ApplicationController
   def show
@@ -15,13 +15,11 @@ class Companies::TaxConfigsController < Companies::ApplicationController
 
   def update
     config = TaxConfig.for_company!(current_company)
-    attributes = normalized_tax_config_params
-    return render_tax_rate_error unless attributes
 
-    if config.update(attributes)
+    if config.update(tax_config_params)
       respond_to do |format|
         format.html { redirect_to company_tax_config_path(current_company), notice: "Tax config updated" }
-        format.json { render json: { tax_config: format_config(config) } }
+        format.json { render json: { tax_config: format_config(config.reload) } }
       end
     else
       respond_to do |format|
@@ -34,44 +32,21 @@ class Companies::TaxConfigsController < Companies::ApplicationController
   private
 
   def tax_config_params
-    params.require(:tax_config).permit(
+    attributes = params.require(:tax_config).permit(
       :date_basis,
       :include_invoices,
       :include_purchases,
       :include_stock_exports,
-      :pos_tax_rate_percent,
-      :pos_tax_name,
+      :default_tax_code_id,
       excluded_invoice_statuses: [],
       excluded_purchase_statuses: [],
       stock_export_business_types: [],
       branch_ids: []
     )
-  end
-
-  # The UI talks in percent because that is what a manager reads; the model
-  # stores basis points so money never touches a float.
-  def normalized_tax_config_params
-    attributes = tax_config_params.to_h
-    return attributes unless attributes.key?("pos_tax_rate_percent")
-
-    raw = attributes.delete("pos_tax_rate_percent").to_s.strip
-    return attributes.merge("pos_tax_rate_bp" => 0) if raw.blank?
-    return nil unless raw.match?(/\A\d+(\.\d+)?\z/)
-
-    percent = BigDecimal(raw)
-    return nil if percent.negative? || percent > 100
-
-    attributes.merge("pos_tax_rate_bp" => (percent * 100).round)
-  end
-
-  def render_tax_rate_error
-    respond_to do |format|
-      format.html { redirect_to company_tax_config_path(current_company), alert: "Tax rate must be a number between 0 and 100" }
-      format.json do
-        render json: { errors: [ "Tax rate must be a number between 0 and 100" ] },
-          status: :unprocessable_content
-      end
+    if attributes.key?(:default_tax_code_id) && attributes[:default_tax_code_id].blank?
+      attributes[:default_tax_code_id] = nil
     end
+    attributes
   end
 
   def format_config(config)
@@ -85,9 +60,8 @@ class Companies::TaxConfigsController < Companies::ApplicationController
       excluded_purchase_statuses: config.excluded_purchase_statuses,
       stock_export_business_types: config.stock_export_business_types,
       branch_ids: config.branch_ids,
-      pos_tax_rate_bp: config.pos_tax_rate_bp.to_i,
-      pos_tax_rate_percent: config.pos_tax_rate_percent,
-      pos_tax_name: config.pos_tax_name.presence || "Tax"
+      default_tax_code_id: config.default_tax_code_id.presence,
+      default_tax_code: config.default_tax_code&.option_payload
     }
   end
 end

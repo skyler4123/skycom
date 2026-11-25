@@ -6,6 +6,7 @@ RSpec.describe Product, type: :model do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
     it { should belong_to(:brand).optional }
+    it { should belong_to(:tax_code).optional }
     it { should have_many(:order_product_appointments).dependent(:destroy) }
     it { should have_many(:orders).through(:order_product_appointments) }
     it { should have_many(:product_product_group_appointments).dependent(:destroy) }
@@ -17,6 +18,14 @@ RSpec.describe Product, type: :model do
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:business_type) }
     it { should validate_length_of(:name).is_at_most(255) }
+
+    it "rejects a tax code from another company" do
+      other = create(:tax_code)
+      product = build(:product, company: create(:company), tax_code: other)
+
+      expect(product).not_to be_valid
+      expect(product.errors[:tax_code]).to be_present
+    end
   end
 
   describe "enums" do

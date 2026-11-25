@@ -12,7 +12,7 @@ class Companies::ServicesController < Companies::ApplicationController
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        scope = current_company.services
+        scope = current_company.services.includes(:category, :tax_code)
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
         scope = scope.where(branch_id: params[:branch_id]) if params[:branch_id].present?
 
@@ -34,14 +34,25 @@ class Companies::ServicesController < Companies::ApplicationController
 
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { service: format_service(service) } }
+      format.json do
+        render json: {
+          service: format_service(service),
+          effective_tax_code: TaxCodes::Resolver.call(record: service)&.option_payload,
+          uses_default_tax: service.tax_code.nil? || service.tax_code.discarded?
+        }
+      end
     end
   end
 
   def new
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: {} }
+      format.json do
+        render json: {
+          tax_codes: tax_code_options,
+          default_tax_code: TaxConfig.for_company!(current_company).default_tax_code&.option_payload
+        }
+      end
     end
   end
 
@@ -50,7 +61,15 @@ class Companies::ServicesController < Companies::ApplicationController
 
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { service: format_service(service) } }
+      format.json do
+        render json: {
+          service: format_service(service),
+          tax_codes: tax_code_options,
+          default_tax_code: TaxConfig.for_company!(current_company).default_tax_code&.option_payload,
+          effective_tax_code: TaxCodes::Resolver.call(record: service)&.option_payload,
+          uses_default_tax: service.tax_code.nil? || service.tax_code.discarded?
+        }
+      end
     end
   end
 
@@ -106,13 +125,14 @@ class Companies::ServicesController < Companies::ApplicationController
       :business_type,
       :workflow_status,
       :category_id,
+      :tax_code_id,
       *property_keys
     )
   end
 
   def format_service(service)
     service.as_json(only: [
-      :id, :name, :description, :code, :category_id,
+      :id, :name, :description, :code, :category_id, :tax_code_id,
       :business_type, :lifecycle_status, :workflow_status,
       :created_at, :updated_at,
       :property_string_1, :property_string_2, :property_string_3, :property_string_4, :property_string_5,
@@ -122,8 +142,13 @@ class Companies::ServicesController < Companies::ApplicationController
       :property_boolean_1, :property_boolean_2, :property_boolean_3, :property_boolean_4, :property_boolean_5,
       :property_datetime_1, :property_datetime_2, :property_datetime_3, :property_datetime_4, :property_datetime_5
     ]).merge(
-      category: service.category&.as_json(only: [ :id, :name ])
+      category: service.category&.as_json(only: [ :id, :name ]),
+      tax_code: service.tax_code&.option_payload
     )
+  end
+
+  def tax_code_options
+    current_company.tax_codes.kept.ordered.map(&:option_payload)
   end
 
   def format_services(services)

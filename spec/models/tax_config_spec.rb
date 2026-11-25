@@ -28,42 +28,43 @@ RSpec.describe TaxConfig, type: :model do
     expect(reloaded.metadata).to include("date_basis" => "updated_at")
   end
 
-  describe "POS tax" do
-    it "defaults to no tax" do
+  describe "default tax code" do
+    it "defaults to nil" do
       config = TaxConfig.for_company!(company)
 
-      expect(config.pos_tax_rate_bp).to eq(0)
-      expect(config.pos_tax_rate).to eq(0.0)
-      expect(config.pos_tax_rate_percent).to eq(0.0)
-      expect(config.pos_tax_name).to eq("Tax")
-      expect(config.pos_tax?).to be(false)
+      expect(config.default_tax_code_id).to be_nil
+      expect(config.default_tax_code).to be_nil
     end
 
-    it "stores basis points and exposes the rate" do
+    it "stores a company tax code" do
+      code = create(:tax_code, company: company)
       config = TaxConfig.for_company!(company)
-      config.update!(pos_tax_rate_bp: 825, pos_tax_name: "Sales tax")
+      config.update!(default_tax_code_id: code.id)
 
       reloaded = TaxConfig.find(config.id)
-      expect(reloaded.pos_tax_rate_bp).to eq(825)
-      expect(reloaded.pos_tax_rate).to eq(0.0825)
-      expect(reloaded.pos_tax_rate_percent).to eq(8.25)
-      expect(reloaded.pos_tax_name).to eq("Sales tax")
-      expect(reloaded.pos_tax?).to be(true)
+      expect(reloaded.default_tax_code_id).to eq(code.id)
+      expect(reloaded.default_tax_code).to eq(code)
     end
 
-    it "rejects a rate above 100%" do
+    it "rejects a tax code from another company" do
+      code = create(:tax_code)
       config = TaxConfig.for_company!(company)
-      config.pos_tax_rate_bp = 10_001
+
+      config.default_tax_code_id = code.id
 
       expect(config).not_to be_valid
-      expect(config.errors[:pos_tax_rate_bp]).to be_present
+      expect(config.errors[:default_tax_code]).to be_present
     end
 
-    it "rejects a negative rate" do
+    it "rejects a discarded tax code" do
+      code = create(:tax_code, company: company)
+      code.discard!
       config = TaxConfig.for_company!(company)
-      config.pos_tax_rate_bp = -1
+
+      config.default_tax_code_id = code.id
 
       expect(config).not_to be_valid
+      expect(config.errors[:default_tax_code]).to be_present
     end
   end
 end

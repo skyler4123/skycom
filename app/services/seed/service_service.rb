@@ -6,6 +6,7 @@ class Seed::ServiceService
     property_mapping: nil,
     name: nil,
     description: nil,
+    price: nil,
     lifecycle_status: nil,
     workflow_status: nil,
     business_type: nil,
@@ -19,6 +20,9 @@ class Seed::ServiceService
 
     name ||= "Service #{SecureRandom.hex(4)}"
     description ||= Faker::Lorem.sentence(word_count: 10)
+    price_cents = if price.present?
+      Money.from_amount(price, company.currency&.upcase || "USD").cents
+    end
 
     Service.new(
       company: company,
@@ -27,11 +31,23 @@ class Seed::ServiceService
       property_mapping: property_mapping,
       name: name,
       description: description,
+      price_cents: price_cents,
+      currency: company.currency,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type || Service.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  # Demo price in the company's currency. VND stays in whole dong; other
+  # currencies use whole units (Money converts to cents).
+  def self.demo_price(company)
+    if company.currency.to_s == "vnd"
+      rand(500_000..3_000_000).round(-4)
+    else
+      rand(50..300)
+    end
   end
 
   def self.create(...)

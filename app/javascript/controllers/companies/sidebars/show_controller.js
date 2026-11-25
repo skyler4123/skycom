@@ -1,12 +1,13 @@
 // Slack-style sidebar renderer: a Favourites section (star toggles) + collapsible
 // <details> groups. Static structure comes from controllers/companies/sidebar_items;
-// custom (dynamic sidebar) groups come from controllers/companies/sidebar_custom
-// (the active sidebar_groups CompanySetting in the client cache) and render ABOVE the static groups.
+// Quick Links (dynamic sidebar) groups come from controllers/companies/sidebar_quick_links
+// (the active sidebar_groups CompanySetting in the client cache) and are spread
+// into the sidebarGroups() list after Operations, before My Profile.
 // Per-employee favourites + open-group state live in controllers/companies/sidebar_storage.
 // FE-only — no server calls (docs/SIDEBAR.md).
 import { Controller } from "@hotwired/stimulus"
-import { SIDEBAR_ITEMS, SIDEBAR_GROUPS } from "controllers/companies/sidebar_items"
-import { customSidebarGroups, customSidebarItems } from "controllers/companies/sidebar_custom"
+import { SIDEBAR_ITEMS, sidebarGroups } from "controllers/companies/sidebar_items"
+import { quickLinksGroups, quickLinksItems } from "controllers/companies/sidebar_quick_links"
 import {
   favourites, isFavourite, toggleFavourite, isGroupOpen, setGroupOpen
 } from "controllers/companies/sidebar_storage"
@@ -25,8 +26,7 @@ export default class Companies_Sidebars_ShowController extends Controller {
   }
 
   groupConfig(groupKey) {
-    return SIDEBAR_GROUPS.find(g => g.key === groupKey)
-      || customSidebarGroups().find(g => g.key === groupKey)
+    return sidebarGroups(quickLinksGroups()).find(g => g.key === groupKey)
   }
 
   // Regular items are starable: not coming-soon and not in a locked (System) group.
@@ -63,9 +63,9 @@ export default class Companies_Sidebars_ShowController extends Controller {
       return
     }
 
-    const pool = [...SIDEBAR_ITEMS, ...customSidebarItems()]
+    const pool = [...SIDEBAR_ITEMS, ...quickLinksItems()]
     const matches = pool.filter((item) => {
-      const label = item.custom ? item.label : translate(item.label)
+      const label = item.quickLink ? item.label : translate(item.label)
       return (label || "").toLowerCase().startsWith(query)
     })
 
@@ -82,8 +82,8 @@ export default class Companies_Sidebars_ShowController extends Controller {
 
   searchResultHTML(item) {
     const cid = this.companyId()
-    const labelHTML = item.custom ? escapeHtml(item.label) : translate(item.label)
-    const href = item.custom ? escapeHtml(item.href(cid)) : item.href(cid)
+    const labelHTML = item.quickLink ? escapeHtml(item.label) : translate(item.label)
+    const href = item.quickLink ? escapeHtml(item.href(cid)) : item.href(cid)
     return `
       <a
         class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted"
@@ -117,14 +117,13 @@ export default class Companies_Sidebars_ShowController extends Controller {
     return `
       ${this.searchHTML()}
       ${this.favouritesHTML()}
-      ${customSidebarGroups().map(g => this.groupHTML(g)).join("\n")}
-      ${SIDEBAR_GROUPS.map(g => this.groupHTML(g)).join("\n")}
+      ${sidebarGroups(quickLinksGroups()).map(g => this.groupHTML(g)).join("\n")}
     `
   }
 
   findItem(key) {
     return SIDEBAR_ITEMS.find(i => i.key === key)
-      || customSidebarItems().find(i => i.key === key)
+      || quickLinksItems().find(i => i.key === key)
   }
 
   favouritesHTML() {
@@ -150,7 +149,7 @@ export default class Companies_Sidebars_ShowController extends Controller {
   }
 
   // Search box rendered ABOVE the Favourites section. FE-only: filters the
-  // sidebar item pool (static + custom) by a case-insensitive prefix and
+  // sidebar item pool (static + Quick Links) by a case-insensitive prefix and
   // renders the matches as clickable links.
   searchHTML() {
     return `
@@ -177,7 +176,7 @@ export default class Companies_Sidebars_ShowController extends Controller {
   groupHTML(groupConfig) {
     const items = [
       ...SIDEBAR_ITEMS.filter(i => i.group === groupConfig.key),
-      ...customSidebarItems().filter(i => i.group === groupConfig.key)
+      ...quickLinksItems().filter(i => i.group === groupConfig.key)
     ]
     const isOpen = isGroupOpen(this.companyId(), groupConfig.key, this.userId())
 
@@ -204,10 +203,10 @@ export default class Companies_Sidebars_ShowController extends Controller {
 
   itemHTML(item) {
     const cid = this.companyId()
-    // Custom (dynamic sidebar) labels + urls are user-controlled — escape them.
+    // Quick Links (dynamic sidebar) labels + urls are user-controlled — escape them.
     // Static labels go through translate() (trusted dictionary strings).
-    const labelHTML = item.custom ? escapeHtml(item.label) : translate(item.label)
-    const href = item.custom ? escapeHtml(item.href(cid)) : item.href(cid)
+    const labelHTML = item.quickLink ? escapeHtml(item.label) : translate(item.label)
+    const href = item.quickLink ? escapeHtml(item.href(cid)) : item.href(cid)
     if (item.comingSoon) {
       return `
         <span class="flex items-center gap-3 px-3 py-2 rounded-lg cursor-not-allowed"

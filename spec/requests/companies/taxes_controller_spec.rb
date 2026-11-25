@@ -258,6 +258,21 @@ RSpec.describe "Companies::TaxesController", type: :request do
       expect(summary.dig("stock_exports", "count")).to eq(1)
     end
 
+    it "returns tax collected by code from invoice snapshots" do
+      invoice = create_invoice(created_at: at("2026-01-15 12:00"))
+      invoice.update_columns(metadata: { "tax_breakdown" => [
+        { "name" => "VAT", "rate_bp" => 1_000, "inclusive" => false,
+          "taxable_cents" => 10_000, "tax_cents" => 1_000 }
+      ] })
+
+      fetch_summary
+
+      expect(response.parsed_body["tax_breakdown"]).to contain_exactly(
+        include("name" => "VAT", "rate_bp" => 1_000, "inclusive" => false,
+          "taxable_cents" => 10_000, "tax_cents" => 1_000)
+      )
+    end
+
     it "returns zero totals when every source is disabled" do
       config.update!(include_invoices: false, include_purchases: false, include_stock_exports: false)
       create_invoice(created_at: at("2026-01-15 12:00"))

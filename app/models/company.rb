@@ -385,6 +385,7 @@ class Company < ApplicationRecord
         Seed::HotelInitService.call(company: self)
       end
 
+      Seed::TaxService.ensure_neutral_code!(company: self)
       Seed::OperationService.seed_defaults!(company: self)
       setup_payment_method_appointments
       create_default_dashboard

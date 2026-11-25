@@ -104,6 +104,7 @@ class Seed::RetailEnrichService
     create_attendance_event_data
     create_attendance_request_samples
     seed_credit_data
+    seed_tax_data
 
     print_footer
     true
@@ -120,6 +121,10 @@ class Seed::RetailEnrichService
     puts "\n========================================================="
     puts "🛍️  Retail Company Group Seeding Complete!"
     puts "========================================================="
+  end
+
+  def seed_tax_data
+    Seed::TaxService.enrich!(company: @retail)
   end
 
   def create_retail_company
@@ -264,7 +269,6 @@ class Seed::RetailEnrichService
   end
 
   def seed_compensation
-    puts "Assigning compensation and reporting lines..."
     Seed::CompensationService.assign!(company: @retail)
     refresh_owner
   end
@@ -397,6 +401,7 @@ class Seed::RetailEnrichService
           branch: branch,
           category: round_robin(service_categories, @service_counter - 1),
           name: "Service #{@service_counter}",
+          price: Seed::ServiceService.demo_price(@retail),
           duration: [ 30, 45, 60, 90 ].sample
         )
         @services << service

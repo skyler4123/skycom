@@ -90,7 +90,7 @@ store_accessor :metadata, :gateway_payload, :callback_data
 | `CompanyMonthlyUsage` | `metadata` | `d1`..`d31` | Daily credit usage (dynamically declared: `store_accessor :metadata, *(1..31).map { |i| "d#{i}" }`) |
 | `CompanyTransaction` | `metadata` | `gateway_payload` | Gateway response payload (QR string, redirect URL, etc.) |
 | `AttendanceLog` | `metadata` | `gps_accuracy_meters`, `geofence_distance_meters` | Mobile check-in GPS accuracy and distance from the branch geofence |
-| `CompanySetting` | `metadata` | `sidebar_groups` | Sidebar custom groups array (key, name, items with key/name/url) |
+| `CompanySetting` | `metadata` | `sidebar_groups` | Sidebar Quick Links groups array (key, name, items with key/name/url) |
 
 For any future JSONB-backed attribute, first check if the target model already uses `store_accessor`. If it does, add your key to the existing declaration. If it doesn't, add a new `store_accessor` line.
 

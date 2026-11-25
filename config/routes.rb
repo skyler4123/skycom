@@ -290,6 +290,7 @@ Rails.application.routes.draw do
       resource :analytic, only: %i[show update], controller: :analytics
 
       resource :tax_config, only: %i[show update], controller: :tax_configs
+      resources :tax_codes, only: %i[index create update destroy]
       get "tax", to: "taxes#index"
       get "tax/summary", to: "taxes#summary"
       get "tax/invoices", to: "taxes#invoices"
@@ -319,6 +320,7 @@ Rails.application.routes.draw do
         post :disable_logging
       end
       resource :billing, only: :show, controller: :billing
+      resource :faq, only: :show, controller: :faqs
 
       post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
       post "order_processing/v1/pay", to: "order_processing/v1#pay"

@@ -2,7 +2,7 @@
 //
 // Depends on BE: Companies::CompanySettingsController#index (GET list, find the
 // active sidebar_groups record) + #update (PATCH sidebar_groups metadata).
-// Custom groups render above the built-in sidebar via
+// Quick Links groups render between Operations and My Profile via
 // companies/sidebars/show_controller.js (see docs/SIDEBAR.md).
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
@@ -228,7 +228,7 @@ export default class Companies_CompanySettings_IndexController extends Companies
             <h2 class="text-xl font-bold text-foreground">${translate("Company Quick Links")}</h2>
             <p class="mt-1 text-sm text-muted-foreground">${translate("Shared with everyone in this company")}</p>
           </div>
-          ${this.groups.length > 0 ? this.groups.map((g, gi) => this.groupFieldsHTML(g, gi)).join("") : `<p class="text-sm text-muted-foreground">${translate("No custom groups yet")}</p>`}
+          ${this.groups.length > 0 ? this.groups.map((g, gi) => this.groupFieldsHTML(g, gi)).join("") : `<p class="text-sm text-muted-foreground">${translate("No Quick Links groups yet")}</p>`}
           <div class="flex items-center justify-between pt-2">
             <button
               type="button"

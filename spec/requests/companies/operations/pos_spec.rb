@@ -14,6 +14,7 @@ RSpec.describe "Companies::Operations::Pos", type: :request do
       record.update!(price_cents: 2_500)
     end
   end
+  let(:default_tax) { create(:tax_code, company: company, name: "Sales tax", rate_bp: 800) }
   let!(:stock) do
     category = product.category
     Stock.create!(
@@ -35,7 +36,7 @@ RSpec.describe "Companies::Operations::Pos", type: :request do
       name: "Company cash", code: "POS_REQ_CO_CASH", business_type: :in_store, lifecycle_status: :active)
     BranchPaymentMethodAppointment.create!(company: company, branch: branch, payment_method: cash_pm,
       name: "Branch cash", code: "POS_REQ_BR_CASH", business_type: :in_store, lifecycle_status: :active)
-    TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+    TaxConfig.for_company!(company).update!(default_tax_code_id: default_tax.id)
     get sign_in_for_test_path(email: company_user.email)
   end
 
@@ -53,13 +54,11 @@ RSpec.describe "Companies::Operations::Pos", type: :request do
     response.parsed_body
   end
 
-  it "returns company currency, tax, catalog counts, and cent prices" do
+  it "returns company currency, per-item tax, catalog counts, and cent prices" do
     body = show_payload
 
     expect(body["currency"]).to eq("usd")
-    expect(body.dig("tax", "rate_bp")).to eq(800)
-    expect(body.dig("tax", "rate_percent")).to eq(8.0)
-    expect(body.dig("tax", "name")).to eq("Sales tax")
+    expect(body).not_to have_key("tax")
     expect(body.dig("catalog", "limit")).to eq(POS_CATALOG_LIMIT)
     expect(body.dig("catalog", "products_total")).to eq(1)
     expect(body.dig("catalog", "services_total")).to eq(1)
@@ -69,6 +68,8 @@ RSpec.describe "Companies::Operations::Pos", type: :request do
     expect(row["price_set"]).to be(true)
     expect(row["stock_quantity"]).to eq(12)
     expect(row["stock_warehouse_name"]).to eq("Main warehouse")
+    expect(row.dig("tax", "rate_bp")).to eq(800)
+    expect(row.dig("tax", "name")).to eq("Sales tax")
 
     service_row = body["services"].find { |item| item["id"] == service.id }
     expect(service_row["price_cents"]).to eq(2_500)

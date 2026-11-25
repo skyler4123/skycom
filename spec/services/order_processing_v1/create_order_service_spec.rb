@@ -48,17 +48,27 @@ RSpec.describe OrderProcessingV1::CreateOrderService do
       expect(result[:tax_cents]).to eq(0)
       expect(result[:total_cents]).to eq(10_000)
       expect(result[:items]).to eq([
-        { kind: "product", id: product.id, quantity: 2, unit_price_cents: 5_000, total_cents: 10_000 }
+        { kind: "product", id: product.id, quantity: 2, unit_price_cents: 5_000, total_cents: 10_000, tax: nil }
       ])
     end
 
-    it "snapshots the configured POS tax rate on the order" do
-      TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+    it "snapshots the product tax on the line and the order" do
+      code = create(:tax_code, company: company, name: "VAT", rate_bp: 1_000)
+      product.update!(tax_code: code)
 
-      expect(result[:tax_cents]).to eq(800)
-      expect(result[:total_cents]).to eq(10_800)
-      expect(Order.last.pos_tax_rate_bp).to eq(800)
-      expect(Order.last.pos_tax_name).to eq("Sales tax")
+      result = described_class.call(company: company, branch: branch, items: items, customer: customer)
+
+      line = OrderProductAppointment.last
+      expect(line.tax_code_id).to eq(code.id)
+      expect(line.tax_name).to eq("VAT")
+      expect(line.tax_rate_bp).to eq(1_000)
+      expect(line.tax_inclusive).to be(false)
+      expect(line.taxable_cents).to eq(10_000)
+      expect(line.tax_cents).to eq(1_000)
+      expect(Order.last.tax_cents).to eq(1_000)
+      expect(Order.last.total_cents).to eq(11_000)
+      expect(result[:tax_lines].first).to include(name: "VAT", tax_cents: 1_000)
+      expect(result[:items].first[:tax]).to include(id: code.id, name: "VAT", rate_bp: 1_000)
     end
 
     it "uses the company currency instead of hardcoding USD" do

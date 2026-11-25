@@ -138,6 +138,14 @@ export const translate = (key) => {
 > **Homepage exception:** server-rendered marketing copy uses
 > `t("home.*")` from `config/locales/home.<locale>.yml`; do not put it in
 > `dictionary.js`.
+>
+> **Page-scoped editorial content exception:** long-form content that would bloat
+> every page (the System FAQ's ~170 bilingual answers) lives in a page-scoped
+> content module with `{ en, vi }` pairs. The page dynamically imports that module
+> and calls `registerDictionary()` before rendering, so `translate()` still
+> resolves every string. UI chrome (search, buttons, badges) stays in
+> `dictionary.js`. See `docs/FAQ.md` §5. This exception is only for content
+> corpora, not for ordinary labels or controls.
 
 ### Pattern Examples
 

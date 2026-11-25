@@ -420,6 +420,7 @@ export const company_payment_method_appointment_path = (companyId, id) =>
 export const company_billing_path = (companyId) => `/companies/${companyId}/billing`
 
 export const company_usage_path = (companyId) => `/companies/${companyId}/usage`
+export const company_faq_path = (companyId) => `/companies/${companyId}/faq`
 export const company_usage_enable_logging_path = (companyId) => `/companies/${companyId}/usage/enable_logging`
 export const company_usage_disable_logging_path = (companyId) => `/companies/${companyId}/usage/disable_logging`
 export const new_company_top_up_path = (companyId) => `/companies/${companyId}/top_ups/new`
@@ -514,6 +515,8 @@ export const company_tax_invoices_path = (companyId) => `/companies/${companyId}
 export const company_tax_purchases_path = (companyId) => `/companies/${companyId}/tax/purchases`
 export const company_tax_stock_exports_path = (companyId) => `/companies/${companyId}/tax/stock_exports`
 export const company_tax_config_path = (companyId) => `/companies/${companyId}/tax_config`
+export const company_tax_codes_path = (companyId) => `/companies/${companyId}/tax_codes`
+export const company_tax_code_path = (companyId, id) => `/companies/${companyId}/tax_codes/${id}`
 
 export const company_payroll_path = (companyId) => `/companies/${companyId}/payroll`
 export const company_payroll_summary_path = (companyId) => `/companies/${companyId}/payroll/summary`

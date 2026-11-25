@@ -3,18 +3,20 @@
 // FE-only (localStorage, per employee) — see docs/SIDEBAR.md.
 import { myProfilePath } from "controllers/helpers/auth_helpers"
 
-// Group registry — array order is the sidebar render order.
+// Group registry — list order is the sidebar render order. Company Quick Links
+// groups (the Quick Links CompanySetting) are spread in after Operations.
 // `locked: true` groups can never be hidden via company settings.
-export const SIDEBAR_GROUPS = [
-  { key: "my_profile", label: "My Profile" },
+export const sidebarGroups = (quickLinks = []) => [
   { key: "general", label: "General" },
+  { key: "operations", label: "Operations" },
+  ...quickLinks,
+  { key: "my_profile", label: "My Profile" },
   { key: "notification", label: "Notification" },
   { key: "catalog", label: "Catalog" },
   { key: "sales", label: "Sales" },
   { key: "organization", label: "Organization" },
   { key: "exams", label: "Exams" },
   { key: "platform", label: "Platform" },
-  { key: "operations", label: "Operations" },
   { key: "storage", label: "Storage" },
   { key: "calendar", label: "Schedule" },
   { key: "attendance", label: "Attendance" },
@@ -92,6 +94,7 @@ export const SIDEBAR_ITEMS = [
   { key: "stock_pendings", group: "inventory", icon: "schedule", label: "Stock Pendings", href: (cid) => Helpers.company_stock_pendings_path(cid) },
   { key: "suppliers", group: "inventory", icon: "local_shipping", label: "Suppliers", href: (cid) => Helpers.company_suppliers_path(cid) },
   { key: "tax_data", group: "tax", icon: "calculate", label: "Tax Data", href: (cid) => Helpers.company_tax_path(cid) },
+  { key: "tax_codes", group: "tax", icon: "percent", label: "Tax Codes", href: (cid) => Helpers.company_tax_codes_path(cid) },
   { key: "tax_config", group: "tax", icon: "tune", label: "Tax Config", href: (cid) => Helpers.company_tax_config_path(cid) },
   { key: "payroll_data", group: "payroll", icon: "payments", label: "Payroll Data", href: (cid) => Helpers.company_payroll_path(cid) },
   { key: "payroll_config", group: "payroll", icon: "tune", label: "Payroll Config", href: (cid) => Helpers.company_payroll_config_path(cid) },
@@ -106,5 +109,6 @@ export const SIDEBAR_ITEMS = [
   { key: "usage", group: "system", icon: "monitoring", label: "Usage", href: (cid) => Helpers.company_usage_path(cid) },
   { key: "top_up", group: "system", icon: "account_balance_wallet", label: "Top Up", href: (cid) => Helpers.new_company_top_up_path(cid) },
   { key: "billing", group: "system", icon: "receipt_long", label: "Billing", href: (cid) => Helpers.company_billing_path(cid) },
-  { key: "help_center", group: "system", icon: "help", label: "Help Center", href: (cid) => Helpers.company_company_tickets_path(cid) }
+  { key: "help_center", group: "system", icon: "help", label: "Help Center", href: (cid) => Helpers.company_company_tickets_path(cid) },
+  { key: "faq", group: "system", icon: "live_help", label: "FAQ", href: (cid) => Helpers.company_faq_path(cid) }
 ]

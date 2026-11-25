@@ -7,6 +7,11 @@ export default class Companies_Services_ShowController extends Companies_LayoutC
   /** @type {Array<{key: string, label: string, type: string}>} */
   propertyMetadata = []
 
+  /** @type {any | null} */
+  effectiveTaxCode = null
+
+  usesDefaultTax = false
+
   async connect() {
     super.connect()
 
@@ -16,6 +21,8 @@ export default class Companies_Services_ShowController extends Companies_LayoutC
     try {
       const response = await fetchJson(`${Helpers.company_service_path(companyId, recordId)}.json`)
       this.service = response.service
+      this.effectiveTaxCode = response.effective_tax_code || null
+      this.usesDefaultTax = response.uses_default_tax === true
 
       if (this.service?.category_id) {
         const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.service.category_id)
@@ -42,6 +49,11 @@ export default class Companies_Services_ShowController extends Companies_LayoutC
 
   contentHTML() {
     return this.showHTML()
+  }
+
+  rateLabel(taxCode) {
+    const rate = Number(taxCode.rate_percent || 0)
+    return Number.isInteger(rate) ? String(rate) : rate.toFixed(2).replace(/0+$/, "").replace(/\.$/, "")
   }
 
   formatDisplayValue(value, type) {
@@ -136,6 +148,23 @@ export default class Companies_Services_ShowController extends Companies_LayoutC
               <div>
                 <p class="text-xs font-medium text-muted-foreground">${translate("Category")}</p>
                 <p class="text-sm font-semibold text-foreground">${category?.name || s.category?.name || translate('N/A')}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <div class="flex size-10 items-center justify-center rounded-lg bg-muted text-info ">
+                <span class="material-symbols-outlined">percent</span>
+              </div>
+              <div>
+                <p class="text-xs font-medium text-muted-foreground">${translate("Tax")}</p>
+                ${this.effectiveTaxCode ? `
+                  <p class="text-sm font-semibold text-foreground">
+                    ${escapeHtml(this.effectiveTaxCode.name)} (${this.rateLabel(this.effectiveTaxCode)}%${this.effectiveTaxCode.inclusive ? `, ${translate("included")}` : ""})
+                    ${this.usesDefaultTax ? `<span class="ml-1 text-[10px] font-bold uppercase text-muted-foreground">${translate("Company default")}</span>` : ""}
+                  </p>
+                ` : `
+                  <p class="text-sm font-semibold text-muted-foreground">${translate("No tax")}</p>
+                `}
               </div>
             </div>
           </div>

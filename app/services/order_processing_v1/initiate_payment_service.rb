@@ -11,8 +11,8 @@ module OrderProcessingV1
   class InitiatePaymentService
     Result = Struct.new(
       :status, :order_id, :transaction_id, :transaction_token, :qr_string,
-      :discount, :subtotal_cents, :discount_cents, :tax_cents, :total_cents,
-      :currency, :cash_received_cents, :change_cents,
+      :discount, :subtotal_cents, :discount_cents, :tax_cents, :added_tax_cents,
+      :total_cents, :currency, :tax_lines, :cash_received_cents, :change_cents,
       keyword_init: true
     )
 
@@ -41,6 +41,8 @@ module OrderProcessingV1
         reserved = OrderProcessingV1::ReserveStockService.call(items: build_items)[:reserved]
 
         ActiveRecord::Base.transaction do
+          PersistLineTaxesService.call(line_taxes: @totals.line_taxes)
+          @order.update_columns(tax_cents: @totals.tax_cents, total_cents: @totals.total_cents)
           invoice = create_invoice
           txn = create_transaction(invoice)
 
@@ -76,8 +78,10 @@ module OrderProcessingV1
         subtotal_cents: @totals.subtotal_cents,
         discount_cents: @totals.discount_cents,
         tax_cents: @totals.tax_cents,
+        added_tax_cents: @totals.added_tax_cents,
         total_cents: @totals.total_cents,
         currency: @totals.currency,
+        tax_lines: @totals.tax_lines,
         cash_received_cents: cash_mode? ? @cash_received_cents : nil,
         change_cents: cash_mode? ? change_cents : nil
       }
@@ -169,9 +173,7 @@ module OrderProcessingV1
         total_cents: @totals.total_cents,
         currency: @order.currency,
         business_type: :sales,
-        pos_tax_rate_bp: @totals.tax_rate_bp,
-        pos_tax_name: @totals.tax_name,
-        pos_tax_inclusive: false
+        tax_breakdown: @totals.tax_lines.map { |line| line.transform_keys(&:to_s) }
       )
     end
 

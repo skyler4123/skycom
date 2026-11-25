@@ -1,13 +1,14 @@
 # Skycom Order Processing V1
 
-> **2026-11-19 POS completion update.** The till now uses server-owned prices,
-> sells services through `OrderServiceAppointment`, snapshots the company POS
-> tax on the order and invoice, supports discount apply/remove on the pending
-> order, voids a pending order, prints an 80 mm slip, locks the terminal
-> server-side, and resolves one selling-stock pile per product. The current
-> contract is summarized in §1.1. Older sections below that still describe a
-> client `unit_price`, a hardcoded 10% tax, or a local-only cancel are
-> superseded by §1.1.
+> **2026-11-25 per-resource tax update.** The till uses server-owned prices,
+> sells services through `OrderServiceAppointment`, snapshots each line's tax
+> code/rate/treatment on the order and invoice, supports mixed tax-added and
+> tax-included lines, groups tax by code on receipts and Tax Data, supports
+> discount apply/remove on the pending order, voids a pending order, prints an
+> 80 mm slip, locks the terminal server-side, and resolves one selling-stock
+> pile per product. The current contract is summarized in §1.1. Older sections
+> below that still describe a client `unit_price`, one company-wide tax rate, or
+> a local-only cancel are superseded by §1.1.
 
 ## 1. Overview
 
@@ -18,29 +19,34 @@ The **Order Processing V1** pipeline is a multi-step POS order lifecycle that co
 - **Cart → ORDER.** `POST checkout` accepts `{ branch_id, customer_id?, items: [{ product_id|service_id, quantity }] }`.
   The server resolves the catalog record and its selling stock row, writes the
   `Order` plus `OrderProductAppointment` / `OrderServiceAppointment` lines, and
-  snapshots `pos_tax_rate_bp` / `pos_tax_name` from Tax Config. The response is
-  in cents: `subtotal_cents`, `tax_cents`, `total_cents`, `currency`, `items`.
-  A client-supplied `unit_price` is ignored; a stale display is refreshed from
-  the response.
+  snapshots each line's tax code, name, rate, inclusive flag, taxable cents, and
+  tax cents. A missing code falls back to the company default. The response is
+  in cents: `subtotal_cents`, `tax_cents`, `added_tax_cents`, `total_cents`,
+  `currency`, `tax_lines`, `items`. A client-supplied `unit_price` is ignored; a
+  stale display is refreshed from the response.
 - **Discount.** `POST apply_discount` reserves a single-use code on the pending
   order and returns the new totals. `POST remove_discount` releases it. Pay
   uses the pending reservation; a code passed to pay replaces it only after the
   new reservation succeeds.
 - **Pay.** `POST pay` with `{ order_id, payment_method_appointment_id, cash_received_cents? }`.
   The `Invoice` is created with `price_cents = total` (subtotal − discount +
-  tax), `tax_cents`, `total_cents`, and the tax snapshot. Cash validates
+  added tax), `tax_cents`, `total_cents`, and the grouped `tax_breakdown`
+  snapshot. Cash validates
   received ≥ total and stores `cash_received_cents` / `change_cents` on the
   transaction. QR returns a token + `qr_string` and waits for the webhook.
 - **Void.** `POST cancel` marks the order `cancelled`, fails pending
   transactions (releasing stock holds and the discount), and voids unpaid
   invoices. Paid orders are refused; refunds stay in Orders.
 - **Receipt.** `GET receipt` returns cents, branch, cashier, line items,
-  subtotal, discount/code, tax/rate/name, total, tender, cash received, change.
+  subtotal, discount/code, grouped `tax_lines`, total, tender, cash received,
+  change.
 - **Lock.** `POST lock` / `POST unlock` set/clear a company-scoped session flag.
   Money endpoints return `423 { errors: ["Terminal is locked"] }` while locked.
-- **Tax.** One company-wide POS rate from Tax Config, added on top of the
-  discounted subtotal. `0` hides the tax row. Tax-inclusive pricing is out of
-  scope for this iteration.
+- **Tax.** Each product/service owns a tax code; blank falls back to the Tax
+  Config default. `OrderTotalsService` allocates the discount proportionally,
+  then computes tax per line. A code either adds tax on top or extracts it from
+  the gross price. Zero tax hides the row. The order line and invoice keep the
+  snapshot, so later code edits never rewrite a sale.
 - **Stock.** `Pos::SellingStockResolver` picks the branch's main warehouse
   first, then the oldest, and the first warehouse in that order with available
   stock. The label names it; the order line persists that `stock_id`; pay
@@ -213,20 +219,21 @@ State ──► ORDER phase ──► COMPLETE PAYMENT phase ──► back to O
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `currency` | `string` | `usd` | Company currency from the POS payload; every amount uses `Helpers.formatMoney`. |
-| `tax` | `Object` | `{ rate_bp: 0, rate_percent: 0, name: "Tax" }` | Company POS tax snapshot. `rate_bp = 0` hides the row. |
+| `taxLines` | `Array` | `[]` | Per-tab server tax breakdown; used after ORDER, discount, and pay. |
+| `addedTaxCents` | `number` | `0` | Per-tab tax added on top; tax-included lines do not change the total. |
 | `catalogMeta` | `Object` | `{ limit: 50, products_total: 0, services_total: 0 }` | Cap counts for "Showing 50 of N". |
 | `viewMode` | `"grid"\|"list"` | `"grid"` | Catalog layout; persisted in localStorage. |
 | `locked` | `boolean` | `false` | Server terminal lock state; the overlay is only the visual half. |
-| `tabs` | `Array` | `[]` | Per-customer carts; each carries `{ id, name, customer, items, orderId, orderTotalCents, appliedDiscount, cashReceivedCents, awaitingToken }`. |
+| `tabs` | `Array` | `[]` | Per-customer carts; each carries `{ id, name, customer, items, orderId, orderTotalCents, appliedDiscount, cashReceivedCents, awaitingToken, taxLines, addedTaxCents }`. |
 | `selectedCategoryName` | `string\|null` | `null` | Active catalog filter (`null` = All). |
 | `searchQuery` | `string` | `''` | Search/scan filter; non-blank queries ask the server (Meilisearch). |
-| `products` / `services` | `Array` | `[]` | Server cents, `price_set`, `category_*`, product `stock_quantity` + `stock_warehouse_name`. |
+| `products` / `services` | `Array` | `[]` | Server cents, `price_set`, `category_*`, per-item `tax`, product `stock_quantity` + `stock_warehouse_name`. |
 
 ### Order Methods
 
 | Method | Signature | Description |
 |--------|-----------|-------------|
-| `initiateOrder()` | `async ()` | POSTs product/service ids + quantities; sets the tab order and applies the server's tax snapshot and line prices. |
+| `initiateOrder()` | `async ()` | POSTs product/service ids + quantities; sets the tab order and applies the server's per-item tax snapshots, `tax_lines`, and line prices. |
 | `applyDiscount()` / `removeDiscount()` | `async ()` | Reserve/release a code on the pending order and render the server totals. |
 | `pay()` | `async ()` | POSTs `{ order_id, payment_method_appointment_id, cash_received_cents }`. `paid` → receipt; `pending` → QR wait + `pos_payment_completed`. |
 | `cancelOrder()` | `async ()` | Confirms "Void this order?", calls `POST cancel`, and unlocks the cart only on success. |
@@ -297,12 +304,12 @@ catalog record, its price, and `Pos::SellingStockResolver`'s selling stock row.
 
 **Flow:**
 1. `CreateOrderService` resolves items, checks availability against the
-   resolved stock, snapshots the Tax Config rate/name, and writes the `Order`
-   plus `OrderProductAppointment` / `OrderServiceAppointment` rows in one
+   resolved stock, snapshots each line's tax code/rate/treatment, and writes the
+   `Order` plus `OrderProductAppointment` / `OrderServiceAppointment` rows in one
    transaction.
 2. Returns `201 Created` with `order_id`, `currency`, `subtotal_cents`,
-   `tax_cents`, `total_cents`, `tax_rate_bp`, `tax_name`, and authoritative
-   `items[]` (`kind`, `id`, `quantity`, `unit_price_cents`, `total_cents`).
+   `tax_cents`, `added_tax_cents`, `total_cents`, `tax_lines`, and authoritative
+   `items[]` (`kind`, `id`, `quantity`, `unit_price_cents`, `total_cents`, `tax`).
 3. `422 { errors: [...] }` for an unknown/foreign item, unset price, unstocked
    product, quantity < 1, or insufficient stock.
 
@@ -315,7 +322,8 @@ catalog record, its price, and `Pos::SellingStockResolver`'s selling stock row.
 code on the pending order (`Discounts::ApplyService`); remove releases it
 (`Discounts::ReleaseService`). Both return `discount` (`code`,
 `amount_cents`, or `null`) plus `subtotal_cents`, `discount_cents`,
-`tax_cents`, `total_cents`, `currency`, `message`. Invalid codes return
+`tax_cents`, `added_tax_cents`, `total_cents`, `currency`, `tax_lines`,
+`message`. Invalid codes return
 `422 { errors: [...] }` without changing the order.
 
 ### `pay`
@@ -332,10 +340,10 @@ params.permit(:order_id, :payment_method_appointment_id, :discount_code, :cash_r
    branch-level appointment (foreign/inactive → 422).
 2. Uses the order's pending discount, or reserves `discount_code` if supplied.
    A new code replaces the old reservation only after the new one succeeds.
-3. Computes totals through `OrderTotalsService`: tax on
-   `subtotal − discount`, then creates the `Invoice` with
-   `price_cents = total_cents = subtotal − discount + tax`, `tax_cents`, and
-   `pos_tax_rate_bp` / `pos_tax_name` metadata.
+3. Computes totals through `OrderTotalsService`: proportional discount
+   allocation + per-line tax, then creates the `Invoice` with
+   `price_cents = total_cents = subtotal − discount + added tax`, `tax_cents`,
+   and `metadata["tax_breakdown"]`.
 4. Cash validates `cash_received_cents ≥ total`, stores received/change on the
    transaction, and completes synchronously. QR calls the gateway and returns
    a pending token + `qr_string`.
@@ -358,10 +366,11 @@ unpaid invoices. Paid orders return `422 { errors: [...] }`. The response is
 
 Returns cents, not floats: `invoice_code`, `issued_at`, `payment_status`,
 `currency`, `branch_name`, `cashier_name`, line items (`name`, `quantity`,
-`unit_price_cents`, `total_cents`, `kind`), `subtotal_cents`,
-`discount_cents`/`discount_code`, `tax_cents`/`tax_rate_bp`/`tax_name`,
-`total_cents`, `payment_method_name`, `cash_received_cents`, `change_cents`.
-Legacy invoices without a tax snapshot show stored tax and no invented rate.
+`unit_price_cents`, `total_cents`, `tax_cents`, `tax_name`, `tax_rate_bp`,
+`tax_inclusive`, `kind`), `subtotal_cents`, `discount_cents`/`discount_code`,
+`tax_cents`, grouped `tax_lines`, `total_cents`, `payment_method_name`,
+`cash_received_cents`, `change_cents`. Invoices without a breakdown fall back
+to the order's line snapshots.
 404 when the order is unknown or belongs to another company.
 
 ### `pay_cancel`
@@ -394,9 +403,10 @@ All services live under `OrderProcessingV1` module and use `self.call(...)` — 
 
 Current POS services:
 - `CreateOrderService` — resolves/scopes items, server price, selling stock,
-  tax snapshot, product + service lines, cent totals.
-- `OrderTotalsService` — subtotal, discount, tax, total in integer cents;
-  reads the order tax snapshot.
+  per-line tax snapshots, product + service lines, cent totals.
+- `OrderTotalsService` — proportional discount allocation, per-line tax,
+  grouped breakdown, total in integer cents; reads each line's tax snapshot.
+- `PersistLineTaxesService` — writes final taxable/tax cents after a discount.
 - `CheckAvailabilityService` / `ReserveStockService` — availability and exact
   selling-stock holds.
 - `InitiatePaymentService` — pending discount, invoice total/tax snapshot,
@@ -466,16 +476,15 @@ are in §1.1 and §4.
 - Resolves each product/service inside `company` + `branch`; rejects foreign or missing items.
 - Prices from `price_cents` (rejects unset prices) and resolves the selling stock row.
 - Checks availability against the exact stock ids, then creates the `Order` with
-  `currency: company.currency`, `business_type: :in_store`, and the Tax Config
-  rate/name snapshot.
+  `currency: company.currency` and `business_type: :in_store`.
 - Bulk-inserts product lines (`stock_id` persisted) and service lines via
-  `insert_all!` inside one transaction.
+  `insert_all!` inside one transaction, including each line's tax snapshot.
 - Returns integer cent totals and authoritative per-line prices.
 
 **Returns:**
 ```ruby
-{ order_id:, currency:, subtotal_cents:, tax_cents:, total_cents:,
-  tax_rate_bp:, tax_name:, items: [...] }
+{ order_id:, currency:, subtotal_cents:, tax_cents:, added_tax_cents:,
+  total_cents:, tax_lines:, items: [...] }
 ```
 
 ### 5.4 `InitiatePaymentService`

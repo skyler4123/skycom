@@ -18,11 +18,10 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
   /** @type {any | null} */ appointment = null
   /** @type {any[]} */ products = []
   /** @type {any[]} */ services = []
-  /** @type {{ id: number, name: string, customer: any | null, items: { kind: string, id: any, name: string, priceCents: number, qty: number, stockQuantity?: number, priceSet?: boolean }[], orderId: string | null, orderTotalCents: number, appliedDiscount: any | null, cashReceivedCents: number, awaitingToken: string | null }[]} */ tabs = []
+  /** @type {{ id: number, name: string, customer: any | null, items: { kind: string, id: any, name: string, priceCents: number, qty: number, stockQuantity?: number, priceSet?: boolean, tax?: any | null }[], orderId: string | null, orderTotalCents: number, appliedDiscount: any | null, cashReceivedCents: number, awaitingToken: string | null, taxLines: any[], addedTaxCents: number }[]} */ tabs = []
   /** @type {number} */ activeTabIndex = 0
   /** @type {number} */ tabCounter = 0
   /** @type {string} */ currency = "usd"
-  /** @type {{ rate_bp: number, rate_percent: number, name: string }} */ tax = { rate_bp: 0, rate_percent: 0, name: "Tax" }
   /** @type {{ limit: number, products_total: number, services_total: number }} */ catalogMeta = { limit: 50, products_total: 0, services_total: 0 }
   /** @type {"grid"|"list"} */ viewMode = "grid"
   /** @type {boolean} */ locked = false
@@ -66,7 +65,6 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
       this.paymentMethods = response.payment_methods || []
       this.selectedMethodId = this.paymentMethods[0]?.id || null
       this.currency = response.currency || "usd"
-      this.tax = response.tax || { rate_bp: 0, rate_percent: 0, name: "Tax" }
       this.catalogMeta = response.catalog || { limit: 50, products_total: this.products.length, services_total: this.services.length }
       this.locked = Boolean(response.locked)
       this.viewMode = localStorage.getItem("pos_view_mode") === "list" ? "list" : "grid"
@@ -101,7 +99,8 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
     this.tabs.push({
       id: this.tabCounter, name: walkInName, customer: null, items: [],
       orderId: null, orderTotalCents: 0, appliedDiscount: null,
-      cashReceivedCents: 0, awaitingToken: null, qrString: null
+      cashReceivedCents: 0, awaitingToken: null, qrString: null,
+      taxLines: [], addedTaxCents: 0
     })
     this.activeTabIndex = this.tabs.length - 1
     this.renderContent()
@@ -215,6 +214,22 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
     if (this.activeTab) this.activeTab.appliedDiscount = value
   }
 
+  get taxLines() {
+    return this.activeTab?.taxLines || []
+  }
+
+  set taxLines(value) {
+    if (this.activeTab) this.activeTab.taxLines = Array.isArray(value) ? value : []
+  }
+
+  get addedTaxCents() {
+    return Number(this.activeTab?.addedTaxCents || 0)
+  }
+
+  set addedTaxCents(value) {
+    if (this.activeTab) this.activeTab.addedTaxCents = Number(value) || 0
+  }
+
   // --- Catalog filtering -----------------------------------------------------------
 
   get companyCategories() {
@@ -308,7 +323,6 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
       this.products = res.products || []
       this.services = res.services || []
       this.currency = res.currency || this.currency
-      this.tax = res.tax || this.tax
       this.catalogMeta = res.catalog || this.catalogMeta
       this.serverSearchActive = Boolean(query)
       this.refreshCatalog()
@@ -360,7 +374,8 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
         name: match.name,
         priceCents: match.price_cents,
         priceSet: match.price_set,
-        stockQuantity: product ? match.stock_quantity : 0
+        stockQuantity: product ? match.stock_quantity : 0,
+        tax: match.tax || null
       }
     })
     this.loadCatalog("")
@@ -424,6 +439,10 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
   addToCart(event) {
     if (this.locked || this.orderId || !this.activeTab) return
     const { id, kind = "product", name, priceCents, priceSet, stockQuantity } = event.params
+    const catalogItem = kind === "service"
+      ? this.services.find((candidate) => String(candidate.id) === String(id))
+      : this.products.find((candidate) => String(candidate.id) === String(id))
+    const tax = this.parseTaxParam(event.params.tax) || catalogItem?.tax || null
     if (String(priceSet) === "false") {
       toast({ type: "warning", message: translate("Price is not set for this item") })
       return
@@ -450,7 +469,8 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
         priceCents: Number(priceCents) || 0,
         qty: 1,
         stockQuantity: quantity,
-        priceSet: true
+        priceSet: true,
+        tax
       })
     }
     this.saveState()
@@ -596,6 +616,8 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
         ? { code: res.discount.code, amountCents: res.discount.amount_cents }
         : null
       this.orderTotalCents = res.total_cents || this.orderTotalCents
+      this.taxLines = res.tax_lines || this.taxLines
+      this.addedTaxCents = res.added_tax_cents ?? this.addedTaxCents
       this.discountSubmitting = false
       this.saveState()
       this.renderContent()
@@ -616,6 +638,8 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
       })
       this.appliedDiscount = null
       this.orderTotalCents = res.total_cents || this.orderTotalCents
+      this.taxLines = res.tax_lines || this.taxLines
+      this.addedTaxCents = res.added_tax_cents ?? this.addedTaxCents
       this.discountSubmitting = false
       this.saveState()
       this.renderContent()
@@ -682,20 +706,20 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
       })
       this.orderId = res.order_id
       this.orderTotalCents = res.total_cents || 0
-      this.tax = {
-        rate_bp: res.tax_rate_bp || 0,
-        rate_percent: (res.tax_rate_bp || 0) / 100,
-        name: res.tax_name || "Tax"
-      }
+      this.taxLines = res.tax_lines || []
+      this.addedTaxCents = res.added_tax_cents || 0
 
       const prices = new Map((res.items || []).map((line) => [ `${line.kind}:${line.id}`, line.unit_price_cents ]))
+      const taxes = new Map((res.items || []).map((line) => [ `${line.kind}:${line.id}`, line.tax ]))
       let changed = false
       tab.items.forEach((item) => {
-        const next = prices.get(`${item.kind}:${item.id}`)
+        const key = `${item.kind}:${item.id}`
+        const next = prices.get(key)
         if (next != null && Number(next) !== Number(item.priceCents)) {
           item.priceCents = Number(next)
           changed = true
         }
+        if (taxes.has(key)) item.tax = taxes.get(key)
       })
       this.cashReceived = this.getTotalCents()
       this.orderSubmitting = false
@@ -731,6 +755,8 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
         this.awaitingToken = res.transaction_token
         if (this.activeTab) this.activeTab.qrString = res.qr_string || null
         this.orderTotalCents = res.total_cents || this.orderTotalCents
+        this.taxLines = res.tax_lines || this.taxLines
+        this.addedTaxCents = res.added_tax_cents ?? this.addedTaxCents
         this.paySubmitting = false
         this.subscribePaymentCompleted()
         this.saveState()
@@ -740,6 +766,8 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
       }
 
       this.orderTotalCents = res.total_cents || this.orderTotalCents
+      this.taxLines = res.tax_lines || this.taxLines
+      this.addedTaxCents = res.added_tax_cents ?? this.addedTaxCents
       this.paySubmitting = false
       toast({ type: "success", message: res.message || translate("Payment completed") })
       await this.showReceipt()
@@ -773,6 +801,8 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
     tab.cashReceivedCents = 0
     tab.awaitingToken = null
     tab.qrString = null
+    tab.taxLines = []
+    tab.addedTaxCents = 0
     this.saveState()
     if (tab.id === this.activeTab?.id) this.renderContent()
   }
@@ -786,6 +816,8 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
     this.cashReceived = 0
     this.awaitingToken = null
     if (this.activeTab) this.activeTab.qrString = null
+    this.taxLines = []
+    this.addedTaxCents = 0
     this.activeTab.items = []
     this.activeTab.customer = null
     this.activeTab.name = this.activeTab.id === 1 ? translate("Walk-in") : `${translate("Walk-in")} ${this.activeTab.id}`
@@ -874,6 +906,8 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
     this.cashReceived = 0
     this.awaitingToken = null
     if (this.activeTab) this.activeTab.qrString = null
+    this.taxLines = []
+    this.addedTaxCents = 0
     this.saveState()
     this.renderContent()
   }
@@ -881,7 +915,7 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
   getSubtotalCents() {
     if (!this.activeTab) return 0
     return this.activeTab.items.reduce(
-      (sum, item) => sum + Number(item.priceCents || 0) * item.qty, 0
+      (sum, item) => sum + this.lineGrossCents(item), 0
     )
   }
 
@@ -889,13 +923,98 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
     return Number(this.appliedDiscount?.amountCents || 0)
   }
 
+  lineGrossCents(item) {
+    return Number(item.priceCents || 0) * Number(item.qty || 0)
+  }
+
+  getTaxLines() {
+    return this.orderId ? this.taxLines : this.localTaxLines()
+  }
+
+  getAddedTaxCents() {
+    if (this.orderId) return this.addedTaxCents
+    return this.localTaxLines()
+      .filter((line) => line.inclusive !== true)
+      .reduce((sum, line) => sum + Number(line.tax_cents || 0), 0)
+  }
+
   getTaxCents() {
-    const taxable = Math.max(this.getSubtotalCents() - this.getDiscountCents(), 0)
-    return Math.round(taxable * Number(this.tax.rate_bp || 0) / 10_000)
+    return this.getTaxLines().reduce((sum, line) => sum + Number(line.tax_cents || 0), 0)
   }
 
   getTotalCents() {
-    return Math.max(this.getSubtotalCents() - this.getDiscountCents(), 0) + this.getTaxCents()
+    return Math.max(this.getSubtotalCents() - this.getDiscountCents(), 0) + this.getAddedTaxCents()
+  }
+
+  localTaxLines() {
+    const items = this.activeTab?.items || []
+    const subtotal = items.reduce((sum, item) => sum + this.lineGrossCents(item), 0)
+    const discount = Math.min(this.getDiscountCents(), subtotal)
+    const shares = this.allocateDiscountShares(items, discount, subtotal)
+    const groups = new Map()
+
+    items.forEach((item, index) => {
+      const tax = item.tax || null
+      const rate = Number(tax?.rate_bp || 0)
+      if (!tax || rate <= 0) return
+
+      const net = this.lineGrossCents(item) - shares[index]
+      const inclusive = tax.inclusive === true
+      const taxCents = inclusive
+        ? Math.round(net * rate / (10_000 + rate))
+        : Math.round(net * rate / 10_000)
+      const taxableCents = inclusive ? net - taxCents : net
+      const key = `${tax.id || tax.name}:${rate}:${inclusive}`
+
+      const group = groups.get(key) || {
+        tax_code_id: tax.id || null,
+        name: tax.name || "Tax",
+        rate_bp: rate,
+        rate_percent: rate / 100,
+        inclusive,
+        taxable_cents: 0,
+        tax_cents: 0
+      }
+      group.taxable_cents += taxableCents
+      group.tax_cents += taxCents
+      groups.set(key, group)
+    })
+
+    return [...groups.values()].filter((line) => line.tax_cents > 0)
+  }
+
+  allocateDiscountShares(items, discount, subtotal) {
+    const shares = items.map(() => 0)
+    if (!discount || !subtotal) return shares
+
+    const rows = items.map((item, index) => {
+      const product = discount * this.lineGrossCents(item)
+      return {
+        index,
+        base: Math.floor(product / subtotal),
+        remainder: product % subtotal
+      }
+    })
+
+    rows.forEach((row) => { shares[row.index] = row.base })
+    const leftover = discount - shares.reduce((sum, value) => sum + value, 0)
+    rows
+      .slice()
+      .sort((a, b) => (b.remainder - a.remainder) || (a.index - b.index))
+      .slice(0, leftover)
+      .forEach((row) => { shares[row.index] += 1 })
+
+    return shares
+  }
+
+  parseTaxParam(value) {
+    if (!value) return null
+    if (typeof value === "object") return value
+    try {
+      return JSON.parse(value)
+    } catch (_error) {
+      return null
+    }
   }
 
   getChangeDueCents() {
@@ -954,7 +1073,7 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
         receipt: undefined
       }))
       localStorage.setItem(this.storageKey(), JSON.stringify({
-        version: 1,
+        version: 2,
         tabs,
         activeTabIndex: this.activeTabIndex,
         tabCounter: this.tabCounter,
@@ -972,7 +1091,7 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
     } catch (_error) {
       saved = null
     }
-    if (!saved || saved.version !== 1 || !Array.isArray(saved.tabs)) return
+    if (!saved || saved.version !== 2 || !Array.isArray(saved.tabs)) return
 
     this.tabs = saved.tabs
       .filter((tab) => tab && Array.isArray(tab.items))
@@ -987,14 +1106,17 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
           priceCents: Number(item.priceCents) || 0,
           qty: Number(item.qty) || 1,
           stockQuantity: Number(item.stockQuantity) || 0,
-          priceSet: item.priceSet !== false
+          priceSet: item.priceSet !== false,
+          tax: item.tax || null
         })),
         orderId: tab.orderId || null,
         orderTotalCents: Number(tab.orderTotalCents) || 0,
         appliedDiscount: tab.appliedDiscount || null,
         cashReceivedCents: Number(tab.cashReceivedCents) || 0,
         awaitingToken: tab.awaitingToken || null,
-        qrString: tab.qrString || null
+        qrString: tab.qrString || null,
+        taxLines: Array.isArray(tab.taxLines) ? tab.taxLines : [],
+        addedTaxCents: Number(tab.addedTaxCents) || 0
       }))
 
     this.activeTabIndex = Math.min(
@@ -1268,6 +1390,7 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
         data-${this.identifier}-price-cents-param="${product.price_cents ?? 0}"
         data-${this.identifier}-price-set-param="${priceSet}"
         data-${this.identifier}-stock-quantity-param="${stockQuantity}"
+        data-${this.identifier}-tax-param="${this.escape(JSON.stringify(product.tax || null))}"
         class="group relative bg-card p-3 rounded-xl flex flex-col justify-between shadow-sm hover:shadow-md transition-all cursor-pointer border border-line hover:border-primary/40 active:scale-[0.99] ${priceSet ? "" : "opacity-70"}">
         <div class="relative w-full h-32 rounded-lg overflow-hidden bg-muted mb-2">
           ${product.image_url
@@ -1308,6 +1431,7 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
         data-${this.identifier}-price-cents-param="${product.price_cents ?? 0}"
         data-${this.identifier}-price-set-param="${priceSet}"
         data-${this.identifier}-stock-quantity-param="${stockQuantity}"
+        data-${this.identifier}-tax-param="${this.escape(JSON.stringify(product.tax || null))}"
         class="bg-card border border-line rounded-xl p-2.5 flex items-center gap-3 cursor-pointer hover:border-primary/40 transition-colors ${priceSet ? "" : "opacity-70"}">
         <div class="w-12 h-12 rounded-lg bg-muted overflow-hidden shrink-0 flex items-center justify-center">
           ${product.image_url
@@ -1378,6 +1502,7 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
                 data-${this.identifier}-name-param="${this.escape(service.name || "")}"
                 data-${this.identifier}-price-cents-param="${service.price_cents ?? 0}"
                 data-${this.identifier}-price-set-param="${priceSet}"
+                data-${this.identifier}-tax-param="${this.escape(JSON.stringify(service.tax || null))}"
                 class="bg-muted border border-line p-3 rounded-xl flex items-center gap-3 hover:border-primary/40 transition-colors cursor-pointer group ${priceSet ? "" : "opacity-70"}">
                 <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
                   <span class="material-symbols-outlined text-[20px]">${icon}</span>
@@ -1484,6 +1609,7 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
             <div class="flex flex-col flex-1 min-w-0">
               <span class="text-[13px] font-semibold text-foreground truncate">${this.escape(item.name)}</span>
               <span class="text-[11px] text-muted-foreground">${translate("Qty:")} ${item.qty}</span>
+              ${item.tax ? `<span class="text-[10px] text-muted-foreground">${this.escape(item.tax.name)} (${this.taxRateFor(item.tax.rate_bp)}%${item.tax.inclusive ? ` · ${translate("Included")}` : ""})</span>` : ""}
             </div>
             <span class="text-[13px] font-bold text-foreground">${lineTotal}</span>
           </div>
@@ -1495,6 +1621,7 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
           <div class="flex flex-col flex-1 min-w-0">
             <span class="text-[13px] font-semibold text-foreground truncate">${this.escape(item.name)}</span>
             <span class="text-[11px] text-muted-foreground">${Helpers.formatMoney(item.priceCents, this.currency)} ${translate("/ ea")}</span>
+            ${item.tax ? `<span class="text-[10px] text-muted-foreground">${this.escape(item.tax.name)} (${this.taxRateFor(item.tax.rate_bp)}%${item.tax.inclusive ? ` · ${translate("Included")}` : ""})</span>` : ""}
             ${atCap ? `<span class="text-[10px] text-warning">${translate("Stock limit")}: ${item.stockQuantity}</span>` : ""}
           </div>
           <div class="flex items-center bg-card rounded-lg p-0.5 shadow-sm border border-line shrink-0">
@@ -1522,7 +1649,7 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
   renderPaymentSection() {
     const subtotalCents = this.getSubtotalCents()
     const discountCents = this.getDiscountCents()
-    const taxCents = this.getTaxCents()
+    const taxLines = this.getTaxLines()
     const totalCents = this.getTotalCents()
     const money = (cents) => Helpers.formatMoney(cents, this.currency)
 
@@ -1624,12 +1751,12 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
               <span class="text-[13px] font-semibold">-${money(discountCents)}</span>
             </div>
           ` : ""}
-          ${this.tax.rate_bp > 0 ? `
+          ${taxLines.map((line) => `
             <div class="flex justify-between items-center text-[12px] text-muted-foreground">
-              <span>${this.escape(this.tax.name)} (${this.taxRateLabel()}%)</span>
-              <span class="text-[13px] font-semibold text-foreground">${money(taxCents)}</span>
+              <span>${this.escape(line.name)} (${this.taxRateFor(line.rate_bp)}%)${line.inclusive ? ` · ${translate("Included")}` : ""}</span>
+              <span class="text-[13px] font-semibold text-foreground">${money(line.tax_cents)}</span>
             </div>
-          ` : ""}
+          `).join("")}
           <div class="h-px bg-line my-1"></div>
           <div class="flex justify-between items-center">
             <span class="text-[13px] font-bold text-foreground">${translate("Total Amount")}</span>
@@ -1701,11 +1828,6 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
     })
   }
 
-  taxRateLabel() {
-    const rate = Number(this.tax.rate_percent || 0)
-    return Number.isInteger(rate) ? String(rate) : rate.toFixed(2).replace(/0+$/, "").replace(/\.$/, "")
-  }
-
   renderReceiptSlip(receipt) {
     const money = (cents) => Helpers.formatMoney(cents, receipt.currency || this.currency)
     return `
@@ -1727,7 +1849,12 @@ export default class Companies_Operations_Pos_ShowController extends Controller 
         <div class="border-t border-dashed border-line mt-3 pt-3 space-y-1">
           <div class="flex justify-between text-[11px] text-muted-foreground"><span>${translate("Subtotal")}</span><span>${money(receipt.subtotal_cents)}</span></div>
           ${receipt.discount_cents > 0 ? `<div class="flex justify-between text-[11px] text-success"><span>${translate("Discount")}${receipt.discount_code ? ` (${this.escape(receipt.discount_code)})` : ""}</span><span>-${money(receipt.discount_cents)}</span></div>` : ""}
-          ${receipt.tax_rate_bp > 0 ? `<div class="flex justify-between text-[11px] text-muted-foreground"><span>${this.escape(receipt.tax_name || "Tax")} (${this.taxRateFor(receipt.tax_rate_bp)}%)</span><span>${money(receipt.tax_cents)}</span></div>` : ""}
+          ${(receipt.tax_lines || []).map((line) => `
+            <div class="flex justify-between text-[11px] text-muted-foreground">
+              <span>${this.escape(line.name || "Tax")} (${this.taxRateFor(line.rate_bp)}%)${line.inclusive ? ` · ${translate("Included")}` : ""}</span>
+              <span>${money(line.tax_cents)}</span>
+            </div>
+          `).join("")}
           <div class="flex justify-between text-[13px] font-black pt-1"><span>${translate("Total Amount")}</span><span>${money(receipt.total_cents)}</span></div>
           ${receipt.payment_method_name ? `<div class="flex justify-between text-[11px] text-muted-foreground"><span>${translate("Payment Method")}</span><span>${this.escape(receipt.payment_method_name)}</span></div>` : ""}
           ${receipt.cash_received_cents != null ? `<div class="flex justify-between text-[11px] text-muted-foreground"><span>${translate("Received")}</span><span>${money(receipt.cash_received_cents)}</span></div>` : ""}
