@@ -156,7 +156,7 @@ export default class Companies_TaxConfigs_ShowController extends Companies_Layou
 
     return `
       <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-card rounded-xl border border-line max-w-2xl">
+        <div class="p-6 bg-card rounded-xl border border-line">
           ${form({
             method: "PATCH",
             attributes: `data-action="submit->${this.identifier}#saveConfig" class="space-y-4"`,
