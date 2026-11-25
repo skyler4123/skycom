@@ -60,8 +60,10 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
       subtotal_cents: result.subtotal_cents,
       discount_cents: result.discount_cents,
       tax_cents: result.tax_cents,
+      added_tax_cents: result.added_tax_cents,
       total_cents: result.total_cents,
       currency: result.currency,
+      tax_lines: result.tax_lines,
       cash_received_cents: result.cash_received_cents,
       change_cents: result.change_cents
     }
@@ -147,8 +149,10 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
       subtotal_cents: totals.subtotal_cents,
       discount_cents: totals.discount_cents,
       tax_cents: totals.tax_cents,
+      added_tax_cents: totals.added_tax_cents,
       total_cents: totals.total_cents,
       currency: totals.currency,
+      tax_lines: totals.tax_lines,
       message: message
     }
   end

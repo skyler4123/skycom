@@ -8,7 +8,10 @@
 # once here and persisted on the line; pay reserves that exact stock.
 module OrderProcessingV1
   class CreateOrderService
-    Line = Struct.new(:kind, :record, :stock, :quantity, :unit_price_cents, keyword_init: true) do
+    Line = Struct.new(
+      :kind, :record, :stock, :quantity, :unit_price_cents, :tax_code,
+      keyword_init: true
+    ) do
       def total_cents
         unit_price_cents * quantity
       end
@@ -36,6 +39,8 @@ module OrderProcessingV1
         order = create_order
         insert_lines(order, lines)
         totals = OrderTotalsService.call(order: order)
+        PersistLineTaxesService.call(line_taxes: totals.line_taxes)
+        order.update_columns(tax_cents: totals.tax_cents, total_cents: totals.total_cents)
         order_result(order, totals, lines)
       end
     end
@@ -43,6 +48,7 @@ module OrderProcessingV1
     private
 
     def resolve_lines
+      default_tax_code = TaxConfig.for_company!(@company).default_tax_code
       product_items = @items.select { |item| item[:product_id].present? }
       products = if product_items.any?
         @company.products.where(branch_id: @branch.id, id: product_items.map { |item| item[:product_id] }).index_by(&:id)
@@ -65,15 +71,21 @@ module OrderProcessingV1
           stock = stocks[product.id]
           raise InsufficientStockError, "Product is not stocked at this branch" unless stock
 
-          Line.new(kind: "product", record: product, stock: stock, quantity: quantity,
-            unit_price_cents: product.price_cents.to_i)
+          Line.new(
+            kind: "product", record: product, stock: stock, quantity: quantity,
+            unit_price_cents: product.price_cents.to_i,
+            tax_code: TaxCodes::Resolver.call(record: product, default_tax_code: default_tax_code)
+          )
         elsif item[:service_id].present?
           service = @company.services.where(branch_id: @branch.id).find_by(id: item[:service_id])
           raise InvalidOrderItemError, "Service not found in this branch" unless service
           raise InvalidOrderItemError, "Price is not set for #{service.name}" if service.price_cents.nil?
 
-          Line.new(kind: "service", record: service, quantity: quantity,
-            unit_price_cents: service.price_cents.to_i)
+          Line.new(
+            kind: "service", record: service, quantity: quantity,
+            unit_price_cents: service.price_cents.to_i,
+            tax_code: TaxCodes::Resolver.call(record: service, default_tax_code: default_tax_code)
+          )
         else
           raise InvalidOrderItemError, "Item must be a product or a service"
         end
@@ -93,7 +105,6 @@ module OrderProcessingV1
     end
 
     def create_order
-      config = TaxConfig.for_company!(@company)
       Order.create!(
         company: @company,
         branch: @branch,
@@ -103,10 +114,7 @@ module OrderProcessingV1
         currency: @company.currency,
         business_type: :in_store,
         fulfillment_channel: :walk_in,
-        employee: @employee,
-        pos_tax_rate_bp: config.pos_tax_rate_bp.to_i,
-        pos_tax_name: config.pos_tax_name.presence || "Tax",
-        pos_tax_inclusive: false
+        employee: @employee
       )
     end
 
@@ -131,6 +139,10 @@ module OrderProcessingV1
           quantity: line.quantity,
           unit_price: Money.from_cents(line.unit_price_cents, currency).to_f,
           total_price: Money.from_cents(line.total_cents, currency).to_f,
+          tax_code_id: line.tax_code&.id,
+          tax_name: line.tax_code&.name.presence || "Tax",
+          tax_rate_bp: line.tax_code&.rate_bp.to_i,
+          tax_inclusive: line.tax_code&.is_inclusive || false,
           created_at: now,
           updated_at: now
         }
@@ -146,6 +158,10 @@ module OrderProcessingV1
           quantity: line.quantity,
           unit_price: Money.from_cents(line.unit_price_cents, currency).to_f,
           total_price: Money.from_cents(line.total_cents, currency).to_f,
+          tax_code_id: line.tax_code&.id,
+          tax_name: line.tax_code&.name.presence || "Tax",
+          tax_rate_bp: line.tax_code&.rate_bp.to_i,
+          tax_inclusive: line.tax_code&.is_inclusive || false,
           created_at: now,
           updated_at: now
         }
@@ -159,16 +175,17 @@ module OrderProcessingV1
         currency: totals.currency,
         subtotal_cents: totals.subtotal_cents,
         tax_cents: totals.tax_cents,
+        added_tax_cents: totals.added_tax_cents,
         total_cents: totals.total_cents,
-        tax_rate_bp: totals.tax_rate_bp,
-        tax_name: totals.tax_name,
+        tax_lines: totals.tax_lines,
         items: lines.map do |line|
           {
             kind: line.kind,
             id: line.record.id,
             quantity: line.quantity,
             unit_price_cents: line.unit_price_cents,
-            total_cents: line.total_cents
+            total_cents: line.total_cents,
+            tax: line.tax_code&.option_payload
           }
         end
       }

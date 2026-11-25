@@ -28,7 +28,6 @@ module Pos
 
       {
         currency: @company.currency,
-        tax: tax_payload,
         catalog: {
           limit: POS_CATALOG_LIMIT,
           products_total: @products_total,
@@ -41,17 +40,18 @@ module Pos
 
     private
 
-    def tax_payload
-      config = TaxConfig.for_company!(@company)
-      {
-        rate_bp: config.pos_tax_rate_bp.to_i,
-        rate_percent: config.pos_tax_rate_percent,
-        name: config.pos_tax_name.presence || "Tax"
-      }
+    def default_tax_code
+      return @default_tax_code if defined?(@default_tax_code)
+
+      @default_tax_code = TaxConfig.for_company!(@company).default_tax_code
+    end
+
+    def tax_payload_for(record)
+      TaxCodes::Resolver.call(record: record, default_tax_code: default_tax_code)&.option_payload
     end
 
     def load_products
-      scope = @company.products.where(branch_id: @branch.id).includes(:category)
+      scope = @company.products.where(branch_id: @branch.id).includes(:category, :tax_code)
       if @query.blank?
         @products_total = scope.count
         scope.order(:name).limit(POS_CATALOG_LIMIT).to_a
@@ -67,7 +67,7 @@ module Pos
     def services
       return @services if defined?(@services)
 
-      scope = @company.services.where(branch_id: @branch.id).includes(:category)
+      scope = @company.services.where(branch_id: @branch.id).includes(:category, :tax_code)
       if @query.blank?
         @services_total = scope.count
         @services = scope.order(:name).limit(POS_CATALOG_LIMIT).to_a
@@ -105,7 +105,8 @@ module Pos
         stock_quantity: stock ? stock.available_count : 0,
         stock_warehouse_id: stock&.warehouse_id,
         stock_warehouse_name: stock&.warehouse&.name,
-        image_url: image_url(product)
+        image_url: image_url(product),
+        tax: tax_payload_for(product)
       }
     end
 
@@ -118,7 +119,8 @@ module Pos
         category_name: service.category&.name,
         price_cents: service.price_cents,
         price_set: !service.price_cents.nil?,
-        image_url: image_url(service)
+        image_url: image_url(service),
+        tax: tax_payload_for(service)
       }
     end
 

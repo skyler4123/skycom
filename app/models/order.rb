@@ -26,10 +26,9 @@ class Order < ApplicationRecord
   include DynamicSearchConcern
   include TagConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
-  # POS tax snapshot at ORDER time. Stored in metadata so a later Tax Config
-  # change never rewrites an open sale.
+  # Tax lives on each order line snapshot; metadata stays available for other
+  # order-level fields.
   attribute :metadata, default: -> { {} }
-  store_accessor :metadata, :pos_tax_rate_bp, :pos_tax_name, :pos_tax_inclusive
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc

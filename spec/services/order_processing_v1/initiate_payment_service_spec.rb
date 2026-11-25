@@ -51,27 +51,30 @@ RSpec.describe OrderProcessingV1::InitiatePaymentService do
   end
 
   describe "cash mode" do
-    it "writes the configured tax and total on the invoice and transaction" do
-      order.update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax")
+    it "writes the line tax breakdown and total on the invoice and transaction" do
+      code = create(:tax_code, company: company, name: "Sales tax", rate_bp: 800)
+      line_item.update!(tax_code_id: code.id, tax_name: "Sales tax", tax_rate_bp: 800, tax_inclusive: false)
 
       result = described_class.call(order: order, appointment: cash_appts.last, cash_received_cents: 12_000)
 
       txn = Transaction.find(result.transaction_id)
       invoice = txn.invoice.reload
       expect(result.tax_cents).to eq(800)
+      expect(result.added_tax_cents).to eq(800)
       expect(result.total_cents).to eq(10_800)
       expect(invoice.price_cents).to eq(10_800)
       expect(invoice.tax_cents).to eq(800)
       expect(invoice.total_cents).to eq(10_800)
-      expect(invoice.pos_tax_rate_bp).to eq(800)
-      expect(invoice.pos_tax_name).to eq("Sales tax")
+      expect(invoice.tax_breakdown).to contain_exactly(
+        include("name" => "Sales tax", "rate_bp" => 800, "inclusive" => false, "taxable_cents" => 10_000, "tax_cents" => 800)
+      )
       expect(txn.price_cents).to eq(10_800)
       expect(txn.cash_received_cents).to eq(12_000)
       expect(txn.change_cents).to eq(1_200)
     end
 
     it "rejects cash received below the total without creating an invoice" do
-      order.update!(pos_tax_rate_bp: 800)
+      line_item.update!(tax_name: "Sales tax", tax_rate_bp: 800)
 
       expect {
         described_class.call(order: order, appointment: cash_appts.last, cash_received_cents: 10_000)
@@ -196,7 +199,7 @@ RSpec.describe OrderProcessingV1::InitiatePaymentService do
     end
 
     it "uses a discount already reserved on the order when no code is passed" do
-      order.update!(pos_tax_rate_bp: 800)
+      line_item.update!(tax_name: "Sales tax", tax_rate_bp: 800)
       discount.reserve!(order: order, employee: employee, amount_cents: 1_000)
 
       result = described_class.call(order: order, appointment: cash_appts.last)

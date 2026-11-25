@@ -20,10 +20,10 @@ class Invoice < ApplicationRecord
 
   include TagConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
-  # Tax snapshot taken when the invoice is created. Receipts read this instead
-  # of the current Tax Config, so a later rate change never rewrites history.
+  # Tax breakdown snapshot taken when the invoice is created. Receipts read this
+  # instead of the current tax codes, so a later rate change never rewrites history.
   attribute :metadata, default: -> { {} }
-  store_accessor :metadata, :pos_tax_rate_bp, :pos_tax_name, :pos_tax_inclusive
+  store_accessor :metadata, :tax_breakdown
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc

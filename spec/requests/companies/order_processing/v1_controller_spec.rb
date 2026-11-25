@@ -277,7 +277,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
     end
     let!(:discount) { Seed::DiscountService.create(company: company, discount_group: group, code: "POS-DISC") }
 
-    before { TaxConfig.for_company!(company).update!(pos_tax_rate_bp: 800, pos_tax_name: "Sales tax") }
+    before { product.update!(tax_code: create(:tax_code, company: company, name: "Sales tax", rate_bp: 800)) }
 
     it "applies, removes, and then voids the order" do
       order_id = checkout_order
@@ -288,6 +288,8 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
       body = JSON.parse(response.body)
       expect(body.dig("discount", "amount_cents")).to eq(1_000)
       expect(body["total_cents"]).to eq(9_720)
+      expect(body["added_tax_cents"]).to eq(720)
+      expect(body["tax_lines"].first).to include("name" => "Sales tax", "tax_cents" => 720)
       expect(discount.reload).to be_status_pending
 
       post "/companies/#{company.id}/order_processing/v1/remove_discount",
