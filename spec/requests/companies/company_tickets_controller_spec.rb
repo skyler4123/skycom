@@ -22,6 +22,10 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
     ActionController::Base.allow_forgery_protection = original
   end
 
+  def sign_in_as(employee)
+    get sign_in_for_test_path(email: employee.user.email)
+  end
+
   describe "GET #index" do
     it "returns the company's tickets with pagination and open count" do
       get company_company_tickets_path(company), as: :json
@@ -97,7 +101,7 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
       expect(names).not_to include("Other printer")
     end
 
-    it "returns all tickets without mine param" do
+    it "returns all tickets for the owner without mine param" do
       other = create(:employee, company: company)
       CompanyTicket.create!(company: company, employee: other,
         name: "Other printer", ticket_category: :technical)
@@ -106,6 +110,25 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
 
       names = JSON.parse(response.body)["company_tickets"].map { |t| t["name"] }
       expect(names).to include("Printer is down", "Other printer")
+    end
+
+    it "shows company-wide tickets plus the reader's own private tickets" do
+      reader = grant_company_ticket_permissions(create(:employee, company: company), :read)
+      other = create(:employee, company: company)
+      CompanyTicket.create!(company: company, employee: reader, name: "Reader private")
+      CompanyTicket.create!(company: company, employee: other, name: "Shared",
+        visibility: :company_wide)
+      CompanyTicket.create!(company: company, employee: other, name: "Hidden")
+
+      sign_in_as(reader)
+      get company_company_tickets_path(company), as: :json
+
+      body = JSON.parse(response.body)
+      names = body["company_tickets"].map { |t| t["name"] }
+      expect(names).to include("Reader private", "Shared")
+      expect(names).not_to include("Hidden", "Printer is down")
+      expect(body["open_count"]).to eq(2)
+      expect(body["company_tickets"].map { |t| t["visibility"] }).to include("only_me", "company_wide")
     end
   end
 
@@ -149,6 +172,33 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
 
       expect(response).to have_http_status(:not_found)
     end
+
+    it "returns 404 for another employee's private ticket" do
+      reader = grant_company_ticket_permissions(create(:employee, company: company), :read)
+      other = create(:employee, company: company)
+      hidden = CompanyTicket.create!(company: company, employee: other, name: "Hidden")
+
+      sign_in_as(reader)
+      get company_company_ticket_path(company, hidden), as: :json
+
+      expect(response).to have_http_status(:not_found)
+      expect(JSON.parse(response.body)).to have_key("errors")
+    end
+
+    it "allows a reader to open a company-wide ticket and exposes manageability" do
+      reader = grant_company_ticket_permissions(create(:employee, company: company), :read)
+      other = create(:employee, company: company)
+      shared = CompanyTicket.create!(company: company, employee: other, name: "Shared",
+        visibility: :company_wide)
+
+      sign_in_as(reader)
+      get company_company_ticket_path(company, shared), as: :json
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)["company_ticket"]
+      expect(body["visibility"]).to eq("company_wide")
+      expect(body["can_manage_visibility"]).to be(false)
+    end
   end
 
   describe "POST #create" do
@@ -164,11 +214,34 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
       created = CompanyTicket.last
       expect(created.employee).to eq(owner_employee)
       expect(created).to be_status_open
+      expect(created).to be_only_me
       expect(WEBSOCKET).to have_received(:publish_event).with(
         channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_created,
-        data: hash_including(name: "WiFi down")
+        data: { id: created.id }
       )
+    end
+
+    it "accepts an explicit company-wide visibility" do
+      post company_company_tickets_path(company), params: {
+        company_ticket: { name: "Shared request", ticket_category: "technical",
+          visibility: "company_wide" }
+      }, as: :json
+
+      expect(response).to have_http_status(:created)
+      expect(CompanyTicket.last).to be_company_wide
+    end
+
+    it "rejects an unknown visibility with 422 and creates nothing" do
+      expect {
+        post company_company_tickets_path(company), params: {
+          company_ticket: { name: "Bogus", ticket_category: "technical",
+            visibility: "branch" }
+        }, as: :json
+      }.not_to change(CompanyTicket, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body)).to have_key("errors")
     end
 
     it "rejects blank name with 422 errors" do
@@ -189,6 +262,76 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
     end
   end
 
+  describe "PATCH #update" do
+    it "lets the creator share a private ticket and logs the change" do
+      patch company_company_ticket_path(company, ticket), params: {
+        company_ticket: { visibility: "company_wide" }
+      }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(ticket.reload).to be_company_wide
+      body = JSON.parse(response.body)
+      expect(body["message"]).to eq("Visibility updated")
+      expect(body["company_ticket"]["visibility"]).to eq("company_wide")
+      expect(body["company_ticket"]["can_manage_visibility"]).to be(true)
+
+      log = ticket.ticket_logs.visibility_changed.last
+      expect(log.from_status).to eq("only_me")
+      expect(log.to_status).to eq("company_wide")
+    end
+
+    it "rejects a non-creator with 403 and keeps the visibility" do
+      reader = grant_company_ticket_permissions(create(:employee, company: company), :update)
+      shared = CompanyTicket.create!(company: company, employee: owner_employee,
+        name: "Owner shared", visibility: :company_wide)
+
+      sign_in_as(reader)
+      patch company_company_ticket_path(company, shared), params: {
+        company_ticket: { visibility: "only_me" }
+      }, as: :json
+
+      expect(response).to have_http_status(:forbidden)
+      expect(shared.reload).to be_company_wide
+    end
+
+    it "rejects the company owner when they are not the creator" do
+      other = create(:employee, company: company)
+      other_private = CompanyTicket.create!(company: company, employee: other,
+        name: "Other private")
+
+      patch company_company_ticket_path(company, other_private), params: {
+        company_ticket: { visibility: "company_wide" }
+      }, as: :json
+
+      expect(response).to have_http_status(:forbidden)
+      expect(other_private.reload).to be_only_me
+    end
+
+    it "returns 404 for a private ticket the reader cannot see" do
+      reader = grant_company_ticket_permissions(create(:employee, company: company), :update)
+      other = create(:employee, company: company)
+      hidden = CompanyTicket.create!(company: company, employee: other, name: "Hidden")
+
+      sign_in_as(reader)
+      patch company_company_ticket_path(company, hidden), params: {
+        company_ticket: { visibility: "company_wide" }
+      }, as: :json
+
+      expect(response).to have_http_status(:not_found)
+      expect(hidden.reload).to be_only_me
+    end
+
+    it "rejects an unknown visibility with 422" do
+      patch company_company_ticket_path(company, ticket), params: {
+        company_ticket: { visibility: "branch" }
+      }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body)).to have_key("errors")
+      expect(ticket.reload).to be_only_me
+    end
+  end
+
   describe "POST #rate" do
     it "records the creator rating on a resolved ticket and publishes" do
       ticket.transition_to!(:resolved, actor: owner_employee)
@@ -202,7 +345,7 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
       expect(WEBSOCKET).to have_received(:publish_event).with(
         channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_status_changed,
-        data: hash_including(to_status: "rated")
+        data: { id: ticket.id }
       )
     end
 

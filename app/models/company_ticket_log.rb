@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # CompanyTicketLog — Atomic purpose: append-only audit row for a CompanyTicket
-# event (created, assigned, status_changed, commented, rated).
+# event (created, assigned, status_changed, commented, rated, visibility_changed).
 #
 # Why it exists: platform support needs an auditable timeline of assignments,
 # status changes, comments, and ratings, with a polymorphic actor (Employee or
@@ -19,7 +19,8 @@ class CompanyTicketLog < ApplicationRecord
     assigned: 1,
     status_changed: 2,
     commented: 3,
-    rated: 4
+    rated: 4,
+    visibility_changed: 5
   }
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true

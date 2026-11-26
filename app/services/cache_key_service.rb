@@ -123,16 +123,6 @@ class CacheKeyService
     "employee:#{employee_id}:manager_ids"
   end
 
-  # Pattern: company:<company_id>:tickets:open_count
-  # Purpose: open support-ticket count shown on the company ticket index.
-  # Store: Rails.sync_cache
-  # TTL: CACHE_DEFAULT_EXPIRY (1 hour)
-  # Written by: Companies::CompanyTicketsController#index
-  # Cleared by: CompanyTicket#invalidate_count_caches (create/assign/transition)
-  def self.company_open_ticket_count(company_id)
-    "company:#{company_id}:tickets:open_count"
-  end
-
   # Pattern: company_ticket:admin:open_count
   # Purpose: open support-ticket count across every company (admin pool).
   # Store: Rails.sync_cache

@@ -63,11 +63,6 @@ RSpec.describe CacheKeyService do
       expect(described_class.employee_manager_ids(12)).to eq("employee:12:manager_ids")
     end
 
-    it "builds the company open ticket count key" do
-      expect(described_class.company_open_ticket_count(3))
-        .to eq("company:3:tickets:open_count")
-    end
-
     it "builds the admin open ticket count key" do
       expect(described_class.admin_open_ticket_count)
         .to eq("company_ticket:admin:open_count")

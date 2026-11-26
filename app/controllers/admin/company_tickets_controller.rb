@@ -4,13 +4,14 @@
 # current_company here; Admin::ApplicationController gates on
 # super_admin/admin instead of Pundit. List page polls (never fans out to N
 # company channels); the open detail subscribes to its ticket's company
-# channel from the FE.
+# channel from the FE. Staff see every ticket regardless of company visibility;
+# socket events carry only the ticket id, so the detail refetches.
 # Serves Stimulus: Admin_CompanyTickets_IndexController (pool JSON + filters),
 #                  Admin_CompanyTickets_ShowController (detail + member actions)
 # Endpoints: GET /admin/company_tickets(.json),
 #            GET /admin/company_tickets/:id(.json),
 #            POST /admin/company_tickets/:id/assign|resolve|close|reopen|comment(.json)
-# Docs: docs/superpowers/plans/2026-10-07-company-support-center.md
+# Docs: docs/superpowers/plans/2026-11-26-company-ticket-visibility.md
 class Admin::CompanyTicketsController < Admin::ApplicationController
   def index
     respond_to do |format|
@@ -58,7 +59,7 @@ class Admin::CompanyTicketsController < Admin::ApplicationController
       return render json: { errors: [ e.message ] }, status: :unprocessable_content
     end
 
-    publish_status(ticket, from_status: ticket.status_before_last_save, to_status: "assigned")
+    publish_status(ticket)
     render json: { company_ticket: format_ticket_detail(ticket.reload) }
   end
 
@@ -93,7 +94,7 @@ class Admin::CompanyTicketsController < Admin::ApplicationController
     WEBSOCKET.publish_event(
       channel: WEBSOCKET.channel_name(:company, ticket.company_id),
       event_key: :company_ticket_commented,
-      data: { id: ticket.id, comment: full_comment, first_responded_at: ticket.reload.first_responded_at }
+      data: { id: ticket.id }
     )
     render json: { company_ticket_comment: full_comment },
       status: :created
@@ -103,19 +104,18 @@ class Admin::CompanyTicketsController < Admin::ApplicationController
 
   def transition(id, to_status)
     ticket = CompanyTicket.find(id)
-    from = ticket.status
     ticket.transition_to!(to_status, actor: current_user)
-    publish_status(ticket, from_status: from, to_status: ticket.status)
+    publish_status(ticket)
     render json: { company_ticket: format_ticket_detail(ticket.reload) }
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
   end
 
-  def publish_status(ticket, from_status:, to_status:)
+  def publish_status(ticket)
     WEBSOCKET.publish_event(
       channel: WEBSOCKET.channel_name(:company, ticket.company_id),
       event_key: :company_ticket_status_changed,
-      data: { id: ticket.id, from_status: from_status, to_status: to_status }
+      data: { id: ticket.id }
     )
   end
 

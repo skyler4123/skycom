@@ -250,7 +250,7 @@ never through model callbacks, mirroring the no-callback rule for direct day wri
 | `before_validation :mirror_workflow_status` | — | `mirror_workflow_status` | Mirrors the dedicated ticket `status` into generic `workflow_status` (`open→pending`, `in_progress→in_progress`, `waiting_customer→confirmed`, `resolved`/`closed→completed`, `cancelled→cancelled`). The ticket `status` is the source of truth; `workflow_status` exists only for the System Fields convention. |
 | `before_update :stamp_sla_timestamps` | — | `stamp_sla_timestamps` | Sets `resolved_at` (once, `||=`) when `status` becomes `resolved`/`closed`; clears it when the ticket leaves those states (reopen). `first_responded_at` is never touched here — only `CompanyTicketComment` stamps it. |
 | `after_create :log_created` | — | `log_created` | Writes the audit `CompanyTicketLog` (`action: :created`, actor = creator employee). |
-| `after_create :invalidate_count_caches` | — | `invalidate_count_caches` | Deletes `CacheKeyService.company_open_ticket_count(company_id)` and `CacheKeyService.admin_open_ticket_count` (DB stays the source of truth). Also called by `assign_to!` / `transition_to!`. |
+| `after_create :invalidate_count_caches` | — | `invalidate_count_caches` | Deletes `CacheKeyService.admin_open_ticket_count` (DB stays the source of truth). Also called by `assign_to!` / `transition_to!`. The company index counts its viewer-scoped open tickets live, so no company count cache exists. |
 
 ---
 

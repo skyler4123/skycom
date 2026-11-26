@@ -2,12 +2,16 @@
 #
 # Help Center comment creation (Shell-First JSON only). Comments ride on the
 # ticket show payload — there is no standalone index here.
+# The ticket lookup runs through CompanyTicket.visible_to, so a hidden ticket
+# is a 404 even for an employee with comment permission. The socket event
+# carries only the ticket id; detail pages refetch through the scoped show.
 # Serves Stimulus: Companies_CompanyTickets_ShowController (comment form)
 # Endpoints: POST /companies/:company_id/company_ticket_comments(.json)
-# Docs: docs/superpowers/plans/2026-10-07-company-support-center.md
+# Docs: docs/superpowers/plans/2026-11-26-company-ticket-visibility.md
 class Companies::CompanyTicketCommentsController < Companies::ApplicationController
   def create
-    ticket = current_company.company_tickets.find(comment_params[:company_ticket_id])
+    ticket = current_company.company_tickets.visible_to(current_employee)
+      .find(comment_params[:company_ticket_id])
 
     comment = CompanyTicketComment.create_for!(
       ticket: ticket,
@@ -20,12 +24,14 @@ class Companies::CompanyTicketCommentsController < Companies::ApplicationControl
     WEBSOCKET.publish_event(
       channel: WEBSOCKET.channel_name(:company, current_company.id),
       event_key: :company_ticket_commented,
-      data: { id: ticket.id, comment: full_comment, first_responded_at: ticket.reload.first_responded_at }
+      data: { id: ticket.id }
     )
     render json: { company_ticket_comment: full_comment },
       status: :created
   rescue ActionController::ParameterMissing
     render json: { errors: [ "comment message is required" ] }, status: :unprocessable_content
+  rescue ActiveRecord::RecordNotFound
+    render json: { errors: [ "Ticket not found" ] }, status: :not_found
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
   end

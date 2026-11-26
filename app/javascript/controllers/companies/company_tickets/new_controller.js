@@ -2,15 +2,23 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 
 // New support ticket — traditional submit (data-turbo=false); the server
 // redirects to the ticket page on success (DASHBOARD_PATTERN convention).
+// Visibility defaults to only-me; the creator can share with the company later.
 // Depends on BE: Companies::CompanyTicketsController#new (reference data) + #create (HTML redirect)
-// Endpoints: GET <pathname>.json — { ticket_categories, priorities }; POST /companies/:id/company_tickets
-// Docs: docs/superpowers/plans/2026-10-07-company-support-center.md
+// Endpoints: GET <pathname>.json — { ticket_categories, priorities, visibilities, default_visibility };
+//            POST /companies/:id/company_tickets
+// Docs: docs/superpowers/plans/2026-11-26-company-ticket-visibility.md
 export default class Companies_CompanyTickets_NewController extends Companies_LayoutController {
   /** @type {string[]} */
   categories = []
 
   /** @type {string[]} */
   priorities = []
+
+  /** @type {string[]} */
+  visibilities = []
+
+  /** @type {string} */
+  defaultVisibility = "only_me"
 
   async connect() {
     super.connect()
@@ -19,6 +27,8 @@ export default class Companies_CompanyTickets_NewController extends Companies_La
       const response = await fetchJson(`${pathname()}.json`)
       this.categories = response.ticket_categories || []
       this.priorities = response.priorities || []
+      this.visibilities = response.visibilities || []
+      this.defaultVisibility = response.default_visibility || "only_me"
     } catch (error) {
       toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to load ticket options") })
     }
@@ -40,6 +50,8 @@ export default class Companies_CompanyTickets_NewController extends Companies_La
     // Fallbacks keep the selects usable when the reference fetch fails (FLAKY_TESTS §6).
     const categories = this.categories.length > 0 ? this.categories : ["billing", "technical", "account", "feature_request", "other"]
     const priorities = this.priorities.length > 0 ? this.priorities : ["low", "medium", "high", "urgent"]
+    const visibilityOptions = Helpers.companyTicketVisibilityOptions()
+      .filter((option) => this.visibilities.length === 0 || this.visibilities.includes(option.value))
 
     const fields = `
       <div class="space-y-6">
@@ -72,6 +84,23 @@ export default class Companies_CompanyTickets_NewController extends Companies_La
               class="w-full px-3 py-2 border border-line rounded-lg bg-card text-sm text-foreground focus:ring-2 focus:ring-primary outline-none">
               ${priorities.map((v) => `<option value="${v}" ${v === "medium" ? "selected" : ""}>${this.humanize(v)}</option>`).join("")}
             </select>
+          </div>
+
+          <div class="col-span-2 space-y-2">
+            <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">${translate("Who can see this?")}</p>
+            <div class="grid gap-2">
+              ${visibilityOptions.map((option) => `
+                <label class="flex items-start gap-3 px-3 py-2 border border-line rounded-lg bg-card cursor-pointer">
+                  <input type="radio" name="company_ticket[visibility]" value="${option.value}"
+                    ${option.value === this.defaultVisibility ? "checked" : ""}
+                    class="mt-1 h-4 w-4 text-primary border-line cursor-pointer">
+                  <span class="flex flex-col gap-0.5">
+                    <span class="text-sm font-medium text-foreground">${option.label}</span>
+                    <span class="text-xs text-muted-foreground">${option.description}</span>
+                  </span>
+                </label>`).join("")}
+            </div>
+            <p class="text-xs text-muted-foreground">${translate("Skycom Support can always see every ticket.")}</p>
           </div>
 
           <div class="col-span-2 space-y-1">

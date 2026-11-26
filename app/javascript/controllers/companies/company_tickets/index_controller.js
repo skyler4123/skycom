@@ -1,11 +1,13 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 // Help Center ticket list — enum filters (status/priority/category).
+// The server scopes the list to company-wide + the current employee's tickets
+// (the company owner sees all); the badge explains each row's visibility.
 // Ticket taxonomy is the inline `ticket_category` enum, NOT the
 // Category/PropertyMapping system, so there is no `category_id` filter here.
 // Depends on BE: Companies::CompanyTicketsController#index
 // Endpoints: GET <pathname>.json?status=&priority=&ticket_category=&mine=1 (open_count included)
-// Docs: docs/superpowers/plans/2026-10-07-company-support-center.md
+// Docs: docs/superpowers/plans/2026-11-26-company-ticket-visibility.md
 export default class Companies_CompanyTickets_IndexController extends Companies_LayoutController {
   static targets = ["ticketsList"]
 
@@ -120,10 +122,13 @@ export default class Companies_CompanyTickets_IndexController extends Companies_
               target: "ticketsList",
               renderers: {
                 name: (value, record) => `
-                  <a href="${Helpers.company_company_ticket_path(currentCompany().id, record.id)}"
-                    class="font-medium text-foreground hover:text-primary transition-colors cursor-pointer">
-                    ${escapeHtml(value) || translate("Untitled ticket")}
-                  </a>`,
+                  <div class="flex flex-wrap items-center gap-2">
+                    <a href="${Helpers.company_company_ticket_path(currentCompany().id, record.id)}"
+                      class="font-medium text-foreground hover:text-primary transition-colors cursor-pointer">
+                      ${escapeHtml(value) || translate("Untitled ticket")}
+                    </a>
+                    ${Helpers.companyTicketVisibilityBadge(record.visibility)}
+                  </div>`,
                 ticket_category: (value) => `<span class="text-sm text-muted-foreground">${value ? this.humanize(value) : "—"}</span>`,
                 priority: (value) => `${Helpers.statusBadge(value || "medium")}`,
                 status: (value) => `${Helpers.statusBadge(value || "open")}`,

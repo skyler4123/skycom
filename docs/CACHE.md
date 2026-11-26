@@ -383,7 +383,6 @@ Two key families:
 | `current_address(record)` | `<domain>:<id>:<cache_version>:current_address` | `sync_cache` | 1 hour | touch — `attach_address` touches the owner |
 | `customer_current_membership(customer)` | `customer:<id>:<cache_version>:current_membership` | `sync_cache` | 1 hour | touch — `attach_membership` touches the customer |
 | `customer_membership_of_type(customer, type)` | `customer:<id>:<cache_version>:membership:<type>` | `sync_cache` | 1 hour | same |
-| `company_open_ticket_count(id)` | `company:<id>:tickets:open_count` | `sync_cache` | 1 hour | `CompanyTicket#invalidate_count_caches` |
 | `admin_open_ticket_count` | `company_ticket:admin:open_count` | `sync_cache` | 1 hour | `CompanyTicket#invalidate_count_caches` |
 | `employee_unread_notifications(id)` | `employee:<id>:notifications:unread` | `sync_cache` | 1 hour | notification create / mark-read / mark-all-read / prune |
 | `company_analytics(id, period)` | `company:<id>:analytics:<period>` | `sync_cache` | 1 hour | TTL only — clear manually for an immediate refresh |

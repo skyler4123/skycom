@@ -1,20 +1,21 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
-// Ticket detail — thread, attachments, activity log, comment box, rating.
-// Comment/rate forms POST JSON via fetchJson submit handlers (notifications
-// mark-read precedent) because the endpoints are JSON-only; the page refreshes
-// its own state instead of navigating. Subscribes to the company channel for
-// live staff replies — comment events carry the full comment payload and are
-// injected into the thread (no re-fetch); status events still refresh.
-// Depends on BE: Companies::CompanyTicketsController#show|rate,
+// Ticket detail — thread, attachments, activity log, comment box, rating,
+// and the creator-only visibility control.
+// Comment/rate/visibility forms POST JSON via fetchJson submit handlers
+// (notifications mark-read precedent) because the endpoints are JSON-only;
+// the page refreshes its own state instead of navigating. Company ticket
+// socket events carry only the ticket id, so the page refetches through the
+// scoped show endpoint — a private ticket's body never rides the broadcast.
+// Depends on BE: Companies::CompanyTicketsController#show|rate|update,
 //               Companies::CompanyTicketCommentsController#create
 // Endpoints: GET <pathname>.json — ticket + comments + logs + attachments;
+//            PATCH /companies/:id/company_tickets/:id (visibility);
 //            POST /companies/:id/company_ticket_comments; POST .../company_tickets/:id/rate
-// Docs: docs/superpowers/plans/2026-10-07-company-support-center.md
+// Docs: docs/superpowers/plans/2026-11-26-company-ticket-visibility.md
 export default class Companies_CompanyTickets_ShowController extends Companies_LayoutController {
   /** @type {any | null} */
   ticket = null
-  _ownIds = new Set()
 
   async connect() {
     super.connect()
@@ -40,18 +41,15 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
 
   handleSocketComment(data) {
     if (!this.ticket || data?.id !== this.ticket.id) return
-    const c = data.payload?.comment
-    if (!c?.id) return
-    if ((this.ticket.comments || []).some((x) => x.id === c.id)) return
-    if (data.payload?.first_responded_at) this.ticket.first_responded_at = data.payload.first_responded_at
-    this.appendComment(c, { silent: this._ownIds.has(c.id) })
+    this.refresh()
   }
 
-  appendComment(c, { silent = false } = {}) {
-    this.ticket.comments = [...(this.ticket.comments || []), c].sort((a, b) =>
+  appendComment(c) {
+    const comments = this.ticket.comments || []
+    if (comments.some((x) => x.id === c.id)) return
+    this.ticket.comments = [...comments, c].sort((a, b) =>
       new Date(a.created_at) - new Date(b.created_at))
     if (this.hasContentTarget) this.renderContent()
-    if (!silent) toast({ type: "info", message: translate("New comment") })
   }
 
   acceptablePickedFile(picked) {
@@ -78,6 +76,10 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
       this.ticket = response.company_ticket
       if (this.hasContentTarget) this.renderContent()
     } catch (error) {
+      if (error.status === 404) {
+        this.ticket = null
+        if (this.hasContentTarget) this.renderContent()
+      }
       toast({ type: "error", message: error.errors?.join(", ") || translate("Ticket not found.") })
     }
   }
@@ -94,8 +96,7 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
       })
       const c = response.company_ticket_comment
       if (c?.id) {
-        this._ownIds.add(c.id)
-        this.appendComment(c, { silent: true })
+        this.appendComment(c)
       }
       formEl.reset()
       toast({ type: "success", message: translate("Comment posted") })
@@ -119,9 +120,76 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
     }
   }
 
+  async handleVisibilitySubmit(event) {
+    event.preventDefault()
+    const value = new FormData(event.target).get("company_ticket[visibility]")
+    try {
+      const response = await fetchJson(Helpers.company_company_ticket_path(currentCompany().id, this.ticket.id), {
+        method: "PATCH",
+        body: { company_ticket: { visibility: value } }
+      })
+      this.ticket = response.company_ticket
+      if (this.hasContentTarget) this.renderContent()
+      toast({ type: "success", message: translate(response.message) })
+    } catch (error) {
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to update visibility") })
+    }
+  }
+
+  handleVisibilityChange(event) {
+    const description = event.target.closest("form")?.querySelector("[data-visibility-description]")
+    if (description) description.textContent = Helpers.companyTicketVisibilityDescription(event.target.value)
+  }
+
   humanize(value) {
     if (!value) return "—"
     return value.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")
+  }
+
+  logTransition(log) {
+    if (!log.from_status) return ""
+    const label = (value) => log.action === "visibility_changed"
+      ? Helpers.companyTicketVisibilityLabel(value)
+      : this.humanize(value)
+    return ` (${label(log.from_status)} → ${label(log.to_status)})`
+  }
+
+  visibilityBlockHTML(ticket) {
+    if (!ticket.can_manage_visibility) {
+      return `
+        <div class="mt-6 pt-6 border-t border-line">
+          <p class="text-xs font-medium text-muted-foreground">${translate("Visibility")}</p>
+          <div class="mt-1">${Helpers.companyTicketVisibilityBadge(ticket.visibility)}</div>
+          <p class="mt-2 text-xs text-muted-foreground">${Helpers.companyTicketVisibilityBadgeDescription(ticket.visibility)}</p>
+          <p class="mt-1 text-xs text-muted-foreground">${translate("Only the creator can change visibility.")}</p>
+        </div>`
+    }
+
+    const options = Helpers.companyTicketVisibilityOptions()
+    const fields = `
+      <div class="space-y-2">
+        <label class="text-xs font-medium text-muted-foreground">${translate("Visibility")}</label>
+        <select name="company_ticket[visibility]" data-action="change->${this.identifier}#handleVisibilityChange"
+          class="w-full px-3 py-2 text-sm border border-line rounded-lg bg-card text-foreground">
+          ${options.map((option) => `<option value="${option.value}" ${option.value === ticket.visibility ? "selected" : ""}>${option.label}</option>`).join("")}
+        </select>
+        <p class="text-xs text-muted-foreground" data-visibility-description>${Helpers.companyTicketVisibilityDescription(ticket.visibility)}</p>
+        <p class="text-xs text-muted-foreground">${translate("Skycom Support can always see every ticket.")}</p>
+      </div>
+      <button type="submit" class="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg font-medium text-sm cursor-pointer">
+        ${translate("Save")}
+      </button>
+    `
+
+    return `
+      <div class="mt-6 pt-6 border-t border-line">
+        ${form({
+          action: Helpers.company_company_ticket_path(currentCompany().id, ticket.id),
+          method: "PATCH",
+          attributes: `class="flex flex-col sm:flex-row sm:items-end gap-3" data-action="submit->${this.identifier}#handleVisibilitySubmit"`,
+          html: fields
+        })}
+      </div>`
   }
 
   attachmentHTML(a) {
@@ -158,7 +226,7 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
     const logs = (t.logs || []).map((l) => `
       <div class="flex items-center gap-2 py-1.5 text-xs text-muted-foreground">
         <span class="material-symbols-outlined text-[16px]">history</span>
-        <span>${this.humanize(l.action)}${l.from_status ? ` (${l.from_status} → ${l.to_status})` : ""}</span>
+        <span>${this.humanize(l.action)}${this.logTransition(l)}</span>
         ${l.note ? `<span class="truncate">— ${escapeHtml(l.note)}</span>` : ""}
         <span class="ml-auto shrink-0">${l.created_at ? Helpers.companyTime(l.created_at) : ""}</span>
       </div>`).join("")
@@ -199,6 +267,8 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
             <div><p class="text-xs font-medium text-muted-foreground">${translate("Created")}</p><p class="font-semibold text-foreground">${t.created_at ? Helpers.companyTime(t.created_at) : "—"}</p></div>
             <div><p class="text-xs font-medium text-muted-foreground">${translate("First response")}</p><p class="font-semibold text-foreground">${t.first_responded_at ? Helpers.companyTime(t.first_responded_at) : "—"}</p></div>
           </div>
+
+          ${this.visibilityBlockHTML(t)}
 
           ${(t.attachments || []).length > 0 ? `
             <div class="mt-6 pt-6 border-t border-line">

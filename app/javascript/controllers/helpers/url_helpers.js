@@ -42,7 +42,7 @@ export const new_admin_payment_method_path = () => `/admin/payment_methods/new`
 export const admin_payment_method_path = (id) => `/admin/payment_methods/${id}`
 export const edit_admin_payment_method_path = (id) => `/admin/payment_methods/${id}/edit`
 export const create_admin_payment_methods_path = () => `/admin/payment_methods`
-// Company support tickets pool (docs/superpowers/plans/2026-10-07-company-support-center.md)
+// Company support tickets pool (docs/superpowers/plans/2026-11-26-company-ticket-visibility.md)
 export const admin_company_tickets_path = () => `/admin/company_tickets`
 export const admin_company_ticket_path = (id) => `/admin/company_tickets/${id}`
 export const assign_admin_company_ticket_path = (id) => `/admin/company_tickets/${id}/assign`
@@ -370,7 +370,7 @@ export const new_company_discount_group_path = (companyId) => `/companies/${comp
 export const company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}`
 export const edit_company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}/edit`
 export const generate_codes_company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}/generate_codes`
-// Company support tickets (docs/superpowers/plans/2026-10-07-company-support-center.md)
+// Company support tickets (docs/superpowers/plans/2026-11-26-company-ticket-visibility.md)
 export const company_company_tickets_path = (companyId) => `/companies/${companyId}/company_tickets`
 export const new_company_company_ticket_path = (companyId) => `/companies/${companyId}/company_tickets/new`
 export const company_company_ticket_path = (companyId, ticketId) => `/companies/${companyId}/company_tickets/${ticketId}`
