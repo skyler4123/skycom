@@ -56,14 +56,14 @@ module CompanyMigrations
 
       # Property columns must carry the PropertyMapping's display name — the
       # TableConfig validation rejects humanized defaults for property_* keys
-      # (same contract the seed init services honor via field_hash(key, name)).
+      # (same contract the seed init services honor via field_hash_for(resource_name, key, name)).
       property_names = property_names_for(category)
 
       Seed::TableConfigService.create(
         company: @company,
         resource_name: @resource,
         category: category,
-        columns_metadata: visible_columns.map { |key| Seed::TableConfigService.field_hash(key, property_names[key]) }
+        columns_metadata: visible_columns.map { |key| Seed::TableConfigService.field_hash_for(@resource, key, property_names[key]) }
       )
     end
 

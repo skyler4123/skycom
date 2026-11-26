@@ -12,7 +12,7 @@ class Seed::RetailInitService
           property_integer_1: "Volume (ml)",
           property_boolean_1: "Organic Certified"
         },
-        visible_columns: %w[name code property_string_1 property_string_2 property_integer_1 property_boolean_1]
+        visible_columns: %w[name code quantity property_string_1 property_string_2 property_integer_1 property_boolean_1]
       },
       "Perfumes" => {
         properties: {
@@ -20,7 +20,7 @@ class Seed::RetailInitService
           property_integer_1: "Volume (ml)",
           property_boolean_1: "Includes Tester Unit"
         },
-        visible_columns: %w[name code property_string_1 property_integer_1 property_boolean_1]
+        visible_columns: %w[name code quantity property_string_1 property_integer_1 property_boolean_1]
       },
       "Beauty Tools" => {
         properties: {
@@ -28,7 +28,7 @@ class Seed::RetailInitService
           property_integer_1: "Wattage",
           property_boolean_1: "Rechargeable"
         },
-        visible_columns: %w[name code property_string_1 property_integer_1 property_boolean_1]
+        visible_columns: %w[name code quantity property_string_1 property_integer_1 property_boolean_1]
       },
       "Makeup" => {
         properties: {
@@ -36,7 +36,7 @@ class Seed::RetailInitService
           property_string_2: "Shade Range",
           property_boolean_1: "Long-lasting"
         },
-        visible_columns: %w[name code property_string_1 property_string_2 property_boolean_1]
+        visible_columns: %w[name code quantity property_string_1 property_string_2 property_boolean_1]
       },
       "Jewelry" => {
         properties: {
@@ -44,14 +44,14 @@ class Seed::RetailInitService
           property_decimal_1: "Weight (g)",
           property_boolean_1: "Hypoallergenic"
         },
-        visible_columns: %w[name code property_string_1 property_decimal_1 property_boolean_1]
+        visible_columns: %w[name code quantity property_string_1 property_decimal_1 property_boolean_1]
       },
       "Accessories" => {
         properties: {
           property_string_1: "Material",
           property_boolean_1: "Adjustable"
         },
-        visible_columns: %w[name code property_string_1 property_boolean_1]
+        visible_columns: %w[name code quantity property_string_1 property_boolean_1]
       }
     },
     employees: {
@@ -575,15 +575,15 @@ class Seed::RetailInitService
           resource_name: resource_name.to_s,
           category: category,
           property_mapping: category.default_property_mapping,
-          columns_metadata: keys.map { |k| field_hash(k, entry[:properties]) },
+          columns_metadata: keys.map { |k| field_hash(resource_name, k, entry[:properties]) },
           name: "#{name} table config"
         )
       end
     end
   end
 
-  def field_hash(key, properties = {})
-    Seed::TableConfigService.field_hash(key, properties[key.to_sym])
+  def field_hash(resource_name, key, properties = {})
+    Seed::TableConfigService.field_hash_for(resource_name, key, properties[key.to_sym])
   end
 
   def create_default_question_categories

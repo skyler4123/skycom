@@ -1,6 +1,6 @@
 # Skycom Dynamic Table System
 
-> **Prerequisites**: Read `CATEGORY_DYNAMIC_SCHEMA.md` for the PropertyMapping/TableConfig data model. Read `DASHBOARD_PATTERN.md` for the base dashboard architecture.
+> **Prerequisites**: Read `CATEGORY_DYNAMIC_SCHEMA.md` for the PropertyMapping/TableConfig data model. Read `DASHBOARD_PATTERN.md` for the base dashboard architecture. For model-calculated index columns, read `COMPUTED_COLUMNS.md`.
 >
 > This document covers only the dynamic column system — how `property_*` columns get their display names, how tables render them, and how the new/show/edit pages generate and display them.
 
@@ -81,9 +81,10 @@ The `name` value from `TableConfig.columns_metadata[].name` is used directly as 
 
 | Column Type | Source |
 |-------------|--------|
-| Standard (`name`, `description`, `code`, `title`, `quantity`, `pending`) | Fixed label from `TableConfig::STANDARD_COLUMN_NAMES` (`Name`, `Description`, `Code`, `Title`, `Quantity`, `Pending`) |
+| Standard (`name`, `description`, `code`, `title`, `quantity`, `pending`) | Fixed label from `TableConfig::STANDARD_COLUMN_NAMES` (`Name`, `Description`, `Code`, `Title`, `Quantity`, `Pending`). The editor only offers the keys that are real DB columns on the resolved resource model. |
 | `property_*` (dynamic) | `PropertyMapping.metadata.properties[].name` |
 | `extra_*` | `PropertyMapping.metadata.extra_columns[].name` |
+| Computed (`quantity` on Product, etc.) | `Model.computed_columns[].name`; read-only calculation, no search/filter (`docs/COMPUTED_COLUMNS.md`) |
 | Unknown key | Stored `columns_metadata[].name` (kept as submitted) |
 
 Existing configs that still carry custom standard labels are normalized on their next save. The Table Config edit/show pages render canonical labels immediately; the live index table may keep a stale custom standard label until that config is saved.
@@ -208,6 +209,25 @@ with the same integer range buckets, and `infer_column_type` treats them as `int
 filters to actually execute in Meilisearch, the indexed model must also declare them via
 `ms_extra_filterable_columns` (see `docs/MEILISEARCH.md` §2.1) — `Stock`/`StockTransfer`/
 `StockImport`/`StockExport` do.
+
+### 2.6 Computed columns
+
+Some index columns are calculated by the resource model from related data instead of being stored
+on the record. They use the same plain key as a real column (`quantity`, not `computed_quantity`),
+and the source is resolved per resource:
+
+1. real DB column → standard;
+2. model `computed_columns` → computed;
+3. otherwise → ghost, dropped from the TableConfig on the next save.
+
+Computed columns are displayed in Table Config under **Computed columns**, show a **Computed**
+badge, and are never searchable or filterable. The model declares them with
+`ComputedColumnsConcern`; the index controller preloads them once per page and merges
+`computed_column_values` into each record. Property Mapping displays the catalog read-only.
+
+Product `quantity` (sum of Stock) is the first adoption. Stock `quantity` remains a real standard
+column with its existing range filter. See `docs/COMPUTED_COLUMNS.md` for the full BE → FE →
+end-user guide and the extension checklist.
 
 ---
 
@@ -471,6 +491,11 @@ after_commit auto-sync) and `Model.ms_clear_index!` before/after — see `docs/M
  | `app/services/products/search_query_service.rb` | TableConfig → Meilisearch search/filter query translation |
  | `app/services/{branches,brands,departments,employees,facilities,invoices,orders,services,warehouses}/search_query_service.rb` | One 3-line subclass per wired index page |
  | `app/javascript/controllers/companies/table_configs/edit_controller.js` | Column editor incl. Search/Filter settings |
+ | `app/models/concerns/computed_columns_concern.rb` | Model registry for computed index columns |
+ | `app/models/computed_columns.rb` | `resource_name` → model resolver for computed columns |
+ | `app/models/product.rb` | First computed column: `quantity` summed from Stock |
+ | `docs/COMPUTED_COLUMNS.md` | Canonical computed-column BE → FE → end-user guide |
+ | `spec/features/companies/products/computed_columns_spec.rb` | Product computed-column index/hide E2E |
  | `spec/features/companies/products/search_filter_spec.rb` | Dynamic search + filter dropdowns E2E |
 | `app/javascript/controllers/companies/layout_controller.js` | `currentTableConfig()`, `currentPropertyMapping()` helpers |
 | `app/javascript/controllers/helpers/auth_helpers.js` | `currentPropertyMappings()`, `currentTableConfigs()` |

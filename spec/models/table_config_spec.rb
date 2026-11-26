@@ -279,5 +279,75 @@ RSpec.describe TableConfig, type: :model do
     end
   end
 
+  describe "computed columns" do
+    let(:company) { create(:company) }
+    let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "products") }
+    let(:property_mapping) { category.default_property_mapping }
+    let(:config) do
+      TableConfig.new(
+        company: company, category: category, property_mapping: property_mapping,
+        resource_name: "products", name: "Products Grid"
+      )
+    end
+
+    it "returns only real DB columns in the standard catalog" do
+      keys = described_class.standard_columns_for("products").map { |column| column["key"] }
+      expect(keys).to include("name", "code")
+      expect(keys).not_to include("quantity")
+    end
+
+    it "returns quantity as computed for products" do
+      expect(described_class.computed_columns_for("products")).to include(
+        "key" => "quantity", "name" => "Quantity", "type" => "integer"
+      )
+    end
+
+    it "keeps quantity standard and filterable for stocks" do
+      keys = described_class.standard_columns_for("stocks").map { |column| column["key"] }
+      expect(keys).to include("quantity")
+      expect(described_class.computed_columns_for("stocks")).to be_nil
+    end
+
+    it "normalizes a computed column and strips search/filter" do
+      config.metadata = { "columns" => [
+        { "key" => "quantity", "name" => "Old Quantity", "visible" => true, "search" => true,
+          "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 10 ] ] } }
+      ] }
+
+      expect(config).to be_valid
+      expect(config.columns).to eq([
+        { "key" => "quantity", "name" => "Quantity", "visible" => true, "type" => "integer" }
+      ])
+    end
+
+    it "drops a standard key the resolved model does not have" do
+      config.metadata = { "columns" => [
+        { "key" => "title", "name" => "Title", "visible" => true }
+      ] }
+
+      expect(config).to be_valid
+      expect(config.columns).to eq([])
+    end
+
+    it "keeps a range filter on the standard stock quantity" do
+      stock_category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "stocks")
+      stock_config = TableConfig.new(
+        company: company, category: stock_category,
+        property_mapping: stock_category.default_property_mapping,
+        resource_name: "stocks", name: "Stocks Grid"
+      )
+      stock_config.metadata = { "columns" => [
+        { "key" => "quantity", "name" => "Quantity", "visible" => true,
+          "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 10 ] ] } }
+      ] }
+
+      expect(stock_config).to be_valid
+      expect(stock_config.columns.first["filter"]).to eq(
+        "type" => "range", "active" => true, "buckets" => [ [ nil, 10 ] ]
+      )
+      expect(stock_config.columns.first).not_to have_key("type")
+    end
+  end
+
   it_behaves_like "property_mapping concern", TableConfig
 end

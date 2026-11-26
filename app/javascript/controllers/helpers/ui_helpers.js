@@ -859,7 +859,7 @@ export const table = ({
       return `<span class="text-muted-foreground/50">—</span>`
     }
 
-    const fieldType = mappingLookup[col.key]?.type
+    const fieldType = mappingLookup[col.key]?.type || col.type
 
     if (fieldType === "boolean") {
       const isTrue = value === true || value === "true"

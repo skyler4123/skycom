@@ -1,6 +1,7 @@
 // Shared presentation helpers for the Table Config editor and show page.
-// Column labels are never edited here: standard labels are fixed below and
-// property/extra labels come from the Property Mapping.
+// Column labels are never edited here: standard and computed labels come from
+// the resource catalog sent by the backend, property/extra labels come from the
+// Property Mapping. See docs/COMPUTED_COLUMNS.md.
 import { translate } from "controllers/helpers/ui_helpers"
 import {
   enumOptionsFor,
@@ -20,6 +21,7 @@ export const STANDARD_COLUMN_NAMES = {
   pending: "Pending"
 }
 
+// Keep in sync with TableConfig::STANDARD_COLUMN_TYPES (app/models/table_config.rb).
 export const STANDARD_COLUMN_TYPES = {
   name: "string",
   description: "string",
@@ -42,9 +44,28 @@ const FILTER_LABELS = {
 const entryForKey = (key, entries = []) =>
   (entries || []).find((entry) => entry?.key === key) || null
 
-/** @returns {"standard" | "property" | "extra" | "other"} */
-export const columnSource = (key) => {
+/**
+ * Source resolution mirrors the backend (TableConfig#column_source):
+ * a real DB column wins over a computed method with the same key.
+ *
+ * @param {string} key
+ * @param {{ standard?: Array<object> | null, computed?: Array<object> }} [catalog]
+ * @returns {"standard" | "computed" | "property" | "extra" | "other"}
+ */
+export const columnSource = (key, catalog = {}) => {
   const value = String(key || "")
+  const standard = Array.isArray(catalog.standard) ? catalog.standard : null
+  const computed = catalog.computed || []
+
+  if (standard) {
+    if (entryForKey(value, standard)) return "standard"
+    if (entryForKey(value, computed)) return "computed"
+    if (value.startsWith("property_")) return "property"
+    if (value.startsWith("extra_")) return "extra"
+    return "other"
+  }
+
+  // Legacy fallback for configs rendered before the server catalog existed.
   if (STANDARD_COLUMN_NAMES[value]) return "standard"
   if (value.startsWith("property_")) return "property"
   if (value.startsWith("extra_")) return "extra"
@@ -52,41 +73,57 @@ export const columnSource = (key) => {
 }
 
 /** @returns {string | null} */
-export const columnType = (key, propertyEntries = [], extraColumns = []) => {
-  const source = columnSource(key)
+export const columnType = (key, propertyEntries = [], extraColumns = [], catalog = {}) => {
+  const value = String(key || "")
+  const source = columnSource(value, catalog)
 
-  if (source === "standard") return STANDARD_COLUMN_TYPES[key] || null
+  if (source === "standard") {
+    return entryForKey(value, catalog.standard || [])?.type || STANDARD_COLUMN_TYPES[value] || null
+  }
+
+  if (source === "computed") {
+    return entryForKey(value, catalog.computed || [])?.type || null
+  }
 
   if (source === "property") {
-    const entry = entryForKey(key, propertyEntries)
+    const entry = entryForKey(value, propertyEntries)
     if (entry) return uiTypeForEntry(entry)
 
-    const match = String(key || "").match(/^property_(string|integer|decimal|boolean|datetime)_\d+$/)
+    const match = value.match(/^property_(string|integer|decimal|boolean|datetime)_\d+$/)
     return match ? match[1] : null
   }
 
   if (source === "extra") {
-    return entryForKey(key, extraColumns)?.type || null
+    return entryForKey(value, extraColumns)?.type || null
   }
 
   return null
 }
 
 /** @returns {string} */
-export const columnName = (key, propertyEntries = [], extraColumns = [], fallback = "") => {
-  const source = columnSource(key)
+export const columnName = (key, propertyEntries = [], extraColumns = [], fallback = "", catalog = {}) => {
+  const value = String(key || "")
+  const source = columnSource(value, catalog)
 
-  if (source === "standard") return translate(STANDARD_COLUMN_NAMES[key])
+  if (source === "standard") {
+    const entry = entryForKey(value, catalog.standard || [])
+    return translate(entry?.name || STANDARD_COLUMN_NAMES[value] || fallback || value)
+  }
+
+  if (source === "computed") {
+    const entry = entryForKey(value, catalog.computed || [])
+    return translate(entry?.name || fallback || value)
+  }
 
   if (source === "property") {
-    return entryForKey(key, propertyEntries)?.name || fallback || String(key)
+    return entryForKey(value, propertyEntries)?.name || fallback || value
   }
 
   if (source === "extra") {
-    return entryForKey(key, extraColumns)?.name || fallback || String(key)
+    return entryForKey(value, extraColumns)?.name || fallback || value
   }
 
-  return fallback || String(key)
+  return fallback || value
 }
 
 /** @returns {string} */
@@ -104,23 +141,30 @@ export const columnTypeTooltip = (type) =>
 /** @returns {string} */
 export const columnSourceLabel = (source) => {
   if (source === "standard") return translate("Standard")
+  if (source === "computed") return translate("Computed")
   if (source === "property" || source === "extra") return translate("Property Mapping")
   return translate("Other")
 }
 
 /** @returns {boolean} */
-export const isSearchableColumn = (key) => {
+export const isSearchableColumn = (key, catalog = {}) => {
   const value = String(key || "")
-  return SEARCHABLE_STANDARD_KEYS.includes(value) || value.startsWith("property_string_")
+  const source = columnSource(value, catalog)
+
+  if (source === "computed" || source === "extra" || source === "other") return false
+  if (source === "property") return value.startsWith("property_string_")
+
+  return SEARCHABLE_STANDARD_KEYS.includes(value)
 }
 
 /** @returns {Array<{ value: string, label: string }>} */
-export const filterTypeOptions = (key, propertyEntries = [], extraColumns = []) => {
-  // Extra columns are presentation-only today: the backend filter validator
-  // does not resolve their type, so they must stay non-filterable.
-  if (columnSource(key) === "extra") return []
+export const filterTypeOptions = (key, propertyEntries = [], extraColumns = [], catalog = {}) => {
+  // Computed and extra columns are presentation-only: the backend filter
+  // validator does not allow them.
+  const source = columnSource(key, catalog)
+  if (source === "computed" || source === "extra" || source === "other") return []
 
-  const type = columnType(key, propertyEntries, extraColumns)
+  const type = columnType(key, propertyEntries, extraColumns, catalog)
   const options = []
 
   if (type === "integer" || type === "enum") {
@@ -140,8 +184,8 @@ export const filterTypeOptions = (key, propertyEntries = [], extraColumns = []) 
 }
 
 /** @returns {boolean} */
-export const canFilter = (key, propertyEntries = [], extraColumns = []) =>
-  filterTypeOptions(key, propertyEntries, extraColumns).length > 0
+export const canFilter = (key, propertyEntries = [], extraColumns = [], catalog = {}) =>
+  filterTypeOptions(key, propertyEntries, extraColumns, catalog).length > 0
 
 /** @returns {Array} */
 export const enumChoicesFor = (key, propertyEntries = []) =>

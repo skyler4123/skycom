@@ -22,9 +22,12 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   // Depends on BE: Companies::TableConfigsController#show (JSON hydration),
   //               Companies::PropertyMappingsController#show (labels/types/options),
   //               Companies::TableConfigsController#update (form PATCH + normalize_column_types)
-  // Docs: docs/DYNAMIC_TABLE.md
+  // Docs: docs/DYNAMIC_TABLE.md, docs/COMPUTED_COLUMNS.md
   /** @type {any | null} */
   config = null
+
+  /** @type {{ standard: Array<object> | null, computed: Array<object> }} */
+  catalog = { standard: null, computed: [] }
 
   /** @type {Array} */
   columnsMetadata = []
@@ -55,6 +58,10 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
       const response = await fetchJson(`${Helpers.company_table_config_path(companyId, configId)}.json`)
       this.config = response.table_config
       this.columnsMetadata = JSON.parse(JSON.stringify(this.config?.metadata?.columns || []))
+      this.catalog = {
+        standard: Array.isArray(this.config?.standard_columns) ? this.config.standard_columns : null,
+        computed: this.config?.computed_columns || []
+      }
 
       /** @type {any | null} */
       this.propertyMapping = null
@@ -147,6 +154,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           <p>${translate("Range filter: 10 – 20 means 10 ≤ value < 20.")}</p>
           <p>${translate("Date filter: 2024 – 2025 means the year 2024.")}</p>
           <p>${translate("Choice list filter: uses the options defined in Property Mapping.")}</p>
+          <p>${translate("Computed columns are calculated by Skycom from related data. They cannot be searched or filtered.")}</p>
         </div>
       </div>
     `
@@ -266,9 +274,9 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
   columnRowHTML(col, index) {
     const key = String(col.key || "")
-    const displayName = columnName(key, this.propertyEntries, this.extraColumns, col.name || "")
-    const source = columnSource(key)
-    const type = columnType(key, this.propertyEntries, this.extraColumns)
+    const displayName = columnName(key, this.propertyEntries, this.extraColumns, col.name || "", this.catalog)
+    const source = columnSource(key, this.catalog)
+    const type = columnType(key, this.propertyEntries, this.extraColumns, this.catalog)
 
     return `
       <tr class="border-b border-line last:border-0" data-column-row="${escapeHtml(key)}">
@@ -308,6 +316,13 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
       return `<span class="inline-flex w-fit items-center rounded-md border border-line bg-muted px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">${translate("Standard")}</span>`
     }
 
+    if (source === "computed") {
+      return `<span class="inline-flex w-fit items-center gap-1 rounded-md border border-success/30 bg-success/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-success">
+        <span class="material-symbols-outlined text-[12px]">functions</span>
+        ${translate("Computed")}
+      </span>`
+    }
+
     if (source === "property" || source === "extra") {
       return `<span class="inline-flex w-fit items-center gap-1 rounded-md border border-info/30 bg-info/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-info">
         <span class="material-symbols-outlined text-[12px]">lock</span>
@@ -331,8 +346,13 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   }
 
   searchCellHTML(col, index, key) {
-    if (!isSearchableColumn(key)) {
-      return `<span class="text-muted-foreground" ${tooltip(translate("Only text columns can be included in keyword search."))}>
+    const source = columnSource(key, this.catalog)
+
+    if (!isSearchableColumn(key, this.catalog)) {
+      const message = source === "computed"
+        ? translate("Computed columns are not searchable.")
+        : translate("Only text columns can be included in keyword search.")
+      return `<span class="text-muted-foreground" ${tooltip(message)}>
         <span class="material-symbols-outlined text-[16px]">lock</span>
       </span>`
     }
@@ -347,9 +367,13 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   }
 
   filterCellHTML(col, key) {
-    const options = filterTypeOptions(key, this.propertyEntries, this.extraColumns)
+    const options = filterTypeOptions(key, this.propertyEntries, this.extraColumns, this.catalog)
+    const source = columnSource(key, this.catalog)
     if (options.length === 0) {
-      return `<span class="text-muted-foreground" ${tooltip(translate("This column cannot be used as an index filter."))}>—</span>`
+      const message = source === "computed"
+        ? translate("Computed columns cannot be filtered.")
+        : translate("This column cannot be used as an index filter.")
+      return `<span class="text-muted-foreground" ${tooltip(message)}>—</span>`
     }
 
     return `
@@ -368,6 +392,12 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     const isFirst = index === 0
     const isLast = index === this.columnsMetadata.length - 1
     const isProtected = key === "name"
+    const isComputed = columnSource(key, this.catalog) === "computed"
+    const removeMessage = isProtected
+      ? translate("The name column is required and cannot be removed.")
+      : (isComputed
+        ? translate("Removes this column from this table only. The calculation is not deleted.")
+        : translate("Removes this column from this table only. The property and its data are not deleted."))
 
     return `
       <div class="inline-flex items-center gap-1">
@@ -386,9 +416,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
         <button type="button" data-action="click->${this.identifier}#removeColumn" data-key="${escapeHtml(key)}"
           ${isProtected ? "disabled" : ""}
           class="inline-flex items-center justify-center rounded-lg p-1 text-danger hover:bg-danger/10 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-          ${tooltip(isProtected
-            ? translate("The name column is required and cannot be removed.")
-            : translate("Removes this column from this table only. The property and its data are not deleted."))}>
+          ${tooltip(removeMessage)}>
           <span class="material-symbols-outlined text-[16px]">delete</span>
         </button>
       </div>
@@ -397,7 +425,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
   filterPanelRowHTML(col, index) {
     const key = String(col.key || "")
-    if (!canFilter(key, this.propertyEntries, this.extraColumns)) return ""
+    if (!canFilter(key, this.propertyEntries, this.extraColumns, this.catalog)) return ""
 
     const expanded = this.expandedFilterKey === key
 
@@ -412,10 +440,10 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
   filterPanelHTML(col, index, key) {
     const filter = col.filter && typeof col.filter === "object" ? col.filter : {}
-    const options = filterTypeOptions(key, this.propertyEntries, this.extraColumns)
+    const options = filterTypeOptions(key, this.propertyEntries, this.extraColumns, this.catalog)
     const selectedType = options.some(option => option.value === filter.type) ? filter.type : ""
     const active = filter.active !== false
-    const displayName = columnName(key, this.propertyEntries, this.extraColumns, col.name || "")
+    const displayName = columnName(key, this.propertyEntries, this.extraColumns, col.name || "", this.catalog)
 
     return `
       <div class="space-y-3">
@@ -493,7 +521,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
   filterBucketsHTML(col, index, key, type, buckets) {
     const isDate = type === "date"
-    const step = isDate ? "1" : (columnType(key, this.propertyEntries, this.extraColumns) === "decimal" ? "any" : "1")
+    const step = isDate ? "1" : (columnType(key, this.propertyEntries, this.extraColumns, this.catalog) === "decimal" ? "any" : "1")
     const rows = Array.isArray(buckets) ? buckets : []
 
     const bucketRows = rows.map((bucket, bucketIndex) => {
@@ -574,7 +602,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
   addColumnAreaHTML() {
     const available = this.availableColumns()
-    const all = [ ...available.standard, ...available.property, ...available.extra ]
+    const all = [ ...available.standard, ...available.property, ...available.computed, ...available.extra ]
 
     if (this.selectedAddKey && !all.some(item => item.key === this.selectedAddKey)) {
       this.selectedAddKey = null
@@ -607,6 +635,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
             <option value="">${translate("Choose a column")}</option>
             ${groupHTML("Standard columns", available.standard)}
             ${groupHTML("Property columns", available.property)}
+            ${groupHTML("Computed columns", available.computed)}
             ${groupHTML("Extra columns", available.extra)}
           </select>
           <button type="button" id="add-column-button" data-action="click->${this.identifier}#addColumn"
@@ -624,13 +653,17 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   availableColumns() {
     const usedKeys = new Set((this.columnsMetadata || []).map(column => column.key))
 
-    const standard = Object.keys(STANDARD_COLUMN_NAMES)
-      .filter(key => !usedKeys.has(key))
-      .map(key => ({
-        key,
+    const standardSource = Array.isArray(this.catalog.standard)
+      ? this.catalog.standard
+      : Object.keys(STANDARD_COLUMN_NAMES).map(key => ({ key, name: STANDARD_COLUMN_NAMES[key] }))
+
+    const standard = standardSource
+      .filter(item => item?.key && !usedKeys.has(item.key))
+      .map(item => ({
+        key: item.key,
         source: "standard",
-        name: columnName(key, this.propertyEntries, this.extraColumns),
-        type: columnType(key, this.propertyEntries, this.extraColumns)
+        name: columnName(item.key, this.propertyEntries, this.extraColumns, item.name, this.catalog),
+        type: columnType(item.key, this.propertyEntries, this.extraColumns, this.catalog)
       }))
 
     const property = (this.propertyEntries || [])
@@ -639,7 +672,16 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
         key: entry.key,
         source: "property",
         name: entry.name || entry.key,
-        type: columnType(entry.key, this.propertyEntries, this.extraColumns)
+        type: columnType(entry.key, this.propertyEntries, this.extraColumns, this.catalog)
+      }))
+
+    const computed = (this.catalog.computed || [])
+      .filter(entry => entry?.key && !usedKeys.has(entry.key))
+      .map(entry => ({
+        key: entry.key,
+        source: "computed",
+        name: columnName(entry.key, this.propertyEntries, this.extraColumns, entry.name, this.catalog),
+        type: columnType(entry.key, this.propertyEntries, this.extraColumns, this.catalog)
       }))
 
     const extra = (this.extraColumns || [])
@@ -648,19 +690,22 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
         key: entry.key,
         source: "extra",
         name: entry.name || entry.key,
-        type: columnType(entry.key, this.propertyEntries, this.extraColumns)
+        type: columnType(entry.key, this.propertyEntries, this.extraColumns, this.catalog)
       }))
 
-    return { standard, property, extra }
+    return { standard, property, computed, extra }
   }
 
   addColumnHintText(all = null) {
-    const items = all || [ ...this.availableColumns().standard, ...this.availableColumns().property, ...this.availableColumns().extra ]
+    const items = all || [ ...this.availableColumns().standard, ...this.availableColumns().property, ...this.availableColumns().computed, ...this.availableColumns().extra ]
     const selected = items.find(item => item.key === this.selectedAddKey)
 
     if (!selected) return translate("Choose a column to add.")
 
     const typeText = selected.type ? columnTypeLabel(selected.type) : translate("Unknown type")
+    if (selected.source === "computed") {
+      return `${typeText} · ${translate("Computed by Skycom from related data. Not searchable or filterable.")}`
+    }
     const sourceText = selected.source === "standard" ? translate("Standard column") : translate("From Property Mapping")
     return `${typeText} · ${sourceText}`
   }
@@ -684,12 +729,20 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     if (this.columnsMetadata.some(column => column.key === key)) return
 
     this.captureColumnsFromDOM()
-    this.columnsMetadata.push({
+    const source = columnSource(key, this.catalog)
+    const column = {
       key,
-      name: columnName(key, this.propertyEntries, this.extraColumns),
-      visible: true,
-      search: false
-    })
+      name: columnName(key, this.propertyEntries, this.extraColumns, "", this.catalog),
+      visible: true
+    }
+
+    if (source === "computed") {
+      column.type = columnType(key, this.propertyEntries, this.extraColumns, this.catalog)
+    } else {
+      column.search = false
+    }
+
+    this.columnsMetadata.push(column)
 
     this.selectedAddKey = null
     this.renderTable()
@@ -788,7 +841,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   }
 
   defaultBucketsFor(column) {
-    const type = columnType(column.key, this.propertyEntries, this.extraColumns)
+    const type = columnType(column.key, this.propertyEntries, this.extraColumns, this.catalog)
     if (type === "datetime") {
       const year = Number(Helpers.localToday().slice(0, 4))
       return [ [ null, year - 1 ], [ year - 1, year ], [ year, null ] ]
@@ -805,6 +858,13 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
       const visible = row.querySelector('[data-column-field="visible"]')
       if (visible) column.visible = visible.checked
+
+      const source = columnSource(key, this.catalog)
+      if (source === "computed") {
+        delete column.search
+        delete column.filter
+        return
+      }
 
       const search = row.querySelector('[data-column-field="search"]')
       if (search) {
@@ -872,7 +932,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
       const filter = column.filter
       if (!filter) return
 
-      const validTypes = filterTypeOptions(key, this.propertyEntries, this.extraColumns).map(option => option.value)
+      const validTypes = filterTypeOptions(key, this.propertyEntries, this.extraColumns, this.catalog).map(option => option.value)
       if (!validTypes.includes(filter.type)) {
         errors.push({
           message: translate("Choose a valid filter type for this column."),

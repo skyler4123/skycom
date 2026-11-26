@@ -20,6 +20,7 @@ class Product < ApplicationRecord
   include TagConcern
   include OrderConcern
   include Product::ImageConcern
+  include ComputedColumnsConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
@@ -39,6 +40,9 @@ class Product < ApplicationRecord
            as: "price",
            with_model_currency: :price_currency,
            disable_validation: true
+
+  # --- Computed index columns ---
+  computed_column :quantity, name: "Quantity", type: :integer
 
   # --- Associations ---
   belongs_to :company
@@ -82,6 +86,23 @@ class Product < ApplicationRecord
   validates :business_type, presence: true
   validates :price_cents, numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
   validate :tax_code_belongs_to_company
+
+  # One grouped query per index page — no per-record Stock query.
+  def self.preload_computed_columns(records)
+    return if records.empty?
+
+    totals = Stock.where(product_id: records.map(&:id)).group(:product_id).sum(:quantity)
+    records.each do |record|
+      record.instance_variable_set(:@computed_quantity, totals[record.id] || 0)
+    end
+  end
+
+  # Total on-hand units across all warehouses (read-only computed column).
+  def quantity
+    return @computed_quantity if defined?(@computed_quantity)
+
+    stocks.sum(:quantity)
+  end
 
   def price_currency
     currency&.upcase || "USD"

@@ -33,7 +33,33 @@ RSpec.describe "Companies::TableConfigsController", type: :request do
     }
   end
 
+  describe "GET #show column catalogs" do
+    it "returns standard columns without quantity and computed quantity for products" do
+      get "/companies/#{company.id}/table_configs/#{config.id}.json"
+
+      body = JSON.parse(response.body)["table_config"]
+      standard_keys = body["standard_columns"].map { |column| column["key"] }
+      expect(standard_keys).to include("name", "code")
+      expect(standard_keys).not_to include("quantity")
+      expect(body["computed_columns"]).to include(
+        "key" => "quantity", "name" => "Quantity", "type" => "integer"
+      )
+    end
+  end
+
   describe "PATCH #update with search/filter column settings" do
+    it "strips search and filter from a computed column" do
+      patch_columns({ "0" => { "key" => "quantity", "name" => "Quantity", "visible" => "true",
+                               "search" => "true",
+                               "filter" => { "type" => "range", "active" => "true",
+                                 "buckets" => { "0" => { "from" => "", "to" => "10" } } } } })
+
+      quantity = config.reload.columns.find { |column| column["key"] == "quantity" }
+      expect(quantity).to include("name" => "Quantity", "type" => "integer")
+      expect(quantity).not_to have_key("search")
+      expect(quantity).not_to have_key("filter")
+    end
+
     it "coerces search and normalizes typed filter buckets" do
       patch_columns({ "0" => { "key" => "property_string_1", "name" => "Color", "visible" => "true",
                                "search" => "true", "filter" => "" },

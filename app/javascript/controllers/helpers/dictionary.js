@@ -1136,6 +1136,9 @@ export const dictionary = () => {
     "Removes this column from this table only. The property and its data are not deleted.": {
       vi: "Chỉ xóa cột này khỏi bảng này. Thuộc tính và dữ liệu của nó không bị xóa.",
     },
+    "Removes this column from this table only. The calculation is not deleted.": {
+      vi: "Chỉ xóa cột này khỏi bảng này. Phép tính không bị xóa.",
+    },
     "The name column is required and cannot be removed.": {
       vi: "Cột tên là bắt buộc và không thể xóa.",
     },
@@ -1182,6 +1185,27 @@ export const dictionary = () => {
     "Standard": { vi: "Chuẩn" },
     "Standard column": { vi: "Cột chuẩn" },
     "Standard columns": { vi: "Cột chuẩn" },
+    "Computed": { vi: "Tính toán" },
+    "Computed columns": { vi: "Cột tính toán" },
+    "Computed columns are not searchable.": {
+      vi: "Không thể tìm kiếm cột tính toán.",
+    },
+    "Computed columns cannot be filtered.": {
+      vi: "Không thể lọc theo cột tính toán.",
+    },
+    "Computed by Skycom from related data. Not searchable or filterable.": {
+      vi: "Được Skycom tính toán từ dữ liệu liên quan. Không thể tìm kiếm hoặc lọc.",
+    },
+    "Computed columns are calculated by Skycom from related data. They cannot be searched or filtered.": {
+      vi: "Cột tính toán được Skycom tính từ dữ liệu liên quan. Không thể tìm kiếm hoặc lọc.",
+    },
+    "Calculated by Skycom from related data. Add or hide them in Table Config.": {
+      vi: "Được Skycom tính toán từ dữ liệu liên quan. Thêm hoặc ẩn trong Cấu hình bảng.",
+    },
+    "These columns are read-only. Visibility and order are controlled in Table Config.": {
+      vi: "Các cột này chỉ đọc. Hiển thị và thứ tự được điều khiển trong Cấu hình bảng.",
+    },
+    "Source": { vi: "Nguồn" },
     "Property columns": { vi: "Cột thuộc tính" },
     "Extra columns": { vi: "Cột bổ sung" },
     "From Property Mapping": { vi: "Từ Ánh xạ thuộc tính" },

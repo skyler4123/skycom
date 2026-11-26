@@ -4,6 +4,8 @@
 # index: plain DB list, OR Meilisearch-backed when ?q= / ?filters[key]= params are
 #        present AND the category's TableConfig enables search/filter per column
 #        (whitelist + query building live in Products::SearchQueryService).
+#        Each record also carries computed columns from Product.computed_columns
+#        (quantity summed from Stock — docs/COMPUTED_COLUMNS.md).
 # Serves Stimulus: Companies_Products_IndexController (index JSON incl. q/filters/export passthrough),
 #                  Companies_Products_NewController|ShowController|EditController (record JSON + form mutations)
 # Endpoints: GET /companies/:company_id/products(.json), GET /companies/:company_id/products/:id(.json with stocks) + nested CRUD — see config/routes.rb
@@ -149,7 +151,7 @@ class Companies::ProductsController < Companies::ApplicationController
     ]).merge(
       category: product.category&.as_json(only: [ :id, :name ]),
       tax_code: product.tax_code&.option_payload
-    )
+    ).merge(product.computed_column_values)
   end
 
   def tax_code_options
@@ -157,6 +159,7 @@ class Companies::ProductsController < Companies::ApplicationController
   end
 
   def format_products(products)
+    Product.preload_computed_columns(products)
     products.map { |product| format_product(product) }
   end
 

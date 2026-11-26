@@ -4,6 +4,8 @@
 # update: metadata[columns] accepts per-column `search` (boolean, string columns) and
 #         `filter` (range/enum/boolean/date hash; submitted as typed form fields,
 #         normalized in normalize_column_types, shape-validated in TableConfig).
+# show/edit JSON also carries standard_columns (real DB columns) and computed_columns
+# (model-calculated, read-only — docs/COMPUTED_COLUMNS.md).
 # Serves Stimulus: Companies_TableConfigs_IndexController|ShowController|NewController|EditController
 # Writes audit: Companies::TableConfigLogsController (explicit log on create/update)
 # Endpoints: GET/POST/PATCH /companies/:company_id/table_configs... — see config/routes.rb
@@ -208,7 +210,9 @@ class Companies::TableConfigsController < Companies::ApplicationController
   def format_config(config)
     config.as_json(only: [ :id, :category_id, :property_mapping_id, :name, :description, :metadata, :resource_name, :created_at, :updated_at ]).merge(
       category: config.category&.as_json(only: [ :id, :name ]),
-      property_mapping: config.property_mapping&.as_json(only: [ :id, :name ])
+      property_mapping: config.property_mapping&.as_json(only: [ :id, :name ]),
+      standard_columns: TableConfig.standard_columns_for(config.effective_resource_name),
+      computed_columns: TableConfig.computed_columns_for(config.effective_resource_name) || []
     )
   end
 

@@ -77,6 +77,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 |---|---|
 | Any modal (create / edit / show) | `docs/MODAL_PATTERN.md` — index action + modal controller + `form()` helper |
 | Index/table pages with filtering or dynamic properties | `docs/DYNAMIC_TABLE.md` — three resolutions + category filtering + rollout recipe |
+| Model-calculated index columns (`Product#quantity`, etc.) | `docs/COMPUTED_COLUMNS.md` — model registry, TableConfig/PropertyMapping catalogs, editor/table behavior, extension recipe |
 | Adding a new Operation page / `operation_type` (web + mobile) | `docs/OPERATION_PAGES.md` — end-to-end guide: design intake, real data, backend, web, mobile, exact-value feature tests, DoD; `docs/OPERATIONS.md` — domain, catalog, appointments, seeding |
 | Resource dashboard pages | `docs/DASHBOARD_PATTERN.md` — backend implementation, no hardcoded paths |
 | Sidebar items, settings, Quick Links groups | `docs/SIDEBAR.md` |

@@ -34,6 +34,16 @@ RSpec.describe "Companies::ProductsController search/filter", type: :request do
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)["products"].map { |p| p["id"] }).to include(product.id)
     end
+
+    it "includes the computed quantity in each product payload" do
+      warehouse = create(:warehouse, company: company)
+      Stock.create!(company: company, warehouse: warehouse, product: product, quantity: 7, pending: 0)
+
+      get index_url
+
+      row = JSON.parse(response.body)["products"].find { |p| p["id"] == product.id }
+      expect(row["quantity"]).to eq(7)
+    end
   end
 
   describe "Meilisearch path" do
