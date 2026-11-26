@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { escapeHtml } from "controllers/helpers/ui_helpers"
+import { escapeHtml, translate } from "controllers/helpers/ui_helpers"
 import {
   mobileHeader,
   mobileMain,
@@ -39,7 +39,7 @@ export default class Mobile_Companies_Notifications_IndexController extends Cont
             <div class="flex items-center justify-between gap-2">
               <h2 class="truncate text-sm font-bold text-foreground">${escapeHtml(notification.name)}</h2>
               <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${this.severityClass(notification.severity)}">
-                ${escapeHtml(mobileHumanize(notification.severity))}
+                ${escapeHtml(translate(mobileHumanize(notification.severity)))}
               </span>
             </div>
             <p class="text-sm text-muted-foreground">${escapeHtml(notification.description)}</p>

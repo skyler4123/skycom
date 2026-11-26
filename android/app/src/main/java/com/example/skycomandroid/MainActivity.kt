@@ -74,8 +74,11 @@ class MainActivity : HotwireActivity(), MobileWebListener {
     }
 
     override fun onNavigatorReady(navigator: Navigator) {
+        val webView = navigator.session.webView
+        webView.addJavascriptInterface(SkycomMobileBridge(this, webView), "SkycomMobile")
+
         if (::bottomNavigationController.isInitialized) {
-            updateTabsVisibility(navigator.session.webView.url)
+            updateTabsVisibility(webView.url)
         }
     }
 
@@ -125,6 +128,24 @@ class MainActivity : HotwireActivity(), MobileWebListener {
             clearProfileStack()
         }
         super.onStop()
+    }
+
+    /**
+     * Each bottom tab owns a WebView. After a language change, reload every
+     * loaded tab's current destination so none of them keep the old language.
+     * Tabs that have not loaded yet pick up the new language when opened.
+     */
+    internal fun reloadTabsForLanguageChange() {
+        if (!::bottomNavigationController.isInitialized) return
+
+        bottomNavigationController.tabs.forEach { tab ->
+            val navigator = delegate.findNavigatorHost(tab.configuration.navigatorHostId)?.navigator
+                ?: return@forEach
+
+            if (navigator.isReady()) {
+                navigator.currentDestination?.refresh(displayProgress = false)
+            }
+        }
     }
 
     private fun updateTabsVisibility(url: String?) {

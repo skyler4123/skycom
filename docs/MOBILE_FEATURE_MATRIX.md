@@ -1,6 +1,6 @@
 # Skycom Mobile Feature Matrix
 
-> **Last verified:** 2026-11-11
+> **Last verified:** 2026-11-26
 > **Scope:** Android Hotwire Native app + the Shell-First
 > `/mobile/companies/:company_id/*` pages (HTML shell + same-URL `.json`).
 > **Purpose:** the single place to compare mobile with web, track what works,
@@ -56,7 +56,7 @@ Source files for the inventory:
 | Leave | 🟡 | Paid-leave balance and pending days on Home, seeded leave requests | No leave request form or history |
 | Schedule | 🟡 | Today/next shift read | No roster, shift list, or swap |
 | Documents and help desk | ⛔ | — | Web-only; future candidates |
-| Native shell | 🟡 | Five tabs, pull-to-refresh, edge-to-edge safe area, dark mode, WebView GPS | No camera, biometrics, push, offline, or deep links |
+| Native shell | 🟡 | Five tabs, pull-to-refresh, edge-to-edge safe area, dark mode, EN/VI language switch, WebView GPS | No camera, biometrics, push, offline, or deep links |
 
 **Headline:** 13 mobile screens (including the payroll password gate, Operations,
 the POS cashier, the Booking console, the Reception console, the Store Manager
@@ -113,7 +113,7 @@ Cross-cutting mobile behavior:
 | Safe area | ✅ | HTML emits `env(safe-area-inset-top)` |
 | Flash/notice toasts | ✅ | Server flash rendered as dismissible banners |
 | Copy email | ✅ | Clipboard controller with toast fallback |
-| English strings | 🟡 | English-only; web supports EN/VI |
+| Language switch | ✅ | EN/VI in the signed-in mobile header, same `localStorage.languageCode` as web; all Shell-First screen copy translates. The `SkycomMobile.reloadTabs` bridge refreshes every loaded tab after a switch. Sign-in, operation-console top bars, Android tab labels and server flash remain English. |
 | Offline | ⛔ | No service worker or native cache |
 | Push | ⛔ | No FCM or notification permission |
 
@@ -383,13 +383,17 @@ status.
 | M-14 | QR check-in | Mockup has a QR action; no scanner | QR payload design + camera permission | Scan branch QR to check in | M |
 | M-15 | Biometric sign-in | Mockup has biometrics; no native library | Android BiometricPrompt + token storage | Biometric unlock after first sign-in | M |
 | M-16 | Offline/cache | No service worker or native cache | Hotwire Native cache or PWA strategy | Read-only cached Home/Attendance/Payroll | L |
-| M-17 | Vietnamese mobile UI | Mobile ERB is English-only | ERB translation pass or `data-i18n` runtime | All mobile strings switch with the language setting | M |
 | M-18 | Native share/camera/file picker | No native wiring; no attachment model | Android intents + attachment model | Share payslip; attach photo/PDF to a request | M |
 | M-19 | Accessibility audit | No mobile accessibility tests | Audit + fixes | Touch targets, labels, contrast, screen-reader pass | S |
 | M-20 | Deep links and remote path config | Remote `configurations/android_v1.json` has no server route | Server endpoint + path rules | Deep links open the right tab/page; remote config loads | S |
 | M-21 | Release readiness | `minifyEnabled false`, no signing config, version 1.0, default `BASE_URL` | Release signing + versioning | Signed release build, production base URL, versioning policy | S |
 | M-22 | Attendance PDF/audit export | No PDF endpoint | PDF service | Download own attendance audit PDF | M |
 | M-23 | Documents, calendar, help desk | Web-only today | Separate product decisions | Employee document list, event calendar, own tickets | L |
+
+> **M-17 shipped:** every Shell-First mobile screen renders copy through
+> `translate()`, and the signed-in header now has the same EN/VI switch as web.
+> Sign-in, operation-console top bars, Android tab labels and server flash
+> remain outside the switch.
 
 ### Future candidates
 
@@ -407,6 +411,7 @@ preferences, and dynamic employee profiles.
 | Hotwire Native | 1.3.2, fragments, lazy tabs | Keep version current |
 | Path configuration | Asset `json/path-configuration.json`; pull-to-refresh on; off for sign-in/new | Remote `configurations/android_v1.json` URL has no server route; add it or drop it |
 | Tabs/back | Native bottom nav; HTML sticky header | No native toolbar; HTML back link on stack pages |
+| Language switch | `SkycomMobile.reloadTabs` JS bridge; `MainActivity` refreshes every loaded tab's current destination | Native tab labels remain Android resources (English) |
 | Edge-to-edge | `enableEdgeToEdge`, IME insets; HTML safe-area | Keep `env(safe-area-inset-*)` in the HTML |
 | Permissions | `INTERNET` + `ACCESS_FINE_LOCATION` + `ACCESS_COARSE_LOCATION` | Camera, biometrics, and notification permissions are still missing |
 | Push | None | Firebase + `POST_NOTIFICATIONS` |

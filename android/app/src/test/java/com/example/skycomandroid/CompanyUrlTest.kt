@@ -39,4 +39,23 @@ class CompanyUrlTest {
         assertTrue(CompanyUrl.isMobileHome("http://10.88.0.2:3000/mobile/home"))
         assertFalse(CompanyUrl.isSignIn("http://10.88.0.2:3000/mobile/companies/$companyId/home"))
     }
+
+    @Test
+    fun acceptsUrlsOnTheConfiguredAppOrigin() {
+        assertTrue(
+            CompanyUrl.isAppOrigin(
+                "http://10.88.0.2:3000/mobile/companies/$companyId/home",
+                "http://10.88.0.2:3000"
+            )
+        )
+    }
+
+    @Test
+    fun rejectsOtherOriginsAndBlankUrls() {
+        assertFalse(CompanyUrl.isAppOrigin("https://evil.example/mobile", "http://10.88.0.2:3000"))
+        assertFalse(CompanyUrl.isAppOrigin("http://10.88.0.2:4000/mobile", "http://10.88.0.2:3000"))
+        assertFalse(CompanyUrl.isAppOrigin("http://10.88.0.2:3001/mobile", "http://10.88.0.2:3000"))
+        assertFalse(CompanyUrl.isAppOrigin(null, "http://10.88.0.2:3000"))
+        assertFalse(CompanyUrl.isAppOrigin("http://10.88.0.2:3000/mobile", ""))
+    }
 }

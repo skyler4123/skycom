@@ -619,6 +619,27 @@ export const popover = (options) => {
   `.trim()
 }
 
+/**
+ * Language menu entries shared by the desktop and mobile headers.
+ * Names are autonyms, so they are never passed through translate().
+ * @returns {string} HTML for the popover menu
+ */
+export const languageOptionsHTML = () => `
+  <div class="flex min-w-[140px] flex-col py-1">
+    ${[
+      { code: "en", name: "English" },
+      { code: "vi", name: "Tiếng Việt" }
+    ].map(({ code, name }) => `
+      <a data-language-code-param="${code}"
+        data-action="click->language#changeLanguage"
+        class="flex cursor-pointer items-center px-4 py-2 text-sm text-foreground transition-colors hover:bg-muted"
+      >
+        ${name}
+      </a>
+    `).join("")}
+  </div>
+`
+
 export const checkbox = ({
   url = pathname(),
   method = "PATCH",

@@ -155,12 +155,12 @@ The only server-rendered screens left are the layout-level `_flash` partial and
 page controller).
 
 Page chrome and formatting live in
-`app/javascript/controllers/helpers/mobile_helpers.js`: header (signed-in avatar
-with initials fallback), avatar, stat tile, empty state, month nav, fetch-error
-state, greeting, initials, duration, 12-hour times, dates/months, money,
-attendance/payroll badges, and employee/business-type labels. Reused as-is:
-`Helpers.form`, `Helpers.fetchJson`, `Helpers.timeFormat`, `Helpers.formatMoney`,
-`translate`, `toast`.
+`app/javascript/controllers/helpers/mobile_helpers.js`: header (language switch,
+theme toggle, signed-in avatar with initials fallback), avatar, stat tile, empty
+state, month nav, fetch-error state, greeting, initials, duration, 12-hour times,
+dates/months, money, attendance/payroll badges, and employee/business-type
+labels. Reused as-is: `Helpers.form`, `Helpers.fetchJson`, `Helpers.timeFormat`,
+`Helpers.formatMoney`, `translate`, `toast`.
 
 Mobile time display follows `docs/TIME_DISPLAY.md`: the wire carries ISO UTC,
 and `mobileTime` renders it in the company timezone (`company.utc_offset` when
@@ -168,6 +168,22 @@ present, otherwise `currentCompany().timezone`). `mobileDate`/`mobileWeekday`/
 `mobileShortDate`/`mobileMonthLabel` treat date-only values as calendar dates
 and never shift them. The mobile layout mounts the `client-cache` controller so
 `currentCompany()` is available for the company timezone.
+
+The header language switch uses the shared `language` controller mounted on the
+mobile layout (`data-controller="… language"`). It writes
+`localStorage.languageCode` — the same key as web — then refreshes the UI; every
+Shell-First screen resolves copy through `translate()` on hydration. The menu
+markup is `Helpers.languageOptionsHTML()` in `ui_helpers.js`, shared with the web
+header.
+
+In a browser the controller falls back to `window.location.reload()`. In the
+Android shell, each bottom tab owns a WebView, so the controller calls
+`SkycomMobile.reloadTabs()` instead. `MainActivity#onNavigatorReady` injects that
+bridge into each tab WebView, and `MainActivity#reloadTabsForLanguageChange`
+refreshes every loaded tab's current destination
+(`Navigator#currentDestination.refresh`).
+The current page stays on its route, and tabs that have not loaded yet pick up
+the new language when first opened. See `android/.../SkycomMobileBridge.kt`.
 
 Small Stimulus controllers live in `app/javascript/controllers/mobile/`:
 `theme`, `flash`, `password_visibility`, `clock`, `copy`,
@@ -399,6 +415,7 @@ Coverage:
 |---|---|
 | `spec/features/mobile/sign_in_spec.rb` | form, password toggle, invalid/valid auth, company-scoped redirect, sign-out |
 | `spec/features/mobile/home_spec.rb` | dashboard data, paid leave, company notice, check-in, company switcher, dark toggle, auth redirect |
+| `spec/features/mobile/language_spec.rb` | header switch order, EN/VI persistence, translated home/profile copy, translated attendance badges, native bridge dispatch |
 | `spec/features/mobile/check_in_spec.rb` | log creation, employee/company stamping, multiple check-ins, company-local day/timezone |
 | `spec/features/mobile/employee_info_spec.rb` | Profile title, sections, avatar change/rejection, Payroll gate entry, group managers/contract, disabled editor, back/sign-out |
 | `spec/features/mobile/attendance_month_spec.rb` | summary, daily rows, prev/next, empty state |
@@ -453,9 +470,15 @@ request feature spec sets them through the DOM with `set_native_field`.
   mark ready/hand over, shelf transfer/purchase, the close sheet and browser
   print; there is no native register/cash-drawer or door-sensor integration, and
   the footfall line says the sensor is not connected.
-- Mobile copy lives in `dictionary.js` and renders through `translate()`.
-  Missing entries fall back to the English key, so add the entry whenever a
-  string moves or changes.
+- Mobile shell copy lives in `dictionary.js` and renders through `translate()`;
+  the signed-in header switches EN/VI with the same `localStorage.languageCode`
+  as web. Missing entries fall back to the English key, so add the entry
+  whenever a string moves or changes. Sign-in, the five shell-mounted operation
+  console top bars, Android tab labels, server flash messages and the suspended
+  banner have no switch and stay English.
+- A language switch refreshes every loaded tab's current destination. Unsaved
+  form input in another tab is discarded; tabs not loaded yet pick up the new
+  language when first opened.
 - `/mobile/home` is not a server route. The Android `CompanyUrl.isMobileHome`
   check is therefore dormant; sign-in either redirects to the member's company
   home or back to `/mobile/sign_in`.
@@ -485,6 +508,7 @@ app/javascript/controllers/mobile/{theme,flash,password_visibility,clock,copy,ch
 android/.../SignInActivity.kt
 android/.../MainActivity.kt
 android/.../SkycomWebFragment.kt
+android/.../SkycomMobileBridge.kt
 android/.../CompanyStore.kt
 android/.../CompanyUrl.kt
 spec/features/mobile/
