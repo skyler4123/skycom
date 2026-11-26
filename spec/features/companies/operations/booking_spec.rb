@@ -163,7 +163,12 @@ RSpec.feature "Companies::Operations::Booking", type: :feature, js: true do
 
       expect(page).to have_css("[data-booking-now-needle]", wait: 10)
       expect(page).to have_css("[data-booking-now-label]", text: "10:00 AM")
-      expect(find("[data-booking-now-needle]")["style"]).to include("20%")
+
+      # CSSOM normalizes the nested calc, so the browser may serialize the
+      # equivalent position as 20.0001%. Compare the percentage, not the string.
+      style = find("[data-booking-now-needle]")["style"]
+      percent = style.scan(/(\d+(?:\.\d+)?)%/).flatten.first.to_f
+      expect(percent).to be_within(0.01).of(20)
     end
   end
 
