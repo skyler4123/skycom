@@ -5,8 +5,6 @@
 # Owner-only, user-prepared CSV ingestion (Shell-First). One import holds the
 # target table + one category, a folder-backed source CSV, the resolved header
 # contract, a full-file dry run, and the approve → run / rollback workflow.
-# Deliberately isolated from Companies::CompanyMigrationsController — see
-# docs/IMPORT.md.
 # Serves Stimulus: Companies_Imports_IndexController (list + create modal + delete),
 #                  Companies_Imports_ShowController (setup, sample, upload, dry run, approve, rollback, progress),
 #                  Companies_Imports_NewModalController (create modal),

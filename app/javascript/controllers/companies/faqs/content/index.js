@@ -14,7 +14,7 @@ import hrAttendance from "controllers/companies/faqs/content/13_hr_attendance"
 import payrollPerformance from "controllers/companies/faqs/content/14_payroll_performance"
 import exams from "controllers/companies/faqs/content/15_exams"
 import notificationsDocumentsStorage from "controllers/companies/faqs/content/16_notifications_documents_storage"
-import importsMigrationsExports from "controllers/companies/faqs/content/17_imports_migrations_exports"
+import importsExports from "controllers/companies/faqs/content/17_imports_exports"
 import customizationPaymentMethods from "controllers/companies/faqs/content/18_customization_payment_methods"
 import creditsBillingUsage from "controllers/companies/faqs/content/19_credits_billing_usage"
 import supportSecurityMobile from "controllers/companies/faqs/content/20_support_security_mobile"
@@ -37,7 +37,7 @@ export const FAQ_GROUPS = [
   payrollPerformance,
   exams,
   notificationsDocumentsStorage,
-  importsMigrationsExports,
+  importsExports,
   customizationPaymentMethods,
   creditsBillingUsage,
   supportSecurityMobile

@@ -3,8 +3,8 @@
 > **Status**: Live. Credit deduction is controlled at the **controller action level** via an `after_action` filter, and the deduction logic lives in a dedicated service class hierarchy (`CompanyCreditDeduction::*`).
 >
 > **Hard boundary**: deduction is **controller-only**. Background jobs, imports,
-> seeds, and migrations are **free-credit** — they may grant credits and drain
-> usage counters, but they must never call `CompanyCreditDeduction::*`,
+> and seeds are **free-credit** — they may grant credits and drain usage
+> counters, but they must never call `CompanyCreditDeduction::*`,
 > `CompanyWallet#deduct_from!`, or `Company#record_credit_usage!`.
 
 ---
@@ -29,16 +29,15 @@ credits out of the wallet.
 | Controller action via `deduct_company_credits_for` | ✅ | ✅ | ✅ |
 | `CompanyUsageSyncJob` | ❌ | ❌ | ❌ — it only drains the counter |
 | Promo campaign job / top-up completion | ❌ | ✅ | ❌ |
-| Data migration job | ❌ | ❌ | ❌ |
 | Order finalization job | ❌ | ❌ | ❌ |
 | Seed data | ❌ | ✅ (demo top-ups) | ✅ (demo usage only) |
 
-When a feature exists in both a controller and a background job (data migration,
-order finalization, bulk updates), **the deduction belongs to the controller
-entry point only**. Do not move it into a shared domain service that the job
-also calls. The mechanical guard is
-`spec/services/credit_deduction_boundary_spec.rb`, which scans `app/jobs`,
-`app/services/company_migrations`, and `app/services/seed` for deduction calls.
+When a feature exists in both a controller and a background job (imports, order
+finalization, bulk updates), **the deduction belongs to the controller entry
+point only**. Do not move it into a shared domain service that the job also
+calls. The mechanical guard is `spec/services/credit_deduction_boundary_spec.rb`,
+which scans `app/jobs`, `app/services/imports`, and `app/services/seed` for
+deduction calls.
 
 ### Why a Service Subclass per Place/Action?
 
@@ -315,7 +314,7 @@ class Companies::DashboardsController < Companies::ApplicationController
 end
 ```
 
-Do **not** call the service from a background job, import, seed, or migration.
+Do **not** call the service from a background job, import, or seed.
 If the same action also runs in a job, deduct only at the controller entry point
 (see “Deduction Boundary — Controllers Only” above).
 

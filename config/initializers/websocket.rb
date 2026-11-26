@@ -26,8 +26,6 @@ class WEBSOCKET
     ticket_commented: "ticket_commented",
     ticket_workflow_step_changed: "ticket_workflow_step_changed",
     ticket_assigned: "ticket_assigned",
-    company_migration_progress: "company_migration_progress",
-    company_migration_finished: "company_migration_finished",
     import_progress: "import_progress",
     import_finished: "import_finished"
   }.freeze

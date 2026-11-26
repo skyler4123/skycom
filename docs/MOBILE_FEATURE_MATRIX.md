@@ -238,7 +238,6 @@ status.
 | Workflows | ⛔ | Admin |
 | Operations | 🟡 | Read-only operation-appointment list on the Operations tab; no admin actions |
 | Documents | ⛔ | Future candidate (employee documents) |
-| Migrations | ⛔ | Admin |
 | Payment Methods | ⛔ | Admin |
 
 ### Storage

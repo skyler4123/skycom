@@ -5,10 +5,9 @@
 > category + one uploaded file, with a full-file dry run, approve → background
 > run, and audit-log based rollback.
 >
-> **Deliberately separate from `docs/DATA_MIGRATION.md`.** Import has its own
-> tables (`imports`, `import_logs`), its own `Imports::` service namespace, its
-> own controller/policy, and its own FE. Do not share code with
-> `CompanyMigrations::*`.
+> **Import is the only CSV ingestion path.** It owns its tables (`imports`,
+> `import_logs`), the `Imports::` service namespace, its controller/policy, and
+> its frontend.
 
 ---
 
@@ -326,8 +325,8 @@ bundle exec parallel_rspec -n 14 spec/features/companies/imports spec/models/imp
 ```
 
 The shared `PropertyMappingConcern` auto-population opt-out is additive (default
-off); run the existing `spec/features/companies/company_migrations` suite as a
-regression check after touching it.
+off); run the `spec/features/companies/imports` suite as a regression check after
+touching it.
 
 ---
 
@@ -337,17 +336,3 @@ Upserts/updates, per-row categories, association name lookups (only raw `*_id`
 UUIDs), `metadata` JSON import, chunked uploads, background dry run, importing
 money/stock/order tables, AI-generated CSV, scheduling/recurring imports, and
 automatic FK creation.
-
-## 13. Differences from Data Migration
-
-| | Import | Data Migration |
-|---|---|---|
-| Input | User-prepared CSV with exact headers | Config-driven mapping (`migration_mapping_config`) |
-| Schema knowledge | Required from the user | Encoded in the config |
-| Targets | Allowlisted master data | Any company-scoped model minus a denylist |
-| Write mode | Create-only | Upsert on `[company_id, external_id]` |
-| Upload | Single file | Browser-split chunks |
-| Category | One selected category | Config-defined reuse/create |
-| Rollback | Destroy records this import created | Destroy created + restore updated `previous_state` |
-| Status field | `workflow_status` only | `workflow_status` + `lifecycle_status` |
-| Code | `Imports::` namespace | `CompanyMigrations::` namespace |

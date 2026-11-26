@@ -282,8 +282,8 @@ vi:
       one_login_body: "Di chuyển giữa các doanh nghiệp mà không đăng xuất hay mở ứng dụng riêng. Bảng điều khiển, phân tích và thanh toán luôn gắn với doanh nghiệp đang dùng."
       access_title: "Truy cập theo vai trò & chính sách"
       access_body: "Vai trò và chính sách ABAC kiểm soát ai được xem và làm gì; thay đổi quyền và cấu hình đều được ghi nhật ký."
-      import_title: "Nhập, xuất & di chuyển dữ liệu hàng loạt"
-      import_body: "Đưa sản phẩm, tồn kho, khách hàng và nhân viên vào bằng nhập thử và di chuyển dữ liệu có cấu hình; xuất dữ liệu trang ra CSV."
+      import_title: "Nhập & xuất dữ liệu hàng loạt"
+      import_body: "Đưa sản phẩm, tồn kho, khách hàng và nhân viên vào bằng nhập thử; xuất dữ liệu trang ra CSV."
       android_title: "Web + ứng dụng Android đồng hành"
       android_body: "Vận hành doanh nghiệp trên web và cung cấp cho nhân viên ứng dụng Android cho chấm công, xem lương, yêu cầu và bảng điều khiển vận hành."
     facts:

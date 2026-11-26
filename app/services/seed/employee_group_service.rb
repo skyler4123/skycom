@@ -59,7 +59,7 @@ class Seed::EmployeeGroupService
   # (Name/Code/Branch/Manager/Members) plus every configured property column.
   # Existing column settings and the config name are preserved; missing columns
   # are appended only. Called from the controller on index/new so existing
-  # companies get a usable page without a data migration.
+  # companies get a usable page without a backfill.
   def self.ensure_defaults!(company:)
     category = Category.find_or_create_by!(
       company: company,

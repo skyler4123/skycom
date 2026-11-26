@@ -1,27 +1,11 @@
 export default {
-  key: "imports_migrations_exports",
+  key: "imports_exports",
   icon: "upload_file",
   title: {
-    en: "Imports, migrations & exports",
-    vi: "Nhập dữ liệu, chuyển dữ liệu & xuất dữ liệu"
+    en: "Imports & exports",
+    vi: "Nhập dữ liệu & xuất dữ liệu"
   },
   questions: [
-    {
-      slug: "import-versus-migration",
-      question: {
-        en: "What is the difference between Import and Data Migration?",
-        vi: "Nhập dữ liệu và Chuyển dữ liệu khác nhau thế nào?"
-      },
-      answer: [
-        {
-          type: "p",
-          text: {
-            en: "Import is the owner's everyday CSV loader for one master table at a time, with one category, one file, a full-file dry run, and a log-based rollback. Data Migration is the config-driven loader for a larger move: it can ingest several related tables in a defined order, accepts chunked uploads, and has its own dry run, approval, resume, and rollback. Use Import for a product or customer list; use Data Migration when the data spans tables or needs a repeatable migration configuration.",
-            vi: "Nhập dữ liệu là công cụ CSV hằng ngày cho chủ sở hữu, mỗi lần một bảng chính, với một danh mục, một tệp, chạy thử toàn bộ tệp và hoàn tác dựa trên nhật ký. Chuyển dữ liệu là công cụ nhập theo cấu hình cho lần chuyển lớn hơn: có thể nhập nhiều bảng liên quan theo thứ tự định nghĩa, nhận tệp tải lên theo phần, và có chạy thử, duyệt, tiếp tục và hoàn tác riêng. Dùng Nhập dữ liệu cho danh sách sản phẩm hoặc khách hàng; dùng Chuyển dữ liệu khi dữ liệu trải nhiều bảng hoặc cần cấu hình chuyển lặp lại."
-          }
-        }
-      ]
-    },
     {
       slug: "importable-tables",
       question: {
@@ -67,28 +51,6 @@ export default {
             en: "Upload the file, choose the target table and category, and run the dry run; Skycom validates the whole file at once and stores the header snapshot, file fingerprints, and row errors. Approval is allowed only when the last dry run passed and still matches the current category fields and the uploaded file. The import then writes the rows in batches, and rollback replays its log to remove what that run created. A failed run is terminal: roll it back and create a new import rather than retrying the same one.",
             vi: "Tải tệp lên, chọn bảng đích và danh mục, rồi chạy thử; Skycom kiểm tra toàn bộ tệp một lần và lưu ảnh chụp header, dấu nhận diện tệp và lỗi từng dòng. Chỉ được duyệt khi lần chạy thử cuối đã đạt và vẫn khớp trường của danh mục hiện tại cùng tệp đã tải. Việc nhập sau đó ghi từng lô, và hoàn tác phát lại nhật ký để xóa những gì lần đó tạo. Lần chạy lỗi là trạng thái cuối: hãy hoàn tác rồi tạo lần nhập mới thay vì thử lại cùng lần."
           }
-        }
-      ]
-    },
-    {
-      slug: "migrate-related-data",
-      question: {
-        en: "How do I migrate related data across several tables?",
-        vi: "Làm sao chuyển dữ liệu liên quan qua nhiều bảng?"
-      },
-      answer: [
-        {
-          type: "p",
-          text: {
-            en: "Use Data Migration, not Import. A migration config declares the target tables and the order they load, the source columns, the category/property mapping, and the safe-target rules for each table. Upload the CSV parts, run the dry run, review the counts and error samples, then approve; the job processes batches, updates progress, and sends notifications. The same run can be rolled back from its log if the import must be undone.",
-            vi: "Dùng Chuyển dữ liệu, không dùng Nhập dữ liệu. Cấu hình chuyển khai báo các bảng đích và thứ tự nạp, cột nguồn, ánh xạ danh mục/thuộc tính và quy tắc đích an toàn cho từng bảng. Tải các phần CSV lên, chạy thử, xem số lượng và mẫu lỗi, rồi duyệt; job xử lý theo lô, cập nhật tiến độ và gửi thông báo. Cùng lần chạy có thể hoàn tác từ nhật ký nếu cần hủy việc nhập."
-          }
-        },
-        {
-          type: "links",
-          items: [
-            { label: { en: "Open Migrations", vi: "Mở Chuyển dữ liệu" }, path: "company_company_migrations_path" }
-          ]
         }
       ]
     },

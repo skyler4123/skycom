@@ -9,8 +9,8 @@
 #   end
 #
 # DEDUCTION BOUNDARY: this concern is the only entry point for credit
-# deduction. Background jobs, imports, seeds, and migrations are free-credit and
-# must never call CompanyCreditDeduction::* or record_credit_usage! directly.
+# deduction. Background jobs, imports, and seeds are free-credit and must never
+# call CompanyCreditDeduction::* or record_credit_usage! directly.
 #
 # The filter:
 #   - runs only after a SUCCESSFUL JSON response (no HTML, no 4xx/5xx)
