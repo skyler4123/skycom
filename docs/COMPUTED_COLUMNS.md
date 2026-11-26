@@ -356,7 +356,7 @@ Stock keeps its real column and filter:
 | File | Purpose |
 |---|---|
 | `app/models/concerns/computed_columns_concern.rb` | Model DSL, registry, values, preload hook. |
-| `app/models/computed_columns.rb` | `resource_name` → model resolver. |
+| `app/services/computed_columns.rb` | `resource_name` → model resolver. |
 | `app/models/product.rb` | First adoption: `quantity`. |
 | `app/models/table_config.rb` | Source resolution, normalization, validation, catalogs. |
 | `app/models/property_mapping.rb` | `effective_resource_name` for the read-only catalog. |
@@ -368,4 +368,4 @@ Stock keeps its real column and filter:
 | `app/javascript/controllers/companies/table_configs/show_controller.js` | Read-only computed badges. |
 | `app/javascript/controllers/companies/property_mappings/{show,edit}_controller.js` | Read-only computed card. |
 | `app/services/seed/table_config_service.rb` | `field_hash_for` keeps computed keys out of search/filter. |
-| `spec/models/computed_columns_spec.rb` | Resolver + real-column precedence. |
+| `spec/services/computed_columns_spec.rb` | Resolver + real-column precedence. |

@@ -492,7 +492,7 @@ after_commit auto-sync) and `Model.ms_clear_index!` before/after — see `docs/M
  | `app/services/{branches,brands,departments,employees,facilities,invoices,orders,services,warehouses}/search_query_service.rb` | One 3-line subclass per wired index page |
  | `app/javascript/controllers/companies/table_configs/edit_controller.js` | Column editor incl. Search/Filter settings |
  | `app/models/concerns/computed_columns_concern.rb` | Model registry for computed index columns |
- | `app/models/computed_columns.rb` | `resource_name` → model resolver for computed columns |
+ | `app/services/computed_columns.rb` | `resource_name` → model resolver for computed columns |
  | `app/models/product.rb` | First computed column: `quantity` summed from Stock |
  | `docs/COMPUTED_COLUMNS.md` | Canonical computed-column BE → FE → end-user guide |
  | `spec/features/companies/products/computed_columns_spec.rb` | Product computed-column index/hide E2E |

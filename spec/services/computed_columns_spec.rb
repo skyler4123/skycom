@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe ComputedColumns, type: :model do
+RSpec.describe ComputedColumns, type: :service do
   describe ".for" do
     it "returns the computed catalog for a model that declares one" do
       expect(described_class.for("products")).to include(
