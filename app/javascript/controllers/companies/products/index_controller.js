@@ -6,7 +6,7 @@ export default class Companies_Products_IndexController extends Companies_Layout
   // (`search: true` → keyword input, `filter: {type,...}` → dropdown with bucket/option labels).
   // Depends on BE: Companies::ProductsController#index (list + Meilisearch q / filters[key])
   // Endpoints: GET <pathname>.json?category_id&q&filters[key] — traditional GET form, full-page submit
-  // Docs: docs/DYNAMIC_TABLE.md, docs/MEILISEARCH.md
+  // Docs: docs/DYNAMIC_TABLE.md, docs/MEILISEARCH.md, docs/COMPUTED_COLUMNS.md
   static targets = ["productsList"]
 
   /** @type {(Product & { name: string })[]} */

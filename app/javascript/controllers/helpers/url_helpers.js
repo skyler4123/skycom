@@ -42,7 +42,7 @@ export const new_admin_payment_method_path = () => `/admin/payment_methods/new`
 export const admin_payment_method_path = (id) => `/admin/payment_methods/${id}`
 export const edit_admin_payment_method_path = (id) => `/admin/payment_methods/${id}/edit`
 export const create_admin_payment_methods_path = () => `/admin/payment_methods`
-// Company support tickets pool (docs/superpowers/plans/2026-10-07-company-support-center.md)
+// Company support tickets pool (docs/superpowers/plans/2026-11-26-company-ticket-visibility.md)
 export const admin_company_tickets_path = () => `/admin/company_tickets`
 export const admin_company_ticket_path = (id) => `/admin/company_tickets/${id}`
 export const assign_admin_company_ticket_path = (id) => `/admin/company_tickets/${id}/assign`
@@ -307,13 +307,6 @@ export const create_company_stored_files_path = (companyId) => `/companies/${com
 export const company_stored_file_path = (companyId, fileId) => `/companies/${companyId}/stored_files/${fileId}`
 export const download_company_stored_file_path = (companyId, fileId) => `/companies/${companyId}/stored_files/${fileId}/download`
 export const company_storage_statistics_path = (companyId) => `/companies/${companyId}/storage_statistics`
-export const company_company_migrations_path = (companyId) => `/companies/${companyId}/company_migrations`
-export const company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}`
-export const chunks_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/chunks`
-export const update_config_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/update_config`
-export const dry_run_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/dry_run`
-export const approve_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/approve`
-export const rollback_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/rollback`
 export const company_imports_path = (companyId) => `/companies/${companyId}/imports`
 export const company_import_path = (companyId, importId) => `/companies/${companyId}/imports/${importId}`
 export const source_file_company_import_path = (companyId, importId) => `/companies/${companyId}/imports/${importId}/source_file`
@@ -370,7 +363,7 @@ export const new_company_discount_group_path = (companyId) => `/companies/${comp
 export const company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}`
 export const edit_company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}/edit`
 export const generate_codes_company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}/generate_codes`
-// Company support tickets (docs/superpowers/plans/2026-10-07-company-support-center.md)
+// Company support tickets (docs/superpowers/plans/2026-11-26-company-ticket-visibility.md)
 export const company_company_tickets_path = (companyId) => `/companies/${companyId}/company_tickets`
 export const new_company_company_ticket_path = (companyId) => `/companies/${companyId}/company_tickets/new`
 export const company_company_ticket_path = (companyId, ticketId) => `/companies/${companyId}/company_tickets/${ticketId}`

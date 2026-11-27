@@ -170,15 +170,6 @@ Rails.application.routes.draw do
           get :download
         end
       end
-      resources :company_migrations do
-        member do
-          post :chunks
-          patch :update_config
-          post :dry_run
-          post :approve
-          post :rollback
-        end
-      end
       resources :imports do
         member do
           post :source_file

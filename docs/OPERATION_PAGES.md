@@ -174,7 +174,7 @@ enum :operation_type, {
 Rules:
 
 - Pick a new, unused integer. Never renumber existing values.
-- The value is persisted; changing it later requires a data migration.
+- The value is persisted; changing it later requires a backfill.
 
 ### 5.2 Catalog constant
 
@@ -208,7 +208,7 @@ Use the existing idempotent service:
 Seed::OperationService.seed_defaults!(company: company)
 ```
 
-Run it for every company in a data migration or rake task. If the team implements the planned `Seed::OperationService.sync_catalog!(company:)`, use that instead and add its spec. See `docs/TODO.md` “Operations — new operation_type backfill”.
+Run it for every company in a backfill or rake task. If the team implements the planned `Seed::OperationService.sync_catalog!(company:)`, use that instead and add its spec. See `docs/TODO.md` “Operations — new operation_type backfill”.
 
 Verification:
 

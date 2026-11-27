@@ -142,7 +142,6 @@ first. If a term is missing, add it here before using it elsewhere.
 | **Shift template** | A reusable definition of a working shift. |
 | **Scheduled shift** | A shift template applied to an employee on a date. |
 | **Import** | Owner-prepared CSV loaded into one allowlisted table, with a dry run and a rollback. |
-| **Company migration** | Config-driven CSV ingestion into several business tables, approved by the owner after a dry run. |
 | **Notification** | An in-app message to a user, with tags for filtering. |
 | **Document / Folder** | Company file storage with access rules. |
 | **Profile / SubProfile** | Extension buckets for per-domain employee or customer details that should not bloat the base record. |

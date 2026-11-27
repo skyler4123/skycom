@@ -310,15 +310,15 @@ class Seed::HospitalInitService
           resource_name: resource_name.to_s,
           category: category,
           property_mapping: category.default_property_mapping,
-          columns_metadata: keys.map { |k| field_hash(k, entry[:properties]) },
+          columns_metadata: keys.map { |k| field_hash(resource_name, k, entry[:properties]) },
           name: "#{name} table config"
         )
       end
     end
   end
 
-  def field_hash(key, properties = {})
-    Seed::TableConfigService.field_hash(key, properties[key.to_sym])
+  def field_hash(resource_name, key, properties = {})
+    Seed::TableConfigService.field_hash_for(resource_name, key, properties[key.to_sym])
   end
 
   def configure_hospital_permissions

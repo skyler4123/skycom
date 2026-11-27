@@ -1,17 +1,16 @@
 import Admin_LayoutController from "controllers/admin/layout_controller"
 
 // Admin ticket detail — handle, comment, resolve/close/reopen.
-// Subscribes to the ticket's company channel for live customer replies.
-// Comment events carry the full comment payload and are injected into the
-// thread (no re-fetch); status events still refresh.
+// Subscribes to the ticket's company channel for live replies. Company ticket
+// events carry only the ticket id, so the page refetches through the admin
+// show endpoint (which keeps cross-company visibility).
 // (List page stays socket-free; only the open detail subscribes once.)
 // Depends on BE: Admin::CompanyTicketsController#show|assign|resolve|close|reopen|comment
 // Endpoints: GET /admin/company_tickets/:id.json; POST .../:id/assign|resolve|close|reopen|comment
-// Docs: docs/superpowers/plans/2026-10-07-company-support-center.md
+// Docs: docs/superpowers/plans/2026-11-26-company-ticket-visibility.md
 export default class Admin_CompanyTickets_ShowController extends Admin_LayoutController {
   /** @type {any | null} */
   ticket = null
-  _ownIds = new Set()
 
   async connect() {
     super.connect()
@@ -39,18 +38,15 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
 
   handleSocketComment(data) {
     if (!this.ticket || data?.id !== this.ticket.id) return
-    const c = data.payload?.comment
-    if (!c?.id) return
-    if ((this.ticket.comments || []).some((x) => x.id === c.id)) return
-    if (data.payload?.first_responded_at) this.ticket.first_responded_at = data.payload.first_responded_at
-    this.appendComment(c, { silent: this._ownIds.has(c.id) })
+    this.refresh()
   }
 
-  appendComment(c, { silent = false } = {}) {
-    this.ticket.comments = [...(this.ticket.comments || []), c].sort((a, b) =>
+  appendComment(c) {
+    const comments = this.ticket.comments || []
+    if (comments.some((x) => x.id === c.id)) return
+    this.ticket.comments = [...comments, c].sort((a, b) =>
       new Date(a.created_at) - new Date(b.created_at))
     if (this.hasContentTarget) this.renderContent()
-    if (!silent) toast({ type: "info", message: "New comment" })
   }
 
   ticketId() {
@@ -129,8 +125,7 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
       })
       const c = response.company_ticket_comment
       if (c?.id) {
-        this._ownIds.add(c.id)
-        this.appendComment(c, { silent: true })
+        this.appendComment(c)
       }
       formEl.reset()
       toast({ type: "success", message: "Comment posted" })

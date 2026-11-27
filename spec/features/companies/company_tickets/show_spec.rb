@@ -11,7 +11,10 @@ RSpec.feature "Companies::CompanyTickets Show", type: :feature, js: true do
 
   before do
     sign_in(owner)
+    cache_client_data(owner)
+  end
 
+  def cache_client_data(user)
     page.execute_script("localStorage.clear()")
 
     company_data = JSON.parse(company.to_json).merge(
@@ -24,7 +27,7 @@ RSpec.feature "Companies::CompanyTickets Show", type: :feature, js: true do
     )
 
     page.execute_script("localStorage.setItem('client_cache_data', arguments[0])",
-      { user: JSON.parse(owner.to_json), companies: [ company_data ], enums: {}, employees: [] }.to_json)
+      { user: JSON.parse(user.to_json), companies: [ company_data ], enums: {}, employees: [] }.to_json)
     page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
@@ -109,5 +112,69 @@ RSpec.feature "Companies::CompanyTickets Show", type: :feature, js: true do
     expect(page).to have_content("Back to Support Tickets", wait: 10)
 
     expect(page.evaluate_script("window.__xss")).to be_nil
+  end
+
+  scenario "lets the creator change visibility from the detail page" do
+    visit company_company_ticket_path(company, ticket)
+    expect(page).to have_content("VPN broken", wait: 10)
+    expect(page).to have_select("company_ticket[visibility]", selected: "Only me", wait: 10)
+
+    select "Everyone in company", from: "company_ticket[visibility]"
+    click_button "Save"
+
+    expect(page).to have_content("Visibility updated", wait: 10)
+    expect(page).to have_content("Everyone", wait: 10)
+    expect(page).to have_content("Visibility Changed", wait: 10)
+    expect(page).to have_content("Only me → Everyone")
+    expect(ticket.reload).to be_company_wide
+  end
+
+  scenario "shows a read-only visibility badge to a non-creator" do
+    reader = grant_company_ticket_permissions(create(:employee, company: company), :read)
+    shared = CompanyTicket.create!(company: company, employee: owner_employee,
+      name: "Shared ticket", visibility: :company_wide)
+
+    sign_in(reader.user)
+    cache_client_data(reader.user)
+    visit company_company_ticket_path(company, shared)
+
+    expect(page).to have_content("Shared ticket", wait: 10)
+    expect(page).to have_content("Everyone", wait: 10)
+    expect(page).to have_content("Only the creator can change visibility.", wait: 10)
+    expect(page).to have_no_select("company_ticket[visibility]")
+  end
+
+  scenario "shows not found for another employee's private ticket" do
+    reader = grant_company_ticket_permissions(create(:employee, company: company), :read)
+    other = create(:employee, company: company)
+    hidden = CompanyTicket.create!(company: company, employee: other, name: "Hidden ticket")
+
+    sign_in(reader.user)
+    cache_client_data(reader.user)
+    visit company_company_ticket_path(company, hidden)
+
+    expect(page).to have_content("Ticket not found.", wait: 10)
+    expect(page).not_to have_content("Hidden ticket")
+  end
+
+  scenario "clears an open ticket when it is made private" do
+    reader = grant_company_ticket_permissions(create(:employee, company: company), :read)
+    shared = CompanyTicket.create!(company: company, employee: owner_employee,
+      name: "Shared soon private", visibility: :company_wide)
+
+    sign_in(reader.user)
+    cache_client_data(reader.user)
+    visit company_company_ticket_path(company, shared)
+    expect(page).to have_content("Shared soon private", wait: 10)
+
+    shared.update!(visibility: :only_me)
+    page.execute_script(
+      "window.WEBSOCKET.handleIncomingPublication(Object.keys(window.WEBSOCKET.listeners)[0], " \
+      "{ event: 'company_ticket_commented', id: arguments[0], payload: {} })",
+      shared.id.to_s
+    )
+
+    expect(page).to have_content("Ticket not found.", wait: 10)
+    expect(page).not_to have_content("Shared soon private")
   end
 end

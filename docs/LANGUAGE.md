@@ -227,7 +227,15 @@ window.location.reload();                    // Required to apply
 
 ### From UI (Header)
 
-The language switcher is in the header (see `layout_controller.js`). Click triggers `data-language-code-param` → `LanguageController#changeLanguage` → saves to localStorage → reloads.
+The language switcher is in the desktop header (see `companies/layout_controller.js`)
+and the signed-in mobile header (see `helpers/mobile_helpers.js`). Both render
+the shared `languageOptionsHTML()` menu from `helpers/ui_helpers.js`. Click
+triggers `data-language-code-param` → `LanguageController#changeLanguage` →
+saves to localStorage → refreshes. A browser calls `window.location.reload()`.
+The Android shell calls `SkycomMobile.reloadTabs()` instead, because each bottom
+tab owns a WebView; `MainActivity` refreshes every loaded tab's current
+destination so no cached tab keeps the old language. Sign-in and the mobile
+operation-console top bars do not render the switch.
 
 ---
 
@@ -241,9 +249,9 @@ deliberate two-layer change:
    `OG_LOCALES` in `config/initializers/constants.rb`, add the route constraint, and update
    hreflang/sitemap/switcher tests. The locale must be complete; production
    fallbacks are disabled.
-2. **App UI:** add the option to the language switcher in
-   `app/javascript/controllers/companies/layout_controller.js` and add
-   translations to `dictionary.js` for every key:
+2. **App UI:** add the option to `languageOptionsHTML()` in
+   `app/javascript/controllers/helpers/ui_helpers.js` (used by both the desktop
+   and mobile headers) and add translations to `dictionary.js` for every key:
    ```javascript
    "Save": {
      vi: "Lưu",
@@ -266,8 +274,10 @@ app UI copy belongs in `dictionary.js`.
 | `app/views/home/sitemap.xml.erb` / `robots.text.erb` | Localized sitemap and robots |
 | `app/javascript/controllers/home/language_controller.js` | Syncs homepage switcher → `languageCode` |
 | `app/javascript/controllers/helpers/dictionary.js` | App UI translation dictionary |
-| `app/javascript/controllers/helpers/ui_helpers.js` | translate() function (line 272) |
-| `app/javascript/controllers/language_controller.js` | App UI language switch controller |
+| `app/javascript/controllers/helpers/ui_helpers.js` | translate() function (line 272), `languageOptionsHTML()` shared menu |
+| `app/javascript/controllers/helpers/mobile_helpers.js` | Signed-in mobile header language switch |
+| `app/javascript/controllers/language_controller.js` | App UI language switch controller; native tab refresh with browser fallback |
+| `android/.../SkycomMobileBridge.kt` | Refreshes every loaded bottom tab after a mobile language change |
 | `app/javascript/application.js` | window.translate exposure |
 | `app/javascript/controllers/companies/layout_controller.js` | App UI language dropdown |
 

@@ -125,8 +125,8 @@ export default {
         {
           type: "p",
           text: {
-            en: "No. Only a user action can deduct credits. Background processing, imports, data migrations, order completion, demo data, and promo campaigns are free-credit. Those processes may still grant credits, such as a top-up completion or a promo campaign, and they may count usage, but they never move credits out. This keeps a suspended company's background processing from digging a deeper negative balance.",
-            vi: "Không. Chỉ thao tác của người dùng mới trừ được tín dụng. Xử lý nền, nhập dữ liệu, chuyển dữ liệu, hoàn tất đơn, dữ liệu demo và chiến dịch khuyến mãi là miễn phí tín dụng. Các tiến trình đó vẫn có thể tặng tín dụng, như hoàn tất nạp tiền hoặc chiến dịch khuyến mãi, và có thể ghi nhận mức dùng, nhưng không bao giờ chuyển tín dụng ra. Điều này ngăn xử lý nền của công ty bị tạm ngưng làm số dư âm sâu hơn."
+            en: "No. Only a user action can deduct credits. Background processing, imports, order completion, demo data, and promo campaigns are free-credit. Those processes may still grant credits, such as a top-up completion or a promo campaign, and they may count usage, but they never move credits out. This keeps a suspended company's background processing from digging a deeper negative balance.",
+            vi: "Không. Chỉ thao tác của người dùng mới trừ được tín dụng. Xử lý nền, nhập dữ liệu, hoàn tất đơn, dữ liệu demo và chiến dịch khuyến mãi là miễn phí tín dụng. Các tiến trình đó vẫn có thể tặng tín dụng, như hoàn tất nạp tiền hoặc chiến dịch khuyến mãi, và có thể ghi nhận mức dùng, nhưng không bao giờ chuyển tín dụng ra. Điều này ngăn xử lý nền của công ty bị tạm ngưng làm số dư âm sâu hơn."
           }
         }
       ]

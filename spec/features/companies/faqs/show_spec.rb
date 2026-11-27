@@ -104,7 +104,7 @@ RSpec.feature "Companies::Faqs Show", type: :feature, js: true do
 
     expect(page).to have_selector("[data-faq-group]", count: 20, wait: 10)
     expect(page).to have_content("20 groups")
-    expect(page).to have_content("169 questions")
+    expect(page).to have_content("167 questions")
   end
 
   scenario "filters to one group" do

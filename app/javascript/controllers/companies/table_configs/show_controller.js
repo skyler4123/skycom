@@ -1,21 +1,26 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import {
   columnName,
+  columnSource,
   columnType,
   columnTypeIcon,
   columnTypeLabel,
   columnTypeTooltip,
-  filterSummary
+  filterSummary,
+  isSearchableColumn
 } from "controllers/helpers/table_config_helpers"
 
 // Read-only Table Config detail page — friendly labels/types/filter summaries,
 // never raw keys.
 // Depends on BE: Companies::TableConfigsController#show (JSON hydration),
 //               Companies::PropertyMappingsController#show (labels/types)
-// Docs: docs/DYNAMIC_TABLE.md
+// Docs: docs/DYNAMIC_TABLE.md, docs/COMPUTED_COLUMNS.md
 export default class Companies_TableConfigs_ShowController extends Companies_LayoutController {
   /** @type {any | null} */
   config = null
+
+  /** @type {{ standard: Array<object> | null, computed: Array<object> }} */
+  catalog = { standard: null, computed: [] }
 
   /** @type {any | null} */
   propertyMapping = null
@@ -35,6 +40,10 @@ export default class Companies_TableConfigs_ShowController extends Companies_Lay
     try {
       const response = await fetchJson(`${Helpers.company_table_config_path(companyId, configId)}.json`)
       this.config = response.table_config
+      this.catalog = {
+        standard: Array.isArray(this.config?.standard_columns) ? this.config.standard_columns : null,
+        computed: this.config?.computed_columns || []
+      }
 
       /** @type {any | null} */
       this.propertyMapping = null
@@ -183,13 +192,24 @@ export default class Companies_TableConfigs_ShowController extends Companies_Lay
 
   columnRowHTML(col) {
     const key = String(col.key || "")
-    const displayName = columnName(key, this.propertyEntries, this.extraColumns, col.name || "")
-    const type = columnType(key, this.propertyEntries, this.extraColumns)
-    const searchable = col.search === true
+    const displayName = columnName(key, this.propertyEntries, this.extraColumns, col.name || "", this.catalog)
+    const source = columnSource(key, this.catalog)
+    const type = columnType(key, this.propertyEntries, this.extraColumns, this.catalog)
+    const searchable = isSearchableColumn(key, this.catalog)
 
     return `
       <tr class="border-b border-line last:border-0 hover:bg-muted/50">
-        <td class="py-3 px-4 text-sm font-medium text-foreground">${escapeHtml(displayName)}</td>
+        <td class="py-3 px-4 text-sm font-medium text-foreground">
+          <div class="flex flex-col gap-1">
+            <span>${escapeHtml(displayName)}</span>
+            ${source === "computed" ? `
+              <span class="inline-flex w-fit items-center gap-1 rounded-md border border-success/30 bg-success/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-success">
+                <span class="material-symbols-outlined text-[12px]">functions</span>
+                ${translate("Computed")}
+              </span>
+            ` : ""}
+          </div>
+        </td>
         <td class="py-3 px-4">
           ${type ? `
             <span class="inline-flex w-fit items-center gap-1 rounded-md border border-line bg-card px-2 py-1 text-xs font-medium text-foreground"
@@ -207,9 +227,12 @@ export default class Companies_TableConfigs_ShowController extends Companies_Lay
         <td class="py-3 px-4">
           ${searchable
             ? `<span class="text-success text-sm font-medium">${translate("Yes")}</span>`
-            : `<span class="text-muted-foreground text-sm">—</span>`}
+            : `<span class="text-muted-foreground text-sm" ${tooltip(translate("Computed columns are not searchable."))}>—</span>`}
         </td>
-        <td class="py-3 px-4 text-sm text-muted-foreground">${escapeHtml(filterSummary(col))}</td>
+        <td class="py-3 px-4 text-sm text-muted-foreground"
+          ${source === "computed" ? tooltip(translate("Computed columns cannot be filtered.")) : ""}>
+          ${escapeHtml(filterSummary(col))}
+        </td>
       </tr>
     `
   }

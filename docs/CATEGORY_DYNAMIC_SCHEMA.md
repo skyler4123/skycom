@@ -249,6 +249,15 @@ TableConfig.columns_metadata        PropertyMapping.property_metadata (array)
 
 This separation means you can define a property name in PropertyMapping but choose not to show it in the table by setting `visible: false` in the table config's column hash. The data exists, the name exists, but it's hidden from the table view.
 
+### Computed columns (fourth source)
+
+Some index columns are not stored on the record and are not PropertyMapping properties: the resource
+model calculates them from related data (e.g. `Product#quantity` summed from `Stock`). They are
+declared with `ComputedColumnsConcern` and exposed to TableConfig/PropertyMapping as a read-only
+`computed_columns` catalog. The column key is plain (`quantity`), and a real DB column always wins
+over a computed declaration with the same key. Computed columns never support search or filters and
+are never stored in PropertyMapping metadata. See `docs/COMPUTED_COLUMNS.md`.
+
 ---
 
 ## 5. Supported Resources

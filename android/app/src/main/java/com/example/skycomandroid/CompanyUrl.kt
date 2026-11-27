@@ -28,6 +28,27 @@ object CompanyUrl {
         return path == "/mobile/home" || path == "/mobile/home/"
     }
 
+    /**
+     * True when [url] has the same scheme, host and port as the configured app
+     * origin. Used to keep the JS bridge unavailable to external pages.
+     */
+    fun isAppOrigin(url: String?, baseUrl: String): Boolean {
+        if (url.isNullOrBlank() || baseUrl.isBlank()) return false
+
+        return try {
+            val target = URI(url)
+            val base = URI(baseUrl)
+            val targetHost = target.host ?: return false
+            val baseHost = base.host ?: return false
+
+            target.scheme.equals(base.scheme, ignoreCase = true) &&
+                targetHost.equals(baseHost, ignoreCase = true) &&
+                target.port == base.port
+        } catch (_: URISyntaxException) {
+            false
+        }
+    }
+
     private fun path(url: String?): String? {
         if (url.isNullOrBlank()) return null
 

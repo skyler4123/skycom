@@ -272,8 +272,8 @@ en:
       one_login_body: "Move between businesses without logging out or opening separate apps. Dashboards, analytics, and billing stay scoped to the active business."
       access_title: "Role & Policy-Based Access"
       access_body: "ABAC roles and policies control who can see and do what; permission and configuration changes are logged."
-      import_title: "Bulk Import, Export & Migration"
-      import_body: "Bring products, stock, customers, and employees in with dry-run imports and configurable migrations; export page data to CSV."
+      import_title: "Bulk Import & Export"
+      import_body: "Bring products, stock, customers, and employees in with dry-run imports; export page data to CSV."
       android_title: "Web + Android Companion"
       android_body: "Run the business on the web and give employees the Android shell for attendance, payroll view, requests, and operation consoles."
     facts:

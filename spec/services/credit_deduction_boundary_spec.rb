@@ -17,8 +17,8 @@ RSpec.describe "Credit deduction boundary" do
     expect(offending_files("app/jobs/**/*.rb")).to be_empty
   end
 
-  it "is never called from company migration/import code" do
-    expect(offending_files("app/services/company_migrations/**/*.rb")).to be_empty
+  it "is never called from import code" do
+    expect(offending_files("app/services/imports/**/*.rb")).to be_empty
   end
 
   it "is never called from seed services (seeds may meter demo usage, never deduct)" do

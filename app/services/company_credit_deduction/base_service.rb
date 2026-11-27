@@ -3,7 +3,7 @@
 # CompanyCreditDeduction::BaseService — the epic credit-deduction service.
 #
 # CONTROLLER-ONLY. This service must never be called from a background job,
-# import, seed, or data migration. Background jobs are free-credit: they may
+# import, or seed. Background jobs are free-credit: they may
 # grant credits (top-ups, promo campaigns) and drain usage counters, but they
 # must not take credits out of a wallet. The only caller is
 # Companies::CreditDeductionConcern's after_action DSL; controllers declare the

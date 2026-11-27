@@ -48,10 +48,10 @@ Rules:
   hierarchy handles credit OUT (deduct promo → main, allowing a negative main
   balance), triggered by an `after_action` filter at the controller action level
   — never inline in actions.
-- **Deduction is controller-only.** Background jobs, imports, seeds, and
-  migrations are free-credit. They may grant credits (money IN) and drain usage
-  counters, but they must never deduct or record usage. Suspended companies may
-  still be processed by those jobs; that must remain free.
+- **Deduction is controller-only.** Background jobs, imports, and seeds are
+  free-credit. They may grant credits (money IN) and drain usage counters, but
+  they must never deduct or record usage. Suspended companies may still be
+  processed by those jobs; that must remain free.
 
 ## The Hot Path Rule (usage tracking)
 

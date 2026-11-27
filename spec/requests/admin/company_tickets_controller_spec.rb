@@ -91,7 +91,7 @@ RSpec.describe "Admin::CompanyTicketsController", type: :request do
       expect(WEBSOCKET).to have_received(:publish_event).with(
         channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_status_changed,
-        data: hash_including(to_status: "assigned")
+        data: { id: ticket.id }
       )
     end
 
@@ -118,7 +118,7 @@ RSpec.describe "Admin::CompanyTicketsController", type: :request do
       expect(WEBSOCKET).to have_received(:publish_event).with(
         channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_commented,
-        data: hash_including(comment: hash_including("message" => "On it", "author_type" => "User", "attachments" => []))
+        data: { id: ticket.id }
       )
       body = JSON.parse(response.body)["company_ticket_comment"]
       expect(body["message"]).to eq("On it")

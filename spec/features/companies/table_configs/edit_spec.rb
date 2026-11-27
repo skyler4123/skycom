@@ -250,4 +250,60 @@ RSpec.feature "Companies::TableConfigs edit search/filter", type: :feature, js: 
     remove_button = find('[data-action*="removeColumn"][data-key="name"]', visible: :all)
     expect(remove_button).to be_disabled
   end
+
+  scenario "computed columns are offered once and lock search/filter" do
+    visit edit_company_table_config_path(company, config)
+    expect(page).to have_selector("#new-column-slot", wait: 10)
+
+    groups = find("#new-column-slot").all("optgroup").to_h { |group| [ group[:label], group.all("option").map(&:text) ] }
+    expect(groups["Computed columns"]).to include("Quantity — Whole number")
+    expect(groups["Standard columns"]).not_to include("Quantity — Whole number")
+
+    select "Quantity — Whole number", from: "new-column-slot"
+    click_button "Add Column"
+
+    within('[data-column-row="quantity"]') do
+      expect(page).to have_content("Quantity")
+      expect(page).to have_content(/computed/i)
+      expect(page).to have_no_selector("input#col-search-quantity")
+      expect(page).to have_no_selector('[data-action*="toggleFilterPanel"][data-key="quantity"]')
+    end
+
+    click_button "Save Changes"
+    expect(page).to have_current_path(company_table_config_path(company, config), wait: 10)
+    expect(page).to have_content(/computed/i, wait: 10)
+    expect(page).to have_content("Quantity")
+
+    quantity = config.reload.columns.find { |column| column["key"] == "quantity" }
+    expect(quantity).to include("name" => "Quantity", "type" => "integer", "visible" => true)
+    expect(quantity).not_to have_key("search")
+    expect(quantity).not_to have_key("filter")
+  end
+
+  scenario "stock quantity stays a standard filterable column" do
+    stock_category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "stocks")
+    stock_config = TableConfig.create!(
+      company: company,
+      category: stock_category,
+      property_mapping: stock_category.default_property_mapping,
+      resource_name: "stocks",
+      name: "Stocks Grid",
+      metadata: { "columns" => [ { "key" => "name", "name" => "Name", "visible" => true } ] }
+    )
+
+    visit edit_company_table_config_path(company, stock_config)
+    expect(page).to have_selector("#new-column-slot", wait: 10)
+
+    groups = find("#new-column-slot").all("optgroup").to_h { |group| [ group[:label], group.all("option").map(&:text) ] }
+    expect(groups["Standard columns"]).to include("Quantity — Whole number")
+    expect(groups["Computed columns"]).to be_nil
+
+    select "Quantity — Whole number", from: "new-column-slot"
+    click_button "Add Column"
+
+    within('[data-column-row="quantity"]') do
+      expect(page).to have_content(/standard/i)
+      expect(page).to have_selector('[data-action*="toggleFilterPanel"][data-key="quantity"]')
+    end
+  end
 end

@@ -9,7 +9,7 @@
 # How it works: credit IN flows through the chain
 # (CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet) and promo
 # grants. Credit OUT is CONTROLLER-ONLY via CompanyCreditDeduction::* — never
-# from a background job, import, seed, or migration. Background jobs are
+# from a background job, import, or seed. Background jobs are
 # free-credit: they may grant credits and drain usage counters, but must never
 # call deduct_from! or CompanyCreditDeduction::*.
 # Balances: main — real purchased credits (top-ups land here via add_credits!);

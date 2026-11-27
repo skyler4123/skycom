@@ -13,8 +13,8 @@
 
 - `Company` has `has_many :folders/:stored_files, dependent: :destroy`; resource
   names include `Folder`, `StoredFile` for ABAC assignment.
-- `CompanyMigration#folder_id` reuses this storage: each migration owns a folder
-  whose `StoredFile` chunks are its uploaded CSV parts (see `docs/DATA_MIGRATION.md`).
+- `Import#folder_id` reuses this storage: each import owns a folder whose
+  `StoredFile` is its uploaded CSV (see `docs/IMPORT.md`).
 - `StoredFile#sync_file_metadata` (`before_save`) copies blob audit columns so
   billing can `SUM(file_size)` without touching blobs.
 - `Folder#prevent_destroy_if_not_empty` (`before_destroy`) blocks delete when

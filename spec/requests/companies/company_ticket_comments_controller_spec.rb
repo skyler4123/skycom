@@ -37,8 +37,12 @@ RSpec.describe "Companies::CompanyTicketCommentsController", type: :request do
     end
   end
 
+  def grant_comment_permissions(employee)
+    grant_company_ticket_permissions(employee, :create, resource: "CompanyTicketComment")
+  end
+
   describe "POST #create" do
-    it "creates an employee comment and publishes an event" do
+    it "creates an employee comment and publishes an id-only event" do
       expect {
         post company_company_ticket_comments_path(company), params: {
           company_ticket_comment: { company_ticket_id: ticket.id, message: "any update?" }
@@ -49,7 +53,7 @@ RSpec.describe "Companies::CompanyTicketCommentsController", type: :request do
       expect(WEBSOCKET).to have_received(:publish_event).with(
         channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_commented,
-        data: hash_including(comment: hash_including("message" => "any update?", "author_type" => "Employee", "attachments" => []))
+        data: { id: ticket.id }
       )
       body = JSON.parse(response.body)["company_ticket_comment"]
       expect(body["message"]).to eq("any update?")
@@ -57,6 +61,39 @@ RSpec.describe "Companies::CompanyTicketCommentsController", type: :request do
       expect(body).to have_key("author_name")
       expect(body).to have_key("created_at")
       expect(body["attachments"]).to eq([])
+    end
+
+    it "returns 404 for another employee's private ticket" do
+      reader = grant_comment_permissions(create(:employee, company: company))
+      other = create(:employee, company: company)
+      hidden = CompanyTicket.create!(company: company, employee: other, name: "Hidden")
+
+      get sign_in_for_test_path(email: reader.user.email)
+
+      expect {
+        post company_company_ticket_comments_path(company), params: {
+          company_ticket_comment: { company_ticket_id: hidden.id, message: "sneaky" }
+        }, as: :json
+      }.not_to change(CompanyTicketComment, :count)
+
+      expect(response).to have_http_status(:not_found)
+      expect(JSON.parse(response.body)).to have_key("errors")
+    end
+
+    it "allows a comment on another employee's company-wide ticket" do
+      reader = grant_comment_permissions(create(:employee, company: company))
+      other = create(:employee, company: company)
+      shared = CompanyTicket.create!(company: company, employee: other, name: "Shared",
+        visibility: :company_wide)
+
+      get sign_in_for_test_path(email: reader.user.email)
+
+      post company_company_ticket_comments_path(company), params: {
+        company_ticket_comment: { company_ticket_id: shared.id, message: "I can help" }
+      }, as: :json
+
+      expect(response).to have_http_status(:created)
+      expect(CompanyTicketComment.last.message).to eq("I can help")
     end
 
     it "rejects blank messages with 422 errors" do

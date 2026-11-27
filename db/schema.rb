@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_25_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_26_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1548,64 +1548,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_000002) do
     t.index ["invoice_number"], name: "index_company_invoices_on_invoice_number", unique: true
   end
 
-  create_table "company_migration_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_migration_id", null: false
-    t.uuid "company_id", null: false
-    t.string "record_type"
-    t.uuid "record_id"
-    t.integer "action"
-    t.jsonb "previous_state", default: {}
-    t.string "resource"
-    t.integer "source_row"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["company_id"], name: "index_company_migration_logs_on_company_id"
-    t.index ["company_migration_id", "record_type", "record_id"], name: "idx_company_migration_logs_unique_record", unique: true
-    t.index ["discarded_at"], name: "index_company_migration_logs_on_discarded_at"
-    t.index ["record_type", "record_id"], name: "index_company_migration_logs_on_record_type_and_record_id"
-  end
-
-  create_table "company_migrations", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "folder_id", null: false
-    t.string "name", null: false
-    t.string "target_resource"
-    t.string "source_filename"
-    t.bigint "source_file_size"
-    t.jsonb "migration_mapping_config", default: {}
-    t.jsonb "dry_run_result"
-    t.integer "total_chunks", default: 0
-    t.bigint "total_rows", default: 0
-    t.bigint "processed_rows", default: 0
-    t.bigint "created_rows", default: 0
-    t.bigint "updated_rows", default: 0
-    t.bigint "failed_rows", default: 0
-    t.datetime "approved_at"
-    t.datetime "completed_at"
-    t.datetime "rolled_back_at"
-    t.string "external_id"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["company_id"], name: "index_company_migrations_on_company_id"
-    t.index ["discarded_at"], name: "index_company_migrations_on_discarded_at"
-    t.index ["external_id"], name: "index_company_migrations_on_external_id"
-    t.index ["folder_id"], name: "index_company_migrations_on_folder_id"
-  end
-
   create_table "company_monthly_usages", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.date "usage_month", null: false
@@ -1844,11 +1786,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "visibility", default: 1, null: false
     t.index ["assigned_user_id"], name: "index_company_tickets_on_assigned_user_id"
     t.index ["business_type"], name: "index_company_tickets_on_business_type"
     t.index ["company_id", "assigned_user_id"], name: "index_company_tickets_on_company_id_and_assigned_user_id"
+    t.index ["company_id", "employee_id"], name: "index_company_tickets_on_company_id_and_employee_id"
     t.index ["company_id", "status"], name: "index_company_tickets_on_company_id_and_status"
     t.index ["company_id", "updated_at"], name: "index_company_tickets_on_company_id_and_updated_at"
+    t.index ["company_id", "visibility"], name: "index_company_tickets_on_company_id_and_visibility"
     t.index ["company_id"], name: "index_company_tickets_on_company_id"
     t.index ["discarded_at"], name: "index_company_tickets_on_discarded_at"
     t.index ["employee_id"], name: "index_company_tickets_on_employee_id"
@@ -10582,10 +10527,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_000002) do
   add_foreign_key "company_entitlements", "companies"
   add_foreign_key "company_invoices", "companies"
   add_foreign_key "company_invoices", "company_orders"
-  add_foreign_key "company_migration_logs", "companies"
-  add_foreign_key "company_migration_logs", "company_migrations"
-  add_foreign_key "company_migrations", "companies"
-  add_foreign_key "company_migrations", "folders"
   add_foreign_key "company_monthly_usages", "companies"
   add_foreign_key "company_orders", "companies"
   add_foreign_key "company_orders", "users"

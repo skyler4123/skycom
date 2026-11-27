@@ -6,7 +6,7 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 // Depends on BE: Companies::PropertyMappingsController#show (JSON hydration),
 //               Companies::PropertyMappingsController#update (form PATCH +
 //               metadata normalization).
-// Docs: docs/CATEGORY_DYNAMIC_SCHEMA.md
+// Docs: docs/CATEGORY_DYNAMIC_SCHEMA.md, docs/COMPUTED_COLUMNS.md
 export default class Companies_PropertyMappings_EditController extends Companies_LayoutController {
   /** @type {any | null} */
   mapping = null
@@ -81,6 +81,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
 
         ${this.helpCardHTML()}
         ${this.mappingDetailsHTML(m)}
+        ${this.computedColumnsHTML()}
         ${this.propertiesSectionHTML()}
         ${this.extraColumnsSectionHTML()}
 
@@ -200,6 +201,35 @@ export default class Companies_PropertyMappings_EditController extends Companies
               class="w-full rounded-lg border border-line bg-background px-3 py-2 text-sm text-muted-foreground"
               ${tooltip(translate("Fixed for this mapping. The category determines which records these properties belong to."))}>
             <input type="hidden" name="property_mapping[resource_name]" value="${escapeHtml(m.resource_name || "")}">
+          </div>
+        </div>
+      </div>
+    `
+  }
+
+  computedColumnsHTML() {
+    const columns = this.mapping?.computed_columns || []
+    if (columns.length === 0) return ""
+
+    return `
+      <div class="rounded-xl border border-line bg-muted/40 p-4">
+        <div class="flex items-start gap-3">
+          <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-success/10 text-success">
+            <span class="material-symbols-outlined text-[20px]!">functions</span>
+          </div>
+          <div class="min-w-0 flex-1">
+            <h3 class="text-sm font-bold text-foreground">${translate("Computed columns")}</h3>
+            <p class="mt-1 text-sm text-muted-foreground">${translate("Calculated by Skycom from related data. Add or hide them in Table Config.")}</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              ${columns.map(column => `
+                <span class="inline-flex items-center gap-1 rounded-md border border-line bg-card px-2 py-1 text-xs font-medium text-foreground">
+                  <span class="material-symbols-outlined text-[14px]">${Helpers.propertyTypeIcon(column.type)}</span>
+                  ${escapeHtml(translate(column.name))}
+                  <span class="text-muted-foreground">· ${Helpers.propertyTypeLabel(column.type)}</span>
+                </span>
+              `).join("")}
+            </div>
+            <p class="mt-3 text-xs text-muted-foreground">${translate("These columns are read-only. Visibility and order are controlled in Table Config.")}</p>
           </div>
         </div>
       </div>

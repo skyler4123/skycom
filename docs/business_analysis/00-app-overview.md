@@ -73,7 +73,7 @@ document exists, it owns the detail.
 | **Sales** | Orders, customers, profiles, invoices, purchases, refunds, tickets, discounts | Built, depth varies | Orders and invoices are real; refunds are thin |
 | **Organization** | Branches, departments, employees, groups, profiles, performance, facilities | Built | Core of tenancy and operations |
 | **Exams** | Question bank, timed assessments, grading | Built | Web only, no mobile |
-| **Platform** | Categories, dynamic properties, dynamic tables, workflows, documents, imports, migrations, payment methods | Built | The customization layer |
+| **Platform** | Categories, dynamic properties, dynamic tables, workflows, documents, imports, payment methods | Built | The customization layer |
 | **Operations** | Operation list and configs | 🟠 | [Landing](01-operations-landing.md) |
 | **Storage** | Folders and storage statistics | Built | File storage |
 | **Schedule** | Calendar, events, event configs | Built | Backbone of Booking and Reception |
@@ -104,7 +104,7 @@ There is **no subscription tier UI**. The commercial model is prepaid credits:
 
 - A **company wallet** holds a main balance and a promo balance.
 - Metered actions deduct credits through a controller-level filter
-  (`CompanyCreditDeduction::*`), never from jobs, imports, seeds, or migrations.
+  (`CompanyCreditDeduction::*`), never from jobs, imports, or seeds.
 - A **top-up** creates a company order, invoice, and transaction; the wallet is
   credited when the order completes.
 - **Usage** shows the 7-day and monthly totals and the live counter; **Billing**
@@ -224,7 +224,7 @@ Booking → Reception → Inventory → Store Manager → Dashboard → Analytic
 ## 9. Engineering appendix
 
 **Navigation source:** `app/javascript/controllers/companies/sidebar_items.js`
-(21 groups, 77 links, 3 coming-soon groups).
+(21 groups, 76 links, 3 coming-soon groups).
 
 **Operation catalog:** `OPERATION_TYPES` in `config/initializers/constants.rb`
 (five types; appointments are seeded per location).
@@ -233,7 +233,7 @@ Booking → Reception → Inventory → Store Manager → Dashboard → Analytic
 `docs/MONEY_FLOW.md`, `docs/STOCK.md`, `docs/PURCHASE_WORKFLOW.md`, `docs/HR.md`,
 `docs/KPI.md`, `docs/EXAMS.md`, `docs/EVENTS.md`, `docs/DISCOUNTS.md`,
 `docs/PAYMENT_METHODS.md`, `docs/CREDIT_DEDUCTION.md`, `docs/IMPORT.md`,
-`docs/DATA_MIGRATION.md`, `docs/ABAC.md`.
+`docs/ABAC.md`.
 
 **Commercial surfaces:** `Companies::BillingController`,
 `Companies::UsageController`, `CompanyWallet`, `CompanyCreditDeduction::*`,

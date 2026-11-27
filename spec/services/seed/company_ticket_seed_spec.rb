@@ -61,4 +61,14 @@ RSpec.describe "company ticket seeding" do
     expect(ticket.first_responded_at).to be_nil
     expect(ticket.resolved_at).to be_nil
   end
+
+  it "alternates visibility on seeded threads" do
+    shared = Seed::CompanyTicketService.create_sample_thread(
+      company: company, employee: employee, staff: staff, index: 0)
+    private_ticket = Seed::CompanyTicketService.create_sample_thread(
+      company: company, employee: employee, staff: staff, index: 1)
+
+    expect(shared).to be_company_wide
+    expect(private_ticket).to be_only_me
+  end
 end

@@ -3,11 +3,12 @@
 // native shell see the same structure. Copy goes through translate() (see
 // dictionary.js); colors use semantic tokens only (bin/check_colors --strict).
 //
-// Depends on: controllers/helpers/ui_helpers.js (translate, timeFormat, escapeHtml)
+// Depends on: controllers/helpers/ui_helpers.js (translate, timeFormat, escapeHtml,
+//             popover, languageOptionsHTML)
 //             controllers/helpers/time_helpers.js (companyOffsetHours, dateOnly)
 //             controllers/helpers/money_helpers.js (formatMoney)
-// Docs: docs/MOBILE.md §2, docs/TIME_DISPLAY.md
-import { translate, timeFormat, escapeHtml } from "controllers/helpers/ui_helpers"
+// Docs: docs/MOBILE.md §2, docs/TIME_DISPLAY.md, docs/LANGUAGE.md
+import { translate, timeFormat, escapeHtml, popover, languageOptionsHTML } from "controllers/helpers/ui_helpers"
 import { companyOffsetHours, dateOnly } from "controllers/helpers/time_helpers"
 import { formatMoney } from "controllers/helpers/money_helpers"
 
@@ -31,8 +32,8 @@ export const mobileMain = (html, attributes = "") => `
 export const currentUserAvatarUrl = () => document.body?.dataset?.userAvatar || ""
 
 /**
- * Sticky top bar: brand (or back link) on the left, theme toggle + avatar on
- * the right.
+ * Sticky top bar: brand (or back link) on the left, language switch, theme
+ * toggle and avatar on the right.
  * @param {object} options
  * @param {string} options.title
  * @param {string|null} [options.backPath]
@@ -43,6 +44,13 @@ export const currentUserAvatarUrl = () => document.body?.dataset?.userAvatar || 
  */
 export const mobileHeader = ({ title, backPath = null, avatarName = null, avatarPath = null, avatarUrl = currentUserAvatarUrl(), replaceNavigation = false }) => {
   const navigationAttribute = replaceNavigation ? `data-turbo-action="replace"` : ""
+  const languageCode = (() => {
+    try {
+      return (localStorage.getItem("languageCode") || "en").toUpperCase()
+    } catch (e) {
+      return "EN"
+    }
+  })()
   const left = backPath
     ? `
         <div class="flex min-w-0 items-center gap-1">
@@ -68,6 +76,15 @@ export const mobileHeader = ({ title, backPath = null, avatarName = null, avatar
       <div class="flex h-16 items-center justify-between gap-2 px-4">
         ${left}
         <div class="flex shrink-0 items-center gap-1">
+          <button type="button" data-language-switch
+            class="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-xs font-bold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label="${translate("Change language")}"
+            ${popover({
+              classes: "bg-card border border-line shadow-xl overflow-hidden",
+              html: languageOptionsHTML()
+            })}>
+            <span>${languageCode}</span>
+          </button>
           <button type="button" data-controller="mobile--theme" data-action="click->mobile--theme#toggle"
             class="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             aria-label="${translate("Toggle dark mode")}">
@@ -301,7 +318,7 @@ const attendanceBadgeClass = (status) => {
 /** Attendance status pill. */
 export const mobileAttendanceBadge = (status) => `
   <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${attendanceBadgeClass(status)}">
-    ${escapeHtml(mobileHumanize(status))}
+    ${escapeHtml(translate(mobileHumanize(status)))}
   </span>
 `
 
@@ -321,7 +338,7 @@ const payrollBadgeClass = (status) => {
 /** Payroll status pill. */
 export const mobilePayrollBadge = (status) => `
   <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${payrollBadgeClass(status)}">
-    ${escapeHtml(mobileHumanize(status))}
+    ${escapeHtml(translate(mobileHumanize(status)))}
   </span>
 `
 

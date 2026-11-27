@@ -329,31 +329,11 @@ export default class Companies_LayoutController extends Controller {
                 >
                 </button>
                 <button
+                  data-language-switch
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-muted text-muted-foreground"
                   ${popover({
                     classes: "bg-card border border-line shadow-xl overflow-hidden",
-                    html: `
-                      ${(() => {
-                        // Define the display names for each code
-                        const languageNames = {
-                          en: "English",
-                          vi: "Tiếng Việt"
-                        };
-
-                        return `
-                          <div class="flex flex-col min-w-[140px] py-1">
-                            ${["en", "vi"].map(lang => `
-                              <a data-language-code-param="${lang}" 
-                                data-action="click->language#changeLanguage" 
-                                class="flex items-center px-4 py-2 text-sm text-foreground hover:bg-muted cursor-pointer transition-colors"
-                              >
-                                ${languageNames[lang] || lang.toUpperCase()}
-                              </a>
-                            `).join("")}
-                          </div>
-                        `;
-                      })()}
-                    `
+                    html: Helpers.languageOptionsHTML()
                   })}
                 >
                   <span>${(localStorage.getItem("languageCode") || "en").toUpperCase()}</span>

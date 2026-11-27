@@ -83,7 +83,7 @@ Future task:
 
 - Add `Seed::OperationService.sync_catalog!(company:)` — idempotent upsert of every
   `OPERATION_TYPES` key for one company.
-- Run it for all companies in a data migration or rake task.
+- Run it for all companies in a backfill or rake task.
 - It must create the Operation record (catalog label, desktop resolution) and
   active appointments for every existing branch/warehouse whose
   `appointment_scope` matches.
@@ -523,9 +523,8 @@ are UTF-8 byte-order marks in CSV parsing). Whole-pillar build, or decline.
       13 screens (`docs/MOBILE.md`); no iOS.
 - [ ] **94 · Offline-first sync engine** ❌ — no service worker or native cache.
 - [x] **95 · Bulk data import/export wizards** ✅ — `Imports` (allowlist, dry
-      run, approve, run, log-based rollback) + `CompanyMigrations` (chunked,
-      config-driven, resume/retry/rollback) + per-page CSV export
-      (`docs/IMPORT.md`, `docs/DATA_MIGRATION.md`, `docs/EXPORT.md`).
+      run, approve, run, log-based rollback) + per-page CSV export
+      (`docs/IMPORT.md`, `docs/EXPORT.md`).
 - [ ] **96 · Per-tenant sandbox / staging** ❌ — nothing.
 - [ ] **97 · PITR backups & tenant export** ❌ — nothing.
 - [x] **98 · Usage metering & tenant billing portal** ✅ — wallet, usage logs,

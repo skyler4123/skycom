@@ -4,9 +4,12 @@ class Seed::TableConfigService
   # String-capable columns get `search: true`; integer/decimal get half-open range buckets,
   # boolean gets true/false options, datetime gets year buckets around the current year.
   # `active: true` is required in every filter hash (TableConfig validation).
-  def self.field_hash(key, name = nil)
+  # Computed columns (docs/COMPUTED_COLUMNS.md) never get search/filter settings.
+  def self.field_hash(key, name = nil, computed: false)
     col = { "key" => key.to_s, "name" => name.presence || key.to_s.humanize,
             "visible" => true }
+
+    return col if computed
 
     case key.to_s
     when "name", "description", "code", "title", /\Aproperty_string_/
@@ -24,6 +27,13 @@ class Seed::TableConfigService
     end
 
     col
+  end
+
+  # Resource-aware convenience wrapper: a computed key on Product must not get
+  # the standard `quantity` range filter.
+  def self.field_hash_for(resource_name, key, name = nil)
+    computed = (ComputedColumns.for(resource_name) || []).any? { |column| column["key"] == key.to_s }
+    field_hash(key, name, computed: computed)
   end
 
   def self.new(

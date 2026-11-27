@@ -1,8 +1,9 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 // Property Mapping show page — friendly names/types/setup summaries, no raw keys.
+// Computed columns are displayed read-only (docs/COMPUTED_COLUMNS.md).
 // Depends on BE: Companies::PropertyMappingsController#show (JSON hydration).
-// Docs: docs/CATEGORY_DYNAMIC_SCHEMA.md
+// Docs: docs/CATEGORY_DYNAMIC_SCHEMA.md, docs/COMPUTED_COLUMNS.md
 export default class Companies_PropertyMappings_ShowController extends Companies_LayoutController {
   /** @type {any | null} */
   mapping = null
@@ -46,6 +47,7 @@ export default class Companies_PropertyMappings_ShowController extends Companies
     const companyId = window.location.pathname.split("/")[2]
     const category = currentCategories().find(c => c.id === m.category_id)
     const metadata = m.metadata?.properties || []
+    const computedColumns = m.computed_columns || []
 
     const fieldsTable = metadata.length > 0 ? `
       <div class="border-t border-line pt-6 mt-6">
@@ -82,6 +84,45 @@ export default class Companies_PropertyMappings_ShowController extends Companies
                   </tr>
                 `
               }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    ` : ''
+
+    const computedTable = computedColumns.length > 0 ? `
+      <div class="border-t border-line pt-6 mt-6">
+        <div class="flex flex-col gap-1 mb-4">
+          <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider">${translate("Computed columns")}</h3>
+          <p class="text-xs text-muted-foreground">${translate("Calculated by Skycom from related data. Add or hide them in Table Config.")}</p>
+        </div>
+        <div class="overflow-x-auto rounded-lg border border-line">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="text-sm text-muted-foreground bg-muted border-b border-line">
+                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Display Name")}</th>
+                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Type")}</th>
+                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Source")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${computedColumns.map(field => `
+                <tr class="border-b border-line last:border-0 hover:bg-muted/50">
+                  <td class="py-3 px-4 text-sm font-medium text-foreground">${escapeHtml(translate(field.name || "-"))}</td>
+                  <td class="py-3 px-4">
+                    <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+                      <span class="material-symbols-outlined text-[14px]!">${Helpers.propertyTypeIcon(field.type)}</span>
+                      ${Helpers.propertyTypeLabel(field.type)}
+                    </span>
+                  </td>
+                  <td class="py-3 px-4">
+                    <span class="inline-flex items-center gap-1 rounded-md border border-success/30 bg-success/10 px-2 py-1 text-xs font-medium text-success">
+                      <span class="material-symbols-outlined text-[14px]">functions</span>
+                      ${translate("Computed")}
+                    </span>
+                  </td>
+                </tr>
+              `).join('')}
             </tbody>
           </table>
         </div>
@@ -136,6 +177,7 @@ export default class Companies_PropertyMappings_ShowController extends Companies
           </div>
 
           ${fieldsTable}
+          ${computedTable}
 
           <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-line">
             <a href="${Helpers.edit_company_property_mapping_path(companyId, m.id)}"

@@ -250,7 +250,7 @@ never through model callbacks, mirroring the no-callback rule for direct day wri
 | `before_validation :mirror_workflow_status` | — | `mirror_workflow_status` | Mirrors the dedicated ticket `status` into generic `workflow_status` (`open→pending`, `in_progress→in_progress`, `waiting_customer→confirmed`, `resolved`/`closed→completed`, `cancelled→cancelled`). The ticket `status` is the source of truth; `workflow_status` exists only for the System Fields convention. |
 | `before_update :stamp_sla_timestamps` | — | `stamp_sla_timestamps` | Sets `resolved_at` (once, `||=`) when `status` becomes `resolved`/`closed`; clears it when the ticket leaves those states (reopen). `first_responded_at` is never touched here — only `CompanyTicketComment` stamps it. |
 | `after_create :log_created` | — | `log_created` | Writes the audit `CompanyTicketLog` (`action: :created`, actor = creator employee). |
-| `after_create :invalidate_count_caches` | — | `invalidate_count_caches` | Deletes `CacheKeyService.company_open_ticket_count(company_id)` and `CacheKeyService.admin_open_ticket_count` (DB stays the source of truth). Also called by `assign_to!` / `transition_to!`. |
+| `after_create :invalidate_count_caches` | — | `invalidate_count_caches` | Deletes `CacheKeyService.admin_open_ticket_count` (DB stays the source of truth). Also called by `assign_to!` / `transition_to!`. The company index counts its viewer-scoped open tickets live, so no company count cache exists. |
 
 ---
 
@@ -394,7 +394,7 @@ now matches a stock by `company_id + warehouse_id + product_id` only.
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
 | `belongs_to :company, touch: true` | 12 | ActiveRecord `touch` | Touches the parent `Company` on create, update, and destroy of a TableConfig. Invalidates the client cache. |
-| `before_validation :normalize_column_names` | 86 | `normalize_column_names` | Forces standard labels from `TableConfig::STANDARD_COLUMN_NAMES`, property labels from `PropertyMapping.properties[].name`, and extra labels from `PropertyMapping.metadata.extra_columns[].name`. Unknown keys keep their submitted name. |
+| `before_validation :normalize_columns` | 106 | `normalize_columns` | Resolves each column's source: real DB standard columns get canonical labels and keep search/filter; computed model columns get canonical name/type and have search/filter stripped; ghost standard keys are dropped; property/extra labels come from the PropertyMapping. Unknown keys keep their submitted name. See `docs/COMPUTED_COLUMNS.md`. |
 
 ---
 

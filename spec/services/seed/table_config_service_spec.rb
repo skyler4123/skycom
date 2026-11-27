@@ -60,4 +60,22 @@ RSpec.describe Seed::TableConfigService do
       expect(config.columns.count { |c| c["filter"].present? }).to eq(4)
     end
   end
+
+  describe ".field_hash_for" do
+    it "does not add search or filter to a computed Product column" do
+      col = described_class.field_hash_for("products", "quantity")
+
+      expect(col).to include("key" => "quantity", "visible" => true)
+      expect(col).not_to have_key("search")
+      expect(col).not_to have_key("filter")
+    end
+
+    it "keeps the range filter on the real Stock quantity column" do
+      col = described_class.field_hash_for("stocks", "quantity")
+
+      expect(col["filter"]).to eq(
+        "type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ]
+      )
+    end
+  end
 end

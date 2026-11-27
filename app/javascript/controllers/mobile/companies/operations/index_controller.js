@@ -80,10 +80,10 @@ export default class Mobile_Companies_Operations_IndexController extends Control
           </div>
           <div class="flex shrink-0 flex-col items-end gap-1">
             <span class="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
-              ${escapeHtml(mobileHumanize(appointment.appointment_workflow_status))}
+              ${escapeHtml(translate(mobileHumanize(appointment.appointment_workflow_status)))}
             </span>
             <span class="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-              ${escapeHtml(mobileHumanize(operation.workflow_status))}
+              ${escapeHtml(translate(mobileHumanize(operation.workflow_status)))}
             </span>
           </div>
         </div>

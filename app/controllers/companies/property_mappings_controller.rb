@@ -1,4 +1,6 @@
 # Property Mapping configuration for dynamic property slots.
+# show/index JSON also carries computed_columns (model-calculated, read-only —
+# docs/COMPUTED_COLUMNS.md); PropertyMapping never stores those definitions.
 # Serves Stimulus: Companies_PropertyMappings_IndexController,
 #                  Companies_PropertyMappings_ShowController,
 #                  Companies_PropertyMappings_NewController,
@@ -266,7 +268,8 @@ class Companies::PropertyMappingsController < Companies::ApplicationController
 
   def format_mapping(mapping)
     mapping.as_json(only: [ :id, :category_id, :name, :description, :metadata, :resource_name, :created_at, :updated_at ]).merge(
-      category: mapping.category&.as_json(only: [ :id, :name ])
+      category: mapping.category&.as_json(only: [ :id, :name ]),
+      computed_columns: ComputedColumns.for(mapping.effective_resource_name) || []
     )
   end
 

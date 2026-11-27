@@ -77,6 +77,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 |---|---|
 | Any modal (create / edit / show) | `docs/MODAL_PATTERN.md` — index action + modal controller + `form()` helper |
 | Index/table pages with filtering or dynamic properties | `docs/DYNAMIC_TABLE.md` — three resolutions + category filtering + rollout recipe |
+| Model-calculated index columns (`Product#quantity`, etc.) | `docs/COMPUTED_COLUMNS.md` — model registry, TableConfig/PropertyMapping catalogs, editor/table behavior, extension recipe |
 | Adding a new Operation page / `operation_type` (web + mobile) | `docs/OPERATION_PAGES.md` — end-to-end guide: design intake, real data, backend, web, mobile, exact-value feature tests, DoD; `docs/OPERATIONS.md` — domain, catalog, appointments, seeding |
 | Resource dashboard pages | `docs/DASHBOARD_PATTERN.md` — backend implementation, no hardcoded paths |
 | Sidebar items, settings, Quick Links groups | `docs/SIDEBAR.md` |
@@ -107,7 +108,6 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | URL/controller structure, Stimulus naming, mandatory table fields | `docs/ARCHITECTURE_GUIDES.md` — technical standards incl. system-fields block |
 | A new resource type or pairwise join | `docs/RESOURCES.md` — gem/system/managed/appointment catalog + atomic-pair recipe |
 | Company seeding, init, or enrich flow | `docs/INIT_AND_ENRICH.md` |
-| Company data migration (CSV migration engine) | `docs/DATA_MIGRATION.md` — config schema, approve/rollback lifecycle, chunk upload, safe-target rails |
 
 ## Quick Commands
 - `bin/dev` - Start dev server (web + css + job via foreman)

@@ -61,6 +61,18 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     expect(page).to have_no_content("property_integer_1")
   end
 
+  scenario "show and edit pages display computed columns read-only" do
+    visit company_property_mapping_path(company, property_mapping)
+    expect(page).to have_content(/computed columns/i, wait: 10)
+    expect(page).to have_content("Quantity")
+    expect(page).to have_content("Calculated by Skycom from related data.")
+
+    visit edit_company_property_mapping_path(company, property_mapping)
+    expect(page).to have_content(/computed columns/i, wait: 10)
+    expect(page).to have_content("Quantity")
+    expect(page).to have_no_selector('input[name*="[computed_columns]"]')
+  end
+
   scenario "new page creates a property mapping" do
     visit new_company_property_mapping_path(company)
     expect(page).to have_selector('form', wait: 10)

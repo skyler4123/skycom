@@ -122,6 +122,10 @@ class PropertyMapping < ApplicationRecord
     table_configs.first
   end
 
+  def effective_resource_name
+    resource_name.presence || category&.resource_name
+  end
+
   def sync_table_configs
     props = self.properties || []
     pm_property_keys = props.select { |pm| pm["key"].to_s.start_with?("property_") }

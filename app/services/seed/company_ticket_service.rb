@@ -2,6 +2,7 @@ class Seed::CompanyTicketService
   CATEGORIES = %i[billing technical account feature_request other].freeze
   PRIORITIES = %i[low medium high urgent].freeze
   STATUSES = %i[open in_progress waiting_customer resolved closed].freeze
+  VISIBILITIES = %i[company_wide only_me].freeze
 
   def self.new(
     company:,
@@ -16,7 +17,8 @@ class Seed::CompanyTicketService
     first_responded_at: nil,
     resolved_at: nil,
     lifecycle_status: :active,
-    discarded_at: nil
+    discarded_at: nil,
+    visibility: :only_me
   )
     raise "Cannot create ticket: No company or employee provided." if company.nil? || employee.nil?
 
@@ -33,7 +35,8 @@ class Seed::CompanyTicketService
       first_responded_at: first_responded_at,
       resolved_at: resolved_at,
       lifecycle_status: lifecycle_status,
-      discarded_at: discarded_at
+      discarded_at: discarded_at,
+      visibility: visibility
     )
   end
 
@@ -54,7 +57,8 @@ class Seed::CompanyTicketService
       name: "Support Ticket #{index + 1}",
       description: "Seeded thread ##{index + 1} for the Help Center.",
       ticket_category: CATEGORIES[index % CATEGORIES.length],
-      priority: PRIORITIES[index % PRIORITIES.length]
+      priority: PRIORITIES[index % PRIORITIES.length],
+      visibility: VISIBILITIES[index % VISIBILITIES.length]
     )
     status = STATUSES[index % STATUSES.length]
 

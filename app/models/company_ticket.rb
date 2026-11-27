@@ -8,8 +8,9 @@
 # internal employee Tickets (see docs/TICKET.md).
 # How it works: belongs to company/employee and optional assigned_user (staff
 # admin/super_admin); status drives workflow_status mirroring and resolved_at;
-# assign_to!/transition_to!/rate! write CompanyTicketLog rows and invalidate the
-# open-count cache.
+# visibility (only_me default / company_wide) scopes the company index through
+# visible_to, with the company owner bypassing it; assign_to!/transition_to!/rate!
+# write CompanyTicketLog rows and invalidate the admin open-count cache.
 # Main associations: belongs_to :company, :employee (required), :assigned_user
 # (optional); has_many :ticket_comments (CompanyTicketComment), :ticket_logs
 # (CompanyTicketLog) (dependent: :destroy).
@@ -43,6 +44,10 @@ class CompanyTicket < ApplicationRecord
     closed: 4,
     cancelled: 5
   }, prefix: true, default: :open
+  enum :visibility, {
+    company_wide: 0,
+    only_me: 1
+  }, default: :only_me
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
@@ -55,6 +60,12 @@ class CompanyTicket < ApplicationRecord
 
   # --- Scopes ---
   scope :open_tickets, -> { where(status: %i[open in_progress waiting_customer]) }
+  # Shared tickets plus the viewer's own; the company owner bypasses the rule.
+  scope :visible_to, ->(employee) {
+    return all if employee.owner_role?
+
+    where(visibility: :company_wide).or(where(employee_id: employee.id))
+  }
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
@@ -132,7 +143,6 @@ class CompanyTicket < ApplicationRecord
   end
 
   def invalidate_count_caches
-    Rails.sync_cache.delete(CacheKeyService.company_open_ticket_count(company_id))
     Rails.sync_cache.delete(CacheKeyService.admin_open_ticket_count)
   end
 

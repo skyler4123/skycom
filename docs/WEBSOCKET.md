@@ -218,11 +218,16 @@ EVENTS: {
 | `top_up_completed` | `"top_up_completed"` | `top_ups/new_controller.js` | `{ amount_cents, transaction_id }` |
 | `pos_payment_completed` | `"pos_payment_completed"` | `companies/operations/pos/show_controller.js` | `{ transaction_token, order_id }` |
 | `notification_created` | `"notification_created"` | bell/header controllers | `{ notification_id, title }` |
-| `company_ticket_created` | `"company_ticket_created"` | Help Center index, Admin pool | `{ name, priority }` |
-| `company_ticket_commented` | `"company_ticket_commented"` | Help Center show, Admin detail | `{ message_preview, author_type }` |
-| `company_ticket_status_changed` | `"company_ticket_status_changed"` | Help Center show, Admin detail | `{ from_status, to_status }` |
+| `company_ticket_created` | `"company_ticket_created"` | None yet | `{ id }` only |
+| `company_ticket_commented` | `"company_ticket_commented"` | Help Center show, Admin detail | `{ id }` only — detail refetches |
+| `company_ticket_status_changed` | `"company_ticket_status_changed"` | Help Center show, Admin detail | `{ id }` only — detail refetches |
 | `import_progress` | `"import_progress"` | `companies/imports/show_controller.js` | `{ phase, status, processed_rows, total_rows, created_rows, failed_rows }` |
 | `import_finished` | `"import_finished"` | `companies/imports/show_controller.js` | `{ status, created_rows, failed_rows }` |
+
+> **Company ticket privacy:** company ticket events carry only the ticket id.
+> The open detail page refetches through its scoped `show` JSON endpoint, so a
+> private ticket's name, comment body, or status never rides the company-wide
+> channel. Do not add sensitive fields back to these payloads.
 
 ---
 

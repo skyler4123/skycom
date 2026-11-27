@@ -135,18 +135,52 @@ RSpec.describe CompanyTicket do
     end
   end
 
+  describe "visibility" do
+    it "defaults new tickets to only me" do
+      expect(build_ticket.visibility).to eq("only_me")
+    end
+
+    describe ".visible_to" do
+      let(:other_employee) { create(:employee, company: company) }
+      let(:owner_employee) { company.employees.find_by(business_type: "owner") }
+
+      let!(:own_private) do
+        build_ticket.tap(&:save!)
+      end
+      let!(:own_shared) do
+        build_ticket(name: "Shared by me", visibility: :company_wide).tap(&:save!)
+      end
+      let!(:other_private) do
+        build_ticket(name: "Other private", employee: other_employee).tap(&:save!)
+      end
+      let!(:other_shared) do
+        build_ticket(name: "Other shared", employee: other_employee, visibility: :company_wide).tap(&:save!)
+      end
+
+      it "includes company-wide tickets and the employee's own tickets" do
+        names = company.company_tickets.visible_to(employee).pluck(:name)
+
+        expect(names).to include("Printer is down", "Shared by me", "Other shared")
+        expect(names).not_to include("Other private")
+      end
+
+      it "lets the company owner see every ticket" do
+        names = company.company_tickets.visible_to(owner_employee).pluck(:name)
+
+        expect(names).to include("Printer is down", "Shared by me", "Other private", "Other shared")
+      end
+    end
+  end
+
   describe "count cache invalidation" do
-    it "deletes both open-count keys" do
+    it "deletes the admin open-count key" do
       ticket = build_ticket
       ticket.save!
-      company_key = CacheKeyService.company_open_ticket_count(company.id)
       admin_key = CacheKeyService.admin_open_ticket_count
-      Rails.sync_cache.write(company_key, 1)
       Rails.sync_cache.write(admin_key, 1)
 
       ticket.send(:invalidate_count_caches)
 
-      expect(Rails.sync_cache.read(company_key)).to be_nil
       expect(Rails.sync_cache.read(admin_key)).to be_nil
     end
   end

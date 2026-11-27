@@ -4,7 +4,7 @@ import Admin_LayoutController from "controllers/admin/layout_controller"
 // List page polls; it never fans out to N company channels.
 // Depends on BE: Admin::CompanyTicketsController#index|assign
 // Endpoints: GET /admin/company_tickets.json?status=&priority=&unassigned=1 (+ open_count)
-// Docs: docs/superpowers/plans/2026-10-07-company-support-center.md
+// Docs: docs/superpowers/plans/2026-11-26-company-ticket-visibility.md
 export default class Admin_CompanyTickets_IndexController extends Admin_LayoutController {
   static targets = ["ticketsList"]
 

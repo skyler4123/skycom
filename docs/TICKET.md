@@ -11,6 +11,12 @@ A `Ticket` is an internal issue tracker for employees. It combines:
 - **Purchase-style workflow binding**: a Ticket belongs to a `Category`; the category owns a `Workflow` (default 4 steps: *To Do → In Progress → Review → Done*). Transitions go through `Workflows::AdvanceService` with ABAC `can?(:update, Ticket)` (Jira-style, no per-step roles).
 - **Real-time collaboration**: assignee (Employee), comments (`TicketComment`), and a dedicated `TicketLog` for ticket lifecycle events.
 
+> **CompanyTicket visibility (Help Center):** `CompanyTicket` has a
+> `visibility` enum — `only_me` (default) or `company_wide`. The company index
+> shows company-wide tickets plus the viewer's own; the company owner sees all,
+> and Skycom staff see all in the admin pool. Only the creator can change
+> visibility. See `docs/superpowers/plans/2026-11-26-company-ticket-visibility.md`.
+
 ## Permission model
 
 Same as Purchase: a workflow transition requires update permission on the subject — `employee.can?(:update, Ticket)`. ABAC is the only permission system. Every transition is audited by `WorkflowStepLog` (generic) and a `TicketLog` entry.
