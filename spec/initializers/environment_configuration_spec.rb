@@ -159,8 +159,10 @@ RSpec.describe "Environment-backed constants" do
     it "scopes the test Redis URL to the parallel worker" do
       url = Rails.application.config_for("redis/shared")[:url]
       expected_db = (TEST_ENV_NUMBER.presence || 1).to_i
+      expected = URI.parse(REDIS_URL_TEST)
+      expected.path = "/#{expected_db}"
 
-      expect(url).to eq("redis://127.0.0.1:6379/#{expected_db}")
+      expect(url).to eq(expected.to_s)
     end
   end
 
