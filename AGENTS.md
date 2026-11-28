@@ -4,6 +4,7 @@
 
 - **Work on the current branch, in the current working directory.** Never create a new branch or worktree, and never move the session elsewhere, unless the user explicitly asks for it.
 - **Default to native (inline) execution.** Never dispatch subagents — for implementation, review, or anything else — unless the user explicitly asks for subagent mode.
+- **Run tests with `IS_LOCAL=true`.** Development happens on the host, so Postgres must resolve to `localhost`. Without the prefix, test credentials point at the compose service name `postgres` and every DB connection fails. See `docs/PARALLEL_TESTS.md`.
 - **Plan multi-step work before coding.** Any feature or refactor that touches more than a trivial change starts from `docs/PLAN_TEMPLATE.md`. Keep the plan self-contained and update it when decisions change. For UI-heavy work, read `docs/AGENT_PLAYBOOK.md` first.
 - These rules take precedence over any installed skill/workflow guidance (e.g. superpowers) that says otherwise.
 
@@ -39,13 +40,13 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 |---|---|
 | Returning JSON from any controller/service action, success or failure | `docs/API_ERROR_FORMAT.md` — failures **must** be `{ errors: [...] }` (plural array) with `:unprocessable_content`; singular `error:` breaks the frontend toast |
 | Adding an app-wide constant | `docs/CONSTANTS.md` — belongs in `config/initializers/constants.rb`, never hardcoded inline |
-| Reading or adding an environment variable / credential | `docs/ENVIRONMENT.md` — declare once in `config/initializers/constants.rb`; precedence is ENV > `Rails.application.credentials` > default; never read `ENV` in app code |
+| Reading or adding an environment variable / credential | `docs/ENVIRONMENT.md` — declare once in `config/initializers/constants.rb`; precedence is ENV > `Rails.application.credentials` > default, or default-only when `IS_LOCAL=true` (ENV-only, refuses production); never read `ENV` in app code |
 | Touching counters or cached state (Kredis) | `docs/KREDIS.md` — owning model wraps storage behind domain-named methods; never low-level `Kredis.redis` in services/controllers/jobs |
 | Adding a jsonb-backed model attribute | `docs/STORE_ACCESSOR.md` — `store_accessor` convention, not a separate column |
 | Creating or restructuring `app/models/*.rb` | `docs/MODEL_STRUCTURE.md` — canonical section order |
 | Adding or modifying model/concern callbacks | `docs/MODEL_CALLBACKS.md` — callback reference |
 | Conflicting migrations after a merge | `docs/MERGE_MIGRATIONS.md` — merge-migration procedure |
-| Writing or running any spec | `docs/PARALLEL_TESTS.md` (runner) + `docs/TEST_PRIORITY.md` (priority: feature > model > request) — always `bundle exec parallel_rspec -n 14 [paths]`; feature specs also need `docs/FLAKY_TESTS.md` (never `sleep`) |
+| Writing or running any spec | `docs/PARALLEL_TESTS.md` (runner) + `docs/TEST_PRIORITY.md` (priority: feature > model > request) — always `IS_LOCAL=true bundle exec parallel_rspec -n 14 [paths]` (local Postgres is `localhost`); feature specs also need `docs/FLAKY_TESTS.md` (never `sleep`) |
 
 ### Money, stock, orders (absolute rules)
 
@@ -118,13 +119,13 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - `bin/check_time` - Reject browser-clock / raw-ISO time display in Stimulus controllers (see `docs/TIME_DISPLAY.md`)
 - `bin/brakeman` - Security scan
 - `bin/rails` - Standard Rails commands
-- `bundle exec parallel_rspec -n 14 [paths]` - Run tests (parallel, 14 workers). See `docs/PARALLEL_TESTS.md`.
+- `IS_LOCAL=true bundle exec parallel_rspec -n 14 [paths]` - Run tests (parallel, 14 workers, local Postgres on `localhost`). See `docs/PARALLEL_TESTS.md`.
 
 ## Pre-Commit Checklist
 - **Credit deduction is controller-only** — never call `CompanyCreditDeduction::*`, `CompanyWallet#deduct_from!`, or `Company#record_credit_usage!` from a background job, import, seed, or migration. Background jobs are free-credit and may still process suspended companies. See `docs/CREDIT_DEDUCTION.md`.
 - **Update** `docs/MODEL_CALLBACKS.md` if model/concern callbacks were added or modified
 - **Constants** — All app-wide constants must be in `config/initializers/constants.rb`, never hardcoded inline. See `docs/CONSTANTS.md`.
-- **Environment variables** — Declare every env-backed value once in `config/initializers/constants.rb` with `ENV[...].presence || Rails.application.credentials.dig(:key) || default`; consumers use only the constant. Run `bin/check_env`. See `docs/ENVIRONMENT.md`.
+- **Environment variables** — Declare every env-backed value once in `config/initializers/constants.rb` through `resolve_env.("NAME", default)` (`ENV` → credentials → default); `IS_LOCAL=true` pins all of them to their defaults. Consumers use only the constant. Run `bin/check_env`. See `docs/ENVIRONMENT.md`.
 - **Client cache** — If any mutation affects data stored in `currentCompany()` (branches, roles, categories, permissions, features, etc.), call `clearClientCacheAndReload()` after the server confirms the change, OR call `clearClientCache()` followed by a page reload.
 - **Language (mandatory)** — Every new or changed user-facing string must be added to `app/javascript/controllers/helpers/dictionary.js` with a Vietnamese translation. See `docs/LANGUAGE.md`. Missing entries break `translate()` output.
 - **Metadata editing** — Never edit JSON/metadata through a textarea in a user-facing form. Give every editable metadata key its own typed input (text, number, select, checkbox, …) and preserve keys the form does not own. See "Metadata & JSON editing" below.
@@ -170,9 +171,9 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - **Text search is Meilisearch-only (mandatory)** — Never use SQL `LIKE`/`ILIKE`/`sanitize_sql_like` to search text (names, codes, emails, descriptions, property slots). Use `Model.ms_raw_search` or a `DynamicSearch::BaseQueryService` subclass. The DB is only for exact lookups (primary key, foreign key, unique code). If a column is missing from the index, add it to `DynamicSearchConcern`/the model's search concern and reindex. See `docs/MEILISEARCH.md`.
 
 ## Testing
-- **ALWAYS** `bundle exec parallel_rspec -n 14 [paths]` — never bare `parallel_rspec` (raises errors), never `bundle exec rspec` for verification (single process), never `docker exec ... rspec` (compose runs services only, web/job via `bin/dev`). See `docs/PARALLEL_TESTS.md`.
+- **ALWAYS** `IS_LOCAL=true bundle exec parallel_rspec -n 14 [paths]` — never bare `parallel_rspec` (raises errors), never `bundle exec rspec` for verification (single process), never `docker exec ... rspec` (compose runs services only, web/job via `bin/dev`). The `IS_LOCAL=true` prefix is required on the local host: Postgres must resolve to `localhost`, while the test credentials point at the Docker service name `postgres`. See `docs/PARALLEL_TESTS.md`.
 - Docs keep `bundle exec rspec ...` as source of truth (runner-swappable) — that does not change what the agent runs.
-- Parallel DBs are already set up locally. Only if worker DBs are missing, run once: `RAILS_ENV=test bundle exec rake "parallel:create"` then `RAILS_ENV=test bundle exec rake "parallel:load_schema"` then `RAILS_ENV=test bundle exec rake "parallel:migrate"`. If `parallel_rspec` fails on migration, see `docs/PARALLEL_TESTS.md` §3.2 for the `drop[14]` → `create[14]` → `load_schema[14]` reset.
+- Parallel DBs are already set up locally. Only if worker DBs are missing, run once: `IS_LOCAL=true RAILS_ENV=test bundle exec rake "parallel:create"` then `IS_LOCAL=true RAILS_ENV=test bundle exec rake "parallel:load_schema"` then `IS_LOCAL=true RAILS_ENV=test bundle exec rake "parallel:migrate"`. If `parallel_rspec` fails on migration, see `docs/PARALLEL_TESTS.md` §3.2 for the `drop[14]` → `create[14]` → `load_schema[14]` reset.
 - **Paired success + failure cases** — Write specs as normal, but prefer paired `it` blocks per behavior where a failure branch exists: one success `it` asserting the expected data, one failure `it` asserting the failure contract (`{ success: false, errors: [...] }` / `not_to be_valid` / non-2xx + `errors` key) plus no unwanted side-effect. Canonical example: `spec/services/discounts/apply_service_spec.rb` (1 success `reserves...` + 7 `fails...` its). Skip the failure `it` only when no failure branch exists — don't invent artificial failures.
 - **Test priority (absolute)** — Feature (system) tests are the most important; model tests are second; request specs are least. A passing request spec does NOT count as proof: if a request spec passes but the corresponding feature test fails, the work is NOT done. Write/update the feature test first (or alongside), model tests second, request specs only for uncovered edge cases. Never declare complete on request/model specs alone when a feature test exists or is expected. Run verification in priority order (feature → model → request) and stop on first failure. See `docs/TEST_PRIORITY.md`.
 

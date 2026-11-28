@@ -9,6 +9,7 @@ require "open3"
 # See docs/ENVIRONMENT.md.
 RSpec.describe "Environment-backed constants" do
   CATALOG = %w[
+    IS_LOCAL CANONICAL_BASE_URL
     MEILISEARCH_HOST MEILISEARCH_API_KEY
     CENTRIFUGO_API_KEY CENTRIFUGO_ENDPOINT CENTRIFUGO_TOKEN_HMAC_SECRET_KEY
     GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET
@@ -24,7 +25,10 @@ RSpec.describe "Environment-backed constants" do
 
   # Runs the code in a fresh Rails boot so the constant is resolved by the
   # initializer under the given ENV, not by the already-booted test process.
+  # IS_LOCAL is unset unless the example sets it, so a developer's exported
+  # value cannot change the precedence examples.
   def constant_from_runner(code, env = {})
+    env = { "IS_LOCAL" => nil }.merge(env)
     stdout, stderr, status = Open3.capture3(env, "bin/rails", "runner", code, chdir: Rails.root.to_s)
     raise "bin/rails runner failed:\n#{stderr}" unless status.success?
 
@@ -47,6 +51,70 @@ RSpec.describe "Environment-backed constants" do
     end
   end
 
+  describe "IS_LOCAL" do
+    it "defaults to false" do
+      expect(constant_from_runner("print IS_LOCAL")).to eq("false")
+    end
+
+    it "pins env-backed constants to their defaults when true" do
+      expect(
+        constant_from_runner(
+          "print MEILISEARCH_HOST",
+          "IS_LOCAL" => "true", "MEILISEARCH_HOST" => "http://env.test"
+        )
+      ).to eq("http://localhost:7700")
+    end
+
+    it "keeps ENV precedence when false" do
+      expect(
+        constant_from_runner(
+          "print MEILISEARCH_HOST",
+          "IS_LOCAL" => "false", "MEILISEARCH_HOST" => "http://env.test"
+        )
+      ).to eq("http://env.test")
+    end
+
+    it "still coerces typed constants when true" do
+      expect(
+        constant_from_runner(
+          "print JOB_CONCURRENCY", "IS_LOCAL" => "true", "JOB_CONCURRENCY" => "7"
+        )
+      ).to eq("1")
+      expect(
+        constant_from_runner(
+          "print JOB_CONCURRENCY.class", "IS_LOCAL" => "true", "JOB_CONCURRENCY" => "7"
+        )
+      ).to eq("Integer")
+    end
+
+    it "accepts 1 and t as true" do
+      expect(constant_from_runner("print IS_LOCAL", "IS_LOCAL" => "1")).to eq("true")
+      expect(constant_from_runner("print IS_LOCAL", "IS_LOCAL" => "t")).to eq("true")
+    end
+
+    it "treats any other value as false" do
+      expect(constant_from_runner("print IS_LOCAL", "IS_LOCAL" => "no")).to eq("false")
+    end
+
+    it "keeps the parallel worker id so Redis and Meilisearch stay isolated" do
+      expect(
+        constant_from_runner(
+          "print TEST_ENV_NUMBER", "IS_LOCAL" => "true", "TEST_ENV_NUMBER" => "7"
+        )
+      ).to eq("7")
+    end
+
+    it "refuses to boot in production when true" do
+      _stdout, stderr, status = Open3.capture3(
+        { "RAILS_ENV" => "production", "SECRET_KEY_BASE" => "dummy", "IS_LOCAL" => "true" },
+        "bin/rails", "runner", "print IS_LOCAL", chdir: Rails.root.to_s
+      )
+
+      expect(status).not_to be_success
+      expect(stderr).to include("IS_LOCAL must not be true in production")
+    end
+  end
+
   describe "typed values" do
     it "coerces integer constants" do
       expect(
@@ -61,6 +129,29 @@ RSpec.describe "Environment-backed constants" do
       expect(
         constant_from_runner("print TEST_RUN_INSIDE_DOCKER", "TEST_RUN_INSIDE_DOCKER" => "false")
       ).to eq("false")
+    end
+  end
+
+  describe "database YAML" do
+    # config/database.yml loads before the constants initializer, so IS_LOCAL
+    # is checked inline there. A fresh boot reads the rendered file.
+    it "pins the Postgres connection values when IS_LOCAL is true" do
+      expect(
+        constant_from_runner(
+          "c = ActiveRecord::Base.connection_db_config.configuration_hash; " \
+          "print [c[:host], c[:username], c[:password], c[:port]].join('|')",
+          "IS_LOCAL" => "true", "POSTGRES_HOST" => "db.example"
+        )
+      ).to eq("localhost|postgres|password|5432")
+    end
+
+    it "keeps ENV precedence when IS_LOCAL is false" do
+      expect(
+        constant_from_runner(
+          "print ActiveRecord::Base.connection_db_config.configuration_hash[:host]",
+          "IS_LOCAL" => "false", "POSTGRES_HOST" => "db.example"
+        )
+      ).to eq("db.example")
     end
   end
 

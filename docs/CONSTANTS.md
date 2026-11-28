@@ -23,6 +23,12 @@ Values that can come from the environment follow one extra rule:
 ENV["VARIABLE"].presence  >  Rails.application.credentials.dig(:variable)  >  hardcoded default
 ```
 
+`IS_LOCAL=true` pins every env-backed constant to its hardcoded default and ignores ENV and
+credentials; the default is `false`. It accepts `1`/`t`/`true` (any case), is read from ENV only,
+refuses to boot in production, and is honored inline for the Postgres connection values in
+`config/database.yml`. `TEST_ENV_NUMBER` is exempt: it always reads ENV so parallel workers stay
+isolated.
+
 They are declared once in `config/initializers/constants.rb` (constant name = ENV name) and every
 other file uses the constant. The full catalog, pre-boot exceptions, and the production warning
 live in `docs/ENVIRONMENT.md`. The single-file exception below **does not apply** to env-backed

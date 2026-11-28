@@ -1,19 +1,35 @@
 # =============================================================================
 # Environment-backed configuration
 #
-# Rule: ENV > Rails.application.credentials > hardcoded default.
+# IS_LOCAL=true  -> every env-backed constant below uses its hardcoded default.
+# IS_LOCAL=false -> ENV > Rails.application.credentials > hardcoded default.
 # Every other file uses the constant, never ENV. See docs/ENVIRONMENT.md.
 # =============================================================================
+
+# Bootstrap switch for the loader itself, so it is deliberately ENV-only: a
+# value in shared credentials must never be able to pin production to defaults.
+# Accepts 1/t/true (any case); everything else is false. config/database.yml
+# repeats this check inline because it loads before this file.
+IS_LOCAL = %w[1 t true].include?(ENV["IS_LOCAL"].to_s.strip.downcase)
+
+if Rails.env.production? && IS_LOCAL
+  raise "IS_LOCAL must not be true in production: it pins every env-backed constant to its development default."
+end
+
+# Resolves one env-backed constant. The credential key is the ENV name
+# downcased (MEILISEARCH_HOST -> :meilisearch_host); AWS_ENDPOINT_URL passes
+# its legacy :aws_endpoint explicitly.
+resolve_env = ->(env_key, default, credential_key = env_key.downcase.to_sym) do
+  next default if IS_LOCAL
+
+  ENV[env_key].presence || Rails.application.credentials.dig(credential_key) || default
+end
 
 # --- Public site / SEO ---
 # Canonical origin for public marketing pages. The request host is not trusted
 # for canonical or hreflang URLs because the app may be reachable through
 # multiple hosts, ports, or proxies.
-CANONICAL_BASE_URL = (
-  ENV["CANONICAL_BASE_URL"].presence ||
-  Rails.application.credentials.dig(:canonical_base_url) ||
-  "https://skyceer.com"
-).sub(%r{/\z}, "")
+CANONICAL_BASE_URL = resolve_env.("CANONICAL_BASE_URL", "https://skyceer.com").sub(%r{/\z}, "")
 
 # --- Public homepage locales ---
 # The order is the language-switcher order. The default locale is served at `/`;
@@ -32,129 +48,78 @@ OG_LOCALES = {
 }.freeze
 
 # --- Meilisearch ---
-MEILISEARCH_HOST = ENV["MEILISEARCH_HOST"].presence ||
-  Rails.application.credentials.dig(:meilisearch_host) ||
-  "http://localhost:7700"
+MEILISEARCH_HOST = resolve_env.("MEILISEARCH_HOST", "http://localhost:7700")
 
-MEILISEARCH_API_KEY = ENV["MEILISEARCH_API_KEY"].presence ||
-  Rails.application.credentials.dig(:meilisearch_api_key) ||
-  "skycom_master_key_password_2026"
+MEILISEARCH_API_KEY = resolve_env.("MEILISEARCH_API_KEY", "skycom_master_key_password_2026")
 
 # --- Centrifugo (websocket) ---
-CENTRIFUGO_API_KEY = ENV["CENTRIFUGO_API_KEY"].presence ||
-  Rails.application.credentials.dig(:centrifugo_api_key) ||
-  "skycom_super_secret_api_key_2026"
+CENTRIFUGO_API_KEY = resolve_env.("CENTRIFUGO_API_KEY", "skycom_super_secret_api_key_2026")
 
-CENTRIFUGO_ENDPOINT = ENV["CENTRIFUGO_ENDPOINT"].presence ||
-  Rails.application.credentials.dig(:centrifugo_endpoint) ||
-  "http://localhost:8000/api"
+CENTRIFUGO_ENDPOINT = resolve_env.("CENTRIFUGO_ENDPOINT", "http://localhost:8000/api")
 
-CENTRIFUGO_WS_URL = ENV["CENTRIFUGO_WS_URL"].presence ||
-  Rails.application.credentials.dig(:centrifugo_ws_url) ||
-  "ws://localhost:8000/connection/websocket"
+CENTRIFUGO_WS_URL = resolve_env.("CENTRIFUGO_WS_URL", "ws://localhost:8000/connection/websocket")
 
-CENTRIFUGO_TOKEN_HMAC_SECRET_KEY = ENV["CENTRIFUGO_TOKEN_HMAC_SECRET_KEY"].presence ||
-  Rails.application.credentials.dig(:centrifugo_token_hmac_secret_key) ||
-  "skycom_jwt_hmac_secret_token_key_2026"
+CENTRIFUGO_TOKEN_HMAC_SECRET_KEY = resolve_env.("CENTRIFUGO_TOKEN_HMAC_SECRET_KEY", "skycom_jwt_hmac_secret_token_key_2026")
 
 # --- Google OAuth ---
-GOOGLE_CLIENT_ID = ENV["GOOGLE_CLIENT_ID"].presence ||
-  Rails.application.credentials.dig(:google_client_id)
+GOOGLE_CLIENT_ID = resolve_env.("GOOGLE_CLIENT_ID", nil)
 
-GOOGLE_CLIENT_SECRET = ENV["GOOGLE_CLIENT_SECRET"].presence ||
-  Rails.application.credentials.dig(:google_client_secret)
+GOOGLE_CLIENT_SECRET = resolve_env.("GOOGLE_CLIENT_SECRET", nil)
 
 # --- Payment webhook signatures ---
-WEBHOOK_BANK_PAYMENT_SECRET = ENV["WEBHOOK_BANK_PAYMENT_SECRET"].presence ||
-  Rails.application.credentials.dig(:webhook_bank_payment_secret) ||
-  "local_secure_dev_secret"
+WEBHOOK_BANK_PAYMENT_SECRET = resolve_env.("WEBHOOK_BANK_PAYMENT_SECRET", "local_secure_dev_secret")
 
-WEBHOOK_REDIRECT_PAYMENT_SECRET = ENV["WEBHOOK_REDIRECT_PAYMENT_SECRET"].presence ||
-  Rails.application.credentials.dig(:webhook_redirect_payment_secret) ||
-  "local_secure_dev_secret"
+WEBHOOK_REDIRECT_PAYMENT_SECRET = resolve_env.("WEBHOOK_REDIRECT_PAYMENT_SECRET", "local_secure_dev_secret")
 
 # --- Mock payment gateways + mock API server ---
-MOCK_QR_GATEWAY_URL = ENV["MOCK_QR_GATEWAY_URL"].presence ||
-  Rails.application.credentials.dig(:mock_qr_gateway_url) ||
-  "http://localhost:4000/api/v1/bank/qr-generate"
+MOCK_QR_GATEWAY_URL = resolve_env.("MOCK_QR_GATEWAY_URL", "http://localhost:4000/api/v1/bank/qr-generate")
 
-MOCK_QR_WEBHOOK_URL = ENV["MOCK_QR_WEBHOOK_URL"].presence ||
-  Rails.application.credentials.dig(:mock_qr_webhook_url) ||
-  "http://192.168.0.100:3000/webhooks/payments/mock_qr_gateway"
+MOCK_QR_WEBHOOK_URL = resolve_env.("MOCK_QR_WEBHOOK_URL", "http://192.168.0.100:3000/webhooks/payments/mock_qr_gateway")
 
-MOCK_REDIRECT_GATEWAY_URL = ENV["MOCK_REDIRECT_GATEWAY_URL"].presence ||
-  Rails.application.credentials.dig(:mock_redirect_gateway_url) ||
-  "http://localhost:4000/api/v1/bank/redirect-session"
+MOCK_REDIRECT_GATEWAY_URL = resolve_env.("MOCK_REDIRECT_GATEWAY_URL", "http://localhost:4000/api/v1/bank/redirect-session")
 
-MOCK_REDIRECT_WEBHOOK_URL = ENV["MOCK_REDIRECT_WEBHOOK_URL"].presence ||
-  Rails.application.credentials.dig(:mock_redirect_webhook_url) ||
-  "http://192.168.0.100:3000/webhooks/payments/mock_redirect_gateway"
+MOCK_REDIRECT_WEBHOOK_URL = resolve_env.("MOCK_REDIRECT_WEBHOOK_URL", "http://192.168.0.100:3000/webhooks/payments/mock_redirect_gateway")
 
-MOCK_API_PING_URL = ENV["MOCK_API_PING_URL"].presence ||
-  Rails.application.credentials.dig(:mock_api_ping_url) ||
-  "http://localhost:4000/api/v1/ping"
+MOCK_API_PING_URL = resolve_env.("MOCK_API_PING_URL", "http://localhost:4000/api/v1/ping")
 
 # --- Background jobs (config/queue.yml) ---
-JOB_CONCURRENCY = (
-  ENV["JOB_CONCURRENCY"].presence ||
-  Rails.application.credentials.dig(:job_concurrency) ||
-  1
-).to_i
+JOB_CONCURRENCY = resolve_env.("JOB_CONCURRENCY", 1).to_i
 
 # --- Redis (config/redis/shared.yml) ---
-REDIS_URL_PRODUCTION = ENV["REDIS_URL_PRODUCTION"].presence ||
-  Rails.application.credentials.dig(:redis_url_production) ||
-  "redis://127.0.0.1:6379/0"
+REDIS_URL_PRODUCTION = resolve_env.("REDIS_URL_PRODUCTION", "redis://127.0.0.1:6379/0")
 
-REDIS_URL_DEVELOPMENT = ENV["REDIS_URL_DEVELOPMENT"].presence ||
-  Rails.application.credentials.dig(:redis_url_development) ||
-  "redis://127.0.0.1:6379/0"
+REDIS_URL_DEVELOPMENT = resolve_env.("REDIS_URL_DEVELOPMENT", "redis://127.0.0.1:6379/0")
 
-REDIS_URL_TEST = ENV["REDIS_URL_TEST"].presence ||
-  Rails.application.credentials.dig(:redis_url_test) ||
-  "redis://127.0.0.1:6379/0"
+REDIS_URL_TEST = resolve_env.("REDIS_URL_TEST", "redis://127.0.0.1:6379/0")
 
 # --- Object storage (config/storage.yml) ---
-AWS_ACCESS_KEY_ID = ENV["AWS_ACCESS_KEY_ID"].presence ||
-  Rails.application.credentials.dig(:aws_access_key_id) ||
-  "admin"
+AWS_ACCESS_KEY_ID = resolve_env.("AWS_ACCESS_KEY_ID", "admin")
 
-AWS_SECRET_ACCESS_KEY = ENV["AWS_SECRET_ACCESS_KEY"].presence ||
-  Rails.application.credentials.dig(:aws_secret_access_key) ||
-  "password"
+AWS_SECRET_ACCESS_KEY = resolve_env.("AWS_SECRET_ACCESS_KEY", "password")
 
 # Credential key stays :aws_endpoint (legacy name) while the ENV uses the
 # standard AWS SDK name.
-AWS_ENDPOINT_URL = ENV["AWS_ENDPOINT_URL"].presence ||
-  Rails.application.credentials.dig(:aws_endpoint) ||
-  "http://10.88.0.2:9000"
+AWS_ENDPOINT_URL = resolve_env.("AWS_ENDPOINT_URL", "http://10.88.0.2:9000", :aws_endpoint)
 
 # --- Mission Control (jobs dashboard) ---
-MISSION_CONTROL_USER = ENV["MISSION_CONTROL_USER"].presence ||
-  Rails.application.credentials.dig(:mission_control_user) ||
-  "dev"
+MISSION_CONTROL_USER = resolve_env.("MISSION_CONTROL_USER", "dev")
 
-MISSION_CONTROL_PASSWORD = ENV["MISSION_CONTROL_PASSWORD"].presence ||
-  Rails.application.credentials.dig(:mission_control_password) ||
-  "secret"
+MISSION_CONTROL_PASSWORD = resolve_env.("MISSION_CONTROL_PASSWORD", "secret")
 
 # --- Test harness / runtime flags ---
-TEST_ENV_NUMBER = ENV["TEST_ENV_NUMBER"].presence ||
-  Rails.application.credentials.dig(:test_env_number) ||
-  ""
+# Parallel worker isolation must survive IS_LOCAL: the Redis DB, the Meilisearch
+# index suffix, and the retry hooks all derive from this id. Local mode skips
+# credentials for it, never the worker id.
+TEST_ENV_NUMBER = IS_LOCAL ? ENV["TEST_ENV_NUMBER"].to_s : resolve_env.("TEST_ENV_NUMBER", "")
 
 TEST_RUN_INSIDE_DOCKER = ActiveModel::Type::Boolean.new.cast(
-  ENV["TEST_RUN_INSIDE_DOCKER"].presence ||
-  Rails.application.credentials.dig(:test_run_inside_docker) ||
-  false
+  resolve_env.("TEST_RUN_INSIDE_DOCKER", false)
 )
 
 # true = skip the db:seed that db:prepare runs on a freshly created database
 # (the rspec container sets it; the seed-test pipeline leaves it false).
 SKIP_DB_SEED = ActiveModel::Type::Boolean.new.cast(
-  ENV["SKIP_DB_SEED"].presence ||
-  Rails.application.credentials.dig(:skip_db_seed) ||
-  false
+  resolve_env.("SKIP_DB_SEED", false)
 )
 
 # A secret silently falling back to its compiled-in development default in

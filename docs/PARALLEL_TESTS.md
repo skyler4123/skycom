@@ -8,7 +8,9 @@
 
 ## 1. Rule
 
-- **ALWAYS** run tests locally with `bundle exec parallel_rspec -n 14 [paths]`.
+- **ALWAYS** run tests locally with `IS_LOCAL=true bundle exec parallel_rspec -n 14 [paths]`.
+  The prefix pins Postgres to `localhost`; test credentials point at the Docker service
+  name `postgres`, so without it every DB connection fails.
   Full suite ~5m vs ~20m single-process. `-n 14` is the default — the dev
   machine handles 14 workers.
 - **NEVER** bare `parallel_rspec` without `bundle exec` — it can raise errors.
@@ -26,14 +28,20 @@
 
 | Scope | Command |
 |-------|---------|
-| Full suite | `bundle exec parallel_rspec -n 14` |
-| Subset | `bundle exec parallel_rspec -n 14 spec/features/admin spec/features/mobile` |
-| Single file / line | `bundle exec parallel_rspec -n 14 spec/models/company_spec.rb` |
+| Full suite | `IS_LOCAL=true bundle exec parallel_rspec -n 14` |
+| Subset | `IS_LOCAL=true bundle exec parallel_rspec -n 14 spec/features/admin spec/features/mobile` |
+| Single file / line | `IS_LOCAL=true bundle exec parallel_rspec -n 14 spec/models/company_spec.rb` |
 
 Always keep `-n 14` and the `bundle exec` prefix. Single files also go through
 parallel — worker isolation (`TEST_ENV_NUMBER`) and retries (§5) only activate
 under parallel. Exception: §7 allowlist files verify with single-process
 `bundle exec rspec <file>` instead.
+
+`IS_LOCAL=true` is a host-only requirement: it makes `config/database.yml` ignore the
+Docker hostname in test credentials and connect to `localhost`. CI containers run
+single-process with `POSTGRES_HOST` set, so they do not use this prefix.
+`TEST_ENV_NUMBER` still passes through, so each worker keeps its own Redis DB,
+Meilisearch index, and retry state.
 
 ## 3. Setup & migration recovery
 
@@ -42,10 +50,10 @@ under parallel. Exception: §7 allowlist files verify with single-process
 Only when worker DBs are missing (e.g. `skycom_test2` does not exist):
 
 ```bash
-RAILS_ENV=test bundle exec rake "parallel:drop"
-RAILS_ENV=test bundle exec rake "parallel:create"
-RAILS_ENV=test bundle exec rake "parallel:load_schema"
-RAILS_ENV=test bundle exec rake "parallel:migrate"
+IS_LOCAL=true RAILS_ENV=test bundle exec rake "parallel:drop"
+IS_LOCAL=true RAILS_ENV=test bundle exec rake "parallel:create"
+IS_LOCAL=true RAILS_ENV=test bundle exec rake "parallel:load_schema"
+IS_LOCAL=true RAILS_ENV=test bundle exec rake "parallel:migrate"
 ```
 
 These create/load `skycom_test`, `skycom_test2` … `skycom_test14` (+ `queue_test*`,
@@ -58,9 +66,9 @@ When `bundle exec parallel_rspec -n 14` fails with `PendingMigrationError`,
 do a full reset — drop everything, then recreate from the current schema:
 
 ```bash
-RAILS_ENV=test bundle exec rake "parallel:drop"
-RAILS_ENV=test bundle exec rake "parallel:create"
-RAILS_ENV=test bundle exec rake "parallel:load_schema"
+IS_LOCAL=true RAILS_ENV=test bundle exec rake "parallel:drop"
+IS_LOCAL=true RAILS_ENV=test bundle exec rake "parallel:create"
+IS_LOCAL=true RAILS_ENV=test bundle exec rake "parallel:load_schema"
 ```
 
 `load_schema` is the default (fast, deterministic from `db/schema.rb`). When
@@ -68,7 +76,7 @@ verifying the migration itself replays cleanly, use `migrate` instead of the
 last line:
 
 ```bash
-RAILS_ENV=test bundle exec rake "parallel:migrate"
+IS_LOCAL=true RAILS_ENV=test bundle exec rake "parallel:migrate"
 ```
 
 Always keep the `RAILS_ENV=test` prefix and `[14]` (14 workers, matches
@@ -123,6 +131,7 @@ CI is out of scope: CI stays single-process (`bundle exec rspec` in
 | `PendingMigrationError` / schema mismatch after a new migration | Worker DBs drifted → full reset per §3.2 (`drop[14]` → `create[14]` → `load_schema[14]`, or `migrate[14]` to verify the migration replays) |
 | Migration error mentions `queue/cable/cache_schema.rb` | Expected: those files are owner read-only by design (agent guard) and `db/schema.rb` is dumped before them → the error means the primary schema is done; OK to ignore (§3.3, `MERGE_MIGRATIONS.md` §5) |
 | Bare `parallel_rspec` raises load error | Missing `bundle exec` prefix → always `bundle exec parallel_rspec` |
+| `could not translate host name "postgres"` / `PG::ConnectionBad` | Test credentials point at the Docker service name → prefix the command with `IS_LOCAL=true` so `database.yml` uses `localhost` |
 | Flaky feature passes alone, fails in suite | Retries only run under parallel — repro must also use `bundle exec parallel_rspec -n 14`, never bare `rspec` (see `docs/FLAKY_TESTS.md`). Exception: §7 allowlist — repro with `bundle exec rspec <file>` instead |
 | Stale Meilisearch hits across workers | Index suffix missing → check `TEST_ENV_NUMBER` is passed through (see `config/initializers/meilisearch.rb`) |
 | §7 allowlist file fails under parallel | Known parallel-incompatible — do NOT treat as regression, do NOT re-run parallel. Verify once with `bundle exec rspec <file>`; if green, move on |

@@ -72,7 +72,8 @@ RSpec.describe OrderProcessingV1::CreateOrderService do
     end
 
     it "uses the company currency instead of hardcoding USD" do
-      company.update!(currency: :vnd)
+      # Company derives currency from country on save, so move the country too.
+      company.update!(country: :vn, currency: :vnd)
       product.update!(price_cents: 50_000)
 
       result = described_class.call(

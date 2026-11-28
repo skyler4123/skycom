@@ -4,9 +4,9 @@
 # ENV guard.
 #
 # Environment-backed values are declared once in
-# config/initializers/constants.rb using ENV > credentials > default. App
-# code uses the constant, never ENV. This script fails when a raw ENV read
-# shows up anywhere else.
+# config/initializers/constants.rb using ENV > credentials > default
+# (or default only when IS_LOCAL=true). App code uses the constant, never ENV.
+# This script fails when a raw ENV read shows up anywhere else.
 #
 # Allowlisted files load before config/initializers/constants.rb, are
 # evaluated outside the initializer sequence, or bridge a third-party SDK

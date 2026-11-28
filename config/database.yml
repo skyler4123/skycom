@@ -103,14 +103,19 @@ sqlite3: &sqlite3
   pool: 5
   timeout: 5000
 
+# IS_LOCAL is read inline because this file is evaluated before
+# config/initializers/constants.rb. Accepts 1/t/true (any case); keep the
+# check in sync with IS_LOCAL there.
+<% is_local = %w[1 t true].include?(ENV["IS_LOCAL"].to_s.strip.downcase) %>
+
 postgresql: &postgresql
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  username: <%= ENV["POSTGRES_USERNAME"].presence || Rails.application.credentials.dig(:postgres_username) || "postgres" %>
-  password: <%= ENV["POSTGRES_PASSWORD"].presence || Rails.application.credentials.dig(:postgres_password) || "password" %>
-  host: <%= ENV["POSTGRES_HOST"].presence || Rails.application.credentials.dig(:postgres_host) || "localhost" %>
-  port: <%= ENV["POSTGRES_PORT"].presence || Rails.application.credentials.dig(:postgres_port) || "5432" %>
+  username: <%= is_local ? "postgres" : (ENV["POSTGRES_USERNAME"].presence || Rails.application.credentials.dig(:postgres_username)) %>
+  password: <%= is_local ? "password" : (ENV["POSTGRES_PASSWORD"].presence || Rails.application.credentials.dig(:postgres_password)) %>
+  host: <%= is_local ? "localhost" : (ENV["POSTGRES_HOST"].presence || Rails.application.credentials.dig(:postgres_host)) %>
+  port: <%= is_local ? "5432" : (ENV["POSTGRES_PORT"].presence || Rails.application.credentials.dig(:postgres_port)) %>
 
 queue: &queue
   <<: *postgresql
