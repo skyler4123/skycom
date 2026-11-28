@@ -49,6 +49,10 @@ CENTRIFUGO_ENDPOINT = ENV["CENTRIFUGO_ENDPOINT"].presence ||
   Rails.application.credentials.dig(:centrifugo_endpoint) ||
   "http://localhost:8000/api"
 
+CENTRIFUGO_WS_URL = ENV["CENTRIFUGO_WS_URL"].presence ||
+  Rails.application.credentials.dig(:centrifugo_ws_url) ||
+  "ws://localhost:8000/connection/websocket"
+
 CENTRIFUGO_TOKEN_HMAC_SECRET_KEY = ENV["CENTRIFUGO_TOKEN_HMAC_SECRET_KEY"].presence ||
   Rails.application.credentials.dig(:centrifugo_token_hmac_secret_key) ||
   "skycom_jwt_hmac_secret_token_key_2026"

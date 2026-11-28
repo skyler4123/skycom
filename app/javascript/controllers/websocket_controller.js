@@ -25,8 +25,9 @@ export default class WebsocketController extends Controller {
       return
     }
 
-    console.log(`⚡ SharedWorker WebSockets Gateway mounted (Centrifugo: ${this.centrifugePath})`)
-    
+    console.log(`⚡ SharedWorker WebSockets Gateway mounted (Centrifugo: ${this.centrifugePath}, URL: ${this.urlValue})`)
+    this.logTokenClaims()
+
     // 2. Initialize SharedWorker & global window interface
     this.initializeSharedWorker()
     this.initializeGlobalInterface()
@@ -51,6 +52,39 @@ export default class WebsocketController extends Controller {
     }
   }
 
+  // Console diagnostics — decode the connection token (no signature check) so the
+  // console shows which channels Centrifugo will actually accept from this browser.
+  logTokenClaims() {
+    try {
+      const payload = this.tokenValue.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")
+      const claims = JSON.parse(atob(payload))
+      console.log("🔑 [WS] token claims", { sub: claims.sub, channels: claims.channels || [] })
+    } catch (error) {
+      console.warn("⚠️ [WS] could not decode connection token claims")
+    }
+  }
+
+  // Forwarded by the SharedWorker — this is Centrifugo's actual answer, not just
+  // the page's subscribe intent.
+  logSubscriptionState({ channel, state, reason, reused }) {
+    const message = `📡 [WS] subscription ${state}${reused ? " (shared worker)" : ""} → "${channel}"`
+    if (state === "error") {
+      console.error(`${message} — ${reason || "unknown error"}`)
+    } else {
+      console.log(message)
+    }
+  }
+
+  logConnectionState({ state, reason, url }) {
+    const target = url ? ` → ${url}` : ""
+    const message = `🔌 [WS] connection ${state}${target}${reason ? ` — ${reason}` : ""}`
+    if (state === "error") {
+      console.error(message)
+    } else {
+      console.log(message)
+    }
+  }
+
   initializeSharedWorker() {
     // Construct worker script using native ES module import
     const workerScript = `
@@ -60,6 +94,8 @@ export default class WebsocketController extends Controller {
       let centrifuge = null;
       let activeSubscriptions = {};
       let connectionIdentity = null;
+      let connectionState = "disconnected";
+      let connectionUrl = null;
 
       self.onconnect = (e) => {
         const port = e.ports[0];
@@ -97,7 +133,19 @@ export default class WebsocketController extends Controller {
 
       function initCentrifugo(url, token) {
         const identity = identityFor(url, token);
-        if (centrifuge && identity === connectionIdentity) return;
+        connectionUrl = url;
+
+        if (centrifuge && identity === connectionIdentity) {
+          // Another tab reused this worker's connection: tell the new page where
+          // the connection currently stands so its console is not silent.
+          broadcast({
+            action: "CONNECTION_STATE",
+            state: connectionState,
+            url: connectionUrl,
+            reason: "shared worker connection reused"
+          });
+          return;
+        }
 
         if (centrifuge) {
           Object.values(activeSubscriptions).forEach((sub) => {
@@ -109,11 +157,43 @@ export default class WebsocketController extends Controller {
         activeSubscriptions = {};
         connectionIdentity = identity;
         centrifuge = new Centrifuge(url, { token });
+
+        centrifuge.on("connecting", () => {
+          connectionState = "connecting";
+          broadcast({ action: "CONNECTION_STATE", state: "connecting", url: connectionUrl });
+        });
+
+        centrifuge.on("connected", () => {
+          connectionState = "connected";
+          broadcast({ action: "CONNECTION_STATE", state: "connected", url: connectionUrl });
+        });
+
+        centrifuge.on("disconnected", (ctx) => {
+          connectionState = "disconnected";
+          broadcast({ action: "CONNECTION_STATE", state: "disconnected", url: connectionUrl, reason: ctx && ctx.reason });
+        });
+
+        centrifuge.on("error", (ctx) => {
+          broadcast({ action: "CONNECTION_STATE", state: "error", url: connectionUrl, reason: ctx && ctx.error && ctx.error.message });
+        });
+
         centrifuge.connect();
       }
 
       function subscribeChannel(channel) {
-        if (!centrifuge || activeSubscriptions[channel]) return;
+        if (!centrifuge) return;
+
+        if (activeSubscriptions[channel]) {
+          // The worker already holds this subscription: report its live state so
+          // a newly opened tab still sees the channel confirmation.
+          broadcast({
+            action: "SUBSCRIPTION_STATE",
+            channel: channel,
+            state: activeSubscriptions[channel].state || "unknown",
+            reused: true
+          });
+          return;
+        }
 
         const sub = centrifuge.newSubscription(channel);
         sub.on("publication", (ctx) => {
@@ -122,6 +202,18 @@ export default class WebsocketController extends Controller {
             channel: channel,
             data: ctx.data
           });
+        });
+
+        sub.on("subscribed", () => {
+          broadcast({ action: "SUBSCRIPTION_STATE", channel: channel, state: "subscribed" });
+        });
+
+        sub.on("unsubscribed", (ctx) => {
+          broadcast({ action: "SUBSCRIPTION_STATE", channel: channel, state: "unsubscribed", reason: ctx && ctx.reason });
+        });
+
+        sub.on("error", (ctx) => {
+          broadcast({ action: "SUBSCRIPTION_STATE", channel: channel, state: "error", reason: ctx && ctx.error && ctx.error.message });
         });
 
         sub.subscribe();
@@ -149,8 +241,15 @@ export default class WebsocketController extends Controller {
     // Listen for events fan-outed from the SharedWorker
     this.workerPort.onmessage = (event) => {
       const { action, channel, data } = event.data
-      if (action === "PUBLICATION" && window.WEBSOCKET) {
-        window.WEBSOCKET.handleIncomingPublication(channel, data)
+
+      if (action === "PUBLICATION") {
+        if (window.WEBSOCKET) {
+          window.WEBSOCKET.handleIncomingPublication(channel, data)
+        }
+      } else if (action === "SUBSCRIPTION_STATE") {
+        this.logSubscriptionState(event.data)
+      } else if (action === "CONNECTION_STATE") {
+        this.logConnectionState(event.data)
       }
     }
 
@@ -208,6 +307,10 @@ export default class WebsocketController extends Controller {
             action: "SUBSCRIBE",
             payload: { channel: channelName }
           })
+
+          console.log(`📡 [WS] subscribe → "${channelName}" (event: "${expectedEvent}")`)
+        } else {
+          console.log(`📡 [WS] extra listener → "${channelName}" (event: "${expectedEvent}", already subscribed)`)
         }
 
         const listener = { eventKey: expectedEvent, callback }
@@ -216,14 +319,31 @@ export default class WebsocketController extends Controller {
         return {
           unsubscribe: () => {
             this.listeners[channelName] = this.listeners[channelName].filter(l => l !== listener)
+            console.log(`📡 [WS] listener removed → "${channelName}" (event: "${expectedEvent}")`)
           }
         }
       },
 
       // Internal publication dispatcher
       handleIncomingPublication(channel, data) {
+        // Every publication that reaches this tab, before any event filtering.
+        console.log(`📨 [WS] message ← "${channel}"`, data)
+
         const channelListeners = this.listeners[channel]
-        if (!channelListeners || !data?.event) return
+        if (!channelListeners) {
+          console.warn(`⚠️ [WS] no local listener for "${channel}" in this tab — message dropped`)
+          return
+        }
+
+        if (!data?.event) {
+          console.warn(`⚠️ [WS] message on "${channel}" has no "event" field — dropped`, data)
+          return
+        }
+
+        const registeredEvents = [...new Set(channelListeners.map(listener => listener.eventKey))]
+        if (!registeredEvents.includes(data.event)) {
+          console.warn(`⚠️ [WS] "${channel}" has no listener for event "${data.event}" (listening: ${registeredEvents.join(", ")})`)
+        }
 
         channelListeners.forEach(({ eventKey, callback }) => {
           if (data.event === eventKey) {

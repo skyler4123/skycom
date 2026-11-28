@@ -80,6 +80,7 @@ development:
 | `MEILISEARCH_API_KEY` | `MEILISEARCH_API_KEY` | `meilisearch_api_key` | `skycom_master_key_password_2026` | `meilisearch.rb` |
 | `CENTRIFUGO_API_KEY` | `CENTRIFUGO_API_KEY` | `centrifugo_api_key` | `skycom_super_secret_api_key_2026` | `websocket.rb` |
 | `CENTRIFUGO_ENDPOINT` | `CENTRIFUGO_ENDPOINT` | `centrifugo_endpoint` | `http://localhost:8000/api` | `websocket.rb` |
+| `CENTRIFUGO_WS_URL` | `CENTRIFUGO_WS_URL` | `centrifugo_ws_url` | `ws://localhost:8000/connection/websocket` | `application/admin/mobile` layouts |
 | `CENTRIFUGO_TOKEN_HMAC_SECRET_KEY` | `CENTRIFUGO_TOKEN_HMAC_SECRET_KEY` | `centrifugo_token_hmac_secret_key` | `skycom_jwt_hmac_secret_token_key_2026` | `websocket.rb` |
 | `GOOGLE_CLIENT_ID` | `GOOGLE_CLIENT_ID` | `google_client_id` | `nil` | `omniauth.rb` |
 | `GOOGLE_CLIENT_SECRET` | `GOOGLE_CLIENT_SECRET` | `google_client_secret` | `nil` | `omniauth.rb` |
