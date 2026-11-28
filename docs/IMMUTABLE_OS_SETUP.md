@@ -248,7 +248,6 @@ What comes up (`docker-compose.yml`):
 | websocket | `centrifugo/centrifugo:v5` | 8000 | realtime (`docs/WEBSOCKET.md`) |
 | minio | `minio/minio:latest` | 9000/9001 | S3-compatible storage + console |
 | mock-api | `golang:1.22-alpine` | 4000 | mock bank gateway (`docs/MOCK_API.md`) |
-| openobserve | `openobserve/openobserve:latest` | 5080 | logs/metrics |
 
 The compose file already carries `:z` volume flags — keep them (SELinux on Atomic hosts).
 
@@ -276,7 +275,7 @@ curl -f http://localhost:8000/health        # Centrifugo
 curl -f http://localhost:4000/api/v1/ping   # Mock API
 ```
 
-Browser checks: Rails `http://localhost:3000`, MinIO console `http://localhost:9001` (minioadmin/minioadmin), OpenObserve `http://localhost:5080`.
+Browser checks: Rails `http://localhost:3000`, MinIO console `http://localhost:9001` (minioadmin/minioadmin).
 
 ## 4. VS Code workflow
 

@@ -105,6 +105,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | External API integration (dev/test) | `docs/MOCK_API.md` — mock server routes + add-new-API template |
 | Backlog / future work | `docs/TODO.md` — performance backlog conventions + payroll client-calculation tasks |
 | Dev environment on an immutable OS | `docs/IMMUTABLE_OS_SETUP.md` — distrobox + docker + VS Code |
+| Re-enabling Lograge / OpenTelemetry (removed 2026-11-28) | `docs/OBSERVABILITY.md` — verbatim restore recipe, partial restores, verification |
 | URL/controller structure, Stimulus naming, mandatory table fields | `docs/ARCHITECTURE_GUIDES.md` — technical standards incl. system-fields block |
 | A new resource type or pairwise join | `docs/RESOURCES.md` — gem/system/managed/appointment catalog + atomic-pair recipe |
 | Company seeding, init, or enrich flow | `docs/INIT_AND_ENRICH.md` |

@@ -97,10 +97,6 @@ development:
 | `AWS_ACCESS_KEY_ID` | `AWS_ACCESS_KEY_ID` | `aws_access_key_id` | `admin` | `config/storage.yml` |
 | `AWS_SECRET_ACCESS_KEY` | `AWS_SECRET_ACCESS_KEY` | `aws_secret_access_key` | `password` | `config/storage.yml` |
 | `AWS_ENDPOINT_URL` | `AWS_ENDPOINT_URL` | `aws_endpoint` | `http://10.88.0.2:9000` | `config/storage.yml` |
-| `OTEL_SERVICE_NAME` | `OTEL_SERVICE_NAME` | `otel_service_name` | `skyceer-<env>` | `opentelemetry.rb` |
-| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | `otel_exporter_otlp_traces_endpoint` | `http://localhost:5080/api/default/v1/traces` | `opentelemetry.rb` |
-| `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT` | `OTEL_EXPORTER_OTLP_LOGS_ENDPOINT` | `otel_exporter_otlp_logs_endpoint` | `http://localhost:5080/api/default/v1/logs` | `opentelemetry.rb` |
-| `OTEL_EXPORTER_OTLP_HEADERS` | `OTEL_EXPORTER_OTLP_HEADERS` | `otel_exporter_otlp_headers` | `Authorization=Basic …,organization=default` | `opentelemetry.rb` |
 | `MISSION_CONTROL_USER` | `MISSION_CONTROL_USER` | `mission_control_user` | `dev` | `mission_control.rb` |
 | `MISSION_CONTROL_PASSWORD` | `MISSION_CONTROL_PASSWORD` | `mission_control_password` | `secret` | `mission_control.rb` |
 | `TEST_ENV_NUMBER` | `TEST_ENV_NUMBER` | `test_env_number` | `""` | `meilisearch.rb`, `config/redis/shared.yml`, `spec/retry_helper.rb` |
@@ -137,7 +133,7 @@ rule inline; do not add new ones without a comment and a `bin/check_env` allowli
 
 Framework/gem-owned variables are configured with their standard names and are not redeclared:
 `RAILS_MASTER_KEY`, `SECRET_KEY_BASE`, `SECRET_KEY_BASE_DUMMY`, `DATABASE_URL` (Rails merges it over
-`database.yml`), `SOLID_CACHE_CONFIG`, and the OTel SDK knobs not listed in §3.1.
+`database.yml`), and `SOLID_CACHE_CONFIG`.
 
 ### 3.3 Out of scope
 
@@ -145,6 +141,11 @@ Framework/gem-owned variables are configured with their standard names and are n
 - `android/` — `BuildConfig.BASE_URL` comes from the Gradle property `-PskycomBaseUrl`.
 - `docker-compose*.yml`, `Dockerfile`, `Procfile.dev`, `config/deploy.yml`, `.kamal/secrets`,
   `.github/workflows/*` — these **set** ENV for containers/jobs; they are not readers.
+
+### 3.4 Removed integrations
+
+Lograge and OpenTelemetry are not installed. `docs/OBSERVABILITY.md` holds the
+verbatim restore recipe (gems, initializer, middleware, constants, compose service).
 
 ## 4. Production warning
 
@@ -157,27 +158,21 @@ unset. It checks ENV and credentials only:
 
 Secrets covered: `MEILISEARCH_API_KEY`, `CENTRIFUGO_API_KEY`, `CENTRIFUGO_TOKEN_HMAC_SECRET_KEY`,
 `WEBHOOK_BANK_PAYMENT_SECRET`, `WEBHOOK_REDIRECT_PAYMENT_SECRET`, `AWS_SECRET_ACCESS_KEY`,
-`MISSION_CONTROL_PASSWORD`, `OTEL_EXPORTER_OTLP_HEADERS`.
+`MISSION_CONTROL_PASSWORD`.
 
 The Postgres password lives in `database.yml` (inline exception) and is not covered — set
 `DATABASE_URL` or `POSTGRES_PASSWORD` in production.
 
-## 5. Third-party SDK bridge
-
-`config/initializers/opentelemetry.rb` writes the resolved `OTEL_EXPORTER_OTLP_*` constants into
-ENV because the OTel SDK reads ENV directly. The constant remains the source of truth; this is the
-only allowed ENV write outside `constants.rb`.
-
-## 6. Load order
+## 5. Load order
 
 `config/initializers/*.rb` load alphabetically. `constants.rb` loads after `assets.rb` and
 `cache.rb`; those two must not read env constants. All other initializers (`meilisearch.rb`,
-`omniauth.rb`, `opentelemetry.rb`, `websocket.rb`, `mission_control.rb`) load after it.
+`omniauth.rb`, `websocket.rb`, `mission_control.rb`) load after it.
 
 Lazily parsed YAML (`config/storage.yml`, `config/redis/shared.yml`, `config/queue.yml`) is read
 after initialization, so it resolves the constants. `config/database.yml` is deliberately inline.
 
-## 7. Adding a new environment variable
+## 6. Adding a new environment variable
 
 1. Declare it in the `Environment-backed configuration` section of
    `config/initializers/constants.rb`:
@@ -195,7 +190,7 @@ after initialization, so it resolves the constants. `config/database.yml` is del
 5. Add it to the catalog table above.
 6. Run `bin/check_env`, `bin/rubocop`, and `bundle exec parallel_rspec -n 14 spec/initializers/environment_configuration_spec.rb`.
 
-## 8. Verification
+## 7. Verification
 
 ```bash
 bin/check_env
@@ -214,7 +209,7 @@ bin/rails runner 'p Rails.application.config_for("redis/shared")'         # YAML
 ActiveStorage::Blob.service.class                                         # S3 from storage.yml
 ```
 
-## 9. File reference
+## 8. File reference
 
 | File | Role |
 |---|---|
@@ -222,7 +217,6 @@ ActiveStorage::Blob.service.class                                         # S3 f
 | `config/initializers/meilisearch.rb` | Consumes Meilisearch constants |
 | `config/initializers/websocket.rb` | Consumes Centrifugo constants |
 | `config/initializers/omniauth.rb` | Consumes Google OAuth constants |
-| `config/initializers/opentelemetry.rb` | Consumes OTel constants; ENV bridge |
 | `config/initializers/mission_control.rb` | Consumes Mission Control constants |
 | `app/services/payments/mock_qr_gateway.rb` | Consumes mock QR URLs |
 | `app/services/payments/mock_redirect_gateway.rb` | Consumes mock redirect URLs |

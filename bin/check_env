@@ -38,7 +38,6 @@ ALLOWLIST = %w[
   config/environments/production.rb
   config/environments/test.rb
   config/initializers/constants.rb
-  config/initializers/opentelemetry.rb
   config/puma.rb
   spec/rails_helper.rb
 ].freeze

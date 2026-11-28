@@ -125,23 +125,6 @@ AWS_ENDPOINT_URL = ENV["AWS_ENDPOINT_URL"].presence ||
   Rails.application.credentials.dig(:aws_endpoint) ||
   "http://10.88.0.2:9000"
 
-# --- OpenTelemetry ---
-OTEL_SERVICE_NAME = ENV["OTEL_SERVICE_NAME"].presence ||
-  Rails.application.credentials.dig(:otel_service_name) ||
-  "skyceer-#{Rails.env}"
-
-OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = ENV["OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"].presence ||
-  Rails.application.credentials.dig(:otel_exporter_otlp_traces_endpoint) ||
-  "http://localhost:5080/api/default/v1/traces"
-
-OTEL_EXPORTER_OTLP_LOGS_ENDPOINT = ENV["OTEL_EXPORTER_OTLP_LOGS_ENDPOINT"].presence ||
-  Rails.application.credentials.dig(:otel_exporter_otlp_logs_endpoint) ||
-  "http://localhost:5080/api/default/v1/logs"
-
-OTEL_EXPORTER_OTLP_HEADERS = ENV["OTEL_EXPORTER_OTLP_HEADERS"].presence ||
-  Rails.application.credentials.dig(:otel_exporter_otlp_headers) ||
-  "Authorization=Basic YWRtaW5AZXhhbXBsZS5jb206UGFzc3dvcmRAMTIz,organization=default"
-
 # --- Mission Control (jobs dashboard) ---
 MISSION_CONTROL_USER = ENV["MISSION_CONTROL_USER"].presence ||
   Rails.application.credentials.dig(:mission_control_user) ||
@@ -180,8 +163,7 @@ if Rails.env.production?
     "WEBHOOK_BANK_PAYMENT_SECRET" => :webhook_bank_payment_secret,
     "WEBHOOK_REDIRECT_PAYMENT_SECRET" => :webhook_redirect_payment_secret,
     "AWS_SECRET_ACCESS_KEY" => :aws_secret_access_key,
-    "MISSION_CONTROL_PASSWORD" => :mission_control_password,
-    "OTEL_EXPORTER_OTLP_HEADERS" => :otel_exporter_otlp_headers
+    "MISSION_CONTROL_PASSWORD" => :mission_control_password
   }.each do |env_key, credential_key|
     next if ENV[env_key].present? || Rails.application.credentials.dig(credential_key).present?
 
