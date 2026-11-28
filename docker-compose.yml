@@ -2,7 +2,7 @@
 #
 # DEV WORKFLOW (services only): web + job run locally via `bin/dev` for fast
 # iteration — do NOT start the `web`/`job` containers in dev. Start infra only:
-#   docker compose up -d postgres redis stograge websocket meilisearch mock-api openobserve
+#   docker compose up -d postgres redis stograge websocket meilisearch mock-api
 #   bin/dev
 # Full-stack compose (web/job containers) is for seed-test / rspec-test files only.
 #
@@ -91,17 +91,6 @@ services:
     volumes:
       - redis_data:/data
 
-  openobserve:
-    image: openobserve/openobserve:latest
-    environment:
-      - ZO_DATA_DIR=/data
-      - ZO_ROOT_USER_EMAIL=admin@example.com
-      - ZO_ROOT_USER_PASSWORD=Password@123
-    ports:
-      - "5080:5080" # UI and OTel endpoint
-    volumes:
-      - openobserve_data:/data
-
   # Centrifugo Real-time Core WebSocket Engine
   websocket:
     image: centrifugo/centrifugo:v5
@@ -178,6 +167,5 @@ volumes:
   rustfs_data:
   sqlite_storage:
   redis_data:
-  openobserve_data:
   websocket_data:
   meilisearch_data:

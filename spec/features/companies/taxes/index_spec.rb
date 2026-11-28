@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.feature "Companies::Taxes Management", type: :feature, js: true do
-  let(:company) { create(:company) }
+  let(:company) { create(:company, country: :us, currency: :usd) }
   let(:owner) { company.user }
 
   before do
