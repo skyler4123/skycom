@@ -13,5 +13,7 @@ Seed::ApplicationService.run Seed::ApplicationService.put_count
 
 bin/rubocop --autocorrect-all
 EDITOR="code --wait" bin/rails credentials:edit
+EDITOR="code --wait" bin/rails credentials:edit -e development
+EDITOR="code --wait" bin/rails credentials:edit -e test
 EDITOR="code --wait" bin/rails credentials:edit -e production
 bin/check_env
