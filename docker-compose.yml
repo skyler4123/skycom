@@ -9,8 +9,8 @@
 # docker compose up -d
 # RAILS_MASTER_KEY=$(cat config/master.key) docker compose up -d --force-recreate
 # RAILS_MASTER_KEY=$(cat config/master1.key) podman compose up -d --force-recreate
-# RAILS_MASTER_KEY=$(cat config/master.key) docker compose -f docker-compose.seed-test.yml up --force-recreate --abort-on-container-exit --exit-code-from web --attach web
-# RAILS_MASTER_KEY=$(cat config/master.key) docker compose -f docker-compose.rspec-test.yml up --force-recreate --abort-on-container-exit --exit-code-from web --attach web
+# RAILS_MASTER_KEY=$(cat config/credentials/test.key) docker compose -f docker-compose.seed-test.yml up --force-recreate --abort-on-container-exit --exit-code-from web --attach web
+# RAILS_MASTER_KEY=$(cat config/credentials/test.key) docker compose -f docker-compose.rspec-test.yml up --force-recreate --abort-on-container-exit --exit-code-from web --attach web
 
 name: skycom_development
 services:
