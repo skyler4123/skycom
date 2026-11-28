@@ -16,7 +16,7 @@ import (
 // =========================================================================
 const (
 	ServerPort = ":4000"
-	BaseIP     = "192.168.0.100"
+	BaseIP     = "10.88.0.2"
 
 	WebhookSecureSecret  = "local_secure_dev_secret"
 	WebhookClientTimeout = 5 * time.Second

@@ -142,9 +142,9 @@ Include a JSON/Ruby example when the shape is non-obvious.
 ## 10. Verification
 
 ```bash
-bundle exec parallel_rspec -n 14 <feature spec paths>
-bundle exec parallel_rspec -n 14 <model spec paths>
-bundle exec parallel_rspec -n 14 <request spec paths>
+IS_LOCAL=true bundle exec parallel_rspec -n 14 <feature spec paths>
+IS_LOCAL=true bundle exec parallel_rspec -n 14 <model spec paths>
+IS_LOCAL=true bundle exec parallel_rspec -n 14 <request spec paths>
 bin/rubocop
 bin/check_colors --strict
 bin/brakeman --no-pager

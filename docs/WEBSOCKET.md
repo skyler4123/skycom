@@ -38,11 +38,14 @@ websocket:
     CENTRIFUGO_TOKEN_HMAC_SECRET_KEY: "skycom_jwt_hmac_secret_token_key_2026"
 ```
 
-- **WebSocket endpoint**: `ws://127.0.0.1:8000/connection/websocket`
+- **WebSocket endpoint**: `ws://localhost:8000/connection/websocket` (browser connection)
 - **HTTP API endpoint**: `http://localhost:8000/api` (used by backend to publish)
-- Rails reads these through the `CENTRIFUGO_API_KEY`, `CENTRIFUGO_ENDPOINT`, and
-  `CENTRIFUGO_TOKEN_HMAC_SECRET_KEY` constants (ENV > credentials > default). The compose values
-  above must match. See `docs/ENVIRONMENT.md`.
+- Rails reads these through the `CENTRIFUGO_API_KEY`, `CENTRIFUGO_ENDPOINT`,
+  `CENTRIFUGO_WS_URL`, and `CENTRIFUGO_TOKEN_HMAC_SECRET_KEY` constants
+  (ENV > credentials > default). The layouts inject `CENTRIFUGO_WS_URL` into
+  `data-websocket-url-value`, while `CENTRIFUGO_ENDPOINT` is the publish API — the
+  two must point at the same Centrifugo instance. The compose values above must
+  match. See `docs/ENVIRONMENT.md`.
 
 ---
 
@@ -60,7 +63,7 @@ WebsocketConcern#set_websocket_channels  (before_action)
     ▼
 application.html.erb layout
     │
-    ├── data-websocket-url-value="ws://127.0.0.1:8000/connection/websocket"
+    ├── data-websocket-url-value="<CENTRIFUGO_WS_URL>"
     └── data-websocket-token-value="<JWT signed by WEBSOCKET.token()>"
     │
     ▼
@@ -89,13 +92,13 @@ end
 
 ### 3.2 Token Injection (Layout)
 
-The `application.html.erb` layout injects the WebSocket URL and a signed JWT token onto the `<body>` element:
+The `application.html.erb`, `admin.html.erb`, and `mobile.html.erb` layouts inject the WebSocket URL (from the `CENTRIFUGO_WS_URL` constant) and a signed JWT token onto the `<body>` element:
 
 ```erb
 <body
   data-controller="... websocket"
   <% if is_signed_in? && @channels.present? %>
-    data-websocket-url-value="ws://127.0.0.1:8000/connection/websocket"
+    data-websocket-url-value="<%= CENTRIFUGO_WS_URL %>"
     data-websocket-token-value="<%= WEBSOCKET.token(sub: current_user.id.to_s, channels: @channels) %>"
   <% end %>
 >
@@ -316,6 +319,24 @@ sub.on('publication', (ctx) => {
   }
 })
 ```
+
+### Console Diagnostics
+
+Every page logs WebSocket traffic, so you can debug channel/event wiring from the
+normal page console (no need to open the SharedWorker inspector). The SharedWorker
+fans out to every connected page, so **each open tab logs every publication** —
+including tabs with no listener for it.
+
+| Log | Meaning |
+|-----|---------|
+| `🔑 [WS] token claims` | `sub` + `channels` the JWT authorizes — check the expected channel is listed |
+| `📡 [WS] subscribe → "..." (event: "...")` | This tab attached its first listener and asked the worker to subscribe |
+| `📡 [WS] extra listener → "..."` | Already-subscribed channel gained another local listener |
+| `📡 [WS] listener removed → "..."` | A subscriber called its returned `unsubscribe()` |
+| `📡 [WS] subscription subscribed\|unsubscribed\|error → "..."` | Centrifugo's actual answer, forwarded from the worker |
+| `🔌 [WS] connection connecting\|connected\|disconnected\|error → "<url>"` | Centrifuge connection lifecycle with the exact endpoint (e.g. `ws://127.0.0.1:8000/connection/websocket`); "shared worker connection reused" appears when a later tab reuses the existing connection |
+| `📨 [WS] message ← "channel" {event, id, payload}` | Every publication that reached this tab, logged before event filtering |
+| `⚠️ [WS] ...` | Message dropped: this tab has no listener for the channel, the payload has no `event`, or the event name does not match any local listener (the log lists what is being listened for) |
 
 ---
 

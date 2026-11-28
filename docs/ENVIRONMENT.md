@@ -16,6 +16,26 @@ ENV["VARIABLE"].presence  >  Rails.application.credentials.dig(:variable)  >  ha
 A blank ENV value counts as unset, so `MEILISEARCH_HOST=` falls through to credentials/default.
 Never put the same value in two places.
 
+### 1.1 Local mode (`IS_LOCAL`)
+
+`IS_LOCAL` is the bootstrap switch for the whole panel. It is read from ENV only —
+never credentials — so a shared credential file can never pin production to defaults.
+Accepted values are `1`, `t`, and `true` (case-insensitive); anything else is `false`.
+
+| `IS_LOCAL` | Resolution |
+|---|---|
+| unset / `false` | ENV → credentials → hardcoded default (the rule above) |
+| `true` | hardcoded default only; ENV and credentials are both ignored |
+
+Use it per process when a machine has stray shell variables: `IS_LOCAL=true bin/dev`.
+Do not export it globally — it clears the Google OAuth credentials. `TEST_ENV_NUMBER`
+is exempt: it always reads ENV, so parallel workers keep their own Redis DB, Meilisearch
+index, and retry state. Booting production with `IS_LOCAL=true` raises during initialization.
+
+On a local host, run tests as `IS_LOCAL=true bundle exec parallel_rspec -n 14 [paths]`
+so Postgres resolves to `localhost` instead of the Docker service name in the test
+credentials. See `docs/PARALLEL_TESTS.md`.
+
 ## 2. Where declarations live
 
 All ENV reads happen in `config/initializers/constants.rb`, in the
@@ -24,25 +44,29 @@ controller, job, seed, spec — uses the constant.
 
 ```ruby
 # config/initializers/constants.rb
-MEILISEARCH_HOST = ENV["MEILISEARCH_HOST"].presence ||
-  Rails.application.credentials.dig(:meilisearch_host) ||
-  "http://localhost:7700"
+MEILISEARCH_HOST = resolve_env.("MEILISEARCH_HOST", "http://localhost:7700")
 ```
+
+`resolve_env` is the single implementation of the two-mode rule. Each declaration
+passes the ENV name and the hardcoded default once.
 
 - **Constant name = ENV name.** `MEILISEARCH_HOST` ↔ `ENV["MEILISEARCH_HOST"]`.
   Grep either way and you land on the same concept.
-- **Credential key = ENV name downcased symbol.** `MEILISEARCH_HOST` → `:meilisearch_host`.
-  The encrypted file already uses this shape, so no mapping table exists.
-- **One exception:** `AWS_ENDPOINT_URL` reads `:aws_endpoint` (the legacy credential key).
+- **Credential key is derived.** `MEILISEARCH_HOST` → `:meilisearch_host` (the ENV
+  name downcased). The encrypted file already uses this shape, so no mapping table exists.
+- **One exception:** `AWS_ENDPOINT_URL` passes the legacy credential key explicitly:
+
+```ruby
+AWS_ENDPOINT_URL = resolve_env.("AWS_ENDPOINT_URL", "http://10.88.0.2:9000", :aws_endpoint)
+```
+
 - Typed values coerce at declaration:
 
 ```ruby
-JOB_CONCURRENCY = (ENV["JOB_CONCURRENCY"].presence ||
-  Rails.application.credentials.dig(:job_concurrency) || 1).to_i
+JOB_CONCURRENCY = resolve_env.("JOB_CONCURRENCY", 1).to_i
 
 TEST_RUN_INSIDE_DOCKER = ActiveModel::Type::Boolean.new.cast(
-  ENV["TEST_RUN_INSIDE_DOCKER"].presence ||
-    Rails.application.credentials.dig(:test_run_inside_docker) || false
+  resolve_env.("TEST_RUN_INSIDE_DOCKER", false)
 )
 ```
 
@@ -75,11 +99,13 @@ development:
 
 | ENV | Constant | Credential key | Default | Read by |
 |---|---|---|---|---|
+| `IS_LOCAL` | `IS_LOCAL` | — (bootstrap, ENV only) | `false` | `constants.rb` itself |
 | `CANONICAL_BASE_URL` | `CANONICAL_BASE_URL` | `canonical_base_url` | `https://skyceer.com` | `app/helpers/home_helper.rb`, homepage SEO |
 | `MEILISEARCH_HOST` | `MEILISEARCH_HOST` | `meilisearch_host` | `http://localhost:7700` | `meilisearch.rb` |
 | `MEILISEARCH_API_KEY` | `MEILISEARCH_API_KEY` | `meilisearch_api_key` | `skycom_master_key_password_2026` | `meilisearch.rb` |
 | `CENTRIFUGO_API_KEY` | `CENTRIFUGO_API_KEY` | `centrifugo_api_key` | `skycom_super_secret_api_key_2026` | `websocket.rb` |
 | `CENTRIFUGO_ENDPOINT` | `CENTRIFUGO_ENDPOINT` | `centrifugo_endpoint` | `http://localhost:8000/api` | `websocket.rb` |
+| `CENTRIFUGO_WS_URL` | `CENTRIFUGO_WS_URL` | `centrifugo_ws_url` | `ws://localhost:8000/connection/websocket` | `application/admin/mobile` layouts |
 | `CENTRIFUGO_TOKEN_HMAC_SECRET_KEY` | `CENTRIFUGO_TOKEN_HMAC_SECRET_KEY` | `centrifugo_token_hmac_secret_key` | `skycom_jwt_hmac_secret_token_key_2026` | `websocket.rb` |
 | `GOOGLE_CLIENT_ID` | `GOOGLE_CLIENT_ID` | `google_client_id` | `nil` | `omniauth.rb` |
 | `GOOGLE_CLIENT_SECRET` | `GOOGLE_CLIENT_SECRET` | `google_client_secret` | `nil` | `omniauth.rb` |
@@ -99,7 +125,7 @@ development:
 | `AWS_ENDPOINT_URL` | `AWS_ENDPOINT_URL` | `aws_endpoint` | `http://10.88.0.2:9000` | `config/storage.yml` |
 | `MISSION_CONTROL_USER` | `MISSION_CONTROL_USER` | `mission_control_user` | `dev` | `mission_control.rb` |
 | `MISSION_CONTROL_PASSWORD` | `MISSION_CONTROL_PASSWORD` | `mission_control_password` | `secret` | `mission_control.rb` |
-| `TEST_ENV_NUMBER` | `TEST_ENV_NUMBER` | `test_env_number` | `""` | `meilisearch.rb`, `config/redis/shared.yml`, `spec/retry_helper.rb` |
+| `TEST_ENV_NUMBER` | `TEST_ENV_NUMBER` | `test_env_number` | `""` | `meilisearch.rb`, `config/redis/shared.yml`, `spec/retry_helper.rb`; always ENV-based, `IS_LOCAL` exempt |
 | `TEST_RUN_INSIDE_DOCKER` | `TEST_RUN_INSIDE_DOCKER` | `test_run_inside_docker` | `false` | `spec/selenium_helper.rb` |
 | `SKIP_DB_SEED` | `SKIP_DB_SEED` | `skip_db_seed` | `false` | `db/seeds.rb` |
 
@@ -112,13 +138,15 @@ seeding is exercised.
 These files are evaluated before `config/initializers/constants.rb`, outside the initializer
 sequence, or by a gem that owns the variable. They repeat the same `ENV → credentials → default`
 rule inline; do not add new ones without a comment and a `bin/check_env` allowlist entry.
+`IS_LOCAL` reaches only the four `POSTGRES_*` values below, read inline in `database.yml`;
+the other inline exceptions ignore it.
 
 | ENV | File | Rule |
 |---|---|---|
-| `POSTGRES_USERNAME` | `config/database.yml` | ENV → `postgres_username` → `postgres` |
-| `POSTGRES_PASSWORD` | `config/database.yml` | ENV → `postgres_password` → `password` |
-| `POSTGRES_HOST` | `config/database.yml` | ENV → `postgres_host` → `localhost` |
-| `POSTGRES_PORT` | `config/database.yml` | ENV → `postgres_port` → `5432` |
+| `POSTGRES_USERNAME` | `config/database.yml` | ENV → `postgres_username` → `postgres`, or `postgres` when `IS_LOCAL` |
+| `POSTGRES_PASSWORD` | `config/database.yml` | ENV → `postgres_password` → `password`, or `password` when `IS_LOCAL` |
+| `POSTGRES_HOST` | `config/database.yml` | ENV → `postgres_host` → `localhost`, or `localhost` when `IS_LOCAL` |
+| `POSTGRES_PORT` | `config/database.yml` | ENV → `postgres_port` → `5432`, or `5432` when `IS_LOCAL` |
 | `RAILS_MAX_THREADS` | `config/database.yml` (pool) | ENV → `5` |
 | `TEST_ENV_NUMBER` | `config/database.yml` (test DB suffix) | ENV only |
 | `RAILS_LOG_LEVEL` | `config/environments/production.rb` | ENV → `info` |
@@ -163,6 +191,9 @@ Secrets covered: `MEILISEARCH_API_KEY`, `CENTRIFUGO_API_KEY`, `CENTRIFUGO_TOKEN_
 The Postgres password lives in `database.yml` (inline exception) and is not covered — set
 `DATABASE_URL` or `POSTGRES_PASSWORD` in production.
 
+`IS_LOCAL=true` in production raises during initialization instead of warning: pinning every
+env-backed constant to its development default is never a valid production state.
+
 ## 5. Load order
 
 `config/initializers/*.rb` load alphabetically. `constants.rb` loads after `assets.rb` and
@@ -178,9 +209,7 @@ after initialization, so it resolves the constants. `config/database.yml` is del
    `config/initializers/constants.rb`:
 
    ```ruby
-   NEW_THING_URL = ENV["NEW_THING_URL"].presence ||
-     Rails.application.credentials.dig(:new_thing_url) ||
-     "http://localhost:1234"
+   NEW_THING_URL = resolve_env.("NEW_THING_URL", "http://localhost:1234")
    ```
 
 2. Use the constant everywhere. No `ENV` reads in app code.
@@ -188,23 +217,28 @@ after initialization, so it resolves the constants. `config/database.yml` is del
    `bin/check_env` allowlist with a comment.
 4. If it is a secret with a dev default, add it to the production warning hash.
 5. Add it to the catalog table above.
-6. Run `bin/check_env`, `bin/rubocop`, and `bundle exec parallel_rspec -n 14 spec/initializers/environment_configuration_spec.rb`.
+6. Run `bin/check_env`, `bin/rubocop`, and `IS_LOCAL=true bundle exec parallel_rspec -n 14 spec/initializers/environment_configuration_spec.rb`.
+
+`IS_LOCAL` needs no per-variable work: the resolver applies it to every declaration
+automatically.
 
 ## 7. Verification
 
 ```bash
 bin/check_env
-bundle exec parallel_rspec -n 14 spec/initializers/environment_configuration_spec.rb
+IS_LOCAL=true bundle exec parallel_rspec -n 14 spec/initializers/environment_configuration_spec.rb
 ```
 
-The spec boots Rails in a subprocess and proves ENV precedence, default fallback, integer and
-boolean coercion, catalog completeness, and that the guard passes.
+The spec boots Rails in a subprocess and proves ENV precedence, default fallback, the
+`IS_LOCAL` modes and production refusal, Postgres local pinning, integer and boolean coercion,
+catalog completeness, and that the guard passes.
 
 Manual smoke:
 
 ```bash
 bin/rails runner 'puts MEILISEARCH_HOST'                                  # default
 MEILISEARCH_HOST=http://env.test bin/rails runner 'puts MEILISEARCH_HOST' # ENV wins
+IS_LOCAL=true MEILISEARCH_HOST=http://env.test bin/rails runner 'puts MEILISEARCH_HOST' # default
 bin/rails runner 'p Rails.application.config_for("redis/shared")'         # YAML constant
 ActiveStorage::Blob.service.class                                         # S3 from storage.yml
 ```

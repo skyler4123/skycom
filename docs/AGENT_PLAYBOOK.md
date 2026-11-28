@@ -363,7 +363,7 @@ Rules:
 - Test empty states, disabled states, reordering, persistence, and invalid input.
 - Test that clearing all rows actually saves.
 - Test that hidden panel inputs still submit.
-- Run `bundle exec parallel_rspec -n 14 <paths>`; never bare `parallel_rspec` or single-process RSpec for verification.
+- Run `IS_LOCAL=true bundle exec parallel_rspec -n 14 <paths>`; never bare `parallel_rspec` or single-process RSpec for verification. Local Postgres is `localhost`; see `docs/PARALLEL_TESTS.md`.
 - Run `bin/rubocop`, `bin/check_colors --strict`, and `bin/brakeman`.
 - Run a translation coverage check for new `translate()` keys.
 - Manual smoke test: happy path, empty state, invalid input, reload persistence, and the live consumer page.
